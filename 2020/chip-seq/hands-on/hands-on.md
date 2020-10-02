@@ -752,13 +752,13 @@ and setting the title box to **FNR Anaerobic A summit +/-100bp**
 
 **Goals**: Associate ChIP-seq peaks to genomic features, draw metagenes, identify closest genes and run ontology analyses
 
-1. Create a directory named **06-PeakAnnotation**
+1. Create a directory named **07-PeakAnnotation**
 ```bash
-mkdir 06-PeakAnnotation
+mkdir 07-PeakAnnotation
 ```
 2. Go to the newly created directory
 ```bash
-cd 06-PeakAnnotation
+cd 07-PeakAnnotation
 ```
 
 ### 1-Associate peaks to closest genes
@@ -775,11 +775,16 @@ srun gunzip ../data/Escherichia_coli_K12.fasta.gz
 ```
 2. Create a file suitable for annotatePeaks.pl.
 ```bash
-awk -F "\t" '{print $0"\t+"}' ../05-PeakCalling/FNR_Anaerobic_A_peaks.bed > FNR_Anaerobic_A_peaks.bed
+srun cut -f1-5 ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed | \
+  srun awk -F "\t" '{print $0"\t+"}'  > FNR_anaerobic_idr_peaks.bed
 ```
 3. Try annotatePeaks.pl
 ```bash
-srun annotatePeaks.pl
+## First load bedtools
+module add homer/4.10
+
+## run Homer annotatePeaks
+srun annotatePeaks.pl --help
 ```
 Let's see the parameters:
 
@@ -794,20 +799,20 @@ annotatePeaks.pl peak/BEDfile genome > outputfile
 4. Annotation peaks with nearby genes with Homer
 ```bash
 srun annotatePeaks.pl \
-FNR_Anaerobic_A_peaks.bed \
-../data/Escherichia_coli_K12.fasta \
--gtf ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf \
-> FNR_Anaerobic_A_annotated_peaks.tsv
+  FNR_anaerobic_idr_peaks.bed \
+  ../data/Escherichia_coli_K12.fasta \
+  -gtf ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf \
+  > FNR_anaerobic_idr_annotated_peaks.tsv
 ```
 
-5. Run ` srun ` in an interactive mode
+5. Run sinteractive to enter an interactive mode
 ```bash
-srun --pty bash
+sinteractive
 ```
 
-6. Load a new conda environment to run R
+6. Load R in your environment
 ```bash
-source activate eba2017_spp
+module add r/4.0.2
 ```
 
 7. Add gene symbol annotation using R
@@ -819,7 +824,7 @@ R
 ## data are loaded into a data frame
 ## sep="\t": this is a tab separated file
 ## h=T: there is a line with headers (ie. column names)
-d <- read.table("FNR_Anaerobic_A_annotated_peaks.tsv", sep="\t", h=T)
+d <- read.table("FNR_anaerobic_idr_annotated_peaks.tsv", sep="\t", h=T)
 
 ## Load a 2-columns files which contains in the first column gene IDs
 ## and in the second column gene symbols
@@ -838,12 +843,12 @@ d.annot <- merge(d[,c(seq(1,6,1),8,10,11)], gene.symbol, by.x="Nearest.PromoterI
 colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
 colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
 
-## output the merged data frame to a file named "FNR_Anaerobic_A_final_peaks_annotation.tsv"
+## output the merged data frame to a file named "FNR_anaerobic_idr_final_peaks_annotation.tsv"
 ## col.names=T: output column names
 ## row.names=F: don't output row names
 ## sep="\t": table fields are separated by tabs
 ## quote=F: don't put quote around text.
-write.table(d.annot, "FNR_Anaerobic_A_final_peaks_annotation.tsv", col.names=T, row.names=F, sep="\t", quote=F)
+write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T, row.names=F, sep="\t", quote=F)
 
 ## Leave R
 quit()
@@ -866,27 +871,27 @@ exit
 9. Retrieve the list of closest genes
 
 ```bash
-tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
 ```
 
 10. Retrieve only the genes that encode for proteins
 ```bash
 # sort | uniq -c to list and count occurences of each item
-tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
 ```
 
 **How many protein-coding genes are there in the file?**
 
 ```bash
-tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
 ```
 
 **Is the number of genes in your file consistent with the previous reply?**
 
 ```bash
-tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
-tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' \
-> FNR_Anaerobic_A_final_peaks_annotation_officialGeneSymbols.tsv
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' \
+> FNR_anaerobic_idr_final_peaks_annotation_officialGeneSymbols.tsv
 ```
 
 11. Compress back the annotation file
@@ -895,23 +900,23 @@ tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-
 srun gzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
 ```
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2017_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2020_chipseq)
 ```bash
-## If you are in 06-PeakAnnotation
+## If you are in 07-PeakAnnotation
 cd ..
 ```
 
 ### 2- Search for Biological Processes, Molecular Functions or Cellular Compartments enrichment
 This gene list can then be used with Gene Ontology search tools such as Database for Annotation, Visualization and Integrated Discovery  (DAVID) or Ingenuity Pathway Analysis (IPA).
 
-Input your gene list (filename :  FNR_Anaerobic_A_final_peaks_annotation_officialGeneSymbols.tsv) on the DAVID website: https://david.ncifcrf.gov/
+Input your gene list (filename :  FNR_anaerobic_idr_final_peaks_annotation_officialGeneSymbols.tsv) on the DAVID website: https://david.ncifcrf.gov/
 
 **Are there biological processes enriched in the list of genes associated to the peaks?**
 
 **Are these genes enriched in some KEGG map?**
 
 
-## Annotation of ChIP-peaks using R tools <a name="peakr"></a>
+## Bonus: Annotation of ChIP-peaks using R tools <a name="peakr"></a>
 
 In this part, we will use a different set of peaks obtained using a peak caller from a set of p300 ChIP-seq experiments in different mouse embryonic tissues (midbrain, forebrain and limb).
 
