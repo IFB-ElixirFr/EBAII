@@ -928,8 +928,8 @@ From now on, we will work locally on your personal machine.
 Create a new folder and go in it.
 ```bash
 cd /shared/projects/<your_project>/EBA2020_chipseq
-mkdir 07-PeakAnnotation
-cd 07-PeakAnnotation
+mkdir 07-PeakAnnotation-bonus
+cd 07-PeakAnnotation-bonus
 ```
 1. Search for the dataset **GSE13845** either using Google or from the front page of [GEO](https://www.ncbi.nlm.nih.gov/geo/)
 2. On the description page, find the three GSM files, and click on each of then
@@ -969,7 +969,7 @@ col = brewer.pal(9,'Set1')
 
 ```r
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBA2020_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/<your_project>/EBA2020_chipseq/07-PeakAnnotation-bonus")
 
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
