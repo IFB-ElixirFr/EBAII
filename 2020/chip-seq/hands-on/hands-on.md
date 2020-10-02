@@ -1,4 +1,4 @@
-# ChIP-seq Hands-on Roscoff 2019
+# ChIP-seq Hands-on Roscoff 2020
 
 
 1. [Introduction](#introduction)  
@@ -87,21 +87,21 @@ cd /shared/projects/<your_project>
 ```
 2. Create a directory that will contain all results of the upcoming analyses.
 ```bash
-mkdir EBA2019_chipseq
+mkdir EBA2020_chipseq
 ```
 3. Go to the newly created directory
 ```bash
-cd EBA2019_chipseq
+cd EBA2020_chipseq
 ```
 4. Copy the directory containing data
 
 ```bash
-srun cp -r /shared/home/sflochlay/ebai2019/atelier_chip/data/ .
+srun cp -r /shared/projects/ebaii2020/atelier_chipseq/data .
 ```
 
 7. Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 ```
@@ -129,7 +129,7 @@ cd 01-QualityControl
 
 Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 │   
@@ -137,7 +137,7 @@ Your directory structure should be like this
 ```
 3. Get FastQC available in your environment
 ```bash
-module add fastqc/0.11.8
+module add fastqc/0.11.9
 ```
 4. Check the help page of the program to see its usage and parameters.
 
@@ -158,14 +158,14 @@ ls
 7. Download the HTML file SRR576933_fastqc.html on your local machine (either with ssh or the program you used to upload your data on the server). Using a bash command it would look like this.
 ```bash
 ### OPEN A NEW TERMINAL
-## Create a directory where to put generated files on your computer
-mkdir ~/Desktop/EBA2019_chipseq
+## Create a directory where to put generated files ON YOUR COMPUTER
+mkdir ~/Desktop/EBA2020_chipseq
 
 ## Go to the location on your computer, where you want to put the data, for example:
-cd ~/Desktop/EBA2019_chipseq
+cd ~/Desktop/EBA2020_chipseq
 
 ## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2019_chipseq/01-QualityControl/SRR576933_fastqc.html .
+scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2020_chipseq/01-QualityControl/SRR576933_fastqc.html .
 # Enter your password
 ```
 8. On your machine, open this file with your favourite web browser.  
@@ -179,7 +179,7 @@ Are there any concerns raised by the report ? If so, can you tell where the prob
 
 10. Once you are done with FastQC, unload it
 ```bash
-module rm fastqc/0.11.8
+module rm fastqc/0.11.9
 ```
 
 <!-- ### 2 - Organism length
@@ -203,7 +203,7 @@ There are multiple programs to perform the mapping step. For reads produced by a
 ### 2 - Bowtie
 1. Load Bowtie
 ```bash
-module add bowtie/1.2.2
+module add bowtie/1.2.3
 ```
 2. Try out bowtie
 ```bash
@@ -261,7 +261,7 @@ cd IP/repA
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 │   
@@ -295,7 +295,7 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
   * -b: output BAM
 ```bash
 ## First load samtools
-module add samtools/1.9
+module add samtools/1.10
 ## Then run samtools
 srun samtools sort SRR576933.sam | srun samtools view -b > SRR576933.bam
 ```
@@ -315,7 +315,7 @@ Open the file SRR576933.out (for example using the ` less ` command), which cont
 
 7. Once it's done, unload the tools you used
 ```bash
-module rm samtools/1.9 bowtie/1.2.2
+module rm samtools/1.10 bowtie/1.2.3
 ```
 
 ### 5 - Map the second replicate and the control
@@ -329,7 +329,7 @@ Open the file SRR576938.out. How many reads were mapped?**
 
 1. Go to the directory with alignment file of the first replicate, repA (IP)
 ```bash
-cd /shared/projects/<your_project>/EBA2019_chipseq/02-Mapping/IP/repA
+cd /shared/projects/<your_project>/EBA2020_chipseq/02-Mapping/IP/repA
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -339,7 +339,7 @@ cd /shared/projects/<your_project>/EBA2019_chipseq/02-Mapping/IP/repA
   * VALIDATION_STRINGENCY: Validation stringency for all SAM files read by picard.
 ```bash
 ## Load picard
-module add picard/2.18.9
+module add picard/2.22.0
 ## Run picard
 srun picard MarkDuplicates \
 CREATE_INDEX=true \
@@ -348,20 +348,26 @@ OUTPUT=Marked_SRR576933.bam \
 METRICS_FILE=metrics \
 VALIDATION_STRINGENCY=STRICT
 ```
+srun picard MarkDuplicates \
+CREATE_INDEX=true \
+INPUT=SRR576938.bam \
+OUTPUT=Marked_SRR576938.bam \
+METRICS_FILE=metrics \
+VALIDATION_STRINGENCY=STRICT
 
 To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
 
 ```bash
 ## Add samtools to your environment
-module add samtools/1.9
+module add samtools/1.10
 ## run samtools
 srun samtools flagstat Marked_SRR576933.bam
 ```
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBA2019_chipseq/)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq/)
 ```bash
 ## Unload picard and samtools
-module rm samtools/1.9 picard/2.18.9
+module rm samtools/1.10 picard/2.22.0
 ## If you are in 02-Mapping/IP/repA
 cd ../../..
 ```
@@ -386,27 +392,27 @@ cd 03-ChIPQualityControls
 ## Load deeptools in your environment
 module add deeptools/3.2.0
 ## Run deeptools fingerprint
-srun plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/IP/repA/SRR576933.bam ../02-Mapping/IP/repB/SRR576934.bam ../02-Mapping/Control/SRR576938.bam -plot fingerprint_50000.png
+srun plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/IP/repA/SRR576933.bam ../02-Mapping/IP/repB/SRR576934.bam ../02-Mapping/Control/SRR576938.bam -plot fingerprint_10000.png
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```bash
-cp /shared/home/sflochlay/ebai2019/atelier_chip/03-ChIPQualityControls/fingerprint.png .
+cp /shared/projects/ebaii2020/atelier_chipseq/03-ChIPQualityControls/fingerprint.png .
 ```
 5. Download the file fingerprint.png on your local machine (either with ` scp ` or Cyberduck). Using ` scp ` it would look like this.
 ```bash
 ### OPEN A NEW TERMINAL
 ## Go to the location on your computer, where you want to put the data
-cd ~/Desktop/EBA2019_chipseq
+cd ~/Desktop/EBA2020_chipseq
 
 ## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2019_chipseq/03-ChIPQualityControls/fingerprint.png .
+scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2020_chipseq/03-ChIPQualityControls/fingerprint.png .
 # Enter your password
 ```
 
 **Look at the result files fingerprint.png. What do you think of it?**  
 
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2019_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2020_chipseq)
 ```bash
 ## Unload deepTools
 module rm deeptools/3.2.0
@@ -465,7 +471,7 @@ cd 04-Visualization
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 │   
@@ -497,6 +503,7 @@ srun --mem=3G bamCoverage --bam ../02-Mapping/IP/repA/Marked_SRR576933.bam \
 --outFileName SRR576933_nodup.bw --outFileFormat bigwig --effectiveGenomeSize 4639675 \
 --normalizeUsing RPGC --skipNonCoveredRegions --extendReads 200 --ignoreDuplicates
 ```
+
 5. Do it for the replicate and the control (be careful for the control you will need **5G** of memory to process the file).
 6. Download the three bigwig files you have just generated
   * 04-Visualization/SRR576933_nodup.bw
@@ -511,7 +518,7 @@ srun --mem=3G bamCoverage --bam ../02-Mapping/IP/repA/Marked_SRR576933.bam \
 **Go back to the genes we looked at earlier: pepT, ycfP. Look at the shape of the signal.**  
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBA2019_chipseq)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq)
 ```bash
 ## If you are in 04-Visualization
 cd ..
@@ -537,7 +544,7 @@ cd 05-PeakCalling/repA
 3. Try out MACS2
 ```bash
 ## Load macs2 in your environment
-module add macs2/2.1.1.20160309
+module add macs2/2.2.7.1
 srun macs2 callpeak
 ```
 This prints the help of the program.
@@ -570,8 +577,8 @@ mkdir pool
 cd pool
 
 # Run macs2 for pooled replicates
-srun macs2 callpeak -t ../../../02-Mapping/IP/repA/SRR576933.bam ../../../02-Mapping/IP/repB/SRR576934.bam \
--c ../../../02-Mapping/Control/SRR576938.bam --format BAM \
+srun macs2 callpeak -t ../../02-Mapping/IP/repA/SRR576933.bam ../../02-Mapping/IP/repB/SRR576934.bam \
+-c ../../02-Mapping/Control/SRR576938.bam --format BAM \
 --gsize 4639675 --name 'FNR_Anaerobic_pool' --bw 400 \
 --fix-bimodal -p 1e-2 &> MACS.out
 ```
@@ -585,15 +592,15 @@ srun macs2 callpeak -t ../../../02-Mapping/IP/repA/SRR576933.bam ../../../02-Map
 ### 4 - Combine replicate together (IDR)
 In order to take advantage of having biological replicates, we will create a combine set of peaks based on the reproducibility of each individual replicate peak calling. We will use the **Irreproducible Discovery Rate** (IDR) algorithm.
 
-1. Create a new directory to store the combined peak coordinates
+1. Create a new directory to store the peak coordinates resulting after idr analysis
 ```
 ## If you are in 05-PeakCalling
-mkdir combined
-cd combined
+mkdir idr
+cd idr
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 │   
@@ -614,7 +621,7 @@ Your directory structure should be like this:
 |    └───repA
 |    └───repB
 |    └───pool
-|    └───combined <- you should be in this folder
+|    └───idr <- you should be in this folder
 ```
 
 2. Load the module idr and have a look at its parameters
@@ -626,23 +633,23 @@ srun idr --help
 * --samples : peak files of each individual replicate
 * --peak-list : the peak file of the pooled replicates, it will be used as a master peak set to compare with the regions from each replicates
 * --input-file-type : format of the peak file, in our case it's narrowPeak
-* --output-file : name of the resulting combined peak file
+* --output-file : name of the result file
 * --plot : plot additional diagnosis plot
 
 3. Run idr
 ```bash
 srun idr --samples ../repA/FNR_Anaerobic_A_peaks.narrowPeak ../repB/FNR_Anaerobic_B_peaks.narrowPeak \
 --peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak
---input-file-type narrowPeak --output-file FNR_anaerobic_combined_peaks.bed \
+--input-file-type narrowPeak --output-file FNR_anaerobic_idr_peaks.bed \
 --plot
 ```
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBA2019_chipseq)
+4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq)
 ```bash
 module rm macs2/2.1.1.20160309
 module rm idr/2.0.4.2
 
-## If you are in 05-PeakCalling/combined
+## If you are in 05-PeakCalling/idr
 cd ../..
 ```
 
@@ -651,7 +658,7 @@ cd ../..
 1. Download the following BED files from the server into your computer to visualise in IGV :
 * 05-PeakCalling/repA/FNR_Anaerobic_A_peaks.bed
 * 05-PeakCalling/repB/FNR_Anaerobic_B_peaks.bed
-* 05-PeakCalling/combined/FNR_anaerobic_combined_peaks.bed
+* 05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed
 
 **Go back again to the genes we looked at earlier: pepT, ycfP. Do you see peaks?**
 
@@ -673,7 +680,7 @@ cd 06-MotifAnalysis
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2019_chipseq
+/shared/projects/<your_project>/EBA2020_chipseq
 │
 └───data
 │   
@@ -698,24 +705,24 @@ Your directory structure should be like this:
 3. Extract peak sequence in fasta format
 ```bash
 ## First load samtools
-module add samtools/1.9
+module add samtools/1.10
 ## Create an index of the genome fasta file
 srun samtools faidx ../data/Escherichia_coli_K12.fasta
 
 ## First load bedtools
-module add bedtools/2.27.1
+module add bedtools/2.29.2
 ## Extract fasta sequence from genomic coordinate of peaks
 srun bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
--bed ../05-PeakCalling/combined/FNR_anaerobic_combined_peaks.bed -fo FNR_anaerobic_combined_peaks.fa
+-bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed -fo FNR_anaerobic_idr_peaks.fa
 ```
-4. Download the file FNR_anaerobic_combined_peaks.fa on your computer
+4. Download the file FNR_anaerobic_idr_peaks.fa on your computer
 
 ### 2 - Motif discovery with RSAT
 1. Open a connection to a Regulatory Sequence Analysis Tools server. You can choose between various website mirrors.
   * Teaching Server  (recommended for this training) [http://pedagogix-tagc.univ-mrs.fr/rsat/](http://pedagogix-tagc.univ-mrs.fr/rsat/)
 2. In the left menu, click on **NGS ChIP-seq** and then click on **peak-motifs**. A new page opens, with a form
 3. The default peak-motifs web form only displays the essential options. There are only two mandatory parameters.
-  * The **title box**, which you will set as **FNR Anaerobic** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **FNR_anaerobic_combined_peaks.fa** from your computer.
+  * The **title box**, which you will set as **FNR Anaerobic** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **FNR_anaerobic_idr_peaks.fa** from your computer.
 4. We will now modify some of the advanced options in order to fine-tune the analysis according to your data set.
   * Open the "Reduce peak sequences" title, and make sure the **Cut peak sequences: +/- ** option is set to **0** (we wish to analyze our full dataset)
   * Open the “Motif Discovery parameters” title, and check the **oligomer sizes 6 and 7** (but not 8). Check "Discover over-represented spaced word pairs **[dyad-analysis]**"
@@ -752,7 +759,7 @@ From now on, we will work locally on your personal machine.
 0. We will download the already called peak files in bed format from GEO.
 Create a new folder and go in it.
 ```bash
-cd /shared/projects/<your_project>/EBA2019_chipseq
+cd /shared/projects/<your_project>/EBA2020_chipseq
 mkdir 07-PeakAnnotation
 cd 07-PeakAnnotation
 ```
@@ -794,7 +801,7 @@ col = brewer.pal(9,'Set1')
 
 ```r
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBA2019_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/<your_project>/EBA2020_chipseq/07-PeakAnnotation")
 
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
@@ -973,5 +980,5 @@ Ramírez, F., Ryan, D.P., Grüning, B., Bhardwaj, V., Kilpert, F., Richter, A.S.
 Download mapping results already generated (as it takes a while to download)
 ```bash
 cd <some directory you want on your computer>
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebai2019/atelier_chip/EBA2019_chipseq/02-Mapping/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebai2020/atelier_chip/EBA2020_chipseq/02-Mapping/*bam* .
 ```
