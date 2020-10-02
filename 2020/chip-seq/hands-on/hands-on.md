@@ -11,10 +11,11 @@
 8. [Visualizing the data in a genome browser](#visualize)
 9. [Peak calling with MACS](#macs)
 10. [Motif analysis](#motif)
-11. [Peak annotation using R](#peakr)
-12. [FAQ](#faq)
-13. [References](#ref)
-14. [During Tuesday lunch break](#lunch)
+11. [Peak annotation](#annotation)
+12. [Bonus: Peak annotation using R](#peakr)
+13. [FAQ](#faq)
+14. [References](#ref)
+15. [During Tuesday lunch break](#lunch)
 
 
 ## Introduction <a name="introduction"></a>
@@ -639,7 +640,7 @@ srun idr --help
 3. Run idr
 ```bash
 srun idr --samples ../repA/FNR_Anaerobic_A_peaks.narrowPeak ../repB/FNR_Anaerobic_B_peaks.narrowPeak \
---peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak
+--peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
 --input-file-type narrowPeak --output-file FNR_anaerobic_idr_peaks.bed \
 --plot
 ```
@@ -734,7 +735,7 @@ srun bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 ### 3 - OPTIONAL : Motif discovery with RSAT (short peaks)
 1. Restrict the dataset to the summit of the peaks +/- 100bp using bedtools slop. Using bedtools slop to extend genomic coordinates allow not to go beyond chromosome boundaries as the user give the size of chromosomes as input (see fai file).
 ```bash
-srun bedtools slop -b 100 -i ../05-PeakCalling/FNR_Anaerobic_A_summits.bed -g ../data/Escherichia_coli_K12.fasta.fai > FNR_Anaerobic_A_summits+-100.bed
+srun bedtools slop -b 100 -i ../05-PeakCalling/repA/FNR_Anaerobic_A_summits.bed -g ../data/Escherichia_coli_K12.fasta.fai > FNR_Anaerobic_A_summits+-100.bed
 ```
 2. Extract the sequences for this BED file
 ```bash
@@ -746,6 +747,168 @@ srun gzip ../data/Escherichia_coli_K12.fasta
 ```
 3. Run RSAT peak-motifs with the same options, but choosing as input file this new dataset (FNR_Anaerobic_A_summits+-100.fa)
 and setting the title box to **FNR Anaerobic A summit +/-100bp**
+
+## Peak annotation <a name="annotation"></a>
+
+**Goals**: Associate ChIP-seq peaks to genomic features, draw metagenes, identify closest genes and run ontology analyses
+
+1. Create a directory named **06-PeakAnnotation**
+```bash
+mkdir 06-PeakAnnotation
+```
+2. Go to the newly created directory
+```bash
+cd 06-PeakAnnotation
+```
+
+### 1-Associate peaks to closest genes
+
+[annotatePeaks.pl](http://homer.ucsd.edu/homer/ngs/annotation.html) from the Homer suite associates peaks with nearby genes.
+
+1. We will need the annotation file data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz and the genome file data/Escherichia_coli_K12.fasta.gz. First start by uncompress the files
+```bash
+## Uncompress annotation file
+srun gunzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz
+
+## Uncompress genome file
+srun gunzip ../data/Escherichia_coli_K12.fasta.gz
+```
+2. Create a file suitable for annotatePeaks.pl.
+```bash
+awk -F "\t" '{print $0"\t+"}' ../05-PeakCalling/FNR_Anaerobic_A_peaks.bed > FNR_Anaerobic_A_peaks.bed
+```
+3. Try annotatePeaks.pl
+```bash
+srun annotatePeaks.pl
+```
+Let's see the parameters:
+
+annotatePeaks.pl peak/BEDfile genome > outputfile
+	User defined annotation files (default is UCSC refGene annotation):
+		annotatePeaks.pl accepts GTF (gene transfer formatted) files to annotate positions relative
+		to custom annotations, such as those from de novo transcript discovery or Gencode.
+
+		-gtf <gtf format file> (Use -gff and -gff3 if appropriate, but GTF is better)
+
+
+4. Annotation peaks with nearby genes with Homer
+```bash
+srun annotatePeaks.pl \
+FNR_Anaerobic_A_peaks.bed \
+../data/Escherichia_coli_K12.fasta \
+-gtf ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf \
+> FNR_Anaerobic_A_annotated_peaks.tsv
+```
+
+5. Run ` srun ` in an interactive mode
+```bash
+srun --pty bash
+```
+
+6. Load a new conda environment to run R
+```bash
+source activate eba2017_spp
+```
+
+7. Add gene symbol annotation using R
+```R
+## Launch R
+R
+
+## read the file with peaks annotated with homer
+## data are loaded into a data frame
+## sep="\t": this is a tab separated file
+## h=T: there is a line with headers (ie. column names)
+d <- read.table("FNR_Anaerobic_A_annotated_peaks.tsv", sep="\t", h=T)
+
+## Load a 2-columns files which contains in the first column gene IDs
+## and in the second column gene symbols
+## data are loaded into a data frame
+## h=F: there is no header line
+gene.symbol <- read.table("../data/Escherichia_coli_K_12_MG1655.annotation.tsv.gz", h=F)
+
+## Merge the 2 data frames based on a common field
+## by.x gives the columns name in which the common field is for the d data frame
+## by.y gives the columns name in which the common field is for the gene.symbol data frame
+## d contains several columns with no information. We select only interesting columns
+## -> d[,c(seq(1,6,1),8,10,11)]
+d.annot <- merge(d[,c(seq(1,6,1),8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
+
+## Change column names of the resulting data frame
+colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
+colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
+
+## output the merged data frame to a file named "FNR_Anaerobic_A_final_peaks_annotation.tsv"
+## col.names=T: output column names
+## row.names=F: don't output row names
+## sep="\t": table fields are separated by tabs
+## quote=F: don't put quote around text.
+write.table(d.annot, "FNR_Anaerobic_A_final_peaks_annotation.tsv", col.names=T, row.names=F, sep="\t", quote=F)
+
+## Leave R
+quit()
+
+## Do not save the environment
+n
+```
+
+**What information is listed in each column of the file?**
+
+**In which column number is the official gene symbol of the nearest gene?**
+
+**What are all the possible gene types?**
+
+8. Exit the node you're connected to and go back to the master non-model
+```bash
+exit
+```
+
+9. Retrieve the list of closest genes
+
+```bash
+tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{print $11}'
+```
+
+10. Retrieve only the genes that encode for proteins
+```bash
+# sort | uniq -c to list and count occurences of each item
+tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
+```
+
+**How many protein-coding genes are there in the file?**
+
+```bash
+tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
+```
+
+**Is the number of genes in your file consistent with the previous reply?**
+
+```bash
+tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
+tail -n +2 FNR_Anaerobic_A_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' \
+> FNR_Anaerobic_A_final_peaks_annotation_officialGeneSymbols.tsv
+```
+
+11. Compress back the annotation file
+```bash
+## Compress annotation file
+srun gzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
+```
+
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2017_chipseq)
+```bash
+## If you are in 06-PeakAnnotation
+cd ..
+```
+
+### 2- Search for Biological Processes, Molecular Functions or Cellular Compartments enrichment
+This gene list can then be used with Gene Ontology search tools such as Database for Annotation, Visualization and Integrated Discovery  (DAVID) or Ingenuity Pathway Analysis (IPA).
+
+Input your gene list (filename :  FNR_Anaerobic_A_final_peaks_annotation_officialGeneSymbols.tsv) on the DAVID website: https://david.ncifcrf.gov/
+
+**Are there biological processes enriched in the list of genes associated to the peaks?**
+
+**Are these genes enriched in some KEGG map?**
 
 
 ## Annotation of ChIP-peaks using R tools <a name="peakr"></a>
