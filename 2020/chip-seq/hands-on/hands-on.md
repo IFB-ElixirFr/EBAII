@@ -1143,5 +1143,6 @@ Ramírez, F., Ryan, D.P., Grüning, B., Bhardwaj, V., Kilpert, F., Richter, A.S.
 Download mapping results already generated (as it takes a while to download)
 ```bash
 cd <some directory you want on your computer>
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebai2020/atelier_chip/EBA2020_chipseq/02-Mapping/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebaii2020/atelier_chipseq/02-Mapping/*/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebaii2020/atelier_chipseq/02-Mapping/*/*/*bam* .
 ```
