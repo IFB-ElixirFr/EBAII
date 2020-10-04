@@ -16,16 +16,23 @@
 
 ## Supports de cours
 
+### Lundi 5 octobre
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
 | Introduction à l'EBAII 2020 |  |  |
-| Eléments de Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Intro Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Arborescence Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Exposé d'ouverture: single-cell | Bastien Job | |
 | Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard | [html](IGV/IGV.html) |
 
 
 ### RNA-seq
 
 - [Program](RNA-seq/)
+
+
 
 *****
