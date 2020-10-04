@@ -9,7 +9,7 @@
 ## Links
 
 - Github repo: <https://github.com/IFB-ElixirFr/EBAII/2020/>
-- Web pages: 
+- Web pages: <https://ifb-elixirfr.github.io/EBAII/2020/>
 
 
 ****
