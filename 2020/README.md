@@ -20,7 +20,8 @@
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
 | Introduction à l'EBAII 2020 |  |  |
-| Eléments de Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | |
+| Eléments de Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
+| Preprocessing and mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard | [html](IGV/IGV.html) |
 
 
