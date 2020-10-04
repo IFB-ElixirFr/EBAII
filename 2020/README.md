@@ -24,4 +24,8 @@
 | Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard | [html](IGV/IGV.html) |
 
 
+### RNA-seq
+
+- [Program](RNA-seq/)
+
 *****
