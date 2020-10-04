@@ -3,13 +3,15 @@
 
 usage:
 	@echo "Targets"
-	@echo "Web    open the github pages for the Web site"
+	@echo "web    open the github pages for the Web site"
 	@echo "repo   open the github repository to access the code"
 
-WEB_URL=
+WEB_URL=https://ifb-elixirfr.github.io/EBAII/2020/
 web:
-	@echo "Web site: ${WEB_URL}"
+	@echo "Web site"
+	@echo "	${WEB_URL}"
 
 REPO=https://github.com/IFB-ElixirFr
 repo:
-	@echo "Github repo: ${REPO}"
+	@echo "Github repo"
+	@echo "	${REPO}"
