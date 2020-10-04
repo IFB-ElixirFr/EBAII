@@ -20,7 +20,7 @@
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
+| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Exposé d'ouverture: single-cell | Bastien Job | |
