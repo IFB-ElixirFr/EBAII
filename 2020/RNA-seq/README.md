@@ -1,4 +1,4 @@
-## EBAI 2019 - RNA-seq course
+## EBAI 2020 - RNA-seq course
 
 ### Hands-on
 
