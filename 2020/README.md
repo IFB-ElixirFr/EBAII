@@ -58,9 +58,9 @@ From there, you can also find a link to download the whole repository with `git`
 |  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) |
 | Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) |
 | Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf)|
-| Variants structuraux | Olivier Quenez | [pdf](5-Variants-Structuraux.pdf)|
+| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf)|
+| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf) |
 
 ### ChIP-seq
 
