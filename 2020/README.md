@@ -16,21 +16,69 @@
 
 ## Supports de cours
 
-### Lundi 5 octobre
+### Linux
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
 | Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
-| Exposé d'ouverture: single-cell | Bastien Job | |
+
+### Exposés d'ouverture
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Single-cell | Bastien Job | |
+| Long reads | Claude Thermes | |
+
+### Visualisation
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
 | Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard | [html](IGV/IGV.html) |
 
 
 ### RNA-seq
 
-- [Program](RNA-seq/)
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Programme de l'atelier RNA-seq | |  [Program](RNA-seq/) |
+| Bioindormatics | Rachel Legendre | |
+| General statistics | Hugo Varet | |
+| Practice SARTools | Rachel Legendre, Hugo Varet |
+| Gene set analysis | Thibault Dayris | |
+| De novo assembly | | | 
+
+### Variants
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Programme de l'atelier Variant | | Bientôt sur vos écrans |
+| Introduction et Processing Post-Alignement  | Maria Bernard, Olivier Rué | |
+| Variant calling | Nadia Bessoltane | |
+| Filtrage et annotation | Olivier Rué | |
+| Variants structuraux | Olivier Quenez | |
+| Workflow et conclusion | Maria Bernard | |
+| Applications sous R | Maria Bernard | |
+
+### ChIP-seq
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Programme de l'atelier ChIP-seq | |  [Program](chip-seq/) |
+| Design expérimental, qualité | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Read mapping | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Normalisation | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Peak-calling | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Analyse des motifs | Elodie Darbo, Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Annotation des pics | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
 
 
+### Croisement et intégration des données
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | |
+| Intégration de données | Laura Cantini | |
 
 *****
