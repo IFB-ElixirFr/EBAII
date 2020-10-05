@@ -45,8 +45,8 @@ From there, you can also find a link to download the whole repository with `git`
 | Programme de l'atelier RNA-seq | |  [Program](RNA-seq/) |
 | Bioinformatics | Rachel Legendre | [pdf](RNA-seq/EBAI2020_RNAseq.pdf)  |
 | General statistics | Hugo Varet | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
-| Practice SARTools | Rachel Legendre, Hugo Varet |
-| Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) |
+| Practice SARTools | Hugo Varet | [TP](RNA-seq/TP_differential_analysis/) |
+| Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) [TP](RNA-seq/GSEA/)|
 | De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2020_red.pdf)  |
 
 ### Variants
