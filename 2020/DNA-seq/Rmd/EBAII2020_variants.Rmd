@@ -1,0 +1,782 @@
+---
+title: "EBAII 2020 Atelier variants - Résumé"
+author: "Elodie Girard - Maria Bernard"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    code_folding: show
+    highlight : zenburn
+    fig_caption: yes
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+  beamer_presentation:
+    colortheme: dolphin
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    fonttheme: structurebold
+    highlight: tango
+    incremental: no
+    keep_tex: no
+    slide_level: 2
+    theme: Montpellier
+    toc: yes
+  ioslides_presentation:
+    colortheme: dolphin
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    fonttheme: structurebold
+    highlight: tango
+    incremental: no
+    keep_md: no
+    smaller: yes
+    theme: cerulean
+    toc: yes
+    widescreen: yes
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    latex_engine: xelatex
+    toc: yes
+  slidy_presentation:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 7
+    highlight: tango
+    incremental: no
+    keep_md: no
+    smaller: yes
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+    widescreen: yes
+  word_document:
+    toc: yes
+    toc_depth: 3
+subtitle: "Ecole de Bioinformatique AVIESAN-IFB-INSERM, 5 au 10 octobre 2020, Roscoff"
+---
+
+```{r setup, include = FALSE}
+
+library(knitr)
+## Default parameters for displaying the slides
+knitr::opts_knit$set(
+  echo = TRUE, 
+  eval=TRUE, 
+  fig.width = 7, 
+  fig.height = 5, 
+  fig.align = "center", 
+  fig.path = "figures/",
+  size = "tiny", 
+  warning = FALSE, 
+  results = TRUE, 
+  message = FALSE, 
+  # root.dir = dir.tuto,
+  comment = "")
+
+require(tidyverse)
+
+```
+
+# Connexion au cluster de l'IFB
+
+[Vidéo] : [The 5 minutes IFB Core Cluster tutorial](https://asciinema.org/a/zZrSazw5Fh7YmpHvUfvVQnzNi)
+
+```{bash connexion, eval=FALSE}
+# Connexion au cluster 
+
+ssh -XY login@core.cluster.france-bioinformatique.fr
+
+```
+
+# Sequence preprocessing et alignement 
+
+## Copie des données brutes
+
+```{bash intro,eval=FALSE}
+# Listing des élements du répertoire 
+
+ls -lh /shared/projects/ebaii2020/atelier_variant/data/variants/*
+
+```
+
+
+```{r, eval=TRUE ,out.width="409px", echo=FALSE}
+knitr::include_graphics("tree_variant_data.png",dpi=300)
+```
+
+
+```{bash intro2,eval=FALSE}
+# Copie récursive du répertoire contenant les données de la partie "variants" dans votre home
+
+mkdir -p ~/tp_variant
+
+cp -r /shared/projects/ebaii2020/atelier_variant/data/variants/* ~/tp_variant
+
+# Déplacement dans le nouveau dossier créé
+
+cd ~/tp_variant
+
+```
+
+## Etapes optionnelles 
+
+### Contrôle qualité avec FASTQC 
+
+```{bash fastqc, eval=FALSE}
+mkdir -p optional
+cd optional
+
+module load fastqc/0.11.9
+
+mkdir -p Fastqc logs/fastQC
+
+sbatch -J FastQC_SRR1262731_R1 -o logs/fastQC/%x.out -e logs/fastQC/%x.err --cpus-per-task=2 --wrap=" \
+fastqc --threads 2 --outdir Fastqc ../fastq/SRR1262731_extract_R1.fq.gz"
+sbatch -J FastQC_SRR1262731_R2 -o logs/fastQC/%x.out -e logs/fastQC/%x.err --cpus-per-task=2 --wrap=" \
+fastqc --threads 2 --outdir Fastqc ../fastq/SRR1262731_extract_R2.fq.gz"
+```
+
+### Retrait des séquences de mauvaise qualité avec Cutadapt 
+
+Cet outil peut également servir au retrait des primers/adaptateurs : https://cutadapt.readthedocs.io/en/stable/guide.html
+
+```{bash cutadapt, eval=FALSE}
+module load cutadapt/2.10
+
+mkdir -p Cutadapt logs/Cutadapt
+
+sbatch -J Cutadapt_SRR1262731 -o logs/Cutadapt/%x.out -e logs/Cutadapt/%x.err --cpus-per-task=2 --wrap=" \
+cutadapt --cores 2 --trim-n --max-n 0.3 --error-rate 0.1 -q 30,30 --minimum-length 50 --pair-filter both \
+ --paired-output Cutadapt/SRR1262731_extract_R2.trimmed.fq \
+ --output Cutadapt/SRR1262731_extract_R1.trimmed.fq \
+ ../fastq/SRR1262731_extract_R1.fq.gz \
+ ../fastq/SRR1262731_extract_R2.fq.gz \
+ > Cutadapt/SRR1262731_extract_trimming_stats.txt"
+ 
+```
+
+## Alignement avec BWA 
+
+```{bash bwa1, eval=FALSE}
+# Indexation du genome de reference avec bwa et creation des index .fai et .dict
+
+module load bwa/0.7.17 ; module load samtools/1.10 ; module load gatk4/4.1.7.0
+
+mkdir -p logs/genomeIndexing
+
+sbatch -J BWA_index -o logs/genomeIndexing/%x.out -e logs/genomeIndexing/%x.err --wrap="bwa index ../genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa"
+
+sbatch -J samtools_index -o logs/genomeIndexing/%x.out -e logs/genomeIndexing/%x.err --wrap="samtools faidx ../genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa"
+
+sbatch -J GATK_index -o logs/genomeIndexing/%x.out -e logs/genomeIndexing/%x.err --wrap=" \
+gatk CreateSequenceDictionary --REFERENCE ../genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa --OUTPUT ../genome/Bos_taurus.UMD3.1.dna.toplevel.6.dict"
+
+# Alignement des données initiales (peut se faire sur les données trimmées de cutadapt)
+# L'ajout des read group peut se faire en même temps que BWA
+
+mkdir -p alignment_bwa logs/alignment_bwa
+
+sbatch -J SRR1262731_mapping -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --cpus-per-task=4 --mem=16G --wrap=" \
+bwa mem -t 4 -R \"@RG\tID:1\tPL:Illumina\tPU:PU\tLB:LB\tSM:SRR1262731\" \
+../genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa ../fastq/SRR1262731_extract_R1.fq.gz ../fastq/SRR1262731_extract_R2.fq.gz \
+| samtools view -Sh - -bo alignment_bwa/SRR1262731_extract.bam"
+
+samtools view -h alignment_bwa/SRR1262731_extract.sam | less -S
+
+# Conversion du sam en bam trié
+
+sbatch -J SRR1262731_mappingSort -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --cpus-per-task=4 --mem=16G --wrap=" \
+samtools sort -@ 4 --write-index -o alignment_bwa/SRR1262731_extract.sort.bam alignment_bwa/SRR1262731_extract.bam "
+
+# statistique d'alignement
+samtools flagstat  alignment_bwa/SRR1262731_extract.sort.bam >  alignment_bwa/SRR1262731.flagstat.txt
+
+cat alignment_bwa/SRR1262731.flagstat.txt
+```
+
+```{bash, eval =TRUE, echo=FALSE}
+cat alignment_bwa/SRR1262731.flagstat.txt
+```
+
+```{bash bwa2, eval=FALSE}
+
+# suppression du fichier d'alignement intermédiaire (on ne conserve que la version triée)
+rm  alignment_bwa/SRR1262731_extract.bam
+
+# Contrôle qualité des données alignées avec qualimap
+
+module load qualimap/2.2.2b
+
+sbatch -J SRR1262731_mappingQC -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --cpus-per-task=4 --mem=6G --wrap=" \
+unset DISPLAY; qualimap bamqc -nt 4 -outdir alignment_bwa/SRR1262731_extract_qualimap_report --java-mem-size=4G -bam alignment_bwa/SRR1262731_extract.sort.bam"
+
+```
+
+# InteRlude R N° 1
+
+Vous devez être placé dans votre dossier tp_variant.
+Quelle est la distribution des qualités de mapping (MAPQ) ? Et quel pourcentage de reads ont une MAPQ >=30 ?
+
+```{bash R1,eval=FALSE}
+## Extraction des qualités de mapping stockées dans la colonne n° 5 
+
+samtools view alignment_bwa/SRR1262731_extract.sort.bam | cut -f 5 > alignment_bwa/SRR1262731_extract.sort.mapping_qualities.txt
+
+# charge la dernière version installée de R.
+module load r  
+
+# /!\ si vous utilisez des package précis il faut préciser la version de R que vous souhaitez utilisé
+# exemple r/3.6.3
+
+R # ouvre R en interactif
+```
+
+```{r hist1, eval=TRUE}
+## Chargement des qualités de mapping sous forme de data frame
+
+mapq <- data.frame(read.table("alignment_bwa/SRR1262731_extract.sort.mapping_qualities.txt"))
+
+head(mapq)
+
+```
+
+```{r hist2, eval=TRUE}
+# afficher l'aide de la fonction hist()
+# ?hist 
+
+h <- hist(mapq[,"V1"]) 
+
+```
+
+```{r hist3, eval=TRUE}
+# affichage des attributs de l'histogramme
+h 
+```
+
+```{r hist4, eval=TRUE}
+### affichage de l'histogramme avec des légendes, un titre et une couleur
+png("alignment_bwa/mapq_hist.png")
+plot(h,xlab="Mapping Qualities", main="SRR1262731" , col = "lightgray") 
+invisible(dev.off())
+
+```
+Ouvrez votre fichier png ou relancez uniquement la commande plot()
+
+```{r, eval=TRUE,out.width="600px",echo=FALSE}
+knitr::include_graphics("alignment_bwa/mapq_hist.png",dpi=300)
+```
+
+```{r pie1, eval=TRUE}
+## Création d'une table de contingence résumant le nombre de reads présentant une MAPQ >=30 
+
+table(mapq[,1]>=30)
+
+## Création du data frame contenant les pourcentages de reads non alignés, et alignés avec MAPQ>=30 ou MAPQ<30
+## récupération des valeurs dans alignment_bwa/SRR1262731.flagstat.txt et dans le tableau précédent
+total <- 2265873
+mapped <- 1700879
+mapped_q30 <- 346703
+
+pc_unmapped <- round((total-mapped)*100/total)
+pc_mapq30 <- round(mapped_q30*100/total)
+pc_below_mapq30 <- 100-pc_unmapped-pc_mapq30
+
+df <- data.frame( Group = c("Unmapped", "Mapped mapq>=30", "Mapped mapq<30"),
+                  Value = c(pc_unmapped,pc_mapq30,pc_below_mapq30)
+                )
+
+df
+```
+
+```{r pie2, eval=TRUE}
+# Représentation de ces pourcentages dans un camember ou pie plot avec ggpubr
+
+pct <- round(df$Value/sum(df$Value)*100)
+labels <- paste(df$Group," (",pct,"%)",sep="")
+pie(df$Value,labels=labels)
+
+```
+
+
+```{r pie3, eval=FALSE}
+# quiter R
+q("no")
+```
+
+# Alignement postprocess
+
+## Ajout des ReadGroups
+
+```{bash rg,eval=FALSE}
+#Ajout des reads groups s'ils ne sont pas déjà présent (cf commande BWA)
+
+sbatch -J SRR1262731_addRG -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+gatk AddOrReplaceReadGroups -I alignment_bwa/SRR1262731_extract.sort.bam -O alignment_bwa/SRR1262731_extract.sort.rg.bam \
+--RGID 1 --RGPL Illumina --RGPU PU --RGSM SRR1262731 --RGLB LB"
+
+
+```
+
+
+## Retrait des duplicats de PCR 
+
+```{bash markdup,eval=FALSE}
+
+sbatch -J SRR1262731_markDup -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --mem=8G --wrap=" \
+gatk MarkDuplicates --java-options '-Xmx8G' -I alignment_bwa/SRR1262731_extract.sort.rg.bam --VALIDATION_STRINGENCY SILENT \
+-O alignment_bwa/SRR1262731_extract.sort.rg.md.bam -M alignment_bwa/SRR1262731_extract_metrics_md.txt"
+
+samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.bam > alignment_bwa/SRR1262731_extract.md.flagstat.txt
+
+```
+
+## Filtre des alignements
+
+Suppresion des séquences non alignées et celles alignées avec une qualité inférieur à 30
+
+```{bash mapq,eval=FALSE}
+samtools view -bh -F 4 -q 30 alignment_bwa/SRR1262731_extract.sort.rg.md.bam > alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam
+
+samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam > alignment_bwa/SRR1262731_extract.filt.flagstat.txt
+```
+
+
+## Intersection avec le fichier de capture 
+
+```{bash intersect,eval=FALSE}
+module load bedtools/2.29.2
+
+sbatch -J SRR1262731_interBed -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+bedtools intersect -a alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam -b additionnal_data/QTL_BT6.bed \
+> alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam"
+
+samtools index alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam
+
+```
+
+# InteRlude R N° 2 
+
+Quelle est la couverture moyenne des lectures correctement alignées (MAPQ>=30) sur les régions ciblées ? 
+
+```{bash R2,eval=FALSE}
+# Calcul de la couverture 
+
+sbatch -J SRR1262731_bamDepth -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+samtools depth -b additionnal_data/QTL_BT6.bed alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam \
+> alignment_bwa/SRR1262731_extract.onTarget.depth.txt"
+
+R # ouvre R en interactif
+
+```
+
+
+```{r cov1 ,eval=TRUE}
+# Chargement du fichier créé avec samtools depth
+
+cov <- read.table("alignment_bwa/SRR1262731_extract.onTarget.depth.txt",header=FALSE,sep="\t")
+
+head(cov)
+
+# Changement du nom des colonnes du data frame
+
+colnames(cov) <- c("chr","position","depth")
+
+head(cov)
+
+# Calcul des différentes métriques (minimum, maximum, moyenne médiane...) de la colonne "depth"
+
+summary(cov[,"depth"])
+
+# Calcul de la moyenne de profondeur et stockage dans une variable
+
+mean_cov <- mean(cov[,"depth"])
+
+mean_cov
+
+## Création du fichier pdf qui va contenir le plot  
+
+pdf("alignment_bwa/SRR1262731_extract.onTarget.depth.pdf",width=10,height=6)
+
+## Représentation sous forme de baton d'histogramme (type=h) de la profondeur par position des régions ciblées
+
+plot(cov$position,cov$depth,type="h",col="steelblue",xlab="Position", ylab="Coverage at MAPQ>=30",main="SRR1262731 on QLT_BT6.bed")
+
+## Ajout d'une ligne horizontale de couleur rouge représentant la moyenne de profondeur
+
+abline(h=mean_cov,col="red")
+
+## Ecriture et stockage du plot dans un fichier pdf 
+invisible(dev.off())
+
+```
+
+Ouvrez votre fichier pdf ou relancez uniquement les lignes plot() et abline()
+
+```{r, eval=TRUE,  echo=FALSE}
+plot(cov$position,cov$depth,type="h",col="steelblue",xlab="Position", ylab="Coverage at MAPQ>=30",main="SRR1262731 on QLT_BT6.bed")
+```
+
+
+```{r cov4,eval=FALSE}
+# quitter R
+q("no")
+```
+ 
+# Appel des SNP / INDEL 
+## Avec GATK HaplotypeCaller 
+
+### Création de VCF
+
+```{bash hc,eval=FALSE}
+
+mkdir -p GATK/vcf logs/GATK
+
+sbatch -J SRR1262731_HC_to_VCF -o logs/GATK/%x.out -e logs/GATK/%x.err --mem=8G --wrap=" \
+gatk HaplotypeCaller --java-options '-Xmx8G' --input alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam \
+--reference genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa --intervals additionnal_data/QTL_BT6.bed \
+--min-base-quality-score 18  --minimum-mapping-quality 30 --emit-ref-confidence \"NONE\" \
+--output GATK/vcf/SRR1262731_extract_GATK.vcf "
+
+```
+
+### Création de gVCF
+
+```{bash hc2,eval=FALSE}
+mkdir -p GATK/gvcf
+
+sbatch -J SRR1262731_HC_to_gVCF -o logs/GATK/%x.out -e logs/GATK/%x.err --mem=8G --wrap=" \
+gatk HaplotypeCaller --java-options '-Xmx8G' --input alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam \
+--reference genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa --intervals additionnal_data/QTL_BT6.bed \
+--min-base-quality-score 18 --minimum-mapping-quality 30 --emit-ref-confidence "GVCF" \
+--output GATK/gvcf/SRR1262731_extract_GATK.g.vcf "
+
+```
+
+
+### Combiner les trois échantillons traités avec GATK
+
+```{bash combine,eval=FALSE}
+# Fusion des fichiers gVCFs en un seul gVCF
+
+sbatch -J CombineGVCFs -o logs/GATK/%x.out -e logs/GATK/%x.err --mem=8G --wrap=" \
+gatk CombineGVCFs --java-options '-Xmx8G' \
+--variant gvcf/SRR1262731_extract_GATK.g.vcf \
+--variant additionnal_data/SRR1205992_extract_GATK.g.vcf \
+--variant additionnal_data/SRR1205973_extract_GATK.g.vcf \
+--reference genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa --intervals additionnal_data/QTL_BT6.bed \
+--output GATK/gvcf/pool_GATK.g.vcf"
+
+# Détection de variants simultanée sur les 3 échantillons du gVCF
+
+sbatch -J GenotypeGVCFs -o logs/GATL/%x.out -e logs/GATK/%x.err --mem=8G --wrap=" \
+gatk GenotypeGVCFs --java-options '-Xmx8G' --variant GATK/gvcf/pool_GATK.g.vcf --reference genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+--output vcf/pool_GATK.vcf"
+```
+
+
+## Avec Varscan2
+
+```{bash varscan,eval=FALSE}
+module load varscan/2.4.4
+
+# Creation d'un nouveau dossier
+mkdir -p Varscan logs/Varscan
+
+# Conversion du fichier d'alignement bam en format mpileup
+# ajout l'option -A pour garder les paires anormales
+
+sbatch -J SRR1262731_mpileup -o logs/Varscan/%x.out -e logs/Varscan/%x.err --mem=8G --wrap=" \
+samtools mpileup -q 30 -B -A -d 10000 -f genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam > Varscan/SRR1262731_extract.mpileup" 
+
+
+# Détection de variants avec Varscan
+sbatch -J  SRR1262731_mpileup2cns -o logs/Varscan/%x.out -e logs/Varscan/%x.err --mem=8G --wrap=" \
+varscan mpileup2cns Varscan/SRR1262731_extract.mpileup --output-vcf --variants --min-avg-qual 18 > Varscan/SRR1262731_extract_Varscan.vcf"
+
+
+```
+
+
+## Merge des trois échantillons traités avec Varscan
+
+```{bash merge,eval=FALSE}
+module load bcftools/1.10.2
+
+# Renommer l'échantillon dans le VCF
+sed -i 's|Sample1|SRR1262731.Varscan|g' Varscan/SRR1262731_extract_Varscan.vcf 
+
+# Compression et indexation du fichiers vcf
+bgzip Varscan/SRR1262731_extract_Varscan.vcf
+tabix -p vcf Varscan/SRR1262731_extract_Varscan.vcf.gz
+
+# Merge des trois échantillons appelés avec Varscan
+bcftools merge Varscan/SRR1262731_extract_Varscan.vcf.gz additionnal_data/SRR1205992_extract_Varscan.vcf.gz \
+additionnal_data/SRR1205973_extract_Varscan.vcf.gz > Varscan/pool_Varscan.vcf
+
+# Correction du header ($ grep contig pool_Varscan.vcf)
+gatk UpdateVcfSequenceDictionary -I Varscan/pool_Varscan.vcf -O Varscan/pool_Varscan_dict.vcf -SD genome/Bos_taurus.UMD3.1.dna.toplevel.6.dict
+
+```
+
+
+# Filtrage et Annotation des variants 
+
+## Sélection des variants 
+
+```{bash filt1,eval=FALSE}
+# Préparation d'un nouveau répertoire de résultats
+mkdir -p filter_and_annot logs/filter
+
+# Extraction des SNVs dans un fichier séparé pour GATK
+sbatch -J GATK_SNP -o logs/filter/%x.out -e logs/filter/%x.err --mem=8G --wrap=" \
+gatk SelectVariants --java-options '-Xmx8G' -R genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+-V GATK/vcf/pool_GATK.vcf --select-type SNP -O filter_and_annot/pool_GATK.SNP.vcf"
+
+# Extraction des SNVs dans un fichier séparé pour Varscan
+sbatch -J Varscan_SNP -o logs/filter/%x.out -e logs/filter/%x.err --mem=8G --wrap=" \
+gatk SelectVariants --java-options '-Xmx8G' -R genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+-V Varscan/pool_Varscan_dict.vcf --select-type SNP -O filter_and_annot/pool_Varscan.SNP.vcf"
+
+# Filtrage des SNVs selon les filtres recommandés par GATK
+
+sbatch -J GATK_SNP_filter -o logs/filter/%X.out -e logs/filter/%x.err --mem=8G --wrap=" \
+gatk VariantFiltration --java-options '-Xmx8G' -R genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+  -V filter_and_annot/pool_GATK.SNP.vcf -O filter_and_annot/pool_GATK.SNP.prefilt.vcf \
+  -filter 'QD < 2.0' --filter-name 'QD2' -filter 'SOR > 3.0' --filter-name 'SOR3' \
+  -filter 'FS > 60.0' --filter-name 'FS60' -filter 'MQ < 40.0' --filter-name 'MQ40' \
+  -filter 'MQRankSum < -12.5' --filter-name 'MQRankSum-12.5' \
+  -filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8'"
+
+# Sélection des variants passant ce filtre
+sbatch -J GATK_SNP_PASS -o logs/filter/%x.out -e logs/filter/%xGATK_SNP_PASS.err --mem=8G --wrap=" \
+gatk SelectVariants --java-options '-Xmx8G' -R genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa \
+-V filter_and_annot/pool_GATK.SNP.prefilt.vcf --exclude-filtered -O filter_and_annot/pool_GATK.SNP.filtered.vcf"
+
+```
+
+## Intersection des callers après filtrage
+
+```{bash filt3,eval=FALSE}
+# Compression et indexation des fichiers vcfs
+bgzip filter_and_annot/pool_GATK.SNP.filtered.vcf
+tabix -p vcf filter_and_annot/pool_GATK.SNP.filtered.vcf.gz
+
+bgzip -c filter_and_annot/pool_Varscan.SNP.vcf
+tabix -p vcf filter_and_annot/pool_Varscan.SNP.vcf.gz
+
+sbatch -J GATK_varscan_isec -o logs/filter/%x.out -e logs/filter/%x.err --mem=8G --wrap=" \
+bcftools isec -f PASS -n +2 -w 1 -O v filter_and_annot/pool_GATK.SNP.filtered.vcf.gz filter_and_annot/pool_Varscan.SNP.vcf.gz \
+> filter_and_annot/GATK_varscan_inter.vcf "
+```
+
+## Création de la base de données snpEff 
+
+```{bash snpeff,eval=FALSE}
+# Création de la base de données SnpEff
+module load snpeff/4.3.1t
+snpEff -version # affiche la version (v4.3t)
+
+echo BosTaurus.genome >> snpeff.config # <genome_name>.genome 
+mkdir -p BosTaurus
+cp genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa BosTaurus/sequences.fa
+cp genome/Bos_taurus.UMD3.1.93.chromosome.6.gff3 BosTaurus/genes.gff
+echo -e "BosTaurus\nSnpEff4.1" > BosTaurus.db
+
+sbatch -J snpeffBuild -o logs/filter/%x.out -e logs/filter/%x.err --mem=8G --wrap="snpEff build -c snpeff.config -gff3 -v BosTaurus -dataDir ."
+
+```
+
+## Annotation
+
+```{bash snpeff2,eval=FALSE}
+# Annotation avec notre base de données
+sbatch -J snpeffAnnot -o logs/filter/%.out -e logs/filter/%x.err --mem=8G --wrap=" \
+snpEff eff -c snpeff.config -dataDir . BosTaurus -s filter_and_annot/snpeff_res.html filter_and_annot/GATK_varscan_inter.vcf \
+> filter_and_annot/GATK_varscan_inter.annot.vcf"
+```
+
+## Filtres fonctionnels 
+
+```{bash snpeff3,eval=FALSE}
+module load snpsift/4.3.1t
+
+# Garder les variants codant qui ne sont pas des synonymes
+
+sbatch -J snpsift1 -o logs/filter/%x.out -e logs/filter/%x.err --mem=8G --wrap=" \
+ cat filter_and_annot/GATK_varscan_inter.annot.vcf | SnpSift filter -Xmx8G \
+ \"(ANN[*].EFFECT != 'synonymous_variant') && (ANN[*].BIOTYPE = 'protein_coding')\" > filter_and_annot/GATK_varscan_inter.annot.coding.nosyn.vcf"
+
+# Sélectionner notre variant d'intérêt parmi les variants hétérozygotes ayant un impact (missense) 
+
+sbatch -J snpsift2 -o logs/filter/%x..out -e logs/filter/%x.err --mem=8G --wrap=" \
+ cat filter_and_annot/GATK_varscan_inter.annot.coding.nosyn.vcf | SnpSift filter -Xmx8G \
+ \"ANN[*].EFFECT = 'missense_variant' & isHet( GEN[2] ) & isVariant( GEN[2] ) & isRef( GEN[0] ) & isRef( GEN[1] ) \" \
+> filter_and_annot/GATK_varscan_inter.annot.coding.nosyn.filtered.vcf"
+
+```
+
+
+<!-- # Interlude R N° 3 -->
+<!-- ```{bash filt,message=FALSE,eval=FALSE} -->
+<!-- # Représentation des variants détectés sur un chromosome -->
+
+<!-- R # ouvre R en interactif -->
+<!-- ``` -->
+
+<!-- ```{r vcfR1,eval=FALSE} -->
+<!-- ## Chargement de la librairie vcfR qui aide déouvrir et gérer les fichiers au format vcf -->
+<!-- library(vcfR) -->
+
+<!-- ## Chargement du fichier vcf avec la commande spéciale read.vcfR -->
+<!-- vcf<-read.vcfR("GATK/vcf/SRR1262731_extract_GATK.vcf") -->
+
+<!-- ## Chargement du fichier fasta avec la commande spéciale read.dna du package ape -->
+<!-- dna <- ape::read.dna("genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa", format ="fasta") -->
+
+<!-- ## Chargement du fichier gff contenant les informations sur les gènes du chr6 -->
+<!-- gff<-read.table("genome/Bos_taurus.UMD3.1.93.chromosome.6.gff3",quote="",sep="\t") -->
+
+<!-- ## Chargement du fichier gff contenant les informations sur les gènes du chr6 -->
+<!-- bed <-read.table("additionnal_data/QTL_BT6.bed")  -->
+<!-- start_region<-bed[1,2] -->
+<!-- end_region<-bed[nrow(bed),3] -->
+
+<!-- chrom <- create.chromR(name='chr6', vcf=vcf, seq=dna, ann=gff) -->
+<!-- chrom <- proc.chromR(chrom, verbose=TRUE) -->
+<!-- chromoqc(chrom, xlim=c(start_region, end_region)) -->
+
+<!-- head(chrom) -->
+
+<!-- dp <- extract.gt(chrom, element="DP", as.numeric=TRUE)  -->
+<!-- ad <- extract.gt(chrom,element="AD", as.numeric=TRUE) -->
+<!-- all_ratio<-data.frame(round(ad*100/dp,2)) -->
+
+<!-- head(all_ratio) -->
+
+<!-- q("no")  -->
+<!-- ``` -->
+
+# Recherche de Variants Structuraux 
+
+## Copie des données
+
+```{bash svdata,eval=FALSE}
+# Copie des données SV
+cp -R /shared/projects/ebai2019/atelier_variant/data/sv ~/tp_sv
+cd ~/tp_sv
+
+# Indexation des fichiers
+
+samtools index mapping_illumina_chr10_500kb.bam
+samtools index mapping_minion_chr10_500kb.bam
+samtools faidx Zymoseptoria_tritici.fa
+
+```
+
+## Avec Delly
+
+- Appel des variants
+
+```{bash delly,eval=FALSE}
+mkdir -p delly logs/delly
+
+module load delly/0.8.3
+
+sbatch -J sample1_delly -o logs/delly/%x.out -e logs/delly/%x.err --mem=8G --wrap=" \
+delly call -g Zymoseptoria_tritici.fa -o delly/SV_calling_illumina.bcf mapping_illumina_chr10_500kb.bam"
+
+# Conversion en fichier vcf
+
+sbatch -J sample1_bcf_to_vcf -o logs/delly/%x.out -e logs/delly/%x.err --wrap=" \
+bcftools view delly/SV_calling_illumina.bcf > delly/SV_calling_illumina.vcf"
+
+```
+
+- Extraction des positions des délétions
+
+```{bash filtrage1,eval=FALSE}
+#Récupération du start des variants
+grep -v "^#" delly/SV_calling_illumina.vcf | grep -v "LowQual" | grep "<DEL>" | cut -f1,2 > delly/delly_del_start.txt
+
+#Récupération des autres informations
+grep -v "^#" delly/SV_calling_illumina.vcf | grep -v "LowQual" | grep "<DEL>" | cut -f8 | cut -d ";" -f1,5,6,14 | sed "s/;/\t/g" > delly/delly_del_info.txt
+
+#Fusion des deux fichiers
+paste -d '\t' delly/delly_del_start.txt delly_del_info.txt > delly/delly_del.txt
+
+#Formattage et ménage
+awk '{print $1"\t"$2"\t"$4"\t"$3"\t"$5"\t"$6}' delly/delly_del.txt | sed "s/END=//g" > delly/delly_del.csv
+rm delly/delly_del_info.txt delly/delly_del_start.txt delly/delly_del.txt
+
+
+```
+
+## Avec Sniffles
+
+- Appel des variants
+
+```{bash sniffles,eval=FALSE}
+module load sniffles/1.0.11
+
+mkdir -p sniffles logs/sniffles
+
+sbatch -J sample1_sniffles -o logs/sniffles/%x.out -e logs/sniffles/%x.err --mem=8G --wrap=" \
+sniffles -l 100 -m mapping_minion_chr10_500kb.bam -v sniffles/SV_calling_minion.vcf"
+
+```
+
+- Extraction des positions des délétions
+
+```{bash filtrage2,eval=FALSE}
+cat sniffles/SV_calling_minion.vcf | grep ^chr_10 | grep "<DEL>" | cut -f 2 > sniffles/sniffles_del_start.txt
+
+cat sniffles/SV_calling_minion.vcf | grep ^chr_10 | grep "<DEL>" | cut -f 2 > sniffles/sniffles_del_start.txt
+
+cat sniffles/SV_calling_minion.vcf | grep ^chr_10 | grep "<DEL>" | cut -f 8 | cut -d ";" -f 1 > sniffles/sniffles_del_infos.txt
+
+paste sniffles/sniffles_del_start.txt sniffles/sniffles_del_stop.txt sniffles/sniffles_del_infos.txt > sniffles/sniffles_del.csv
+
+rm sniffles/sniffles_del_start.txt sniffles/sniffles_del_stop.txt sniffles/sniffles_del_infos.txt
+
+```
+
+# Interlude R N° 4
+
+Test comparatif des tailles des délétions détectées par delly vs sniffles
+
+```{bash R4,eval=FALSE}
+# ouvre R en interactif
+R 
+```
+
+```{r sv_R,eval=TRUE}
+# chargement des positions de delly
+delly <- read.table("delly/delly_del.csv", sep="\t")
+# ajout d'une colonne size correspondant à end-start
+delly$size <- delly$V3-delly$V2
+
+# chargement des positions de sniffles
+sniffles <- read.table("sniffles/sniffles_del.csv",sep="\t")
+# ajout d'une colonne size correspondant à end-start
+sniffles$size <- sniffles$V3-sniffles$V2
+
+# apperçu des tableaux
+head(delly) ; head(sniffles)
+
+```
+
+```{r sv_R2, eval=TRUE}
+# Test de student entre les deux listes de taille.
+t.test(delly$size,sniffles$size)
+```
+
+
+```{r sv_R3, eval=FALSE}
+# quitter R
+q("no")
+```
+

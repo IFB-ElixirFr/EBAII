@@ -47,19 +47,19 @@ From there, you can also find a link to download the whole repository with `git`
 | General statistics | Hugo Varet | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Rachel Legendre, Hugo Varet |
 | Gene set analysis | Thibault Dayris | |
-| De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2020_red.pdf)  | 
+| De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2020_red.pdf)  |
 
 ### Variants
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Programme de l'atelier Variant | | Bientôt sur vos écrans |
-| Introduction et Processing Post-Alignement  | Maria Bernard, Olivier Rué | |
-| Variant calling | Nadia Bessoltane | |
-| Filtrage et annotation | Olivier Rué | |
-| Variants structuraux | Olivier Quenez | |
-| Workflow et conclusion | Maria Bernard | |
-| Applications sous R | Maria Bernard | |
+| Programme de l'atelier Variant | | [Program](DNA-seq/) |
+| Introduction et Processing Post-Alignement  | Maria Bernard, Olivier Rué |[pdf_intro](DNA-seq/1-Introduction-Atelier-Variant.pdf) [pdf_alignement-processing](DNA-seq/2-Processing-Post-Alignement.pdf)|
+| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) |
+| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf)|
+| Variants structuraux | Olivier Quenez | [pdf](5-Variants-Structuraux.pdf)|
+| Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
+| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf)|     
 
 ### ChIP-seq
 
