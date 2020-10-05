@@ -6,6 +6,8 @@ Go to [hands-on](/2020/chip-seq/hands-on/hands-on.md)
 ### Planning
 
 #### Tuesday
+
+
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
 | 10:45 | 12:25 | 02:00 | Experimental design | St |
@@ -17,6 +19,8 @@ Go to [hands-on](/2020/chip-seq/hands-on/hands-on.md)
 
 
 #### Wednesday
+
+
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
 | 08:30 | 10:15 | 01:45 | Peak-calling | St |
