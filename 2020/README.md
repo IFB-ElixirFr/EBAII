@@ -60,7 +60,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf)|
 | Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf) |
+| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) |
 
 ### ChIP-seq
 
