@@ -86,6 +86,6 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [Google slides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) |
-| Intégration de données | Laura Cantini | |
+| Intégration de données | Laura Cantini |[pdf](croisement_donnees/CANTINI_NGS_AVIESAN_IFB.pdf) |
 
 *****
