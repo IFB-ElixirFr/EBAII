@@ -192,7 +192,8 @@ sbatch -J SRR1262731_mappingSort -o logs/alignment_bwa/%x.out -e logs/alignment_
 samtools sort -@ 4 --write-index -o alignment_bwa/SRR1262731_extract.sort.bam alignment_bwa/SRR1262731_extract.bam "
 
 # statistique d'alignement
-samtools flagstat  alignment_bwa/SRR1262731_extract.sort.bam >  alignment_bwa/SRR1262731.flagstat.txt
+sbatch -J SRR1262731_flagstat -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+samtools flagstat  alignment_bwa/SRR1262731_extract.sort.bam >  alignment_bwa/SRR1262731.flagstat.txt"
 
 cat alignment_bwa/SRR1262731.flagstat.txt
 ```
@@ -329,7 +330,9 @@ sbatch -J SRR1262731_markDup -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/
 gatk MarkDuplicates --java-options '-Xmx8G' -I alignment_bwa/SRR1262731_extract.sort.rg.bam --VALIDATION_STRINGENCY SILENT \
 -O alignment_bwa/SRR1262731_extract.sort.rg.md.bam -M alignment_bwa/SRR1262731_extract_metrics_md.txt"
 
-samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.bam > alignment_bwa/SRR1262731_extract.md.flagstat.txt
+sbatch -J SRR1262731_md_flagstat -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.bam > \
+alignment_bwa/SRR1262731_extract.md.flagstat.txt"
 
 ```
 
@@ -340,7 +343,9 @@ Suppresion des séquences non alignées et celles alignées avec une qualité in
 ```{bash mapq,eval=FALSE}
 samtools view -bh -F 4 -q 30 alignment_bwa/SRR1262731_extract.sort.rg.md.bam > alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam
 
-samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam > alignment_bwa/SRR1262731_extract.filt.flagstat.txt
+sbatch -J SRR1262731_filt_flagstat -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+samtools flagstat alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam > \
+alignment_bwa/SRR1262731_extract.filt.flagstat.txt"
 ```
 
 
@@ -353,7 +358,8 @@ sbatch -J SRR1262731_interBed -o logs/alignment_bwa/%x.out -e logs/alignment_bwa
 bedtools intersect -a alignment_bwa/SRR1262731_extract.sort.rg.md.filt.bam -b additionnal_data/QTL_BT6.bed \
 > alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam"
 
-samtools index alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam
+sbatch -J SRR1262731_bamIdx -o logs/alignment_bwa/%x.out -e logs/alignment_bwa/%x.err --wrap=" \
+samtools index alignment_bwa/SRR1262731_extract.sort.rg.md.filt.onTarget.bam"
 
 ```
 
@@ -514,11 +520,13 @@ bgzip Varscan/SRR1262731_extract_Varscan.vcf
 tabix -p vcf Varscan/SRR1262731_extract_Varscan.vcf.gz
 
 # Merge des trois échantillons appelés avec Varscan
+sbatch -J merge_varscan -o logs/Varscan/%x.out -e logs/Varscan/%x.err --mem=8G --wrap=" \
 bcftools merge Varscan/SRR1262731_extract_Varscan.vcf.gz additionnal_data/SRR1205992_extract_Varscan.vcf.gz \
-additionnal_data/SRR1205973_extract_Varscan.vcf.gz > Varscan/pool_Varscan.vcf
+additionnal_data/SRR1205973_extract_Varscan.vcf.gz > Varscan/pool_Varscan.vcf"
 
 # Correction du header ($ grep contig pool_Varscan.vcf)
-gatk UpdateVcfSequenceDictionary -I Varscan/pool_Varscan.vcf -O Varscan/pool_Varscan_dict.vcf -SD genome/Bos_taurus.UMD3.1.dna.toplevel.6.dict
+sbatch -J merged_varscan_updateDict -o logs/Varscan/%x.out -e logs/Varscan/%x.err --mem=8G --wrap=" \
+gatk UpdateVcfSequenceDictionary -I Varscan/pool_Varscan.vcf -O Varscan/pool_Varscan_dict.vcf -SD genome/Bos_taurus.UMD3.1.dna.toplevel.6.dict"
 
 ```
 
@@ -671,9 +679,9 @@ cd ~/tp_sv
 
 # Indexation des fichiers
 
-samtools index mapping_illumina_chr10_500kb.bam
-samtools index mapping_minion_chr10_500kb.bam
-samtools faidx Zymoseptoria_tritici.fa
+srun samtools index mapping_illumina_chr10_500kb.bam
+srun samtools index mapping_minion_chr10_500kb.bam
+srun samtools faidx Zymoseptoria_tritici.fa
 
 ```
 
@@ -744,7 +752,7 @@ rm sniffles/sniffles_del_start.txt sniffles/sniffles_del_stop.txt sniffles/sniff
 
 ```
 
-# Interlude R N° 4
+# Interlude R N° 3
 
 Test comparatif des tailles des délétions détectées par delly vs sniffles
 

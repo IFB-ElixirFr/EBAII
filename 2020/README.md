@@ -54,13 +54,13 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf)   |
-|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) |
-| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) |
-| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf)|
-| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) |
+| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [ggslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
+|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [ggslides](https://docs.google.com/presentation/d/1cfdGX-3rjhNAFGSBsk2NhBU44f7A4lkFeS_8ptdlLEw/edit?usp=sharing) |
+| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [ggslides](https://docs.google.com/presentation/d/1GbfYjfXeeow6wkRRLR0MmDie5OTd1j3Cg02xgfGlUeI/edit?usp=sharing) |
+| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [ggslides](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit?usp=sharing) |
+| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [ggslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) |
+| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [ggslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
 
 ### ChIP-seq
 
