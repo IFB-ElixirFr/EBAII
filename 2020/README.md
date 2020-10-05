@@ -54,12 +54,13 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction et Processing Post-Alignement  | Maria Bernard, Olivier Rué |[pdf_intro](DNA-seq/1-Introduction-Atelier-Variant.pdf) [pdf_alignement-processing](DNA-seq/2-Processing-Post-Alignement.pdf)|
+| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf)   |
+|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) |
 | Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) |
 | Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf)|
 | Variants structuraux | Olivier Quenez | [pdf](5-Variants-Structuraux.pdf)|
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf)|     
+| Workflow et conclusion | Maria Bernard | [pdf](6-Workflow_Conclusion.pdf)|
 
 ### ChIP-seq
 
