@@ -24,6 +24,12 @@ From there, you can also find a link to download the whole repository with `git`
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
+### R
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Introduction à R | Thomas Denecker, Jacques van Helden, Hugo Varet | [R script](R/script_intro_R_2020.r) [google slides](https://docs.google.com/presentation/d/1wJHUGDIip5EE8NL7mLSZFfYR9c-u2AAKKh30SQjuL-Q/edit?usp=sharing) |
+
 ### Exposés d'ouverture
 
 | Cours | Intervenants | Supports |
