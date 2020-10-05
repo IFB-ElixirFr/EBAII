@@ -35,7 +35,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard | [html](IGV/IGV.html) |
+| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard , Rachel Legendre, Olivier Quesnez, Bastien Job| [html](IGV/IGV.html) |
 
 
 ### RNA-seq
@@ -47,7 +47,7 @@ From there, you can also find a link to download the whole repository with `git`
 | General statistics | Hugo Varet | |
 | Practice SARTools | Rachel Legendre, Hugo Varet |
 | Gene set analysis | Thibault Dayris | |
-| De novo assembly | | | 
+| De novo assembly | Erwan Corre | | 
 
 ### Variants
 
