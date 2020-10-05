@@ -24,18 +24,24 @@ From there, you can also find a link to download the whole repository with `git`
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
+### R
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Introduction à R | Thomas Denecker, Jacques van Helden, Hugo Varet | [google slides](https://docs.google.com/presentation/d/1wJHUGDIip5EE8NL7mLSZFfYR9c-u2AAKKh30SQjuL-Q/edit?usp=sharing) [R script](R/script_intro_R_2020.r) [expression.txt](R/expression.txt) [annotation.csv](R/annotation.csv)|
+
 ### Exposés d'ouverture
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Single-cell | Bastien Job | |
+| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [google slides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
 | Long reads | Claude Thermes | |
 
 ### Visualisation
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard , Rachel Legendre, Olivier Quenez, Bastien Job| [html](IGV/IGV.html) |
+| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard , Rachel Legendre, Olivier Quenez, Bastien Job| [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
 
 
 ### RNA-seq
@@ -45,8 +51,8 @@ From there, you can also find a link to download the whole repository with `git`
 | Programme de l'atelier RNA-seq | |  [Program](RNA-seq/) |
 | Bioinformatics | Rachel Legendre | [pdf](RNA-seq/EBAI2020_RNAseq.pdf)  |
 | General statistics | Hugo Varet | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
-| Practice SARTools | Rachel Legendre, Hugo Varet |
-| Gene set analysis | Thibault Dayris | |
+| Practice SARTools | Hugo Varet | [ZIP archive](RNA-seq/TP_differential_analysis/Practice_SARTools.zip) |
+| Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) [TP](RNA-seq/GSEA/)|
 | De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2020_red.pdf)  |
 
 ### Variants
