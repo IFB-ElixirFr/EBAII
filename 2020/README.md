@@ -34,7 +34,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Single-cell | Bastien Job | |
+| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [google slides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
 | Long reads | Claude Thermes | |
 
 ### Visualisation
