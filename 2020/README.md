@@ -6,11 +6,11 @@
 **Du 04-10-2020 au 09-10-2020 à la Station biologique de Roscoff**
 
 
-## Links
+## Web site
 
-- Github repo: <https://github.com/IFB-ElixirFr/EBAII/>
 - Web pages: <https://ifb-elixirfr.github.io/EBAII/2020/>
 
+From there, you can also find a link to download the whole repository with `git`.
 
 ****
 
