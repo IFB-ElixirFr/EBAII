@@ -1,11 +1,13 @@
-## EBAII 2020 - RNA-seq course
+# EBAII 2020 - RNA-seq course
 
-### Hands-on
+## Hands-on
 
 
-### Planning
+## Planning
 
-#### Tuesday
+### Tuesday
+
+
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
 | 10:45 | 12:25 | 02:00 | Bioinformatics: Quality Controls, Mapping, Counting | Rachel |
@@ -14,7 +16,10 @@
 | 16:00 | 16:30 | 00:30 | **Break** |  |
 | 16:30 | 17:45 | 01:15 | Statistics: General statistics | Hugo |
 
-#### Wednesday
+
+### Wednesday
+
+
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
 | 08:30 | 10:15 | 01:45 | Introduction to R | Hugo |
