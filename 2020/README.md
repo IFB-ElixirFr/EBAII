@@ -70,15 +70,19 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### ChIP-seq
 
-| Cours | Intervenants | Supports |
-|----------------------------------|------------------|----------|
-| Programme de l'atelier ChIP-seq | |  [Program](chip-seq/) |
-| Design expérimental, qualité | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
-| Read mapping | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
-| Normalisation | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
-| Peak-calling | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
-| Analyse des motifs | Elodie Darbo, Stéphanie Le Gras, Denis Puthier, Tao Ye | |
-| Annotation des pics | Stéphanie Le Gras, Denis Puthier, Tao Ye | |
+| Support | Lien |
+|----------------------------------|------------------|
+| Partie théorique | [ggslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
+| Partie pratique | [TD](/2020/chip-seq/hands-on/hands-on.md) |
+
+| Cours | Intervenants |
+|----------------------------------|------------------|
+| Design expérimental, Contrôle qualité | Stéphanie Le Gras |
+| Alignement | Stéphanie Le Gras |
+| Contrôle qualité des alignements, visualisation | Tao Ye |
+| Peak-calling | Stéphanie Le Gras |
+| Analyse des motifs | Elodie Darbo |
+| Annotation des pics | Tao Ye |
 
 
 ### Croisement et intégration des données
