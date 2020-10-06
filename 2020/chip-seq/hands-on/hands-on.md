@@ -97,7 +97,7 @@ cd EBA2020_chipseq
 4. Copy the directory containing data
 
 ```bash
-srun cp -r /shared/projects/ebaii2020/atelier_chipseq/data .
+srun cp -r /shared/home/slegras/EBA2020_chipseq/data .
 ```
 
 7. Your directory structure should be like this
@@ -286,7 +286,7 @@ Your directory structure should be like this:
   * 2> SRR576933.out will output some statistics about the mapping in the file SRR576933.out
 ```bash  
 ## Run alignment
-srun bowtie ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam
+srun --cpus 10 bowtie -p 10 ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam
 ```  
 This should take few minutes as we work with a small genome. For the human genome, we would need either more time and more resources.
 
@@ -397,7 +397,7 @@ srun plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/IP/repA/SRR576933.
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```bash
-cp /shared/projects/ebaii2020/atelier_chipseq/03-ChIPQualityControls/fingerprint.png .
+cp /shared/home/slegras/EBA2020_chipseq/03-ChIPQualityControls/fingerprint.png .
 ```
 5. Download the file fingerprint.png on your local machine (either with ` scp ` or Cyberduck). Using ` scp ` it would look like this.
 ```bash
@@ -1148,6 +1148,6 @@ Ramírez, F., Ryan, D.P., Grüning, B., Bhardwaj, V., Kilpert, F., Richter, A.S.
 Download mapping results already generated (as it takes a while to download)
 ```bash
 cd <some directory you want on your computer>
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebaii2020/atelier_chipseq/02-Mapping/*/*bam* .
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/projects/ebaii2020/atelier_chipseq/02-Mapping/*/*/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBA2020_chipseq/02-Mapping/*/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBA2020_chipseq/02-Mapping/*/*/*bam* .
 ```
