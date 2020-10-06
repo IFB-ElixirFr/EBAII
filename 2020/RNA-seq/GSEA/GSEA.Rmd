@@ -1,6 +1,6 @@
 ---
 title: "Gene Set Analysis (GSA)"
-author: "RNA-Seq group, IFB-AVIESAN 2019"
+author: "RNA-Seq group, IFB-AVIESAN 2020"
 institution: "Institut Gustave Roussy, Institut Pasteur"
 date: '`r Sys.Date()`'
 output:
@@ -126,27 +126,15 @@ library("org.At.tair.db");
 
 It is a good practice to keep package names in order to avoid name-space collision. However, during this presentation, for the sake of readability, we shall omit them.
 
-
-## Load SARTools results (1/2)
-
-First, we need to set a working directory: `setwd()`
-
-We use the function `"file.path"`, from the `"base"` package. It takes a variable number of arguments, and joins them as a path to a file.
-
-```{r}
-# Path to SARTools results
-results_path <- file.path(
-  "tables",
-  "KOvsWT.complete.txt"
-);
-
-```
-
-## Load SARTools results (2/2)
+## Load SARTools results
 
 We use the function `"read.table"` from the package `"utils"`. This is installed by default in your R environments.
 
 ```{r, eval=TRUE, echo=FALSE}
+results_path <- file.path(
+  "tables",
+  "KOvsWT.complete.txt"
+);
 de_res <- read.table(
   file   = results_path,   # Path to results
   header = TRUE,           # There are column names
@@ -157,7 +145,7 @@ de_res <- read.table(
 
 ```{r, echo=TRUE, eval=FALSE}
 de_res <- read.table(
-  file   = "KOvsWT.complete.txt",   # Path to results
+  file   = "tables/KOvsWT.complete.txt",   # Path to results
   header = TRUE,           # There are column names
   sep    = "\t",           # This is a tabulation
   stringsAsFactors = FALSE # Colnames are not factors
@@ -181,14 +169,14 @@ colnames(de_res);
 
 ## Select columns from SARTools' results
 
-We want to keep the following columns **only**: `"Id", "padj"`, `"log2FoldChange"`, and `"stat"`.
+We want to keep the following columns **only**: `"Id", "padj"`, `"log2FoldChange"`.
 
 ```{r}
 # Keep selected columns
-reduced <- de_res[ ,c("Id", "padj", "log2FoldChange", "stat")];
+de_res <- de_res[ ,c("Id", "padj", "log2FoldChange")];
 
 # Check dimensions
-dim(reduced);
+dim(de_res);
 ```
 
 ## Filter SARTools' results
@@ -197,14 +185,13 @@ And now, we want to filter out the values with a `padj` above 0.001.
 
 ```{r}
 # List all values that are to be kept
-threshold <- reduced[, "padj"] <= 0.001;
-no_na <- !is.na(reduced$log2FoldChange);
+threshold <- de_res[, "padj"] <= 0.001;
 
 # Keep only non-null and significant values
-filtered <- reduced[which(threshold), ];
+de_res <- de_res[which(threshold), ];
 
 # Check dimensions
-dim(filtered);
+dim(de_res);
 ```
 
 ## Sort SARTools results
@@ -213,11 +200,11 @@ The order of the genes within a list of genes is **very** important. We need to 
 
 ```{r}
 ordered_lines_number <- order(
-  filtered$log2FoldChange,     # Select the column
+  de_res$log2FoldChange,     # Select the column
   decreasing = TRUE            # Decreasing sort
 );
 
-sorted <- filtered[ordered_lines_number, ];
+de_res <- de_res[ordered_lines_number, ];
 ```
 
 # Genes identifiers
@@ -230,13 +217,13 @@ We need a raw gene identifier:
 
 ```{r}
 # Replace the names in the ID column
-sorted[, "Id"] <- sub("gene:", "", sorted[, "Id"]);
+de_res[, "Id"] <- sub("gene:", "", de_res[, "Id"]);
 ```
 
 And we can check our genes identifiers with the function `"head"`:
 
 ```{r, eval=FALSE}
-head(sorted);
+head(de_res);
 ```
 
 ## From gene identifiers to gene names
@@ -247,7 +234,7 @@ In order to get theses identifiers, we use the function `"bitr"` from the packag
 
 ```{r, message=FALSE, warning=FALSE}
 annotation <- bitr(
-  geneID   = sorted$Id,            # Our gene list
+  geneID   = de_res$Id,            # Our gene list
   fromType = "TAIR",               # We have TAIR ID
   toType   = c("ENTREZID", "SYMBOL"),# Other ID list
   OrgDb    = org.At.tair.db        # Our annotation
@@ -497,16 +484,46 @@ dotplot(object = ego, showCategory=20);
 
 # GSEA
 
+## Re-load the original data
+
+We need the *complete, unfiltered* list of genes for GSEA:
+
+```{r, eval=TRUE, echo=FALSE}
+results_path <- file.path(
+  "tables",
+  "KOvsWT.complete.txt"
+);
+de_res <- read.table(
+  file   = results_path,   # Path to results
+  header = TRUE,           # There are column names
+  sep    = "\t",           # This is a tabulation
+  stringsAsFactors = FALSE # Colnames are not factors
+);
+de_res <- de_res[ ,c("Id", "stat")];
+de_res[, "Id"] <- sub("gene:", "", de_res[, "Id"]);
+```
+
+```{r, echo=TRUE, eval=FALSE}
+de_res <- read.table(
+  file   = "tables/KOvsWT.complete.txt",   # Path to results
+  header = TRUE,           # There are column names
+  sep    = "\t",           # This is a tabulation
+  stringsAsFactors = FALSE # Colnames are not factors
+);
+de_res <- de_res[ ,c("Id", "stat")];
+de_res[, "Id"] <- sub("gene:", "", de_res[, "Id"]);
+```
+
 ## Prepare Data (1/2)
 
 To perform a Gene Set Enrichment Analysis (GSEA), we need to give a list of weighted ranked genes in order to compute the enrichment score for our table called "`sorted`". We also need the ENTREZ identifiers, from our table called "`annotation`". We need to merge them according the the TAIR identifiers:
 
 ```{r}
 # Rename the columns
-colnames(sorted) <- c("TAIR", "padj", "log2FoldChange");
+colnames(de_res) <- c("TAIR", "stat");
 
 # Merge the frames
-geneFrame <- merge(sorted, annotation, by="TAIR");
+geneFrame <- merge(de_res, annotation, by="TAIR");
 geneFrame <- unique(geneFrame); # Drop duplicates
 ```
 
@@ -516,7 +533,7 @@ GSEA expects a list of decreasing numeric values. Let's build this structure:
 
 ```{r}
 # Build a numeric vector
-geneList <- as.numeric(geneFrame$log2FoldChange);
+geneList <- as.numeric(geneFrame$stat);
 
 # Get the genes identifiers
 names(geneList) <- geneFrame$ENTREZID;
@@ -631,7 +648,7 @@ gseaplot2(
 
 A pathway contains both enhancers and suppressors genes. An up-regulation of enhancer genes and a down-regulation of suppressor genes will lead to a "bad" enrichment score. However, this will lead to a strong change in your pathway activity!
 
-If your favorite pathway does not have a *"goog enrichment score"*, it does not mean that pathway is not affected.
+If your favorite pathway does not have a *"good enrichment score"*, it does not mean that pathway is not affected.
 
 # Set comparison
 
