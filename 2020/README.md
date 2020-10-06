@@ -77,6 +77,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
+| Programme de l'atelier ChIP-seq | | [Program](chip-seq/) |
 | Design expérimental, Contrôle qualité | Stéphanie Le Gras |
 | Alignement | Stéphanie Le Gras |
 | Contrôle qualité des alignements, visualisation | Tao Ye |
