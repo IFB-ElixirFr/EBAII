@@ -7,6 +7,10 @@ library("enrichplot");
 library("pathview");
 library("org.At.tair.db");
 
+
+##########################################################################
+######  PREPARATION   ####################################################
+##########################################################################
 de_res <- read.table(
   file   = "tables/KOvsWT.complete.txt",   # Path to results
   header = TRUE,           # There are column names
@@ -15,7 +19,7 @@ de_res <- read.table(
 );
 
 # Keep selected columns
-de_res <- de_res[ ,c("Id", "padj", "log2FoldChange", "stat")];
+de_res <- de_res[ ,c("Id", "padj", "log2FoldChange")];
 
 # List all values that are to be kept
 threshold <- de_res[, "padj"] <= 0.001;
@@ -31,6 +35,12 @@ ordered_lines_number <- order(
 
 # Gather sorted lines
 de_res <- de_res[ordered_lines_number, ];
+
+
+##########################################################################
+######   ANNOTATION   ####################################################
+##########################################################################
+
 
 # Replace the names in the ID column
 de_res[, "Id"] <- sub("gene:", "", de_res[, "Id"]);
@@ -52,6 +62,12 @@ head(entrez[entrez$Freq > 1, ]);
 symbol <- data.frame(table(annotation$SYMBOL));
 head(symbol[symbol$Freq > 1, ]);
 
+
+##########################################################################
+######   ENRICHMENT   ####################################################
+##########################################################################
+
+
 # run enrichment analysis
 ego <- enrichGO(
   gene    = annotation$ENTREZID,# Ranked gene list
@@ -66,15 +82,31 @@ ego <- enrichGO(
 barplot(ego, showCategory=20);
 dotplot(object = ego, showCategory=20);
 
+
+
+##########################################################################
+######      GSEA      ####################################################
+##########################################################################
+
+
+de_res <- read.table(
+  file   = "tables/KOvsWT.complete.txt",   # Path to results
+  header = TRUE,           # There are column names
+  sep    = "\t",           # This is a tabulation
+  stringsAsFactors = FALSE # Colnames are not factors
+);
+de_res <- de_res[ ,c("Id", "stat")];
+de_res[, "Id"] <- sub("gene:", "", de_res[, "Id"]);
+
 # Rename the columns
-colnames(de_res) <- c("TAIR", "padj", "log2FoldChange");
+colnames(de_res) <- c("TAIR", "stat");
 
 # Merge the frames
 geneFrame <- merge(de_res, annotation, by="TAIR");
 geneFrame <- unique(geneFrame); # Drop duplicates
 
 # Build a numeric vector
-geneList <- as.numeric(geneFrame$log2FoldChange);
+geneList <- as.numeric(geneFrame$stat);
 # Get the genes identifiers
 names(geneList) <- geneFrame$ENTREZID;
 # Sort this list
@@ -110,6 +142,12 @@ gseaplot2(
   title = "Most enriched terms"
 );
 
+
+##########################################################################
+###### SETS COMPARISON  ##################################################
+##########################################################################
+
+
 # Heatmaps
 heatplot(
   x =  ego,             # Our enrichment
@@ -121,6 +159,12 @@ heatplot(
 upsetplot(x = ego); # From our enrichment analysis
 emapplot(ego); # From our enrichment analysis
 goplot(ego); # From our enrichment analysis
+
+
+##########################################################################
+###### PATHWAY ANALYSIS  #################################################
+##########################################################################
+
 
 # Run Kegg erichment and plot-it
 names(geneList) <- geneFrame$TAIR;  # Use TAIR id
