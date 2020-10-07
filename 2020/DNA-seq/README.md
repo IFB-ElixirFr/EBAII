@@ -1,4 +1,4 @@
-## EBAII 2020 - ChIP-seq course
+## EBAII 2020 - DNA-seq course
 
 ### Planning
 
