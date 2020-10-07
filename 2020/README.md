@@ -71,6 +71,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
 | Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
+| Schéma récapitulatif | | [Schema](DNA-seq/variantCalling_pipeline.pdf) |
 
 ### ChIP-seq
 
