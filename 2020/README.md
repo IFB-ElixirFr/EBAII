@@ -32,7 +32,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Script  | | [[R script](R/script_intro_R_2020.r)] |
 | Données | | [[expression.txt](R/expression.txt)] [[annotation.csv](R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
-| Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> | 
+| Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
 
 ### Exposés d'ouverture
 
@@ -77,7 +77,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Support | Lien |
 |----------------------------------|------------------|
 | Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
-| Partie pratique | [TD](/2020/chip-seq/hands-on/hands-on.md) |
+| Partie pratique | [TD](chip-seq/hands-on/hands-on.md) |
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
