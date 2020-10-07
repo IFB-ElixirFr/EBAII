@@ -13,8 +13,6 @@
 | 16:00 | 16:30 | 00:30 | **Break** |  |
 | 16:30 | 17:45 | 01:15 | Filtre et annotation des variants | Olivier Rué |
 
-
-
 #### Wednesday
 
 
