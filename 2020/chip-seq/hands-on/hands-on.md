@@ -431,7 +431,7 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 ### 2 - Viewing the raw alignment data in IGV
 1. Download the following files from the server onto your computer
   * data/Escherichia_coli_K12.fasta
-  * data/Escherichia_coli_K12_MG1655.annotation.gff3
+  * data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz
   * 02-Mapping/IP/repA/SRR576933.bam
   * 02-Mapping/IP/repA/SRR576933.bam.bai
   * 02-Mapping/IP/repB/SRR576934.bam
