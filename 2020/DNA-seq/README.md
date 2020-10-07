@@ -1,4 +1,4 @@
-## EBAII 2020 - ChIP-seq course
+## EBAII 2020 - DNA-seq courses
 
 ### Planning
 
@@ -12,8 +12,6 @@
 | 14:30 | 16:00 | 01:30 | Variant Calling | Nadia Bessoltane |
 | 16:00 | 16:30 | 00:30 | **Break** |  |
 | 16:30 | 17:45 | 01:15 | Filtre et annotation des variants | Olivier Rué |
-
-
 
 #### Wednesday
 

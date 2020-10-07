@@ -103,7 +103,6 @@ colnames(de_res) <- c("TAIR", "stat");
 
 # Merge the frames
 geneFrame <- merge(de_res, annotation, by="TAIR");
-geneFrame <- unique(geneFrame); # Drop duplicates
 
 # Build a numeric vector
 geneList <- as.numeric(geneFrame$stat);
@@ -111,6 +110,7 @@ geneList <- as.numeric(geneFrame$stat);
 names(geneList) <- geneFrame$ENTREZID;
 # Sort this list
 geneList <- sort(geneList, decreasing = TRUE);
+geneList <- unique(geneList);
 
 # Run GSEA
 gsea <- gseGO(

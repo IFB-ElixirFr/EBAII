@@ -1,7 +1,7 @@
 ## EBAII 2020 - ChIP-seq course
 
 ### Hands-on
-Go to [hands-on](/2020/chip-seq/hands-on/hands-on.md)
+Go to [hands-on](/2020/chip-seq/hands-on/)
 
 ### Planning
 

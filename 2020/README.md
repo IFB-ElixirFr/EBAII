@@ -32,7 +32,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Script  | | [[R script](R/script_intro_R_2020.r)] |
 | Données | | [[expression.txt](R/expression.txt)] [[annotation.csv](R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
-| Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> | 
+| Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
 
 ### Exposés d'ouverture
 
@@ -53,7 +53,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNA-seq/) |
-| Bioinformatics | Rachel Legendre | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) |
+| Bioinformatics | Rachel Legendre | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
 | General statistics | Hugo Varet | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Hugo Varet | [ZIP archive](RNA-seq/TP_differential_analysis/Practice_SARTools.zip) |
 | Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) [R script](RNA-seq/GSEA/GSEA.R)|
@@ -71,13 +71,14 @@ From there, you can also find a link to download the whole repository with `git`
 | Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
 | Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
+| Schéma récapitulatif | | [Schema](DNA-seq/variantCalling_pipeline.pdf) |
 
 ### ChIP-seq
 
 | Support | Lien |
 |----------------------------------|------------------|
 | Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
-| Partie pratique | [TD](/2020/chip-seq/hands-on/hands-on.md) |
+| Partie pratique | [TD](chip-seq/hands-on/) |
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
