@@ -13,3 +13,5 @@ RnwWeave: knitr
 LaTeX: XeLaTeX
 
 AutoAppendNewline: Yes
+
+BuildType: Makefile

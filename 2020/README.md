@@ -20,22 +20,26 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
-| Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
-| Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [google slides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
+| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
+| Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
+| Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
 ### R
 
 | Cours | Intervenants | Supports |
-|----------------------------------|--------------|----------|
-| Introduction à R | Thomas Denecker, Jacques van Helden, Hugo Varet | [google slides](https://docs.google.com/presentation/d/1wJHUGDIip5EE8NL7mLSZFfYR9c-u2AAKKh30SQjuL-Q/edit?usp=sharing) [R script](R/script_intro_R_2020.r) [expression.txt](R/expression.txt) [annotation.csv](R/annotation.csv)|
+|-----------------------|--------------|-------------------------------------|
+| Introduction à R | Thomas Denecker, Jacques van Helden, Hugo Varet | [[pdf](R/Intro_R_2020.pdf)] [[gslides](https://docs.google.com/presentation/d/1wJHUGDIip5EE8NL7mLSZFfYR9c-u2AAKKh30SQjuL-Q/edit?usp=sharing)] |
+| Script  | | [[R script](R/script_intro_R_2020.r)] |
+| Données | | [[expression.txt](R/expression.txt)] [[annotation.csv](R/annotation.csv)] |
+| Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
+| Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> | 
 
 ### Exposés d'ouverture
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [google slides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
-| Long reads | Claude Thermes | |
+| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [gslides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
+| Long reads | Claude Thermes | [ppt](long_reads/20201006_THERMES_ROSCOFF9_V3.pptx) |
 
 ### Visualisation
 
@@ -60,19 +64,19 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [ggslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
-|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [ggslides](https://docs.google.com/presentation/d/1cfdGX-3rjhNAFGSBsk2NhBU44f7A4lkFeS_8ptdlLEw/edit?usp=sharing) |
-| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [ggslides](https://docs.google.com/presentation/d/1GbfYjfXeeow6wkRRLR0MmDie5OTd1j3Cg02xgfGlUeI/edit?usp=sharing) |
-| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [ggslides](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit?usp=sharing) |
-| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [ggslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
+| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [gslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
+|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1cfdGX-3rjhNAFGSBsk2NhBU44f7A4lkFeS_8ptdlLEw/edit?usp=sharing) |
+| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [gslides](https://docs.google.com/presentation/d/1GbfYjfXeeow6wkRRLR0MmDie5OTd1j3Cg02xgfGlUeI/edit?usp=sharing) |
+| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [gslides](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit?usp=sharing) |
+| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
 | Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [ggslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
+| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
 
 ### ChIP-seq
 
 | Support | Lien |
 |----------------------------------|------------------|
-| Partie théorique | [ggslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
+| Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
 | Partie pratique | [TD](/2020/chip-seq/hands-on/hands-on.md) |
 
 | Cours | Intervenants |
@@ -90,7 +94,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [Google slides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) |
+| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) |
 | Intégration de données | Laura Cantini |[pdf](croisement_donnees/CANTINI_NGS_AVIESAN_IFB.pdf) |
 
 *****
