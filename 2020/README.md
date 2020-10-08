@@ -95,6 +95,11 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) |
+| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) [soluce](croisement_donnees/solution.html) |
 | Intégration de données | Laura Cantini |[pdf](croisement_donnees/CANTINI_NGS_AVIESAN_IFB.pdf) |
-| IFB Core Cluster - Introduction slides | Thomas Denecker Gildas Le Corguillé Julien Seiler |[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/index.html#1) |
+
+### Initiation Slurm
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| IFB Core Cluster - Introduction slides | Thomas Denecker, Gildas Le Corguillé, Julien Seiler |[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/index.html#1) |
