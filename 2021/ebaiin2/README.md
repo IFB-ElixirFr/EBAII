@@ -7,7 +7,7 @@
 
 ## Web site
 
-- Web pages: <https://ifb-elixirfr.github.io/EBAII/2020/>
+- Web pages: <https://ifb-elixirfr.github.io/EBAII/2021/ebaiin2/>
 
 From there, you can also find a link to download the whole repository with `git`.
 
