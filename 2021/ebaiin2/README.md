@@ -14,3 +14,12 @@ From there, you can also find a link to download the whole repository with `git`
 ****
 
 ## Supports de cours
+
+### ChIP-seq
+| Cours | Intervenants | Supports |
+|-----------------------|--------------|-------------------------------------|
+| Annotation des peaks | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/tutu.Rmd)]  |
+| Heatmap | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+| GRange - Comparaison de jeux de données  | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+| Enrichissement fonctionnel |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+| Jamais sans mes stats |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
