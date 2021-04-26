@@ -5,7 +5,8 @@
 
 ## Teaching material
 
-
+- [Session 2021 niveau 1](2021/ebaiin1/README.md)
+- [Session 2021 niveau 2](2021/ebaiin2/README.md)
 - [Session 2020](2020/README.md)
 - [Sessions précédentes](http://france-bioinformatique.fr/)
 
