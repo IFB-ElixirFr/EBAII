@@ -23,3 +23,11 @@ From there, you can also find a link to download the whole repository with `git`
 | GRange - Comparaison de jeux de données  | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
 | Enrichissement fonctionnel |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
 | Jamais sans mes stats |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+
+### RNA-seq
+
+| Cours | Intervenants | Supports |
+|-----------------------|--------------|-------------------------------------|
+| TP | Hugo Varet | [[Rmarkdown](RNASeq/EBAIIn2_RNASeq.Rmd)] |
+| TP | Hugo Varet | [[Rmarkdown](RNASeq/EBAIIn2_RNASeq.Rmd)] |
+
