@@ -26,8 +26,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### RNA-seq
 
-| Cours | Intervenants | Supports |
-|-----------------------|--------------|-------------------------------------|
-| TP | Hugo Varet | [[Rmarkdown](RNASeq/EBAIIn2_RNASeq.Rmd)] |
-| TP | Hugo Varet | [[Rmarkdown](RNASeq/EBAIIn2_RNASeq.Rmd)] |
-
+| Fichier                  | Intervenant | Lien                                  |
+|--------------------------|-------------|---------------------------------------|
+| Script Rmarkdown vide    | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq_vide.Rmd) |
+| Script Rmarkdown complet | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq.Rmd)      |
+| Rendu HTML               | Hugo Varet  | [HTML](RNASeq/EBAIIn2_RNASeq.html)    |
+| Données                  | Hugo Varet  | [ZIP](RNASeq/data.zip)                |
