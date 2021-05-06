@@ -17,9 +17,16 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### Visualisation en R
 
-| Fichier                  | Intervenant | Lien                                  |
-|--------------------------|-------------|---------------------------------------|
-| Programme    | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S00programme.html)] |
+| Fichier   | Intervenant        | Lien                                  |
+|-----------|--------------------|---------------------------------------|
+| Programme | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S00programme.html)] |
+| Packages  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S01packages.html)] |
+| dplyr     | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S02dplyr.html)] |
+| ggplot2   | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S03ggplot2.html)] |
+| couleurs  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S04couleurs.html)] |
+| pheatmap  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S05pheatmap.html)] |
+| upset     | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S06upset.html)] |
+| gggenes   | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S07gggenes.html)] |
 
 
 ### ChIP-seq
