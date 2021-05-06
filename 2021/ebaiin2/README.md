@@ -15,8 +15,16 @@ From there, you can also find a link to download the whole repository with `git`
 
 ## Supports de cours
 
+### Visualisation en R
+
+| Fichier                  | Intervenant | Lien                                  |
+|--------------------------|-------------|---------------------------------------|
+| Programme    | Vincent Guillemot  | [Rmd](01R/tidyViz/vignettes/S00programme.Rmd) |
+
+
 ### ChIP-seq
-| Cours | Intervenants | Supports |
+
+| Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
 | Annotation des peaks | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/tutu.Rmd)]  |
 | Heatmap | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
