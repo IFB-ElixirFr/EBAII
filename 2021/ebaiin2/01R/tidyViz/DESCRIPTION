@@ -10,6 +10,8 @@ Description:
   ainsi que des tutoriels développés avec learnr.
 Depends:
     R (>= 3.5.0)
+Imports: learnr, dplyr, ggplot2, RColorBrewer, ggvenn, ComplexUpset, gggenes
+BiocViews: trackViewer
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.1
