@@ -1,0 +1,42 @@
+---
+title: "gggenes et trackViewer"
+author: "Vincent Guillemot"
+date: "Mardi 25 mai 2021"
+output: 
+    ioslides_presentation:
+        css: styles.css
+vignette: >
+  %\VignetteIndexEntry{06gggenes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+## Avant toutes choses
+
+Nous aurons besoin des packages `gggenes` et `trackViewer` :
+
+ * Vérifier que les packages `gggenes` et `trackViewer` sont bien installés
+ * Si non, les installer, puis les charger
+
+Attention ! Vous trouverez `gggenes` sur le [CRAN](https://wilkox.org/gggenes/) et `trackViewer` sur [Bioconductor](https://www.bioconductor.org/packages/release/bioc/html/trackViewer.html) !
+
+
+```{r gggenes, message = FALSE}
+library(gggenes)
+library(trackViewer)
+```
+
+
