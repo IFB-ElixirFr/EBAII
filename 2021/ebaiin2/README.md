@@ -17,7 +17,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### Visualisation en R
 
-| Fichier   | Intervenant        | Lien                                  |
+
+| Thématique| Intervenant        | Lien                                  |
 |-----------|--------------------|---------------------------------------|
 | Programme | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S00programme.html)] |
 | Packages  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S01packages.html)] |

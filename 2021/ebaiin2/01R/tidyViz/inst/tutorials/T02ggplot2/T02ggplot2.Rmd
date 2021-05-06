@@ -11,11 +11,11 @@ library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 library(ggpubr)
-data("fruits", package = "intro2r")
+data("fruits", package = "tidyViz")
 couleurs <- c("steelblue", "limegreen", "darkolivegreen", "darkorchid")
 ```
 
-Le package ggplot2 permet de réaliser facilement des graphiques avec une syntaxe unifiée. Dans ce tutoriel, nous allons nous entraîner avec les données "fruits".
+Le package `ggplot2` permet de réaliser facilement des graphiques avec une syntaxe unifiée. Dans ce tutoriel, nous allons nous entraîner avec les données "fruits".
 
 ## Commande de base
 

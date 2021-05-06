@@ -74,4 +74,28 @@ knitr::opts_chunk$set(
     2. ou l'inverse.
     3. Exécuter la commande `install.package("source.tar.gz", repos = NULL, type = "source")`.
 
-# Exercices ?
+# Exercices
+
+## Installez le package du cours
+
+Dans le cadre de ce cours, j'ai créé un package R contenant :
+
+ * les slides (`html`)
+ * les données fruits (`csv`, `xlsx`, et `RData`)
+ * des TDs interactifs (`html`)
+
+Installez ce package avec la commande
+
+```{r install, eval = FALSE}
+remotes::install_github(
+  "IFB-ElixirFr/EBAII",
+  subdir = "2021/ebaiin2/01R/tidyViz",
+  build_vignettes = TRUE
+)
+```
+
+## Explorez la documentation du package
+
+
+
+
