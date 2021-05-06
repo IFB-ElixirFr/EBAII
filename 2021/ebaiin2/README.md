@@ -19,7 +19,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Fichier                  | Intervenant | Lien                                  |
 |--------------------------|-------------|---------------------------------------|
-| Programme    | Vincent Guillemot  | [Rmd](01R/tidyViz/vignettes/S00programme.Rmd) |
+| Programme    | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S00programme.html)] |
 
 
 ### ChIP-seq
