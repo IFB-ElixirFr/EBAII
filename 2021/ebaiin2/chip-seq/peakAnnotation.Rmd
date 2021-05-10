@@ -17,8 +17,9 @@ bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
+#setwd("/Volumes/ngs/illumina/slegras/B21000_EBAIIv2/")
 knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
-setwd("/Volumes/ngs/illumina/slegras/B21000_EBAIIv2/")
+
 ```
 
 ## Peak Annotation
