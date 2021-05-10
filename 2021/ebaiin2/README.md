@@ -34,7 +34,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
-| Annotation des peaks | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/tutu.Rmd)]  |
+| Introduction | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/Introduction.html)]  |
+| Annotation des peaks |  | [[Rmarkdown](chip-seq/peakAnnotation.html)]  |
 | Heatmap | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
 | GRange - Comparaison de jeux de données  | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
 | Enrichissement fonctionnel |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
