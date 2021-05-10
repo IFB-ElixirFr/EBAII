@@ -1,0 +1,93 @@
+---
+title: "UpSet graphes"
+author: "Vincent Guillemot"
+date: "Mardi 25 mai 2021"
+output: 
+    ioslides_presentation:
+        css: styles.css
+vignette: >
+  %\VignetteIndexEntry{06upset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+## Avant toutes choses
+
+Nous aurons besoin des packages `ggvenn` et `ComplexUpset` :
+
+ * Vérifier que les packages `ggvenn` et `ComplexUpset` sont bien installés
+ * Si non, les installer, puis les charger
+
+```{r ComplexUpset, message = FALSE}
+library(ggvenn)
+library(ComplexUpset)
+```
+
+Nous allons également avoir besoin des données fruits : 
+
+```{r data}
+data("fruits", package = "tidyViz")
+```
+
+## Visualiser des relations entre listes {.columns-2 .smaller}
+
+Créons une liste d'objets :
+
+```{r flist}
+flist <- with(fruits,
+  list(
+    Sucres = nom[Sucres > 20],
+    Fibres = nom[Fibres > 2],
+    Energie = nom[Energie > 50],
+    Potassium = nom[Potassium > 100],
+    Crus = nom[groupe == "crus"]
+))
+```
+
+Et une matrice binaire
+
+```{r fbin}
+fbin <- with(fruits,
+  data.frame(
+    Sucres = Sucres > 20,
+    Fibres = Fibres > 2,
+    Energie = Energie > 50,
+    Potassium = Potassium > 100,
+    Crus = groupe == "crus"
+))
+```
+
+
+## Diagramme de Venn {.smaller}
+
+Compliqués à lire à partir de 4 ensembles : 
+
+```{r venn, fig.height = 4, fig.width = 8}
+ggvenn(flist, set_name_size = 5)
+```
+
+
+## UpSet plot {.smaller}
+
+C'est une méthode de visualisation alternative.
+Pour notre exemple : 
+
+```{r upset0, fig.height = 4}
+upset(fbin, intersect = c("Sucres", "Fibres", "Energie", "Potassium", "Crus"))
+```
+
+
+

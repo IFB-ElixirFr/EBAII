@@ -1,0 +1,117 @@
+---
+title: "Premier jour: visualisation(s)"
+author: "Vincent Guillemot"
+date: "Mardi 25 mai 2021"
+output: 
+    ioslides_presentation:
+        css: styles.css
+vignette: >
+  %\VignetteIndexEntry{00programme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+## Je me présente {.columns-2 .bigger}
+
+![Vincent Guillemot](img/S00programme/moi.001.jpeg){width=75%}
+
+ * Biostatisticien
+ * Intégration de données
+ * Machine Learning
+ * Cours de statistiques et de R
+
+## Quiz de bienvenue
+
+![Voir le lien et le code sur le chat !](img/S00programme/Kahoot_Logo.svg){width=100%}
+
+
+## Au programme {.columns-2 .bigger}
+
+Plutôt le matin
+
+ * Quiz de bienvenue
+ * `dplyr` : pour manipuler des données
+ * `ggplot2` : pour les graphiques de base
+ * retour sur les couleurs dans R
+ * `ggpubr` pour combiner des graphes
+
+
+<p class="forceBreak"></p>
+
+Plutôt l'après-midi
+
+ * `pheatmap` : pour les cartes de chaleur et la classification hiérarchique
+ * Diagrammes de Venn et *UpSet* plots
+ * `gggenes` 
+ * `trackViewer::lolliplot`
+ * Quiz de fin
+
+## Déroulement du cours
+
+Pour favoriser l'interactivité de ce cours en distanciel, voici ce que je vous propose : 
+
+ * Deux quiz (Kahoot, cf. programme)
+ * Des exercices réguliers
+ * Les étudiant·e·s sont sollicités régulièrement
+ * Tutoriels interactifs pour s'entraîner "à la maison"
+
+
+## Des données simples... pour moi
+
+![Composition de produits alimentaires (https://ciqual.anses.fr/)](img/S00programme/ciqual.jpg){width=100%}
+
+
+## Ressources
+
+
+  * Les [feuilles de triche](https://www.rstudio.com/resources/cheatsheets/) (EN) de
+    - [dplyr](https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (EN)
+    - [ggplot2](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf) (EN)
+  * La page STDHA sur [les couleurs](http://www.sthda.com/french/wiki/couleurs-dans-r) (FR)
+  * La page de [ggpubr](https://rpkgs.datanovia.com/ggpubr/) (EN)
+  * La vignette de [gggenes](https://cran.r-project.org/web/packages/gggenes/vignettes/introduction-to-gggenes.html) (EN)
+  * La vignette de [trackViewer](https://bioconductor.org/packages/release/bioc/vignettes/trackViewer/inst/doc/trackViewer.html) (EN)
+  * [R pour les débutants d'Emmanuel Paradis](https://cran.r-project.org/doc/contrib/Paradis-rdebuts_fr.pdf) (FR)
+  
+  
+
+## moRe ! {.columns-2 .smaller}
+
+  * Livre *R for Data Science* : https://r4ds.had.co.nz/
+  * Livre *R Cookbook* : https://rc2e.com/
+  * Livre *Modern Data Science with R* : https://mdsr-book.github.io/mdsr2e/
+  * Livre *Computational Genomics with R* : https://compgenomr.github.io/book/
+  * Livre *ggplot2: elegant graphics for data analysis* : https://ggplot2-book.org/index.html
+  * Site de référence ggplot2 : https://ggplot2.tidyverse.org/reference/
+  * Extensions ggplot2 : https://exts.ggplot2.tidyverse.org/gallery/
+
+<p class="forceBreak"></p>
+
+
+  * *A ggplot2 Tutorial for Beautiful Plotting in R* : https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/
+  * Package R patchwork : https://github.com/thomasp85/patchwork
+  * Livre *Circular Visualization in R* : https://jokergoo.github.io/circlize_book/book/
+  * Livre ComplexHeatmap : https://jokergoo.github.io/ComplexHeatmap-reference/book/
+  * Palettes de couleurs : https://github.com/EmilHvitfeldt/r-color-palettes
+  
+## RNA-Seq {.columns-2 .bigger}
+
+  * Chaine YouTube [StatQuest](https://www.youtube.com/c/joshstarmer/videos)
+  * Site DoItYourself Transcriptomics : https://diytranscriptomics.com/
+  * Site RNA-Seqlopedia : https://rnaseq.uoregon.edu/
+
+<p class="forceBreak"></p>
+
+  * [*Selecting between-sample RNA-Seq normalization methods from the perspective of their assumptions*](https://academic.oup.com/bib/article/19/5/776/3056951) (Evans 2017) : 
