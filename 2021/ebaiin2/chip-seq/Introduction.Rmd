@@ -1,0 +1,69 @@
+---
+title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
+author: "Stephanie Le Gras"
+date: "2021 May, 27th"
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    toc: true
+    toc_depth: 3
+  html_document: default
+params:
+  mapping.chipseq: data/stats_mappingChIPseq.tsv
+  peakcalling.chipseq: data/stats_peakCalling.tsv
+  ensembl: 103
+  assembly: hg38
+  organism: Homo sapiens
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
+```
+
+## Introduction
+During this training session, we are going to analyze data from Laurette et al. [@laurette_transcription_2015] which data are deposited in GEO as [GSE61967](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE61967). There are ChIP-seq and RNA-seq data. Data were downloaded from GEO and processed.
+
+### Processing of RNA-seq data
+#### Preprocessing
+Reads were preprocessed in order to remove adapter, polyA and low-quality sequences (Phred quality score below 20). After this preprocessing, reads shorter than 40 bases were discarded for further analysis. These preprocessing steps were performed using cutadapt [@martin_cutadapt_2011] version 1.10.
+
+#### Mapping
+Reads were mapped onto the hg38 assembly of Homo sapiens genome using STAR [@dobin_star:_2013] version 2.5.3a.
+
+#### Quantification
+Gene expression quantification was performed from uniquely aligned reads using htseq-count verson 0.6.1.p1 [@anders_htseqpython_2015], with annotations from Ensembl version 103 and “union” mode. Only non-ambiguously assigned reads have been retained for further analyses.
+
+#### Normalization
+Read counts have been normalized across samples with the median-of-ratios method proposed by Anders and Huber [@AND2010], to make these counts comparable between samples.
+
+### Processing of ChIP-seq data
+#### Mapping
+Reads were mapped to ``r params$organism`` genome (assembly ``r params$assembly``) using Bowtie [@langmead_ultrafast_2009] v1.0.0 with default parameters except for "-p 3 -m 1 --strata --best --chunkmbs 128". The following table shows the number of reads aligned to the ``r params$organism`` genome.
+
+```{r stats.chipseq, echo=FALSE}
+align.stat <- read.table(params$mapping.chipseq, sep="\t", quote="", header=T, check.names = F)
+
+library(knitr)
+
+align.stat = align.stat[order(align.stat$"Sample ID"),]
+
+kable(align.stat, caption = "Mapping statistics of ChIP-seq data analyzed during this training session. Raw corresponds to the number of sequenced reads. Aligned corresponds to the number of reads aligned exactly 1 time. Multimapped corresponds to the number of reads aligned > 1 times. Unmapped corresponds to the number of reads aligned 0 time.", row.names = FALSE)
+
+```
+
+#### Peak Calling
+Prior to peak calling, reads falling into Encode blacklisted regions [@anshulkundaje_2014] were removed using bedtools intersect v2.26.0 [@quinlan_bedtools:_2010]. Then peak calling was done with Macs2 v2.1.1 with default parameters.
+
+```{r peakcalling, echo=FALSE}
+
+peak.stat <- read.table(params$peakcalling.chipseq, sep="\t", quote="", header=T, check.names = F)
+
+peak.stat = peak.stat[order(peak.stat$"IP sample"),]
+
+kable(peak.stat, caption = "Number of peaks detected", row.names = FALSE)
+```
+
+#### Generation of BigWig files
+Normalized BigWig files were generated using Homer [@heinz_simple_2010] makeUCSCfile v4.11.0 with the following parameter ’-norm 1e7’ meaning that data were normalized to 10M reads.
