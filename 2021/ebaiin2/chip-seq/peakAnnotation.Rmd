@@ -3,12 +3,12 @@ title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
 author: "Stephanie Le Gras"
 date: "2021 May, 27th"
 output:
+  html_document: default
   pdf_document:
     fig_caption: yes
     keep_tex: yes
     toc: true
     toc_depth: 3
-  html_document: default
 params:
   ensembl: 103
   assembly: hg38
@@ -23,11 +23,14 @@ knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B2100
 ```
 
 ## Peak Annotation
-During this session, we are going to use
+During this session, we are going to use various R packages.
 ```{r loadPackage, include=TRUE}
+## loading packages
 library(ChIPseeker)
 ```
 
 ### Load data
-peakfile <- system.file("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", package="ChIPseeker")
-peak.gr <- readPeakFile(peakfile, as="GRanges")
+```{r loadData, include=TRUE}
+peak.gr <- readPeakFile("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", as="GRanges")
+peak.gr
+```

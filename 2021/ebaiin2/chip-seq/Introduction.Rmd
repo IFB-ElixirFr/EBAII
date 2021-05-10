@@ -3,12 +3,12 @@ title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
 author: "Stephanie Le Gras"
 date: "2021 May, 27th"
 output:
+  html_document: default
   pdf_document:
     fig_caption: yes
     keep_tex: yes
     toc: true
     toc_depth: 3
-  html_document: default
 params:
   mapping.chipseq: data/stats_mappingChIPseq.tsv
   peakcalling.chipseq: data/stats_peakCalling.tsv
@@ -67,3 +67,5 @@ kable(peak.stat, caption = "Number of peaks detected", row.names = FALSE)
 
 #### Generation of BigWig files
 Normalized BigWig files were generated using Homer [@heinz_simple_2010] makeUCSCfile v4.11.0 with the following parameter ’-norm 1e7’ meaning that data were normalized to 10M reads.
+
+### References
