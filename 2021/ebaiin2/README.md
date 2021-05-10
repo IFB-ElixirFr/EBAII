@@ -34,12 +34,12 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
-| Introduction | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/Introduction.html)]  |
-| Annotation des peaks |  | [[Rmarkdown](chip-seq/peakAnnotation.html)]  |
-| Heatmap | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| GRange - Comparaison de jeux de données  | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| Enrichissement fonctionnel |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| Jamais sans mes stats |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+| Introduction | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[html](chip-seq/Introduction.html)]  |
+| Annotation des peaks |  | [[html](chip-seq/peakAnnotation.html)]  |
+| Heatmap | | [[html](chip-seq/tutu.Rmd)] |
+| GRange - Comparaison de jeux de données  | | [[html](chip-seq/tutu.Rmd)] |
+| Enrichissement fonctionnel |  | [[html](chip-seq/tutu.Rmd)] |
+| Jamais sans mes stats |  | [[html](chip-seq/tutu.Rmd)] |
 
 ### RNA-seq
 
