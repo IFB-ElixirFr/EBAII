@@ -23,25 +23,15 @@ knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B2100
 ```
 
 ## Heatmaps
-During this session, we are going to use various R packages.
-```{r loadPackage, include=TRUE}
-## loading packages
-library(ChIPseeker)
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
-```
-
 ### Profile of ChIP peaks binding to TSS regions
-First of all, for calculating the profile of ChIP peaks binding to TSS regions, we should prepare the TSS regions, which are defined as the flanking sequence of the TSS sites. Then align the peaks that are mapping to these regions, and generate the tagMatrix.
+First of all, for calculating the profile of ChIP peaks binding to TSS regions, we should prepare the TSS regions, which are defined as the flanking sequence of the TSS sites. Then align the peaks that are mapped to these regions, and generate the tagMatrix.
 
 ```{r prepareMatrix, include=TRUE}
-peak <- readPeakFile("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", as="GRanges")
-
-peakHeatmap(peak, TxDb=txdb, upstream=3000, downstream=3000, color="red")
+peakHeatmap(peak, TxDb=txdb, upstream=5000, downstream=5000, color="red")
 ```
 
 ### Average Profile of ChIP peaks binding to TSS region
 ```{r averageProfile, include=TRUE}
-plotAvgProf2(peak, TxDb=txdb, upstream=3000, downstream=3000,
+plotAvgProf2(peak, TxDb=txdb, upstream=5000, downstream=5000,
              xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency")
 ```

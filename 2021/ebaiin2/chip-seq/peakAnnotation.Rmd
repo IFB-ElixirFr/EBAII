@@ -3,13 +3,18 @@ title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
 author: "Stephanie Le Gras"
 date: "2021 May, 27th"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_depth: 3
   pdf_document:
     fig_caption: yes
     keep_tex: yes
     toc: true
     toc_depth: 3
 params:
+  brg1: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak
+  mitf: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak
+  sox10: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak
   ensembl: 103
   assembly: hg38
   organism: Homo sapiens
@@ -18,31 +23,43 @@ bibliography: references.bib
 
 ```{r setup, include=FALSE}
 #setwd("/Volumes/ngs/illumina/slegras/B21000_EBAIIv2/")
-knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
-
+#knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
+knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
 ```
-## Working environment
-During this session, we are going to use various R packages.
-```{r loadPackage, echo=TRUE}
-## loading packages
+
+## Load data
+During this training session we are going to use some features from the package ChIPseeker. Load it.
+```{r setupenv, message=FALSE, include=TRUE}
 library(ChIPseeker)
 ```
 
-### Load data
+Peak files are in narrowPeak format which is of the form ([source](https://genome.ucsc.edu/FAQ/FAQformat.html#format12)):
+
+1. chrom - Name of the chromosome (or contig, scaffold, etc.).
+2. chromStart - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.
+3. chromEnd - The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99.
+4. name - Name given to a region (preferably unique). Use "." if no name is assigned.
+5. score - Indicates how dark the peak will be displayed in the browser (0-1000). If all scores were "'0"' when the data were submitted to the DCC, the DCC assigned scores 1-1000 based on signal value. Ideally the average signalValue per base spread is between 100-1000.
+6. strand - +/- to denote strand or orientation (whenever applicable). Use "." if no orientation is assigned.
+7. signalValue - Measurement of overall (usually, average) enrichment for the region.
+8. pValue - Measurement of statistical significance (-log10). Use -1 if no pValue is assigned.
+9. qValue - Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned.
+10. peak - Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called.
+
 ```{r loadData, include=TRUE}
 peaks <- list()
-peaks[["BRG1"]] <- readPeakFile("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", as="GRanges")
-peaks[["MITF"]] <- readPeakFile("2021-05-07_PeakCalling/MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak", as="GRanges")
-peaks[["SOX10"]] <- readPeakFile("2021-05-07_PeakCalling/SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak", as="GRanges")
+peaks[["BRG1"]] <- readPeakFile(params$brg1, as="GRanges")
+peaks[["MITF"]] <- readPeakFile(params$mitf, as="GRanges")
+peaks[["SOX10"]] <- readPeakFile(params$sox10, as="GRanges")
 peaks
 ```
 
-The peaks are stored as **GenomicRanges** object; this is an R format which look like the bed format, but is optimized in terms of memory requirements and speed of execution.
+Peaks are stored as **GenomicRanges** objects; this is an R format which look like the bed format, but is optimized in terms of memory requirements and speed of execution.
 
 We can start by computing some basic statistics on the peak sets.
 
 ### ChIP-seq data description
-#### How many peaks?
+#### How many peaks were called?
 
 ```{r peaksStats, include=TRUE}
 ## check the number of peak sets
@@ -92,7 +109,7 @@ ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
 ```
 
 #### How large are these peaks?
-```{r peakWidth, include=TRUE}
+```{r peakWidth, message=FALSE, include=TRUE}
 ## statistics on BRG1 peak sizes
 ## we use the function width() from GenomicRanges
 library(GenomicRanges)
@@ -105,100 +122,143 @@ lapply(peak.width,summary)
 
 ## create a simple boxplot of the peak sizes
 boxplot(peak.width)
+
+## Create a nice looking boxplot with ggplot2
+# ggplot takes a data frame as input.
+# we can either create a date frame, this is what we have
+# done when we created the barplot. Here, we are going to use a
+# package that creates a data frame from other types of data: reshape2
+# Load the package
+library(reshape2)
+peak.width.table <- melt(peak.width)
+head(peak.width.table)
+
+# in this table, there is as many rows as the total number
+# of peaks in all peak sets.
+# Number of peaks per chipped protein
+sapply(peaks, length)
+# total number of peaks
+sum(sapply(peaks, length))
+# size of the table we've just generated
+dim(peak.width.table)
+
+# it contains all possible pairs IP <-> number of peaks possible
+
+# Now create a nice looking boxplot
+ggplot(peak.width.table, aes(x=L1, y=value)) +
+         geom_boxplot()
+
+# Enhance it
+# - theme_classic() change grey background to white background
+# - fill=L1 and scale_fill_brewer(palette="Set1") colors boxplots
+# based on chipped protein and with colors from RColorBrewer Set1 palette
+# - labs changes x and y axis labels and legend title
+# - scale_y_log10() set y axis to a log scale so that we can have a nice
+# view of the data in small values
+ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
+         geom_boxplot()+
+         theme_classic()+
+         scale_fill_brewer(palette="Set1")+
+         labs(x = "", y = "Peak sizes", fill = "")+
+         scale_y_log10()
+
 ```
 
-#### What is the score of these peaks?
+<!-- #### What is the score of these peaks?
 
-Can you adapt the previous code to display a boxplot of the peak score distribution for the Forebrain peak set (column `Maximum.Peak.Height`)?
+Can you adapt the previous code to display a boxplot of the peak score distribution for the Forebrain peak set (column `Maximum.Peak.Height`)? -->
 
-#### Where are the peaks located?
+### Where are the peaks located over the whole genome?
 
 We can now display the genomic distribution of the peaks along the chromosomes, including the peak scores, using the `covplot` function from `ChIPSeeker`:
-```r
-# genome wide distribution
-covplot(peaks.forebrain, weightCol="Maximum.Peak.Height")
+
+```{r peakGenomeDistribution, include=TRUE}
+# genome wide BRG1 peak distribution
+covplot(peaks$BRG1, weightCol="V5")
+
+# chromosome wide BRG1 peak distribution
+covplot(peaks$BRG1, chrs=c("chr1", "chr2"), weightCol="V5")
 ```
-**Exercice: use the option "lower" in covplot to display only the peaks with a score (Max.Peak.Height) above 10**
 
-#### How does the signal look like at TSS?
+### How does the signal look like at TSS?
 
-In addition to the genome wide plot, we can check if there is a tendency for the peaks to be located close to gene promoters.
-```r
-# define gene promoters
+In addition to the genome wide plot, we can check if there is a tendency for the peaks to be located close to gene promoters. Here promoters are defined as regions +/-5Kb around the TSS.
+
+```{r signalAroundTSS, message=FALSE, include=TRUE}
+## Load transcript annotation
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+
+## define gene promoters
+## TxDb object should be passed for peak annotation (see below)
 promoter = getPromoters(TxDb=txdb, upstream=5000, downstream=5000)
 
-# compute the density of peaks within the promoter regions
-tagMatrix = getTagMatrix(peaks.limb, windows=promoter)
+## compute the density of peaks within the promoter regions
+tagMatrix = getTagMatrix(peaks$BRG1, windows=promoter)
 
-# plot the density
+## plot the density
 tagHeatmap(tagMatrix, xlim=c(-5000, 5000), color="red")
 ```
 
-### 3 - Functional annotation of the peaks
+The TxDb class is a container for storing transcript annotations. Bioconductor provides several packages containing TxDb objects for model organisms sur as Human and mouse. For instance, TxDb.Hsapiens.UCSC.hg38.knownGene, TxDb.Hsapiens.UCSC.hg19.knownGene for human genome hg38 and hg19, TxDb.Mmusculus.UCSC.mm10.knownGene and TxDb.Mmusculus.UCSC.mm9.knownGene for mouse genome mm10 and mm9, etc. User can also prepare their own TxDb by retrieving information from UCSC Genome Bioinformatics and BioMart data resources by R function makeTxDbFromBiomart and makeTxDbFromUCSC. One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
 
-We can now assign the peaks to the closest genes and genomic compartments (introns, exons, promoters, distal regions, etc...)
-This is done using the function `annotatePeak` which compares the peak files with the annotation file of the mouse genome. This function returns
+```{r createTxDbGTF, include=TRUE, eval=FALSE}
+## download GTF file
+download.file("https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/93934/101/GCF_001577835.2_Coturnix_japonica_2.1/GCF_001577835.2_Coturnix_japonica_2.1_genomic.gtf.gz", "Coturnix_japonica_2.1.annotation.gtf.gz")
+
+## Build TxDb object
+library(GenomicFeatures)
+txdb = makeTxDbFromGFF("Coturnix_japonica_2.1.annotation.gtf.gz")
+
+## To save the txdb database
+library(AnnotationDbi)
+saveDb(txdb, 'txdb.Coturnix_japonica_2.1.sqlite')
+
+## load it when needed
+library(AnnotationDbi)
+txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
+```
+
+### Functional annotation of the peaks
+
+We can now assign the peaks to the closest genes and genomic features (introns, exons, promoters, distal regions, etc...).
+This is done using the function `annotatePeak` which compares peak positions with the genomic feature positions of the reference genome. This function returns
 a complex object which contains all this information.
 
-```r
-peakAnno.forebrain = annotatePeak(peaks.forebrain, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
-peakAnno.midbrain = annotatePeak(peaks.midbrain, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
-peakAnno.limb = annotatePeak(peaks.limb, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
+```{r annotatePeaks, eval=TRUE, message=FALSE, include=TRUE}
+## org.Hs.eg.db is an R object that contains mappings between Entrez Gene identifiers and GenBank accession numbers.
+library(org.Hs.eg.db)
+
+## Annotate peaks for all datasets and store it in a list
+peakAnno <- list()
+peakAnno[["BRG1"]] = annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+peakAnno[["MITF"]] = annotatePeak(peaks$MITF, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+peakAnno[["SOX10"]] = annotatePeak(peaks$SOX10, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
 ```
 
-#### genomic localization
+#### Genomic localization
 
-We can now analyze more in details the localization of the peaks (introns, exons, promoters, distal regions,...)
+We can now analyze more in details the genomic features associated to our peaks (introns, exons, promoters, distal regions,...)
 
-```r
-# distribution of genomic compartments for forebrain peaks
-plotAnnoPie(peakAnno.forebrain)
+```{r genomicFeatureDistribution, include=TRUE, eval=TRUE}
+## distribution of genomic features for BRG1 peaks
+# as a pie chart - which is the most widely used representation in publication
+plotAnnoPie(peakAnno$BRG1)
 
-# for all the peaks
-plotAnnoBar(list(forebrain=peakAnno.forebrain, midbrain=peakAnno.midbrain,limb=peakAnno.limb))
+# as a barplot
+plotAnnoBar(peakAnno$BRG1)
+
+# However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap
+library(UpSetR)
+upsetplot(peakAnno$BRG1)
+
+## Representation with barplot is the most convenient view when looking
+## at several datasets at once
+## show the distribution of genomic features for all peak sets at once
+plotAnnoBar(peakAnno)
 ```
-*Question: do you see differences between the three peak sets?*
 
-
-#### functional annotation
-
-An important step in ChIP-seq analysis is to interpret genes that are located close to the ChIP peaks. Hence, we need to
-1. assign genes to peaks
-2. compute functional enrichments of the target genes.
-
-**Beware:**
-By doing so, we assume that the target gene of the peak is always the closest one. Hi-C/4C analysis have shown that in higher eukaryotes, this is not always the case. However, in the absence of data on the real target gene of ChIP-peaks, we can work with this approximation.
-
-We will compute the enrichment of the Gene Ontology "Biological Process" categories in the set of putative target genes.
-
-```r
-# load the library
-library(clusterProfiler)
-
-# define the list of all mouse genes as a universe for the enrichment analysis
-universe = mappedkeys(org.Mm.egACCNUM)
-
-## extract the gene IDs of the forebrain target genes
-genes.forebrain = peakAnno.forebrain@anno$geneId
-ego.forebrain = enrichGO(gene          = genes.forebrain,
-                universe      = universe,
-                OrgDb         = org.Mm.eg.db,
-                ont           = "BP",
-                pAdjustMethod = "BH",
-                pvalueCutoff  = 0.01,
-                qvalueCutoff  = 0.05,
-        readable      = TRUE)
-
-# display the results as barplots
-barplot(ego.forebrain,showCategory=10)
-```
-*Question: do you see an enrichment of the expected categories? What does the x-axis mean? What does the color mean?*
-
-**Exercise:** redo this analysis for the limb dataset and check if the enriched categories make sense.
-
-
-### peak annotation
-```{r peakAnnotation, include=TRUE}
-peakAnno <- annotatePeak(files[[4]], tssRegion=c(-3000, 3000),
-                         TxDb=txdb, annoDb="org.Hs.eg.db")
+### session info
+```{r sessionInfo, include=TRUE, eval=TRUE}
+sessionInfo()
 ```
