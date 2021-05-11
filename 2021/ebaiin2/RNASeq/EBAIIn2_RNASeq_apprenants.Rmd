@@ -363,7 +363,7 @@ Le *gene-set* `hsa05418_Fluid_shear_stress_and_atherosclerosis` est enrichi en g
 $$ \text{OR} = \frac{\text{Odd in gene-set}}{\text{Odd out gene-set}} = \frac{25/81}{1152/11488} = 3.07 $$
 est significativement supérieur à 1 (P-valeur = $8.86 \times 10^{-6}$). On peut également calculer le *Fold-Enrichment* :
 
-$$ \text{FE} = \frac{\text{% gene DE in gene-set}}{\text{% gene DE out gene-set }} = \frac{25/(25+81)}{1152/(1152+11488)} = \frac{23,6}{9,1} = 2,59$$
+$$ \text{FE} = \frac{\text{Pct gene DE in gene-set}}{\text{Pct gene DE out gene-set }} = \frac{25/(25+81)}{1152/(1152+11488)} = \frac{23,6}{9,1} = 2,59$$
 On peut maintenant répéter l'opération grâce à une boucle sur tous les *pathways* KEGG :
 
 ```{r enrichment_loop}
