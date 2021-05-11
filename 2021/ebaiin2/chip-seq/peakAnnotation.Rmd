@@ -21,16 +21,184 @@ bibliography: references.bib
 knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
 
 ```
-
-## Peak Annotation
+## Working environment
 During this session, we are going to use various R packages.
-```{r loadPackage, include=TRUE}
+```{r loadPackage, echo=TRUE}
 ## loading packages
 library(ChIPseeker)
 ```
 
 ### Load data
 ```{r loadData, include=TRUE}
-peak.gr <- readPeakFile("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", as="GRanges")
-peak.gr
+peaks <- list()
+peaks[["BRG1"]] <- readPeakFile("2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak", as="GRanges")
+peaks[["MITF"]] <- readPeakFile("2021-05-07_PeakCalling/MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak", as="GRanges")
+peaks[["SOX10"]] <- readPeakFile("2021-05-07_PeakCalling/SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak", as="GRanges")
+peaks
+```
+
+The peaks are stored as **GenomicRanges** object; this is an R format which look like the bed format, but is optimized in terms of memory requirements and speed of execution.
+
+We can start by computing some basic statistics on the peak sets.
+
+### ChIP-seq data description
+#### How many peaks?
+
+```{r peaksStats, include=TRUE}
+## check the number of peak sets
+length(peaks)
+
+## compute the number of peaks for all datasets using the list object
+sapply(peaks,length)
+
+## make a simple barplot
+barplot(sapply(peaks,length))
+
+## let's create a barplot with ggplot2 out of this data
+# Load ggplot2 library
+library(ggplot2)
+
+# create a table with the data to display
+# sapply apply the same function (here length) to all elements
+# of the list "peaks"
+# sapply() function takes list, vector or data frame as input and gives output in vector or matrix
+peak.lengths <- data.frame(IP=names(peaks),
+                           NbPeaks=sapply(peaks,length))
+
+# make the barplot
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks)) +
+         geom_bar(stat="identity")
+
+# Let's add colors to the barplot
+# In R it exists some already defined colors palettes
+# the most widely used palette is RColorBrewer.
+# This R library offers several color palettes
+# See:
+library(RColorBrewer)
+par(mar=c(3,4,2,2))
+display.brewer.all()
+
+# now lets add colors to the barplot
+# first ass the new information, fill=IP to let ggplot know
+# that colors change based on chipped protein
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_bar(stat="identity")
+
+# if we want to use colors from RColorBrewer library
+# with the "Set1" color palette
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_bar(stat="identity")+
+         scale_fill_brewer(palette="Set1")
+```
+
+#### How large are these peaks?
+```{r peakWidth, include=TRUE}
+## statistics on BRG1 peak sizes
+## we use the function width() from GenomicRanges
+library(GenomicRanges)
+summary(width(peaks$BRG1))
+
+## get the same for all peaks
+## lapply() function is useful for performing operations on list objects and returns a list object of same length of original set.
+peak.width = lapply(peaks,width)
+lapply(peak.width,summary)
+
+## create a simple boxplot of the peak sizes
+boxplot(peak.width)
+```
+
+#### What is the score of these peaks?
+
+Can you adapt the previous code to display a boxplot of the peak score distribution for the Forebrain peak set (column `Maximum.Peak.Height`)?
+
+#### Where are the peaks located?
+
+We can now display the genomic distribution of the peaks along the chromosomes, including the peak scores, using the `covplot` function from `ChIPSeeker`:
+```r
+# genome wide distribution
+covplot(peaks.forebrain, weightCol="Maximum.Peak.Height")
+```
+**Exercice: use the option "lower" in covplot to display only the peaks with a score (Max.Peak.Height) above 10**
+
+#### How does the signal look like at TSS?
+
+In addition to the genome wide plot, we can check if there is a tendency for the peaks to be located close to gene promoters.
+```r
+# define gene promoters
+promoter = getPromoters(TxDb=txdb, upstream=5000, downstream=5000)
+
+# compute the density of peaks within the promoter regions
+tagMatrix = getTagMatrix(peaks.limb, windows=promoter)
+
+# plot the density
+tagHeatmap(tagMatrix, xlim=c(-5000, 5000), color="red")
+```
+
+### 3 - Functional annotation of the peaks
+
+We can now assign the peaks to the closest genes and genomic compartments (introns, exons, promoters, distal regions, etc...)
+This is done using the function `annotatePeak` which compares the peak files with the annotation file of the mouse genome. This function returns
+a complex object which contains all this information.
+
+```r
+peakAnno.forebrain = annotatePeak(peaks.forebrain, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
+peakAnno.midbrain = annotatePeak(peaks.midbrain, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
+peakAnno.limb = annotatePeak(peaks.limb, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Mm.eg.db")
+```
+
+#### genomic localization
+
+We can now analyze more in details the localization of the peaks (introns, exons, promoters, distal regions,...)
+
+```r
+# distribution of genomic compartments for forebrain peaks
+plotAnnoPie(peakAnno.forebrain)
+
+# for all the peaks
+plotAnnoBar(list(forebrain=peakAnno.forebrain, midbrain=peakAnno.midbrain,limb=peakAnno.limb))
+```
+*Question: do you see differences between the three peak sets?*
+
+
+#### functional annotation
+
+An important step in ChIP-seq analysis is to interpret genes that are located close to the ChIP peaks. Hence, we need to
+1. assign genes to peaks
+2. compute functional enrichments of the target genes.
+
+**Beware:**
+By doing so, we assume that the target gene of the peak is always the closest one. Hi-C/4C analysis have shown that in higher eukaryotes, this is not always the case. However, in the absence of data on the real target gene of ChIP-peaks, we can work with this approximation.
+
+We will compute the enrichment of the Gene Ontology "Biological Process" categories in the set of putative target genes.
+
+```r
+# load the library
+library(clusterProfiler)
+
+# define the list of all mouse genes as a universe for the enrichment analysis
+universe = mappedkeys(org.Mm.egACCNUM)
+
+## extract the gene IDs of the forebrain target genes
+genes.forebrain = peakAnno.forebrain@anno$geneId
+ego.forebrain = enrichGO(gene          = genes.forebrain,
+                universe      = universe,
+                OrgDb         = org.Mm.eg.db,
+                ont           = "BP",
+                pAdjustMethod = "BH",
+                pvalueCutoff  = 0.01,
+                qvalueCutoff  = 0.05,
+        readable      = TRUE)
+
+# display the results as barplots
+barplot(ego.forebrain,showCategory=10)
+```
+*Question: do you see an enrichment of the expected categories? What does the x-axis mean? What does the color mean?*
+
+**Exercise:** redo this analysis for the limb dataset and check if the enriched categories make sense.
+
+
+### peak annotation
+```{r peakAnnotation, include=TRUE}
+peakAnno <- annotatePeak(files[[4]], tssRegion=c(-3000, 3000),
+                         TxDb=txdb, annoDb="org.Hs.eg.db")
 ```
