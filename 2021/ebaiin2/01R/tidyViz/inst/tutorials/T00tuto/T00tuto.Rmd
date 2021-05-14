@@ -11,7 +11,7 @@ library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-Dans ce cours d'introduction à la programmation en R, nous utiliserons de temps en temps des tutoriels qui porteront sur des thèmes abordés en cours. Ces tutoriels interactifs vous permettront de vous entraîner avec des exercices très simples.
+Dans ce cours de programmation en R, nous utiliserons de temps en temps des tutoriels qui porteront sur des thèmes abordés en cours. Ces tutoriels interactifs vous permettront de vous entraîner avec des exercices très simples.
 
 ## Exemple
 

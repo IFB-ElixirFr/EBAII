@@ -96,6 +96,14 @@ remotes::install_github(
 
 ## Explorez la documentation du package
 
+  1. Charger le package :  `library(tidyViz)`
+  2. Regardez l'aide "générale" du package : \u0060`?tidyViz-package`\u0060
+  3. Explorez la première vignette : `vignette("S00programme")`
+  4. Accédez à la liste complète des vignettes : `browseVignettes("tidyViz")`, cette interface permet d'accéder au code source (R Markdown et R)...
+  5. ... que vous pouvez également accéder avec la commande : `edit(vignette("S00programme"))`
+  
+# Les tutoriels !
 
+Vous pouvez y accéder sur la page du site, mais ils sont aussi disponibles dans un onglet spécial si vous travaillez avec Rstudio > 1.3
 
 
