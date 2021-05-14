@@ -1,0 +1,37 @@
+---
+title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
+author: "Stephanie Le Gras"
+date: "2021 May, 27th"
+output:
+  html_document: default
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    toc: true
+    toc_depth: 3
+params:
+  ensembl: 103
+  assembly: hg38
+  organism: Homo sapiens
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+#setwd("/Volumes/ngs/illumina/slegras/B21000_EBAIIv2/")
+knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
+
+```
+
+## Heatmaps
+### Profile of ChIP peaks binding to TSS regions
+First of all, for calculating the profile of ChIP peaks binding to TSS regions, we should prepare the TSS regions, which are defined as the flanking sequence of the TSS sites. Then align the peaks that are mapped to these regions, and generate the tagMatrix.
+
+```{r prepareMatrix, include=TRUE}
+peakHeatmap(peak, TxDb=txdb, upstream=5000, downstream=5000, color="red")
+```
+
+### Average Profile of ChIP peaks binding to TSS region
+```{r averageProfile, include=TRUE}
+plotAvgProf2(peak, TxDb=txdb, upstream=5000, downstream=5000,
+             xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency")
+```

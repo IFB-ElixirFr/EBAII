@@ -34,17 +34,18 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
-| Annotation des peaks | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[Rmarkdown](chip-seq/tutu.Rmd)]  |
-| Heatmap | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| GRange - Comparaison de jeux de données  | | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| Enrichissement fonctionnel |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
-| Jamais sans mes stats |  | [[Rmarkdown](chip-seq/tutu.Rmd)] |
+| Introduction | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[html](chip-seq/Introduction.html)]  |
+| Annotation des peaks |  | [[html](chip-seq/peakAnnotation.html)]  |
+| Heatmap | | [[html](chip-seq/tutu.Rmd)] |
+| GRange - Comparaison de jeux de données  | | [[html](chip-seq/tutu.Rmd)] |
+| Enrichissement fonctionnel |  | [[html](chip-seq/tutu.Rmd)] |
+| Jamais sans mes stats |  | [[html](chip-seq/tutu.Rmd)] |
 
 ### RNA-seq
 
-| Fichier                  | Intervenant | Lien                                  |
-|--------------------------|-------------|---------------------------------------|
-| Script Rmarkdown vide    | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq_vide.Rmd) |
-| Script Rmarkdown complet | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq.Rmd)      |
-| Rendu HTML               | Hugo Varet  | [HTML](RNASeq/EBAIIn2_RNASeq.html)    |
-| Données                  | Hugo Varet  | [ZIP](RNASeq/data.zip)                |
+| Fichier                  | Intervenant | Lien                                        |
+|--------------------------|-------------|---------------------------------------------|
+| Script Rmarkdown vide    | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq_apprenants.Rmd) |
+| Script Rmarkdown complet | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq.Rmd)            |
+| Rendu HTML               | Hugo Varet  | [HTML](RNASeq/EBAIIn2_RNASeq.html)          |
+| Données                  | Hugo Varet  | [ZIP](RNASeq/data.zip)                      |
