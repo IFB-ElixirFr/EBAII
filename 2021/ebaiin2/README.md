@@ -21,9 +21,9 @@ From there, you can also find a link to download the whole repository with `git`
 | Thématique| Intervenant        | Lien vers la présentation | Tutoriel|
 |-----------|--------------------|---------------------------------------|-----------|
 | Programme | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S00programme.html)] | `NA` |
-| Packages  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S01packages.html)] | [[Lien](google.fr)] [[R Markdown](01R/tidyViz/inst/tutorials/T00tuto/T00tuto.Rmd)] |
-| dplyr     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S02dplyr.html)] | [[Lien](google.fr) [R Markdown](01R/tidyViz/inst/tutorials/T01dplyr/T01dplyr.Rmd)] |
-| ggplot2   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S03ggplot2.html)] | [[Lien](google.fr) [R Markdown](01R/tidyViz/inst/tutorials/T02ggplot2/T02ggplot2.Rmd)] |
+| Packages  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S01packages.html)] | [[Lien](https://learnr.pasteur.fr/T00tuto/)] [[R Markdown](01R/tidyViz/inst/tutorials/T00tuto/T00tuto.Rmd)] |
+| dplyr     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S02dplyr.html)] | [[Lien](https://learnr.pasteur.fr/T01tuto/) [R Markdown](01R/tidyViz/inst/tutorials/T01dplyr/T01dplyr.Rmd)] |
+| ggplot2   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S03ggplot2.html)] | [[Lien](https://learnr.pasteur.fr/T02tuto/) [R Markdown](01R/tidyViz/inst/tutorials/T02ggplot2/T02ggplot2.Rmd)] |
 | couleurs  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S04couleurs.html)] | [[Lien](google.fr) [R Markdown](01R/tidyViz/inst/tutorials/T03couleurs/T03couleurs.Rmd)] |
 | pheatmap  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S05pheatmap.html)] | [[Lien](google.fr) [R Markdown](01R/tidyViz/inst/tutorials/T04gggenes/T04gggenes.Rmd)] |
 | upset     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S06upset.html)] | [[Lien](google.fr) [R Markdown](01R/tidyViz/inst/tutorials/T00tuto/)] |
