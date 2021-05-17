@@ -1,9 +1,9 @@
 ---
-title: "Diagramme de Venn et UpSet"
+title: "Exemples de représentation de données génomiques"
 output: learnr::tutorial
 runtime: shiny_prerendered
 description: >
-   Attention, à utiliser avec prudence !
+   Avec les packages gggenes et TrackViewer
 ---
 
 ```{r setup, include=FALSE}

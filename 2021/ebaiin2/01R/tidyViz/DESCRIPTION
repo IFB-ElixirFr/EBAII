@@ -1,7 +1,7 @@
 Package: tidyViz
 Type: Package
 Title: Package pour la formation EBAII niveau 2
-Version: 1.0
+Version: 1.0.1
 Date: 2021-04-09
 Author: Vincent Guillemot
 Maintainer: Vincent Guillemot <vincent.guillemot@pasteur.fr>
@@ -10,7 +10,7 @@ Description:
   ainsi que des tutoriels développés avec learnr.
 Depends:
     R (>= 3.5.0)
-Imports: learnr, dplyr, ggplot2, RColorBrewer, ggvenn, ComplexUpset, gggenes, trackViewer
+Imports: learnr, dplyr, ggplot2, RColorBrewer, ggvenn, UpSetR, gggenes, trackViewer
 biocViews: Software
 License: MIT + file LICENSE
 Encoding: UTF-8

@@ -1,0 +1,31 @@
+---
+title: "Rappel : les packages en R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+description: >
+  Quelques éléments sur Bioconductor et GitHub. Différence entre library et require.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Installation de packages
+
+## CRAN
+
+blablabla
+
+## Bioconductor
+
+blablabla
+
+## GitHub
+
+blablabla
+
+# Chargement de packages
+
+
+
