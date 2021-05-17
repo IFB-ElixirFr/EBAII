@@ -26,14 +26,14 @@ knitr::opts_chunk$set(
 
 ## Avant toutes choses
 
-Nous aurons besoin des packages `ggvenn` et `ComplexUpset` :
+Nous aurons besoin des packages `ggvenn` et `UpSetR` :
 
- * Vérifier que les packages `ggvenn` et `ComplexUpset` sont bien installés
+ * Vérifier que les packages `ggvenn` et `UpSetR` sont bien installés
  * Si non, les installer, puis les charger
 
-```{r ComplexUpset, message = FALSE}
+```{r UpSetR, message = FALSE}
 library(ggvenn)
-library(ComplexUpset)
+library(UpSetR)
 ```
 
 Nous allons également avoir besoin des données fruits : 
@@ -67,7 +67,7 @@ fbin <- with(fruits,
     Energie = Energie > 50,
     Potassium = Potassium > 100,
     Crus = groupe == "crus"
-))
+)) + 0
 ```
 
 
@@ -86,7 +86,7 @@ C'est une méthode de visualisation alternative.
 Pour notre exemple : 
 
 ```{r upset0, fig.height = 4}
-upset(fbin, intersect = c("Sucres", "Fibres", "Energie", "Potassium", "Crus"))
+upset(fbin)
 ```
 
 
