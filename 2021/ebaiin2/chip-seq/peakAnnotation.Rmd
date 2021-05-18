@@ -1,23 +1,28 @@
 ---
 title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
-date: "2021 May, 27th"
+date: "2021 May"
+author: "Elodie Darbo$^{1}$ - elodie.darbo@u-bordeaux.fr; Stephanie Le Gras$^{2}$ - slegras@igbmc.fr"
 output:
   html_document:
     toc: true
     toc_depth: 3
+    toc_float: true
+    number_sections: true
   pdf_document:
     fig_caption: yes
     keep_tex: yes
     toc: true
-    toc_depth: 3
+    toc_depth: 4
 params:
-  path.peaks: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/
-  brg1: BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak
-  mitf: MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak
-  sox10: SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak
+  path.peaks: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/
+  brg1: BRG1siCTRL_CHIP-seq_peaks.narrowPeak
+  mitf: MITF_CHIP-seq_peaks.narrowPeak
+  sox10: SOX10_CHIP-seq_peaks.narrowPeak
   ensembl: 103
   assembly: hg38
   organism: Homo sapiens
+  rnaseq: B21000_alldata.tsv
+  path.rnaseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/
 bibliography: references.bib
 ---
 
@@ -25,12 +30,12 @@ bibliography: references.bib
 knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
 ```
 
-## Load data
-During this training session we are going to use some features from the package ChIPseeker. Load it.
-```{r setupenv, message=FALSE, include=TRUE}
-library(ChIPseeker)
-```
+$^1$
 
+$^2$ GenomEast platform, IGBMC
+
+## Peak annotation
+### Load data
 Peak files are in narrowPeak format which is of the form ([source](https://genome.ucsc.edu/FAQ/FAQformat.html#format12)):
 
 1. chrom - Name of the chromosome (or contig, scaffold, etc.).
@@ -45,6 +50,10 @@ Peak files are in narrowPeak format which is of the form ([source](https://genom
 10. peak - Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called.
 
 ```{r loadData, include=TRUE}
+## The package ChIPseeker provides a function to load peak files such as narrowPeaks as GRanges objects
+## Here all peak sets are loaded into a list of peaks
+library(ChIPseeker)
+
 peaks <- list()
 peaks[["BRG1"]] <- readPeakFile(paste0(params$path.peaks, params$brg1), as="GRanges")
 peaks[["MITF"]] <- readPeakFile(paste0(params$path.peaks, params$mitf), as="GRanges")
@@ -56,19 +65,22 @@ Peaks are stored as **GenomicRanges** objects; this is an R format which look li
 
 We can start by computing some basic statistics on the peak sets.
 
-## ChIP-seq data description
-### How many peaks were called?
-Check the number of peak sets
+### Statistics on peak sets
+#### How many peaks were called?
+Compute the number of datasets.
 ```{r peaksStats1, include=TRUE}
 length(peaks)
 ```
 
-Compute the number of peaks for all datasets using the list object
+Compute the number of peaks per dataset.
 ```{r peaksStats2, include=TRUE}
+# sapply() function takes list, vector or data frame as input and gives output in vector or matrix
+# sapply apply the same function (here length) to all elements
+# of the list "peaks"
 sapply(peaks,length)
 ```
 
-Make a simple barplot showing the number of peaks per chipped protein
+Make a simple barplot showing the number of peaks per chipped protein.
 ```{r simplebarplot, include=TRUE}
 barplot(sapply(peaks,length))
 ```
@@ -79,9 +91,6 @@ Let's create a barplot with ggplot2 out of this data.
 library(ggplot2)
 
 # create a table with the data to display
-# sapply apply the same function (here length) to all elements
-# of the list "peaks"
-# sapply() function takes list, vector or data frame as input and gives output in vector or matrix
 peak.lengths <- data.frame(IP=names(peaks),
                            NbPeaks=sapply(peaks,length))
 
@@ -111,7 +120,7 @@ ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
          scale_fill_brewer(palette="Set1")
 ```
 
-### How large are these peaks?
+#### How large are these peaks?
 Compute statistics on BRG1 peak sizes
 ```{r peakWidth, message=FALSE, include=TRUE}
 ## we use the function width() from GenomicRanges
@@ -126,7 +135,7 @@ peak.width = lapply(peaks,width)
 lapply(peak.width,summary)
 ```
 
-Create a simple boxplot of the peak sizes
+Create a simple boxplot of the peak sizes.
 ```{r simpleboxplot, message=FALSE, include=TRUE}
 boxplot(peak.width)
 ```
@@ -139,7 +148,7 @@ peak.width.table <- melt(peak.width)
 head(peak.width.table)
 ```
 
-In this table, there is as many rows as the total number of peaks in all peak sets. It contains all possible pairs IP <-> number of peaks possible
+In this table, there is as many rows as the total number of peaks in all peak sets. It contains all possible pairs IP <-> number of peaks possible.
 ```{r reshapeCheck, message=FALSE, include=TRUE}
 # Number of peaks per chipped protein
 sapply(peaks, length)
@@ -149,12 +158,11 @@ sum(sapply(peaks, length))
 dim(peak.width.table)
 ```
 
-Now create a nice looking boxplot
+Now create a nice looking boxplot.
 ```{r enhancedboxplot1, message=FALSE, include=TRUE}
 ggplot(peak.width.table, aes(x=L1, y=value)) +
          geom_boxplot()
 ```
-
 
 Enhance it.
 ```{r enhancedboxplot2, message=FALSE, include=TRUE}
@@ -173,13 +181,8 @@ ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
 
 ```
 
-<!-- #### What is the score of these peaks?
-
-Can you adapt the previous code to display a boxplot of the peak score distribution for the Forebrain peak set (column `Maximum.Peak.Height`)? -->
-
-## Where are the peaks located over the whole genome?
-
-We can now display the genomic distribution of the peaks along the chromosomes, including the peak scores, using the `covplot` function from `ChIPSeeker`:
+### Where are the peaks located over the whole genome?
+Sometime, peaks may occur more in some chromosoms than others. We can display the genomic distribution of the peaks along the chromosomes, using the `covplot` function from `ChIPSeeker`. Height of peaks is drawn based on the peak scores.
 
 ```{r peakGenomeDistribution, include=TRUE}
 # genome wide BRG1 peak distribution
@@ -189,24 +192,69 @@ covplot(peaks$BRG1, weightCol="V5")
 covplot(peaks$BRG1, chrs=c("chr1", "chr2"), weightCol="V5")
 ```
 
-## Functional annotation of the peaks
+### Functional annotation
 We can now assign peaks to the closest genes and genomic features (introns, exons, promoters, distal regions, etc...).
-This is done using the function `annotatePeak` which compares peak positions with the genomic feature positions of the reference genome. This function returns
-a complex object which contains all this information.
+This is done using the function `annotatePeak` which compares peak positions with the genomic feature positions of the reference genome. This function returns a complex object which contains all this information.
 
 ```{r annotatePeaks, eval=TRUE, message=FALSE, include=TRUE}
 ## org.Hs.eg.db is an R object that contains mappings between Entrez Gene identifiers and GenBank accession numbers.
 library(org.Hs.eg.db)
 
 ## Annotate peaks for all datasets and store it in a list
+## Here TSS regions are regions -1000Kb/+100b arount TSS positions
+## Peak annotations are stored in a list
+## Load transcript annotation
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+
 peakAnno <- list()
 peakAnno[["BRG1"]] = annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
 peakAnno[["MITF"]] = annotatePeak(peaks$MITF, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
 peakAnno[["SOX10"]] = annotatePeak(peaks$SOX10, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+
+## Visualize and export annotation as a data table
+# as.data.frame(peakAnno$BRG1)
+head(as.data.frame(peakAnno$BRG1))
 ```
 
-### Genomic localization
-We can now analyze more in details genomic features associated to our peaks (introns, exons, promoters, distal regions,...)
+All the peak information contained in the peak list will be retained in the output of `annotatePeak`. The position and strand information of nearest genes are reported. The distance from peak to the TSS of its **nearest gene** is also reported. The genomic region of the peak is reported in annotation column. Since some annotation may overlap, ChIPseeker adopted the following priority in genomic annotation :
+
+  * Promoter
+  * 5’ UTR
+  * 3’ UTR
+  * Exon
+  * Intron
+  * Downstream
+  * Intergenic
+  * Downstream is defined as the downstream of gene end.
+
+This hierachy can be customized using the parameter *genomicAnnotationPriority*.
+
+annotatePeak report detail information when the annotation is Exon or Intron, for instance “Exon (uc002sbe.3/9736, exon 69 of 80)”, means that the peak is overlap with an Exon of transcript uc002sbe.3, and the corresponding Entrez gene ID is 9736 (Transcripts that belong to the same gene ID may differ in splice events), and this overlaped exon is the 69th exon of the 80 exons that this transcript uc002sbe.3 prossess.
+
+Parameter annoDb is optional, if provided, extra columns including SYMBOL, GENENAME, ENSEMBL/ENTREZID will be added. The geneId column in annotation output will be consistent with the geneID in TxDb. If it is ENTREZID, ENSEMBL will be added if annoDb is provided, while if it is ENSEMBL ID, ENTREZID will be added.
+
+The TxDb class is a container for storing transcript annotations. Bioconductor provides several packages containing TxDb objects for model organisms sur as Human and mouse. For instance, TxDb.Hsapiens.UCSC.hg38.knownGene, TxDb.Hsapiens.UCSC.hg19.knownGene for human genome hg38 and hg19, TxDb.Mmusculus.UCSC.mm10.knownGene and TxDb.Mmusculus.UCSC.mm9.knownGene for mouse genome mm10 and mm9, etc. User can also prepare their own TxDb by retrieving information from UCSC Genome Bioinformatics and BioMart data resources by R function makeTxDbFromBiomart and makeTxDbFromUCSC. One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
+
+```{r createTxDbGTF, include=TRUE, eval=FALSE}
+## download GTF file
+download.file("https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/93934/101/GCF_001577835.2_Coturnix_japonica_2.1/GCF_001577835.2_Coturnix_japonica_2.1_genomic.gtf.gz", "Coturnix_japonica_2.1.annotation.gtf.gz")
+
+## Build TxDb object
+library(GenomicFeatures)
+txdb = makeTxDbFromGFF("Coturnix_japonica_2.1.annotation.gtf.gz")
+
+## To save the txdb database
+library(AnnotationDbi)
+saveDb(txdb, 'txdb.Coturnix_japonica_2.1.sqlite')
+
+## load it when needed
+library(AnnotationDbi)
+txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
+```
+
+### Visualize genomic annotation
+We can now analyze more in details genomic features associated to our peaks (introns, exons, promoters, distal regions,...).
 
 ```{r genomicFeatureDistribution, include=TRUE, eval=TRUE}
 ## distribution of genomic features for BRG1 peaks
@@ -217,18 +265,52 @@ plotAnnoPie(peakAnno$BRG1)
 plotAnnoBar(peakAnno$BRG1)
 ```
 
-However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap
+However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap.
 ```{r upsetR, include=TRUE, eval=TRUE}
 library(UpSetR)
 upsetplot(peakAnno$BRG1)
+```
 
-## Representation with barplot is the most convenient view when looking
-## at several datasets at once
-## show the distribution of genomic features for all peak sets at once
+Representation with barplot is the most convenient view when looking at several datasets at once show the distribution of genomic features for all peak sets at once
+```{r annotAllOnce, include=TRUE, eval=TRUE}
 plotAnnoBar(peakAnno)
 ```
 
-## session info
+### Importance of the annotation database
+In the previous section, we have annotated peaks using annotation from UCSC's knownGene. The database chosen for annotation can have an impact on subsequent results including data integration such as comparison between genes associated to peaks and gene expression using RNA-seq data for instance.
+
+Let's look at the overlap between genes expressed in RNA-seq data with genes associated to peaks (let's remind that peaks are associated to closest genes if no other evidences are used).
+
+```{r compareAnnot, include=TRUE, eval=TRUE}
+## Download GTF files
+library(GenomicFeatures)
+## GTF file downloaded from https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gtf.gz
+txdb.refseq = makeTxDbFromGFF("data/GCA_000001405.15_GRCh38_full_analysis_set.refseq_annotation.gtf.gz")
+txdb.ensembl = makeTxDbFromGFF("data/Homo_sapiens.GRCh38.103_UCSC_chr.gtf.gz")
+
+## Ensembl TxDB can also been download using the function makeTxDbFromBiomart
+# txdb.ensembl <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",
+  # host="nov2020.archive.ensembl.org", dataset="hsapiens_gene_ensembl")
+
+annot <- list()
+annot[["ensembl"]] <- annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb.ensembl, annoDb="org.Hs.eg.db")
+annot[["refseq"]] <- annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb.refseq, annoDb="org.Hs.eg.db")
+
+rnaseq <- read.table(paste0(params$path.rnaseq, params$rnaseq), header=TRUE,
+          check.names = FALSE, quote="", sep="\t")
+
+
+
+```
+
+## Link and external references
+  * [ChIPseeker](https://bioconductor.org/packages/release/bioc/vignettes/ChIPseeker/inst/doc/ChIPseeker.html)
+  * [GRanges](https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html)
+  * [EnrichedHeatmap](https://bioconductor.org/packages/release/bioc/vignettes/EnrichedHeatmap/inst/doc/EnrichedHeatmap.html)
+  * [ChIPpeakAnno](https://www.bioconductor.org/packages/release/bioc/vignettes/ChIPpeakAnno/inst/doc/pipeline.html)
+
+
+## Session info
 ```{r sessionInfo, include=TRUE, eval=TRUE}
 sessionInfo()
 ```

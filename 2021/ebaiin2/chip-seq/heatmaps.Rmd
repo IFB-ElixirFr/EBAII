@@ -67,25 +67,6 @@ plotAvgProf2(peaks, TxDb=txdb, upstream=5000, downstream=5000,
              xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency")
 ```
 
-The TxDb class is a container for storing transcript annotations. Bioconductor provides several packages containing TxDb objects for model organisms sur as Human and mouse. For instance, TxDb.Hsapiens.UCSC.hg38.knownGene, TxDb.Hsapiens.UCSC.hg19.knownGene for human genome hg38 and hg19, TxDb.Mmusculus.UCSC.mm10.knownGene and TxDb.Mmusculus.UCSC.mm9.knownGene for mouse genome mm10 and mm9, etc. User can also prepare their own TxDb by retrieving information from UCSC Genome Bioinformatics and BioMart data resources by R function makeTxDbFromBiomart and makeTxDbFromUCSC. One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
-
-```{r createTxDbGTF, include=TRUE, eval=FALSE}
-## download GTF file
-download.file("https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/93934/101/GCF_001577835.2_Coturnix_japonica_2.1/GCF_001577835.2_Coturnix_japonica_2.1_genomic.gtf.gz", "Coturnix_japonica_2.1.annotation.gtf.gz")
-
-## Build TxDb object
-library(GenomicFeatures)
-txdb = makeTxDbFromGFF("Coturnix_japonica_2.1.annotation.gtf.gz")
-
-## To save the txdb database
-library(AnnotationDbi)
-saveDb(txdb, 'txdb.Coturnix_japonica_2.1.sqlite')
-
-## load it when needed
-library(AnnotationDbi)
-txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
-```
-
 ### Are MITF and BRG1 co-localizing at MITF peak locations
 To address this question, we are going to compute and visualize read enrichment at MITF peak location. Most of the time we look at regions centered at middles of peaks of interest and extended to 2/5Kb in both direction.
 To achieve this, we need :
@@ -222,4 +203,9 @@ EnrichedHeatmap(mat1$BRG1, name = "BRG1", col=col_brg1,
 draw(ht_list, split = partition, annotation_legend_list = list(lgd),
     ht_gap = unit(c(2, 8, 8), "mm"))
 
+```
+
+### session info
+```{r sessionInfo, include=TRUE, eval=TRUE}
+sessionInfo()
 ```
