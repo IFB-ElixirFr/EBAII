@@ -1,6 +1,5 @@
 ---
 title: "EBAIIn2 - ChIP-seq Workshop - Peak annotation"
-author: "Stephanie Le Gras"
 date: "2021 May, 27th"
 output:
   html_document:
@@ -12,9 +11,10 @@ output:
     toc: true
     toc_depth: 3
 params:
-  brg1: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak
-  mitf: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak
-  sox10: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak
+  path.peaks: /Volumes/ngs/illumina/slegras/B21000_EBAIIv2/2021-05-07_PeakCalling/
+  brg1: BRG1siCTRL_CHIP-seq/BRG1siCTRL_CHIP-seq_peaks.narrowPeak
+  mitf: MITF_CHIP-seq/MITF_CHIP-seq_peaks.narrowPeak
+  sox10: SOX10_CHIP-seq/SOX10_CHIP-seq_peaks.narrowPeak
   ensembl: 103
   assembly: hg38
   organism: Homo sapiens
@@ -22,8 +22,6 @@ bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-#setwd("/Volumes/ngs/illumina/slegras/B21000_EBAIIv2/")
-#knitr::opts_knit$set(echo = TRUE,  root.dir="/Volumes/ngs/illumina/slegras/B21000_EBAIIv2", fig.path = "images/")
 knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
 ```
 
@@ -48,9 +46,9 @@ Peak files are in narrowPeak format which is of the form ([source](https://genom
 
 ```{r loadData, include=TRUE}
 peaks <- list()
-peaks[["BRG1"]] <- readPeakFile(params$brg1, as="GRanges")
-peaks[["MITF"]] <- readPeakFile(params$mitf, as="GRanges")
-peaks[["SOX10"]] <- readPeakFile(params$sox10, as="GRanges")
+peaks[["BRG1"]] <- readPeakFile(paste0(params$path.peaks, params$brg1), as="GRanges")
+peaks[["MITF"]] <- readPeakFile(paste0(params$path.peaks, params$mitf), as="GRanges")
+peaks[["SOX10"]] <- readPeakFile(paste0(params$path.peaks, params$sox10), as="GRanges")
 peaks
 ```
 
@@ -58,20 +56,25 @@ Peaks are stored as **GenomicRanges** objects; this is an R format which look li
 
 We can start by computing some basic statistics on the peak sets.
 
-### ChIP-seq data description
-#### How many peaks were called?
-
-```{r peaksStats, include=TRUE}
-## check the number of peak sets
+## ChIP-seq data description
+### How many peaks were called?
+Check the number of peak sets
+```{r peaksStats1, include=TRUE}
 length(peaks)
+```
 
-## compute the number of peaks for all datasets using the list object
+Compute the number of peaks for all datasets using the list object
+```{r peaksStats2, include=TRUE}
 sapply(peaks,length)
+```
 
-## make a simple barplot
+Make a simple barplot showing the number of peaks per chipped protein
+```{r simplebarplot, include=TRUE}
 barplot(sapply(peaks,length))
+```
 
-## let's create a barplot with ggplot2 out of this data
+Let's create a barplot with ggplot2 out of this data.
+```{r enhancedbarplot, include=TRUE}
 # Load ggplot2 library
 library(ggplot2)
 
@@ -108,47 +111,53 @@ ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
          scale_fill_brewer(palette="Set1")
 ```
 
-#### How large are these peaks?
+### How large are these peaks?
+Compute statistics on BRG1 peak sizes
 ```{r peakWidth, message=FALSE, include=TRUE}
-## statistics on BRG1 peak sizes
 ## we use the function width() from GenomicRanges
 library(GenomicRanges)
 summary(width(peaks$BRG1))
+```
 
-## get the same for all peaks
+Now, get the same for all peaks.
+```{r peakWidth, message=FALSE, include=TRUE}
 ## lapply() function is useful for performing operations on list objects and returns a list object of same length of original set.
 peak.width = lapply(peaks,width)
 lapply(peak.width,summary)
+```
 
-## create a simple boxplot of the peak sizes
+Create a simple boxplot of the peak sizes
+```{r simpleboxplot, message=FALSE, include=TRUE}
 boxplot(peak.width)
+```
 
-## Create a nice looking boxplot with ggplot2
-# ggplot takes a data frame as input.
-# we can either create a date frame, this is what we have
-# done when we created the barplot. Here, we are going to use a
-# package that creates a data frame from other types of data: reshape2
+Now, create a nice looking boxplot with ggplot2. ggplot takes a data frame as input. We can either create a date frame, this is what we have done when we created the barplot. Here, we are going to use a package that creates a data frame from other types of data: reshape2.
+```{r reshape, message=FALSE, include=TRUE}
 # Load the package
 library(reshape2)
 peak.width.table <- melt(peak.width)
 head(peak.width.table)
+```
 
-# in this table, there is as many rows as the total number
-# of peaks in all peak sets.
+In this table, there is as many rows as the total number of peaks in all peak sets. It contains all possible pairs IP <-> number of peaks possible
+```{r reshapeCheck, message=FALSE, include=TRUE}
 # Number of peaks per chipped protein
 sapply(peaks, length)
 # total number of peaks
 sum(sapply(peaks, length))
 # size of the table we've just generated
 dim(peak.width.table)
+```
 
-# it contains all possible pairs IP <-> number of peaks possible
-
-# Now create a nice looking boxplot
+Now create a nice looking boxplot
+```{r enhancedboxplot1, message=FALSE, include=TRUE}
 ggplot(peak.width.table, aes(x=L1, y=value)) +
          geom_boxplot()
+```
 
-# Enhance it
+
+Enhance it.
+```{r enhancedboxplot2, message=FALSE, include=TRUE}
 # - theme_classic() change grey background to white background
 # - fill=L1 and scale_fill_brewer(palette="Set1") colors boxplots
 # based on chipped protein and with colors from RColorBrewer Set1 palette
@@ -168,7 +177,7 @@ ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
 
 Can you adapt the previous code to display a boxplot of the peak score distribution for the Forebrain peak set (column `Maximum.Peak.Height`)? -->
 
-### Where are the peaks located over the whole genome?
+## Where are the peaks located over the whole genome?
 
 We can now display the genomic distribution of the peaks along the chromosomes, including the peak scores, using the `covplot` function from `ChIPSeeker`:
 
@@ -180,48 +189,8 @@ covplot(peaks$BRG1, weightCol="V5")
 covplot(peaks$BRG1, chrs=c("chr1", "chr2"), weightCol="V5")
 ```
 
-### How does the signal look like at TSS?
-
-In addition to the genome wide plot, we can check if there is a tendency for the peaks to be located close to gene promoters. Here promoters are defined as regions +/-5Kb around the TSS.
-
-```{r signalAroundTSS, message=FALSE, include=TRUE}
-## Load transcript annotation
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
-
-## define gene promoters
-## TxDb object should be passed for peak annotation (see below)
-promoter = getPromoters(TxDb=txdb, upstream=5000, downstream=5000)
-
-## compute the density of peaks within the promoter regions
-tagMatrix = getTagMatrix(peaks$BRG1, windows=promoter)
-
-## plot the density
-tagHeatmap(tagMatrix, xlim=c(-5000, 5000), color="red")
-```
-
-The TxDb class is a container for storing transcript annotations. Bioconductor provides several packages containing TxDb objects for model organisms sur as Human and mouse. For instance, TxDb.Hsapiens.UCSC.hg38.knownGene, TxDb.Hsapiens.UCSC.hg19.knownGene for human genome hg38 and hg19, TxDb.Mmusculus.UCSC.mm10.knownGene and TxDb.Mmusculus.UCSC.mm9.knownGene for mouse genome mm10 and mm9, etc. User can also prepare their own TxDb by retrieving information from UCSC Genome Bioinformatics and BioMart data resources by R function makeTxDbFromBiomart and makeTxDbFromUCSC. One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
-
-```{r createTxDbGTF, include=TRUE, eval=FALSE}
-## download GTF file
-download.file("https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/93934/101/GCF_001577835.2_Coturnix_japonica_2.1/GCF_001577835.2_Coturnix_japonica_2.1_genomic.gtf.gz", "Coturnix_japonica_2.1.annotation.gtf.gz")
-
-## Build TxDb object
-library(GenomicFeatures)
-txdb = makeTxDbFromGFF("Coturnix_japonica_2.1.annotation.gtf.gz")
-
-## To save the txdb database
-library(AnnotationDbi)
-saveDb(txdb, 'txdb.Coturnix_japonica_2.1.sqlite')
-
-## load it when needed
-library(AnnotationDbi)
-txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
-```
-
-### Functional annotation of the peaks
-
-We can now assign the peaks to the closest genes and genomic features (introns, exons, promoters, distal regions, etc...).
+## Functional annotation of the peaks
+We can now assign peaks to the closest genes and genomic features (introns, exons, promoters, distal regions, etc...).
 This is done using the function `annotatePeak` which compares peak positions with the genomic feature positions of the reference genome. This function returns
 a complex object which contains all this information.
 
@@ -236,9 +205,8 @@ peakAnno[["MITF"]] = annotatePeak(peaks$MITF, tssRegion=c(-1000, 100), TxDb=txdb
 peakAnno[["SOX10"]] = annotatePeak(peaks$SOX10, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
 ```
 
-#### Genomic localization
-
-We can now analyze more in details the genomic features associated to our peaks (introns, exons, promoters, distal regions,...)
+### Genomic localization
+We can now analyze more in details genomic features associated to our peaks (introns, exons, promoters, distal regions,...)
 
 ```{r genomicFeatureDistribution, include=TRUE, eval=TRUE}
 ## distribution of genomic features for BRG1 peaks
@@ -247,8 +215,10 @@ plotAnnoPie(peakAnno$BRG1)
 
 # as a barplot
 plotAnnoBar(peakAnno$BRG1)
+```
 
-# However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap
+However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap
+```{r upsetR, include=TRUE, eval=TRUE}
 library(UpSetR)
 upsetplot(peakAnno$BRG1)
 
@@ -258,7 +228,7 @@ upsetplot(peakAnno$BRG1)
 plotAnnoBar(peakAnno)
 ```
 
-### session info
+## session info
 ```{r sessionInfo, include=TRUE, eval=TRUE}
 sessionInfo()
 ```
