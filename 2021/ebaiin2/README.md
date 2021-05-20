@@ -49,3 +49,15 @@ From there, you can also find a link to download the whole repository with `git`
 | Script Rmarkdown complet | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq.Rmd)            |
 | Rendu HTML               | Hugo Varet  | [HTML](RNASeq/EBAIIn2_RNASeq.html)          |
 | Données                  | Hugo Varet  | [ZIP](RNASeq/data.zip)                      |
+
+### DNAseq
+
+| Fichier                  | Intervenant      | Lien                                        |
+|--------------------------|------------------|---------------------------------------------|
+| Introduction et rappel   | Nadia Bessoltane | [pdf](DNAseq/EBAIIn2_DNAseq_Introduction_Rappel.Rmd) |
+| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [Rmd] (DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd) |
+| html #1 | Nadia Bessoltane | [html] (DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html) |
+| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [Rmd] (DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd) |
+| html #2 | Nadia Bessoltane | [html] (DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html) |
+| Copy Number Variants | Bastien Job | |
+
