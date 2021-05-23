@@ -17,6 +17,9 @@ Un graphe simple
 \description{
 "Bonjour !" : Cette fonction est un exemple de fonction graphique avec deux paramètres simples : la couleur du texte et la couleur du fond.
 }
+\details{
+PS : cette fonction ne servira jamais pour le cours, elle sert juste à dire bonjour !
+}
 \examples{
 bonjour()
 }

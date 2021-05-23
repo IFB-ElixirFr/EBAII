@@ -165,7 +165,7 @@ ggplot(fruits, aes(cut(Eau, c(0, 84.2, 100)))) +
 
 ## Avec geom_col
 
-On dispose déjà de comptages.
+S'utilise **quand on dispose déjà** de comptages.
 
 ```{r geom_col, fig.height = 2}
 dat.count <- fruits %>% 
@@ -184,12 +184,317 @@ Comment modifier les deux commandes précédentes pour faire un diagramme en bâ
 
 # Histogrammes
 
-## 
+## Histogramme ou diagramme en bâtons ? {.columns-2 .smaller}
+
+```{r sucrebatons, out.width = "100%"}
+ggplot(fruits, aes(Sucres)) + 
+  geom_bar()
+```
+
+```{r sucrehist, out.width = "100%", message = FALSE}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram()
+```
+
+## Histogramme ou diagramme en bâtons ? {.columns-2}
+
+### Diagramme en bâtons
+
+Représente des comptages de :
+
+ * variables nominales
+ * variables ordinales
+ * variables discrètes
+
+<p class="forceBreak"></p>
+
+### Histogramme
+
+Représente des comptages ou des densités de :
+
+ * variables continues
+ * variables discrètes
+
+Pour ce genre de graphe, il est important de choisir les intervalles sur lesquels les données seront énumérées.
+
+## L'histogramme par défaut {.columns-2 .smaller}
+
+ * Axe des $y$ : les comptages de l'intervalle donné
+ * Axe des $x$ : 
+   - des intervalles de même amplitude,
+   - trente intervalles,
+   - pas de séparation visuelle entre les intervalles (sauf ceux qui sont vides)
+   - des *rectangles* gris foncé
+   - un *message*
+
+![](img/S03ggplot2/message.png){width=80%}
+
+<p class="forceBreak"></p>
+
+```{r histodefo, fig.height = 3, fig.width = 3, message = FALSE}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram()
+```
+   
+   
+## Exercice qui n'a (presque) rien à voir!
 
 
+Dans un document R Markdown, comment faire pour ne pas afficher le message dans votre rapport ?
+
+*... il y a plusieurs solutions possibles...*
+
+## Modification des intervalles
+
+```{r histo1, echo = FALSE, fig.height = 3}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5))
+```
+
+```{r histo1 code, eval = FALSE}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5))
+```
+
+## Modification de la couleur
+
+```{r histo2, echo = FALSE, fig.height = 3}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5),
+                 fill = "steelblue")
+```
+
+```{r histo2 code, eval = FALSE}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5),
+                 fill = "steelblue")
+```
+## Modification de la couleur
+
+```{r histo3, echo = FALSE, fig.height = 3}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5),
+                 fill = "steelblue",
+                 color = "white")
+```
+
+```{r histo3 code, eval = FALSE}
+ggplot(fruits, aes(Sucres)) + 
+  geom_histogram(breaks = seq(0, 75, 5),
+                 fill = "steelblue",
+                 color = "white")
+```
 
 
+## Boxplot
 
+![](img/S03ggplot2/boxplot.png){width=100%}
+
+## Boxplot d'une variable
+
+```{r boxplot, fig.height = 4}
+ggplot(data=fruits, aes(x = Sucres)) + 
+  geom_boxplot()
+```
+
+## Boxplot : lien entre une variable catégorielle et une variable continue
+
+```{r boxplot2, fig.height = 4}
+ggplot(data=fruits, aes(x=groupe, y=Sucres)) + 
+  geom_boxplot()
+```
+
+## Avec des violons {.columns-2 .smaller}
+
+```{r violinplot, fig.height = 4}
+ggplot(data=fruits, aes(x = Sucres, y = 1)) + 
+  geom_violin()
+```
+
+<p class="forceBreak"></p>
+
+```{r violinplot2, fig.height = 4}
+ggplot(data=fruits, aes(x = groupe, y = Sucres)) + 
+  geom_violin()
+```
+
+## A vous ! {.columns-2}
+
+Complétez le code suivant pour obtenir la figure de droite :
+
+```{r codeacompleter, eval = FALSE}
+ggplot(fruits, 
+       aes(x = Fibres > 1.5, 
+           y = Proteines, 
+           fill = ***)) + 
+  geom_***()
+```
+
+<p class="forceBreak"></p>
+
+![](img/S03ggplot2/violonfibres.png){width=100%}
+
+# Personnalisation
+
+## Thèmes
+
+Les *thèmes* sont des fonctions qui permettent de modifier certains paramètres graphiques comme : 
+  
+  * la couleur du fond,
+  * la couleur des axes,
+  * la couleur des grilles majeures et mineures,
+  * etc.
+  
+Exemple de fonctions thèmes (`theme_***()`) : 
+  
+  * `theme_bw()` : pour un thème en noir et blanc,
+  * `theme_minimal()` : pour un thème minimaliste,
+  * `theme_void()` : pour un thème dépouillé
+
+## Exemple sur un histogramme : `theme_bw()`
+
+```{r histotheme1, message=FALSE, fig.height=3}
+ggplot(fruits, aes(Fibres)) + 
+  geom_histogram() + 
+  theme_bw()
+```
+
+## Exemple sur un histogramme : `theme_minimal()`
+
+```{r histotheme2, message=FALSE, fig.height=3}
+ggplot(fruits, aes(Fibres)) + 
+  geom_histogram() + 
+  theme_minimal()
+```
+
+## Exemple sur un histogramme : `theme_void()`
+
+```{r histotheme3, message = FALSE, fig.height=3}
+ggplot(fruits, aes(Fibres)) + 
+  geom_histogram() + 
+  theme_void()
+```
+
+## A vous ! {.columns-2}
+
+ 1. Consultez la page d'aide de la fonction `theme_bw` avec la commande `?theme_bw`
+ 2. Choisissez la thème permettant de réaiser le graphe à droite en complétant la commande suivante.
+ 
+```{r mysterytheme, eval = FALSE}
+ggplot(fruits, aes(y = Fibres)) + 
+  geom_boxplot() + 
+  theme_***()
+```
+
+<p class="forceBreak"></p>
+
+![](img/S03ggplot2/theme.png){width=100%}
+
+## Autres personnalisations "simples"
+
+ * __Titre__ : avec la fonction `ggtitle`
+ * __Titre de  l'axe des $x$__ : avec la fonction `xlab`
+ * __Titre de  l'axe des $y$__ : avec la fonction `ylab`
+
+Mais je vous conseille d'utiliser la fonction `labs` qui permet de faire tout cela, et plus !
+
+```{r labs, eval = FALSE}
+labs(
+  title = "Titre du graphe",
+  subtitle = "Sous-titre du graphe",
+  x = "Titre de l'axe des x",
+  y = "Titre de l'axe des y",
+  color = "Titre de la légende des couleurs",
+  shape = "Titre de la légende des formes"
+)
+```
+
+## Personnalisations avancées
+
+Avec la fonction `theme()`, qui a une syntaxe bien particulière : chaque élément doit être spécifié selon sa nature.
+
+ * Pour changer la taille, la police, la couleur d'élément de type "texte", on utilise `element_text(size=, colour = "", family = "")`
+ * Pour changer la couleur et la taille d'une ligne, on utilise `element_line(colour=“”, size=)`
+ * Pour personnaliser la couleur du fond, on utilise `element_rect(fill = "")`
+
+## Ce que l'on peut changer avec `theme()`
+
+ * `axis.title`, `axis.title.x`, `axis.title.y` :  taille, police, couleur, ...
+ * `axis.text`, `axis.text.x`, `axis.text.y` : taille, police, couleur, ...
+ * `axis.ticks`, `axis.ticks.x`, `axis.ticks.y`
+ * `axis.line`, `axis.line.x`, `axis.line.y`
+ * `panel.background` : couleur 
+ * `panel.grid.major`, `panel.grid.minor` : couleur, taille
+ * `legend.text`: taille, police, couleur
+ * `legend.position`
+ * `plot.title` : taille, police, couleur
+
+
+# Nuages de points
+
+## Avec `geom_point`
+
+Cette géométrie nécessite des paramètres esthétiques de position (en $x$ et $y$), et accepte optionnellement des paramètres esthétiques de taille, couleur et forme.
+
+```{r geompoint, fig.height = 3}
+ggplot(fruits, aes(x = Phosphore, y = Calcium, size = Magnesium)) + 
+  geom_point()
+```
+
+## Paramètres esthétiques 
+
+Lorsqu'ils sont spécifiés dans la fonction `aes()`, ces paramètres appliquent les valeurs d'une variable à une caractéristique des objets graphiques tracés par les géométries.
+
+ * `color` ou `colour` : couleur du point
+ * `fill` : couleur de remplissage
+ * `size` : taille
+ * `shape` : forme
+ * `alpha` : transparence
+ * `linetype` : type de ligne
+ * `label` : étiquettes
+
+Lorsqu'ils sont appliqués en dehors de la fonction `aes()`, leur comportement est plus général !
+
+## Exemple {.columns-2 .smaller}
+
+```{r dans aes, fig.height = 3, fig.width = 3}
+ggplot(fruits, 
+       aes(x = Phosphore, y = Calcium, 
+           color = Magnesium)) + 
+  geom_point() + 
+  theme(legend.position = "bottom")
+```
+
+<p class="forceBreak"></p>
+
+```{r pas dans aes, fig.height = 3, fig.width = 3}
+ggplot(fruits, 
+    aes(x = Phosphore, y = Calcium)) + 
+  geom_point(color = "limegreen")
+```
+
+## A vous ! {.columns-2 .smaller}
+
+Complétez la commande suivante pour obtenir le graphe ci-contre.
+
+```{r last, eval = FALSE}
+ggplot(fruits,
+       aes(x = Sucres, 
+           y = Proteines, 
+           *** = Magnesium, 
+           *** = ***)) + 
+  geom_***() + 
+  ***(title = "Fruits",
+     x = "Sucres (g/100 g)", 
+     y = "Protéines, N x 6.25 (g/100 g)",
+     size = "Magnésium\n(mg/100 g)",
+     ***= "Groupe") + 
+  theme_***()
+```
+
+<p class="forceBreak"></p>
+
+![](img/S03ggplot2/latotale.png){width=100%}
 
 
 
