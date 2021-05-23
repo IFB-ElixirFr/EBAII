@@ -177,6 +177,31 @@ brewer.pal(n = 3, name = "Set3")
 
 ![](img/S04couleurs/brewerdisplay.png){width=100%}
 
+## En quelques mots
+
+Il y a trois types de palettes : séquentielles, divergentes et qualitatives.
+
+ 1. Les palettes séquentielles permettent de distinguer des valeurs petites (en clair) de valeurs grande (en foncé)
+ 2. Les palettes divergentes permettent de distinguer les valeurs petites des valeurs grandes, mais ces deux extrêmes sont toutes les deux de ton foncé dans des couleurs très différentes. Les valeurs intermédiaires sont représentées en ton clair.
+ 3. Les palettes qualitatives sont faites pour distinguer toutes les couleurs les unes des autres. Elle sont adaptées à la représentation de données qualitatives.
+
+## A vous {.columns-2}
+
+Complétez le code suivant pour obtenir le graphe ci-contre : 
+
+```{r couleurexo1, eval = FALSE}
+pal <- brewer.pal(***, ***)
+barplot(rep(1, 7), 
+        col = pal, 
+        axes = ***, 
+        border = ***)
+```
+
+<p class="forceBreak"></p>
+
+![](img/S04couleurs/exo1.png){width=100%}
+
+
 # Extrapoler des couleurs
 
 ## Pour extrapoler des couleurs...
@@ -188,9 +213,22 @@ colfun <- colorRampPalette(c("darkorchid", "black", "limegreen"))
 barplot(rep(1, 30), col = colfun(30), axes = F, border = NA)
 ```
 
-## Exercice
+## Exercice {.columns-2}
 
-Reproduisez le graphe ci-dessous.
+Reproduisez le graphe ci-contre en modifiant la commande ci-dessous.
+
+```{r couleurexo2, eval = FALSE}
+colfun <- colorRampPalette(
+  c(***, ***, ***))
+barplot(rep(1, 100), 
+        col = colfun(100), 
+        axes = F, border = NA)
+
+```
+
+<p class="forceBreak"></p>
+
+![](img/S04couleurs/colz.png){width=100%}
 
 
 

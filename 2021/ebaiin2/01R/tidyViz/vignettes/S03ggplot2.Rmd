@@ -561,7 +561,34 @@ ggplot(fruits,
 
 ![](img/S03ggplot2/scalelog.png){width=100%}
 
+## Avec les fonctions `coord_***`
 
+Pour modifier le système de coordonnées **après** avoir appliquer toutes les transformations spécifiées auparavant (par une fonction `scale_***` par exemple). Par exemple :
+
+ * `coord_fixed` pour fixer le ratio des unités de l'axe des $y$ sur les unités de l'axe des $x$,
+ * `coord_equal` quand ce ratio vaut 1,
+ * `coord_flip` pour échanger les axes,
+ * `coord_polar` pour passer d'un système de coordonnées cartésien à un système de coordonnées polaires
+
+## Pour s'amuser !
+
+Transformez les coordonnées du graphe suivant en coordonnées polaires (`coord_polar(theta = "y")`). Quel est le résultat ?
+
+```{r almostfromage, eval = FALSE}
+ggplot(fruits, aes(x = 1, fill = groupe)) + 
+  geom_bar(width = 1) + 
+  theme_void()
+```
+
+## Avec les fonctions `*lim*`
+
+Change le minimum et le maximum d'un axe. Attention, toutes les valeurs en dehors des nouveaux axes sont **éliminées** !
+
+ * `xlim`, `ylim` ou `lims` pour spécifier l'étendue,
+ * `expand_limits` pour *étendre* l'étendue à certaines valeurs.
+ 
+Pour faire un "zoom" sans perdre de points, il faut utiliser la fonction `coord_cartesian` ou une fonction du type `scale_***`
+ 
 # Créer des "facettes"
 
 ## La fonction `facet_wrap`
@@ -633,11 +660,17 @@ CONSEIL : pour l'utilisation de facettes, faites attention à bien nommer les mo
 
 
 
-
 # Conclusion
 
+## En quelques mots
 
+Nous avons vu un package de représentations graphiques très puissant ! `ggplot2` fonctionne sur la base d'un canevas, de paramètres esthétiques comme la position en $x$, en $y$, les couleurs, la forme etc. A partir de ces paramètres, on va tracer les graphes à l'aides de *géométries*, qui peuvent se superposer !
 
+## Quelques remarques
+
+ 1. `ggplot2` est  très complet... et très complexe
+ 2. Il faut prendre son temps, et savoir travailler avec ses petits jeux de données préférés bien connus et **très très très très propres** pour travailler sur son graphe,
+ 3. Personnaliser un graphe prend du temps, il faut s'armer de patience...
 
 
 # [N'oubliez pas la feuille de triche !](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) {data-background=#ffffff}
