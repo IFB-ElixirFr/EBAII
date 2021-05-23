@@ -496,6 +496,148 @@ ggplot(fruits,
 
 ![](img/S03ggplot2/latotale.png){width=100%}
 
+## Au secours, mes points se superposent! {.columns-2}
+
+Pas de panique, on peut utiliser la transparence (aka `alpha`) : 
+
+```{r alpha, eval = FALSE, fig.height = 3}
+ggplot(fruits, 
+       aes(x = Phosphore, 
+           y = Calcium, 
+           color = groupe)) + 
+  geom_point(alpha = 0.5, 
+             size = 2) + 
+  theme_bw() + 
+  theme(legend.position = 
+          "bottom")
+```
+
+<p class="forceBreak"></p>
+
+```{r alpha2, echo = FALSE, fig.height = 4, fig.width = 4}
+ggplot(fruits, 
+       aes(x = Phosphore, 
+           y = Calcium, 
+           color = groupe)) + 
+  geom_point(alpha = 0.5, 
+             size = 2) + 
+  theme_bw() + 
+  theme(legend.position = 
+          "bottom")
+```
+
+# Changer les échelles
+
+## Avec les fonctions `scale_***` {.smaller}
+
+Ces fonctions vont vous permettre de personnaliser l'échelle, en $x$, en $y$, mais pas seulement ! Ce concept est généraliser dans `ggplot2` à de nombreux paramètres esthétiques. Par exemple : 
+
+  * `scale_x_log10()` permet de transformer l'échelle des $x$ en échelle logarithmique,
+  * `scale_y_log10()` permet de transformer l'échelle des $y$ en échelle logarithmique,
+  * `scale_color_manual()` permet de personnaliser les couleurs,
+  * `scale_fill_manual()` permet de personnaliser les couleurs de remplissage,
+  * `scale_x_continuous()` permet de personnaliser l'axe des $x$ lorsque $x$ est une variable "continue",
+  * `scale_y_discrete()` permet de personnaliser l'axe des $y$ lorsque $y$ est une variable "discrète",
+  * `scale_x_continuous()` permet de personnaliser l'axe des $x$ lorsque $x$ est une variable "discrète",
+  * `scale_y_discrete()` permet de personnaliser l'axe des $y$ lorsque $y$ est une variable "discrète".
+  
+## A vous ! {.columns-2}
+
+Complétez la commande suivante pour obtenir le graphe ci-contre.
+
+```{r exoscale, eval = FALSE}
+ggplot(fruits, 
+       aes(Phosphore, 
+           Calcium)) + 
+  geom_point(*** = "white") + 
+  scale_***() + 
+  scale_***() + 
+  labs(x = "log10(Phosphore)",
+       y = "log10(Calcium)") + 
+  theme_dark()
+```
+
+<p class="forceBreak"></p>
+
+![](img/S03ggplot2/scalelog.png){width=100%}
+
+
+# Créer des "facettes"
+
+## La fonction `facet_wrap`
+
+S'uilise pour diviser le graphe en panneaux selon les modalités d'une variable catégorielle.
+
+Attention à la syntaxe : elle est basée sur l'utilisation du terme `vars`, qui permet d'accéder aux variables du jeu de données spécifié.
+
+Par exemple, pour diviser le graphe `g` en plusieurs panneaux selon les modalités d'un facteur `fac`, on écrira
+
+```
+g + facet_wrap(facets = vars(fac))
+```
+
+On peut également utiliser une "formule" : 
+
+```
+g + facet_wrap(~ fac)
+```
+
+
+## Exemple {.columns-2}
+
+
+```{r facet1, eval = FALSE}
+ggplot(fruits, 
+       aes(x = Phosphore, 
+           y = Calcium, 
+           color = groupe)) + 
+  geom_point() + 
+  facet_wrap(vars(Sucres > 10)) + 
+  theme_bw() + 
+  theme(legend.position = 
+          "bottom")
+```
+
+<p class="forceBreak"></p>
+
+```{r facet2, echo = FALSE, fig.height = 4, fig.width = 4}
+ggplot(fruits, 
+       aes(x = Phosphore, 
+           y = Calcium, 
+           color = groupe)) + 
+  geom_point() + 
+  facet_wrap(vars(Sucres > 10)) + 
+  theme_linedraw() + 
+  theme(legend.position = 
+          "bottom")
+```
+
+## Avec la fonction `facet_grid`
+
+S'utilise de la même façon que `facet_wrap`.
+
+Par exemple, pour diviser le graphe `g` en plusieurs panneaux selon les modalités d'un facteur `factorow` pour les lignes et `factocol` pour les colonnes, on écrira
+
+```
+g + facet_grid(rows = vars(factorow), cols = vars(factocol))
+```
+
+On peut aussi utiliser une formule : 
+
+```
+g + facet_grid(factorow ~ factocol)
+```
+
+CONSEIL : pour l'utilisation de facettes, faites attention à bien nommer les modalités de vos facteurs pour rendre le graphe plus clair.
+
+
+
+
+
+# Conclusion
+
+
+
 
 
 # [N'oubliez pas la feuille de triche !](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) {data-background=#ffffff}
