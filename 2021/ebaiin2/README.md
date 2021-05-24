@@ -36,7 +36,7 @@ From there, you can also find a link to download the whole repository with `git`
 |-----------------------|--------------|-------------------------------------|
 | ChIPseq Workshop (Rendu HTML) | Elodie Darbo, Stéphanie Le Gras | [html](chip-seq/ChIPseq_Workshop.html)  |
 | ChIPseq Workshop (Rmarkdown) | Elodie Darbo, Stéphanie Le Gras | [Rmd](chip-seq/ChIPseq_Workshop.Rmd)  |
-| Diaporama | Elodie Darbo, Stéphanie Le Gras | [Google doc](https://docs.google.com/presentation/d/1twITqohPsRwHDnarQO61BgNdI_5rMrPsznRt0lcPdQo/edit#slide=id.gd3e42826b6_0_0)  |
+| Diaporama | Elodie Darbo, Stéphanie Le Gras | [Google doc](https://docs.google.com/presentation/d/1twITqohPsRwHDnarQO61BgNdI_5rMrPsznRt0lcPdQo/edit?usp=sharing)  |
 
 ### RNA-seq
 
