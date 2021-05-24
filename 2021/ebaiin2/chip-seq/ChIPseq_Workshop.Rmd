@@ -177,7 +177,7 @@ barplot(sapply(peaks,length))
 ```
 
 Let's create a barplot with ggplot2 out of this data.
-```{r enhancedbarplot, include=TRUE, out.width="50%", fig.align = 'center'}
+```{r enhancedbarplot, include=TRUE, out.width="50%"}
 # Load ggplot2 library
 library(ggplot2)
 # create a table with the data to display
@@ -271,7 +271,7 @@ length(peaks$BRG1)
 ## Where are the peaks located over the whole genome?
 Sometime, peaks may occur more in some chromosomes than others. We can display the genomic distribution of the peaks along the chromosomes, using the `covplot` function from `ChIPSeeker`. Height of peaks is drawn based on the peak scores.
 
-```{r peakGenomeDistribution, cache=TRUE, include=TRUE}
+```{r peakGenomeDistribution, cache=TRUE, include=TRUE, fig.align = 'center'}
 # genome wide BRG1 peak distribution
 covplot(peaks$BRG1, weightCol="V5")
 # chromosome wide BRG1 peak distribution
@@ -350,7 +350,7 @@ txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
 ### Visualize genomic annotation
 We can now perform a more detailled analysis of genomic features associated to our peaks (introns, exons, promoters, distal regions,...).
 
-```{r genomicFeatureDistribution, include=TRUE, eval=TRUE}
+```{r genomicFeatureDistribution, include=TRUE, eval=TRUE, fig.align = 'center'}
 ## distribution of genomic features for BRG1 peaks
 # as a pie chart - which is the most widely used representation in publication
 plotAnnoPie(peakAnno$BRG1)
@@ -359,7 +359,7 @@ plotAnnoBar(peakAnno$BRG1)
 ```
 
 However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap.
-```{r upsetR, include=TRUE, eval=TRUE}
+```{r upsetR, include=TRUE, eval=TRUE, fig.align = 'center'}
 library(UpSetR)
 upsetplot(peakAnno$BRG1)
 ```
@@ -373,7 +373,7 @@ We want to know if BRG1 is binding large and/or narrow regions, unique and/or ta
 
 First of all, for calculating the profile of ChIP peaks binding to the BRG1 center, we need to define peak centers and extend them each side. Then (we need to) align the peaks that are mapped to these regions, and to generate the `tagMatrix`.
 
-```{r signalAroundBRG1center, message=FALSE, include=TRUE, cache = TRUE}
+```{r signalAroundBRG1center, message=FALSE, include=TRUE, cache = TRUE, fig.align = 'center'}
 ## Load the library
 library(GenomicRanges)
 # Compute the center of the peaks and attribute it to a new
@@ -414,7 +414,7 @@ tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.5K.BRG1)
 
 \
 
-```{r profileBRG1, message=F,warning=F}
+```{r profileBRG1, message=F, warning=F, fig.align = 'center'}
 # Plot the profile
 plotAvgProf(tagMatrix, xlim=c(-5000, 5000),
             xlab="Distance to peak center", ylab = "Peak Count Frequency")
@@ -538,7 +538,7 @@ head(peaks$BRG1)
 
 - Now, customize the enrichment colors and differentiate clusters with colors.
 
-```{r enhancedHeatmap, message=FALSE, include=TRUE}
+```{r enhancedHeatmap, message=FALSE, include=TRUE, fig.align = 'center'}
 library(circlize)
 # Define new colors for each heatmap
 col_brg1 <- colorRamp2(c(0,10,15), c("white", "blue","black"))
@@ -597,7 +597,7 @@ Compute the number of datasets.
 length(peaks)
 ```
 
-```{r nbPeaks, include=TRUE}
+```{r nbPeaks, include=TRUE, fig.align = 'center'}
 # Load ggplot2 library
 library(ggplot2)
 peak.lengths <- data.frame(IP=names(peaks),
@@ -699,7 +699,7 @@ According to the hypergeometric test p-values all pairwise comparisons are highl
 #### Is the overlap significant?
 ChIPpeakAnno provides the `preparePool` and `peakPermTest` functions to compute this test. These tests are made by pair, we will look at SOX10/MITF overlap significance as an example.
 
-```{r permPeaks, warning=F,message=F,cache=T}
+```{r permPeaks, warning=F,message=F,cache=T, fig.align = 'center'}
 # Prepare a pool of random peaks following the characteristics of our peak sets
 pool <- preparePool(txdb,peaks$SOX10,bindingType="TSS",featureType="transcript",seqn=paste0("chr",c(1:22,"X","Y")))
 # Create the permPool object needed for peakPermTest
@@ -773,7 +773,7 @@ BRG1.mat <- lapply(sig, function(x){
 
 We use the partition we computed in section 2.7.2.2
 
-```{r TSSheatmapKmeans, message=F,warning=F, cache = TRUE}
+```{r TSSheatmapKmeans, message=F,warning=F, cache = TRUE, fig.align = 'center'}
 # Define new colors for each heatmap
 col_sox10 <-colorRamp2(c(0,3,4), c("white", "blue","black"))
 col_mitf <- colorRamp2(c(0,4,5), c("white", "blue","black"))
@@ -799,7 +799,7 @@ draw(ht_list, split = partition, annotation_legend_list = list(lgd),
 
 Lets have a look at the TF binding profiles in cluster 5.
 
-```{r plotClustBRG1}
+```{r plotClustBRG1, fig.align = 'center'}
 # For each matrix, filter peaks from cluster 5
 sig.tmp <- lapply(sig,function(x,part){
     mat <- x[part=="cluster5",]
@@ -883,7 +883,7 @@ TSS.mat <- lapply(sig, function(x){
 
 We will compute K-means clustering with `kmeans` function to define the partitions of the TSS based on BRG1 signal.
 
-```{r plotHeatmapTSS, message=FALSE, warning=FALSE, include=TRUE}
+```{r plotHeatmapTSS, message=FALSE, warning=FALSE, include=TRUE, fig.align = 'center'}
 # Compute a partition using the kmeans function, asking for 5 clusters
 set.seed(20210526)
 partition.TSS = paste0("cluster", kmeans(TSS.mat$BRG1, centers = 5)$cluster)
@@ -910,7 +910,7 @@ draw(ht_list, split = partition.TSS, annotation_legend_list = list(lgd),
 
 Lets have a look at the TF binding profiles in cluster 4.
 
-```{r plotClustTSS}
+```{r plotClustTSS, fig.align = 'center'}
 # For each matrix, filter peaks from cluster 5
 sig.tmp <- lapply(sig,function(x,part){
     mat <- x[part=="cluster4",]
@@ -1003,7 +1003,7 @@ ggplot(expr.melt,aes(x=cluster,y=log2(value+1))) +
 
 We can see that there are not apparent difference between the conditions even if cluster 3, which has the less BRG1 signal, is much less expressed than the other. We can check if the distribution of significantly differentially expressed genes differs among the clusters.
 
-```{r, cache = TRUE}
+```{r, cache = TRUE, fig.align = 'center'}
 # Distribution of differentially expressed genes as barplots
 ggplot(RNAseq,aes(x=cluster)) +
   geom_bar(aes(fill=signif),position = "fill",color="black") +
@@ -1059,12 +1059,50 @@ pathview(logFC.cl4,pathway.id = "hsa04110",species = "hsa")
 
 [](data/hsa04110.pathview.png)
 
-## Importance of the annotation databases
+### Are there published data I could use to enrich my analysis ?
+
+- Data Mining with ChIP seq data deposited in GEO with `ChIPSeeker`
+
+There are many ChIP seq data sets that have been published and deposited in GEO database. We can compare our own dataset to those deposited in GEO to search for significant overlap data. Significant overlap of ChIP seq data by different binding proteins may be used to infer cooperative regulation and thus can be used to generate hypotheses.
+
+We collect about 17,000 bed files deposited in GEO, user can use getGEOspecies to get a summary based on spieces.
+
+```{r geospecies, message=F,warning=F}
+getGEOspecies()
+```
+
+User can access the detail information by getGEOInfo, for each genome version.
+
+```{r}
+hg38 <- getGEOInfo(genome="hg38", simplify=TRUE)
+head(hg38)
+```
+
+ChIPseeker provide function downloadGEObedFiles to download all the bed files of a particular genome.
+
+```{r, eval=FALSE}
+downloadGEObedFiles(genome="hg38", destDir="hg38")
+```
+
+Or a vector of GSM accession number by downloadGSMbedFiles.
+
+```{r, eval=FALSE}
+gsm <- hg38$gsm[sample(nrow(hg38), 10)]
+downloadGSMbedFiles(gsm, destDir="hg38")
+```
+
+After download the bed files from GEO, we can pass them to `enrichPeakOverlap` for testing the significant of overlap. Parameter targetPeak can be the folder, e.g. hg19, that containing bed files. `enrichPeakOverlap` will parse the folder and compare all the bed files. It is possible to test the overlap with bed files that are mapping to different genome or different genome versions, `enrichPeakOverlap` provide a parameter `chainFile` that can pass a chain file and liftOver the `targetPeak` to the genome version consistent with `queryPeak.` Signifcant overlap can be use to generate hypothesis of cooperative regulation.By mining the data deposited in GEO, we can identify some putative complex or interacted regulators in gene expression regulation or chromosome remodelling for further validation.
+
+- The (mod)ENCODE project [link](https://www.encodeproject.org/chip-seq-matrix/?type=Experiment&replicates.library.biosample.donor.organism.scientific_name=Homo%20sapiens&assay_title=TF%20ChIP-seq&status=released)
+
+- The UCSC genome browser [link](https://genome-euro.ucsc.edu/cgi-bin/hgGateway?redirect=manual&source=genome.ucsc.edu)
+
+# Importance of the annotation databases
 In previous annotation steps, we have annotated peaks using annotation from UCSC's knownGene. The database chosen for annotation can have an impact on subsequent results including data integration such as comparison between genes associated to peaks and gene expression using RNA-seq data for instance.
 
 Let's look at the overlap between genes expressed in RNA-seq data with genes associated to peaks (let's remind that peaks are associated to closest genes if no other evidences are used).
 
-```{r compareAnnot, eval=FALSE, fig.align=, message=FALSE, include=TRUE, out.width="50%"}
+```{r compareAnnot, eval=TRUE, fig.align = 'center', message=FALSE, include=TRUE}
 ## Download GTF files
 library(GenomicFeatures)
 
@@ -1101,44 +1139,6 @@ x <- list(RNAseq=RNAseq[RNAseq$signif=="up",]$SYMBOL,
 ggVennDiagram(x) + scale_fill_gradient(low="white",high = "blue")
 
 ```
-
-### Are there published data I could use to enrich my analysis ?
-
-- Data Mining with ChIP seq data deposited in GEO with `ChIPSeeker`
-
-There are many ChIP seq data sets that have been published and deposited in GEO database. We can compare our own dataset to those deposited in GEO to search for significant overlap data. Significant overlap of ChIP seq data by different binding proteins may be used to infer cooperative regulation and thus can be used to generate hypotheses.
-
-We collect about 17,000 bed files deposited in GEO, user can use getGEOspecies to get a summary based on spieces.
-
-```{r geospecies, message=F,warning=F}
-getGEOspecies()
-```
-
-User can access the detail information by getGEOInfo, for each genome version.
-
-```{r}
-hg38 <- getGEOInfo(genome="hg38", simplify=TRUE)
-head(hg38)
-```
-
-ChIPseeker provide function downloadGEObedFiles to download all the bed files of a particular genome.
-
-```{r, eval=F}
-downloadGEObedFiles(genome="hg38", destDir="hg38")
-```
-
-Or a vector of GSM accession number by downloadGSMbedFiles.
-
-```{r, eval=F}
-gsm <- hg38$gsm[sample(nrow(hg38), 10)]
-downloadGSMbedFiles(gsm, destDir="hg38")
-```
-
-After download the bed files from GEO, we can pass them to `enrichPeakOverlap` for testing the significant of overlap. Parameter targetPeak can be the folder, e.g. hg19, that containing bed files. `enrichPeakOverlap` will parse the folder and compare all the bed files. It is possible to test the overlap with bed files that are mapping to different genome or different genome versions, `enrichPeakOverlap` provide a parameter `chainFile` that can pass a chain file and liftOver the `targetPeak` to the genome version consistent with `queryPeak.` Signifcant overlap can be use to generate hypothesis of cooperative regulation.By mining the data deposited in GEO, we can identify some putative complex or interacted regulators in gene expression regulation or chromosome remodelling for further validation.
-
-- The (mod)ENCODE project [link](https://www.encodeproject.org/chip-seq-matrix/?type=Experiment&replicates.library.biosample.donor.organism.scientific_name=Homo%20sapiens&assay_title=TF%20ChIP-seq&status=released)
-
-- The UCSC genome browser [link](https://genome-euro.ucsc.edu/cgi-bin/hgGateway?redirect=manual&source=genome.ucsc.edu)
 
 # Session info
 ```{r sessionInfo, include=TRUE, eval=TRUE}
