@@ -34,12 +34,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
-| Introduction | Elodie Darbo, Swann Floc'hlay, Rachel Legendre, Denis Puthier, Stéphanie Le Gras | [[html](chip-seq/Introduction.html)]  |
-| Annotation des peaks |  | [[html](chip-seq/peakAnnotation.html)]  |
-| Heatmap | | [[html](chip-seq/tutu.Rmd)] |
-| GRange - Comparaison de jeux de données  | | [[html](chip-seq/tutu.Rmd)] |
-| Enrichissement fonctionnel |  | [[html](chip-seq/tutu.Rmd)] |
-| Jamais sans mes stats |  | [[html](chip-seq/tutu.Rmd)] |
+| ChIPseq Workshop (Rendu HTML) | Elodie Darbo, Stéphanie Le Gras | [html](chip-seq/ChIPseq_Workshop.html)  |
+| ChIPseq Workshop (Rmarkdown) | Elodie Darbo, Stéphanie Le Gras | [Rmd](chip-seq/ChIPseq_Workshop.Rmd)  |
+| Diaporama | Elodie Darbo, Stéphanie Le Gras | [Google doc](https://docs.google.com/presentation/d/1twITqohPsRwHDnarQO61BgNdI_5rMrPsznRt0lcPdQo/edit#slide=id.gd3e42826b6_0_0)  |
 
 ### RNA-seq
 
@@ -58,4 +55,3 @@ From there, you can also find a link to download the whole repository with `git`
 | Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
 | Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
 | Copy Number Variants | Bastien Job | |
-
