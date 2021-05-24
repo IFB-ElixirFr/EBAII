@@ -9,75 +9,54 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
-library(VennDiagram)
+library(ggvenn)
 library(ggplot2)
 library(UpSetR)
-data("fruits", package = "intro2r")
-lesFruits <- rownames(fruits)
+data("fruits", package = "tidyViz")
+lesFruits <- make.unique(fruits$nom)
 
 vitC <- lesFruits[fruits$VitamineC > 10]
-vitD <- lesFruits[fruits$VitamineD > 0.1]
 vitE <- lesFruits[fruits$VitamineE > 1]
 
-vitList <- list(vitC = vitC, vitD = vitD, vitE = vitE)
+vitList <- list(vitC = vitC, vitE = vitE)
 theme_set(theme_bw())
 
-dat01 <- data.frame(vitC = fruits$VitamineC > 10, vitD = fruits$VitamineD > 0.1, vitE = fruits$VitamineE > 1) + 0
+dat01 <- data.frame(vitC = fruits$VitamineC > 10,  vitE = fruits$VitamineE > 1) + 0
 ```
 
 ## Diagramme de Venn
 
 Les diagrammes de Venn permettent de représenter des liens entre ensembles d'objets : combien d'objets sont communs à plusieurs ensembles, et combien sont spécifiques d'un seul ensemble.
 
-Pour les besoins de ce tutoriel, j'ai créé trois ensembles : 
+Pour les besoins de ce tutoriel, j'ai créé deux ensembles : 
 
 * l'ensemble des fruits contenant de la Vitamine C (plus de 10 mg / 100G)
-* l'ensemble des fruits contenant de la Vitamine D (plus de 0.10 µg / 100G)
 * l'ensemble des fruits contenant de la Vitamine E
 (plus de 1 mg / 100G)
 
 Prenez-un moment pour lire ce code et le comprendre.
 
 ```{r ensfruits, echo = TRUE}
-lesFruits <- rownames(fruits)
+lesFruits <- make.unique(fruits$nom)
 
 vitC <- lesFruits[fruits$VitamineC > 10]
-vitD <- lesFruits[fruits$VitamineD > 0.1]
 vitE <- lesFruits[fruits$VitamineE > 1]
 
-vitList <- list(vitC = vitC, vitD = vitD, vitE = vitE)
+vitList <- list(vitC = vitC, vitE = vitE)
 ```
 
-La fonction `venn.diagram` du package `VennDiagram` vous permettra de générer un diagramme de Venn entre *au plus* 5 ensembles. Modifiez les commandes suivantes pour avoir des couleurs d'ensembles différentes !
+La fonction `ggvenn` du package `ggvenn` vous permettra de générer un diagramme de Venn entre *au plus* 5 ensembles. Modifiez les couleurs ! 
 
 
 ```{r venn, exercise = TRUE}
-vd <- venn.diagram(vitList, filename = NULL)
-grid.draw(vd)
+ggvenn(vitList)
 ```
 
 ```{r venn-solution}
-vd <- venn.diagram(vitList, filename = NULL, col = 2:4, fill = 2:4, alpha = rep(0.4, 3))
-grid.draw(vd)
-```
-
-Attention, si vous avez déjà créé un graphe, la fonction `grid.draw` "peindra" par dessus, il faudra donc créer une nouvelle fenêtre graphique avec la fonction `grid.newpage()`. Comparez les deux façons de faire avec le code ci-dessous.
-
-```{r newpage-setup}
-vd <- venn.diagram(vitList, filename = NULL, col = 2:4, fill = 2:4, alpha = rep(0.4, 3))
+ggvenn(vitList, fill_color = c("orange", "limegreen"))
 ```
 
 
-```{r newpage, exercise = TRUE}
-gg <- ggplot(fruits, aes(VitamineC)) + 
-  geom_boxplot()
-
-plot(gg)
-grid.draw(vd)
-
-plot(gg)
-grid.newpage() ; grid.draw(vd)
-```
 
 ## Les diagrammes UpSet
 
@@ -97,7 +76,6 @@ J'ai créé pour vous cette *data-frame* de zéros et de uns avec la commande su
 ```{r mat01}
 dat01 <- data.frame(
   vitC = ifelse(fruits$VitamineC > 10, 1, 0), 
-  vitD = ifelse(fruits$VitamineD > 0.1, 1, 0), 
   vitE = ifelse(fruits$VitamineE > 1, 1, 0))
 ```
 
@@ -115,6 +93,14 @@ upset(dat01)
 upset(data = dat01, 
       order.by = "degree", 
       sets.bar.color = "steelblue")
+```
+
+Rassurez-vous tout de même, il existe dans le package `UpSetR` une fonction qui permet automatiquement de passer une liste à `upset` : la fonction `fromList`.
+
+Par exemple, exécutez le code suivant : ouf, on n'a pas besoin de faire de gymnastique compliquée pour transformer nos données après tout !
+
+```{r upsetFromList, exercise = TRUE}
+upset(fromList(vitList))
 ```
 
 

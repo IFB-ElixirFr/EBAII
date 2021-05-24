@@ -4,8 +4,8 @@
 \name{tidyViz-package}
 \alias{tidyViz}
 \alias{tidyViz-package}
-\title{Package pour la formation EBAII
-Contient les vignettes (les slides de cours), un jeu de données et les tutoriels}
+\title{Package pour la formation EBAII niveau 2
+Contient les vignettes (les slides de cours), le jeu de données "fruits" et les tutoriels. https://ifb-elixirfr.github.io/EBAII/2021/ebaiin2/}
 \description{
 Ce package contient les slides du cours (sous forme de vignettes)
   ainsi que des tutoriels développés avec learnr.

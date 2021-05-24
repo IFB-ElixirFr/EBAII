@@ -82,12 +82,41 @@ ggvenn(flist, set_name_size = 5)
 
 ## UpSet plot {.smaller}
 
-C'est une méthode de visualisation alternative.
-Pour notre exemple : 
+C'est une méthode de visualisation (récente !) alternative au diagramme de Venn.
+
+Référence : Jake R Conway, Alexander Lex, Nils Gehlenborg, UpSetR: an R package for the visualization of intersecting sets and their properties, Bioinformatics, Volume 33, Issue 18, 15 September 2017, Pages 2938–2940, https://doi.org/10.1093/bioinformatics/btx364
+
+## Correspondance {.columns-2}
+
+![](img/S06upset/set1.png){width=50%}
+
+<p class="forceBreak"></p>
+
+![](img/S06upset/set2.png){width=50%}
+
+
+## Exemple
 
 ```{r upset0, fig.height = 4}
 upset(fbin)
 ```
 
+## Mais c'est la même chose que...
+
+```{r upset1, fig.height = 4}
+upset(fromList(flist))
+```
+
+## On peut (beaucoup) personnaliser ce graphe
+
+```{r persoupset, fig.height = 3}
+upset(
+  fbin, nintersects = NA, order.by = "freq", 
+  main.bar.color = "steelblue", matrix.color = "limegreen",
+  sets.bar.color = "tomato", point.size = 2)
+```
 
 
+## A vous !
+
+Imaginez une situation dans laquelle vous pourriez avoir besoin de ce type de graphes.
