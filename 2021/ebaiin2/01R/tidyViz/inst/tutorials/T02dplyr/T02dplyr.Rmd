@@ -134,18 +134,16 @@ Pour cet exercice, nous allons résumer la variable `Energie` par groupe de frui
   * la colonne `Q2` contient la médiane,
   * la colonne `Q3` contient le troisième quartile.
 
-Utilisez la fonction `summarise` pour créer la table `EnergieQuartiles`. N'oubliez pas de consulter l'aide de la fonction `summarise` pour vous guider.
+Utilisez la fonction `summarise` pour créer la table `EnergieQuartiles`. N'oubliez pas de consulter l'aide de la fonction `summarise` pour vous guider. Pour cet exercice vous aurez besoin des fonctions : 
 
+ * `group_by` pour grouper les lignes,
+ * `summarise` pour résumer les valeurs,
+ * `quantile` pour calculer les quartiles.
 
 ```{r quartiles, exercise = TRUE}
 
 ```
 
-```{r quartiles-hint}
-# group_by pour grouper les lignes
-# puis summarise pour résumer
-# avec quantile pour calculer les quartiles
-```
 
 ```{r quartiles-solution}
 EnergieQuartiles <- fruits %>%

@@ -23,7 +23,7 @@ Il en existe d'autres, mais ces trois-ci sont vraiment les plus importants.
 
 ### CRAN
 
-C'est le *repository* "originel" qui me à disposition (à l'heure où ce tutoriel a été écrit) 17618 packages. La liste de ces packages est disponible [ici](https://cran.r-project.org/web/packages/available_packages_by_name.html).
+C'est le *repository* "originel" qui met à disposition (à l'heure où ce tutoriel a été écrit) 17618 packages. La liste de ces packages est disponible [ici](https://cran.r-project.org/web/packages/available_packages_by_name.html).
 
 La commande pour installer un package depuis cette source est
 
@@ -37,7 +37,7 @@ Cette commande installera le package `nom_du_package` dans la librairie par déf
 .libPaths()
 ```
 
-Le résultat depend de beaucoup de choses, y compris le système d'exploitation et la version de R que vous utilisez. Chez moi, le résultat est le suivant :
+Le résultat depend de beaucoup de choses, y compris du système d'exploitation et de la version de R que vous utilisez. Chez moi, le résultat est le suivant :
 
 ```
 "/Library/Frameworks/R.framework/Versions/4.0/Resources/library"

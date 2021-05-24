@@ -12,11 +12,12 @@ knitr::opts_chunk$set(echo = FALSE)
 library(corrplot)
 library(pheatmap)
 library(RColorBrewer)
-data("fruits", package = "intro2r")
-vitafruits <- fruits[, grep("Vitamine", colnames(fruits))]
-cru <- ifelse(grepl("cru", rownames(vitafruits)), "oui", "non")
+data("fruits", package = "tidyViz")
+vitafruits <- data.frame(
+  fruits[, grep("Vitamine", colnames(fruits))],
+  row.names = make.unique(fruits$nom))
 annotFruit <- data.frame(
-  cru = cru,
+  groupe = fruits$groupe,
   row.names = rownames(vitafruits))
 ```
 
@@ -29,7 +30,9 @@ Tout d'abord, concentrons nous sur un petit sous-ensemble de variables : les vit
 J'ai créé pour vous une table vitafruits à l'aide de la commande suivante. Prenez quelques instants pour décortiquer cette commande et comprendre comment elle fonctionne. Comprenez vous le rôle de la fonction grep ?
 
 ```
-vitafruits <- fruits[, grep("Vitamine", colnames(fruits))]
+vitafruits <- data.frame(
+  fruits[, grep("Vitamine", colnames(fruits))],
+  row.names = make.unique(fruits$nom))
 ```
 
 Maintenant, utilisez la fonction `pheatmap` du package `pheatmap` pour faire une carte de chaleur de la table `vitafruits`.
@@ -114,21 +117,20 @@ pheatmap(vitafruits)
 pheatmap(vitafruits, cluster_rows = FALSE,
          cluster_cols = FALSE, show_rownames = FALSE,
          border_color = "black", cellwidth = 15,
-         scale = "row", color = colzRamp)
+         scale = "column", color = colzRamp)
 ```
 
 ## Ajouter des informations
 
 La carte de chaleur permet de représenter des données quantitatives, mais très souvent, nous avons en plus de ces données des données qualitatives qui décrivent les lignes ou les colonnes de nos données !
 
-Nous allons nous entraîner sur un cas très simple : représenter si l'aliment à base de fruits qui est représenté dans la table est *cru* ou non.
+Nous allons nous entraîner sur un cas très simple : représenter àquel groupe l'aliment à base de fruits appartient.
 
-Pour cela, j'ai créé une table annexe qui a les mêmes noms de lignes que la table `vitafruits` et qui contient une colonne `crue` qui contient les valeurs `oui` ou `non`. Prenez quelques minutes pour lire et comprendre ce code.
+Pour cela, j'ai créé une table annexe qui a les mêmes noms de lignes que la table `vitafruits` et qui contient une colonne `groupe` qui contient le groupe.
 
 ```{r cruoupas, echo = TRUE}
-cru <- ifelse(grepl("cru", rownames(vitafruits)), "oui", "non")
 annotFruit <- data.frame(
-  cru = cru,
+  groupe = fruits$groupe,
   row.names = rownames(vitafruits))
 ```
 
@@ -145,7 +147,7 @@ colzRamp <- colorRampPalette(mycolz)(50)
 pheatmap(vitafruits, cluster_rows = TRUE, 
          cluster_cols = FALSE, show_rownames = FALSE,
          cellwidth = 10, border_color = "black",
-         scale = "row", color = colzRamp,
+         scale = "column", color = colzRamp,
          annotation_row = annotFruit)
 ```
 
@@ -163,14 +165,14 @@ pheatmap(vitafruits,
          show_rownames = FALSE,
          cellwidth = 10, 
          border_color = "black",
-         scale = "row")
+         scale = "column")
 ```
 
 ```{r vitafruitsClassif-solution}
 pheatmap(vitafruits, cluster_rows = TRUE, 
          cluster_cols = FALSE, show_rownames = FALSE,
          cellwidth = 10, border_color = "black",
-         scale = "row", 
+         scale = "column", 
          clustering_distance_rows = "correlation",
          clustering_method = "ward.D2")
 ```
@@ -184,7 +186,7 @@ La librairie `pheatmap` n'est pas la seule à pouvoir produire de jolies cartes 
 Voici un exemple dans lequel j'ai changé quelques paramètres pour rendre le graphe joli. Modifiez ces paramètres, tout en prenant bien soin d'aller consulter l'aide de la fonction `?corrplot` pour comprendre leur signification.
 
 ```{r corrplot, exercise = TRUE}
-cormat <- cor(fruits[, -1], use = "pairwise.complete.obs")
+cormat <- cor(fruits[, -(1:2)], use = "pairwise.complete.obs")
 corrplot(corr = cormat, method = "square", type = "upper", diag = FALSE, , order = "hclust", tl.col = "black")
 ```
 

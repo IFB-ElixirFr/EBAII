@@ -9,112 +9,45 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
-library(VennDiagram)
+library(tidyViz)
 library(ggplot2)
-library(UpSetR)
-data("fruits", package = "intro2r")
-lesFruits <- rownames(fruits)
-
-vitC <- lesFruits[fruits$VitamineC > 10]
-vitD <- lesFruits[fruits$VitamineD > 0.1]
-vitE <- lesFruits[fruits$VitamineE > 1]
-
-vitList <- list(vitC = vitC, vitD = vitD, vitE = vitE)
-theme_set(theme_bw())
-
-dat01 <- data.frame(vitC = fruits$VitamineC > 10, vitD = fruits$VitamineD > 0.1, vitE = fruits$VitamineE > 1) + 0
+library(gggenes)
+library(trackViewer)
+data("methy")
+data("gr")
+data("features")
 ```
 
-## Diagramme de Venn
+Ce tutoriel est vraiment beaucoup plus rapide que les précédents : il s'agit juste de montrer comment utiliser les fonctions de base des packages `gggenes` et `trackViewer` sur les exemples fournis par les auteurs.
 
-Les diagrammes de Venn permettent de représenter des liens entre ensembles d'objets : combien d'objets sont communs à plusieurs ensembles, et combien sont spécifiques d'un seul ensemble.
+## Représentation de gènes
 
-Pour les besoins de ce tutoriel, j'ai créé trois ensembles : 
-
-* l'ensemble des fruits contenant de la Vitamine C (plus de 10 mg / 100G)
-* l'ensemble des fruits contenant de la Vitamine D (plus de 0.10 µg / 100G)
-* l'ensemble des fruits contenant de la Vitamine E
-(plus de 1 mg / 100G)
-
-Prenez-un moment pour lire ce code et le comprendre.
-
-```{r ensfruits, echo = TRUE}
-lesFruits <- rownames(fruits)
-
-vitC <- lesFruits[fruits$VitamineC > 10]
-vitD <- lesFruits[fruits$VitamineD > 0.1]
-vitE <- lesFruits[fruits$VitamineE > 1]
-
-vitList <- list(vitC = vitC, vitD = vitD, vitE = vitE)
-```
-
-La fonction `venn.diagram` du package `VennDiagram` vous permettra de générer un diagramme de Venn entre *au plus* 5 ensembles. Modifiez les commandes suivantes pour avoir des couleurs d'ensembles différentes !
+Les fonctions de base du package `gggenes` permettent de représenter des informations le long d'un génome, en reprenant la syntaxe de `ggplot2`. 
 
 
-```{r venn, exercise = TRUE}
-vd <- venn.diagram(vitList, filename = NULL)
-grid.draw(vd)
-```
-
-```{r venn-solution}
-vd <- venn.diagram(vitList, filename = NULL, col = 2:4, fill = 2:4, alpha = rep(0.4, 3))
-grid.draw(vd)
-```
-
-Attention, si vous avez déjà créé un graphe, la fonction `grid.draw` "peindra" par dessus, il faudra donc créer une nouvelle fenêtre graphique avec la fonction `grid.newpage()`. Comparez les deux façons de faire avec le code ci-dessous.
-
-```{r newpage-setup}
-vd <- venn.diagram(vitList, filename = NULL, col = 2:4, fill = 2:4, alpha = rep(0.4, 3))
+```{r gggenes, exercise = TRUE}
+ggplot(example_genes,
+       aes(xmin = start,
+           xmax = end,
+           y = molecule,
+           fill = gene)) +
+  geom_gene_arrow() +
+  facet_wrap( ~ molecule, 
+              scales = "free", 
+              ncol = 1) +
+  scale_fill_brewer(palette = "Set3") +
+  theme_genes()
 ```
 
 
-```{r newpage, exercise = TRUE}
-gg <- ggplot(fruits, aes(VitamineC)) + 
-  geom_boxplot()
-
-plot(gg)
-grid.draw(vd)
-
-plot(gg)
-grid.newpage() ; grid.draw(vd)
-```
-
-## Les diagrammes UpSet
-
-Les auteurs de la publications [UpSet: Visualization of Intersecting Sets](https://ieeexplore.ieee.org/document/6876017) sont partis du constat qu'à partir de 4 ou 5 ensembles différents, le diagramme de Venn atteint ses limites. Ils ont proposé un visualisation à base de diagrammes en bâtons de points qui permettent de représenter l'information complexe de ce qui est partagé ou pas entre plusieurs groupes. Cette nouvelle représentation, appelée `UpSet`, est implémentée en R dans la librairie `UpSetR` et sa fonction principale `upset`.
-
-Ce n'est pas forcément évident au premier regard : la fonction `upset` n'accepte pas les mêmes types d'argument en entrée que la fonction `venn.diagram`. La fonction `upset` souhaite en effet comme argument principal avoir une matrice de 0s et de 1s avec 
-
-  * en ligne les éléments des ensembles,
-  * en colonne les ensembles,
-  * un 1 en position $(i,j)$ si l'élément $i$ appartient au groupe $j$,
-  * un 0 sinon !
-  
-Qu'est-ce que cela signifie pour notre exemple ? 
-
-J'ai créé pour vous cette *data-frame* de zéros et de uns avec la commande suivante. Examinez cette commande pendant quelques instants.
-
-```{r mat01}
-dat01 <- data.frame(
-  vitC = ifelse(fruits$VitamineC > 10, 1, 0), 
-  vitD = ifelse(fruits$VitamineD > 0.1, 1, 0), 
-  vitE = ifelse(fruits$VitamineE > 1, 1, 0))
-```
-
-Pour générer un diagramme UpSet, utilisez ensuite la commande suivante. Puis modifiez la pour faire un joli graphe !
 
 
-```{r upset01, exercise = TRUE}
-upset(dat01)
-```
+## Représentation en pissenlit
 
-```{r upset01-solution}
-# C'est vraiment tout ce qu'on peut faire
-# avant de descendre dans des paramètres 
-# vraiment très compliqués !
-upset(data = dat01, 
-      order.by = "degree", 
-      sets.bar.color = "steelblue")
+La représentation en pissenlit (*dandelion* en anglais, c'est plus joli !) permet de représenter des données ponctuelles et complexes le long d'un génome.
+
+```{r dandelionplot, exercise = TRUE}
+dandelion.plot(methy, features, ranges=gr)
 ```
 
 
