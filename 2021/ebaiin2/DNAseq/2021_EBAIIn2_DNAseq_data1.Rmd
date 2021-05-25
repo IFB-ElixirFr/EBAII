@@ -1,0 +1,414 @@
+---
+title: "EBAII niveau 2 : recherche de mutation dans un QTL"
+author: "Nadia Bessoltane - nadia.bessoltane@inrae.fr"
+date: "`r format(Sys.time(), '%B, %Y')`"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+  pdf_document:
+    toc: yes
+    toc_float: true
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+L'objectif de ce TP est de vous permettre de vous familiariser avec les packages R utilisés pour la manipulation et la visualisation de variations génomiques à partir d'un fichier VCF. Le Jeux de données choisi pour ce TP est le même que celui utilisé pour le TP variant du niveau 1. 
+
+Pour ce TP nous allons avoir besoin des packages R ci-dessous :
+```{r library, message=FALSE, warning=FALSE}
+library(vcfR)        # extraire les informations stockées dans un VCF
+library(tidyverse)   # collection de packages R pour la manipulation et la visualisation des données,
+library(reshape2)    # transform les data frame
+library(ggplot2)     # visualisation
+library(UpSetR)      # upset plot -> graphique d'intersection
+library(venn)        # diagramme de venn
+
+```
+
+
+# Description du jeux de donnée : 
+[voir lien](https://docs.google.com/presentation/d/1E-buwG1NDitZp7mUsZ5PiFSb8DQWYDkN/edit#slide=id.p1)
+
+| Samples    | QTL* |
+|------------|------|
+| SRR1262731 | QTL- |
+| SRR1205992 | QTL+ |
+| SRR1205973 | QTL+ |
+
+* QTL+ : diminution de la production en lait et une augmentation des concentrations en protéine et lipide
+
+Pour le TP nous disposons des résultats du variant calling des 3 échantillons (en Multi-VCF annoté).
+```{r}
+# le chemain vers le vcf
+vcf_file <- "data/data1_mutation/pool_GATK_annot.vcf"
+
+```
+
+
+# Lire le fichier vcf
+La fonction read.vcfR() permet de lire un fichier vcf/multi-vcf et retourne un objet de la class vcfR.
+```{r}
+
+# pour chercher l'aide d'une fonction utiliser la fonction help() ou ?
+# help(read.vcfR) 
+# ?read.vcfR()
+vcf <- vcfR::read.vcfR(file = vcf_file)
+
+# pour vérifier le type ou la class d'un objet on utilise summary(), class(), is()
+summary(vcf)
+```
+
+Les différentes sections d'une class S4 s'appellent des "slots".
+La fonction slotNames() permet de lister les noms des slots de notre objet
+```{r}
+#help(slotNames)
+slotNames(vcf)
+```
+
+Pour accéder au contenu d'une section (slot) --> nomObjet@nomDuSlot
+
+> @meta
+
+```{r}
+## @meta est un vecteur de caractères
+# afficher les 6 1er éléments du vecteur
+head(vcf@meta)
+```
+
+> @fix
+
+```{r}
+## @fix est une matrix R
+head(vcf@fix) %>% data.frame()
+
+```
+Nombre de lignes correspond au nombre de variants == `r dim(vcf@fix)[1]` variants.
+
+> @gt
+
+```{r}
+## @gt est une matrix R
+head(vcf@gt) %>% data.frame()
+
+```
+Chaque ligne correspond aux informations de génotypage par variant et par échantillon.
+
+## Quelques fonctions utiles du package vcfR
+
+### extract.indels()
+
+Séparer les SNVs des INDELs
+```{r extract.snv}
+# extraire les SNVs
+vcf.snv   <- extract.indels(vcf, return.indels = FALSE)
+```
+Nombre de SNV == `r dim(vcf.snv@fix)[1]`.
+
+```{r extract.indels}
+# extraire les InDels
+vcf.indel <- extract.indels(vcf, return.indels = TRUE)
+
+```
+Nombre de InDels == `r dim(vcf.indel@fix)[1]`.
+
+### tidy vcfR
+Convertir l'objet vcfR en format compatible avec les fonctions tidyverse.
+
+#### vcf_field_names()
+
+Cette fonction extrait les metadata sous format tabulé.
+
+```{r}
+
+# extraire les champs INFO du metadata
+stringr::str_subset(vcf.snv@meta, pattern = "INFO=")[1:3]
+
+## convertir la section metadata @meta en data frame type tibble
+#help(vcf_field_names)
+vcf_field_names(vcf.snv, tag = "INFO")[1:3,]
+```
+La même chose pour le champs FORMAT :
+```{r}
+
+# extraire les champs INFO du metadata
+stringr::str_subset(vcf.snv@meta, pattern = "FORMAT=")[3:5]
+
+## convertir la section metadata @meta en data frame type tibble
+#help(vcf_field_names)
+vcf_field_names(vcf.snv, tag = "FORMAT")[3:5,]
+```
+
+#### extract_info_tidy()
+
+Cette fonction permet d'extraire la colonne INFO du vcf sous format tabulé. Cela facilite la manipulation des ces info par la suite.
+```{r}
+# extraire les champs INFO de la section @fix
+vcf.snv@fix[,"INFO"][1]
+
+## convertir le champ INFO en data frame type tibble
+#  on peut choisir les 
+#extract_info_tidy(vcf.snv, info_fields = c("AC", "AN", "MQ"))
+extract_info_tidy(vcf.snv)
+```
+
+#### extract_gt_tidy()
+
+Cette fonction permet d'extraire chaque metriques et scores de la colonne FORMAT sous format tabulé.
+```{r, message=FALSE, warning=FALSE}
+# 6 1ere lignes de la section @gt
+vcf.snv@gt[1:6,] %>% data.frame()
+
+## convertir la section @gt en data frame type tibble
+#  on peut choisir les champs à garder
+#extract_gt_tidy(vcf.snv, format_fields = c("AC", "AN", "MQ"))
+extract_gt_tidy(vcf.snv)
+```
+
+#### vcfR2tidy()
+
+Cette fonction convertit toutes les info stockées dans l'objet vcfR en data frame de type tibble.
+
+```{r vcfR2tidy, message=FALSE}
+# la fonction "vcfR2tidy" prend en entrée un objet vcfR
+# pour connaitre le type d'un objet on fait la commande : is(vcf.snv)
+# on peut specifier les champs que on veux garder (ex ci-dessous) 
+# vcf.tidy.list <- vcfR2tidy(vcf.snv, format_fields = c("GT", "AD", "DP"), info_fields = c("AC", "AN", "MQ")) 
+vcf.tidy.list <- vcfR2tidy(vcf.snv)
+```
+Cette fonction retourne une liste de 3 tibbles `r names(vcf.tidy.list)`
+
+```{r vcf.tidy}
+names(vcf.tidy.list)
+
+head(vcf.tidy.list$meta)
+head(vcf.tidy.list$fix)
+head(vcf.tidy.list$gt)
+
+```
+
+
+
+
+> Pour encore facilter la manipulation de nos données :
+
+On va fusionner les deux tibble $fix et $gt :
+```{r}
+# "ChromKey", "POS" sont les colonnes communes
+vcf.tidy <- dplyr::full_join(vcf.tidy.list$fix , vcf.tidy.list$gt, by = c("ChromKey", "POS"))
+#head(vcf.tidy)
+```
+
+Le champs ID renseigne un identifiant unique pour chaque variant. S'il n'est pas renseigné il est recommandé d'en créer un pour faciliter la manipulation des tableaux. 
+```{r}
+## exmple :
+# CHROM <- "Chr1"
+# POS <- 10000
+# REF <- "A"
+# ALT <- "T"
+# ID  <- paste(CHROM, POS, REF, ALT, sep="_") # résultats : Chr1_10000_A_T
+
+# Pour chaque variant si ID n'est pas null, créer le ID (comme dans l'ex.), sinon garder le ID.
+vcf.tidy <- dplyr::mutate(vcf.tidy, ID = dplyr::if_else(is.na(ID), paste(CHROM, POS, REF, ALT, sep="_"), ID))
+head(vcf.tidy)
+```
+
+l'information lié au nombre de reads par allele est stocké dans la colonne gt_AD (Allele depth) sous forme de : (ref AD,alt AD) ou (ref AD,alt1 AD,alt2 AD) dans les cas multi-alléliques.
+
+Dans le cas des variants multi-alléliques les valeurs de la colonne ALT contiennent une "," pour séparer les différents allèles alternatifs.
+```{r}
+# les variants multi-alléliques
+#stringr::str_detect(vcf.tidy, string = ALT, pattern = ",")
+#dplyr::filter(vcf.tidy, stringr::str_detect(string = ALT, pattern = ",")) %>% select(ID, ALT, gt_AD) %>% head
+vcf.tidy.multiAlt <- dplyr::filter(vcf.tidy, str_detect(string = ALT, pattern = ","))
+vcf.tidy.multiAlt %>% select(ID, ALT, gt_AD) %>% head
+```
+
+Pour le reste du TP on va s'intéresser uniquement aux variations avec un allele alternatif
+```{r}
+# garder les variations  avec un allele alternatif
+filter(vcf.tidy, !str_detect(string = ALT, pattern = ",")) %>% select(ID, ALT, gt_AD) %>% head
+vcf.tidy <- dplyr::filter(vcf.tidy, !str_detect(string = ALT, pattern = ","))
+```
+
+On va séparer la colonne gt_AD en deux colonnes ref AD et alt AD. Pour cela on utilise la fonction "separate" du package "tidyr".
+```{r}
+# separarer la colonne gt_AD en deux colonne ref AD et alt AD
+vcf.tidy <- tidyr::separate(data = vcf.tidy, col = gt_AD, c("gt_ref.AD", "gt_alt.AD"), sep = ",", remove=FALSE)
+select(vcf.tidy, ID, Indiv, gt_AD, gt_ref.AD, gt_alt.AD) %>% head()
+
+```
+On va ajouter une colonne avec l'allèle ratio de chaque variant. 
+```{r}
+#vcf.tidy <- dplyr::mutate(vcf.tidy, gt_AR = gt_alt.AD/gt_DP)
+#vcf.tidy <- dplyr::mutate(vcf.tidy, gt_AR = if_else(gt_DP == 0, 0, gt_alt.AD/gt_DP))
+
+vcf.tidy <- dplyr::mutate(vcf.tidy, gt_AR = if_else(gt_DP == 0, 0, as.numeric(gt_alt.AD)/gt_DP))
+
+select(vcf.tidy, ID, Indiv, gt_AD, gt_ref.AD, gt_alt.AD, gt_AR) %>% head()
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+#> BONUS
+A <- vcf.tidy %>% separate(col=gt_GT_alleles, into = c("ref", "alt"), sep="[|/.]", remove = FALSE) %>% select(gt_GT_alleles, ref, alt)
+```
+
+
+
+
+# Contrôle de qualité et nettoyage des donnnées :
+
+
+```{r control quality, out.width="50%", fig.show="hold", warning=FALSE, message=FALSE}
+
+p <- ggplot(data=vcf.tidy) + 
+  geom_density(aes(QUAL, color=Indiv)) + 
+  xlab("score de qualité") + ylab("densité") + xlim(c(0,100))
+p
+
+p <- ggplot(data=vcf.tidy) + 
+  geom_density(aes(gt_DP, color=Indiv)) + 
+  xlab("Variant position coverage") + ylab("densité") + xlim(c(0,100))
+p
+
+p <- ggplot(data=vcf.tidy) + 
+  geom_density(aes(as.numeric(gt_alt.AD), color=Indiv)) +
+  xlab("Alternative allele depth") + ylab("densité") + xlim(c(0,50))
+p
+
+p <- ggplot(data=vcf.tidy) + 
+  geom_density(aes(gt_AR, color=Indiv)) + 
+  xlab("Alternative allele ratio") + ylab("densité")
+p
+```
+
+La visualisation des différents métriques nous permet de voir la qualité de nos données mais aussi de définir les filtres et seuils à appliquer.
+
+Ci-dessous on vous  donne quelques exemples de filtres mais il existe plein d'autres filtres qualité 
+```{r}
+# filtrer les variations avec un score qualité inférieur à 30
+vcf.tidy.flt.q <- dplyr::filter(vcf.tidy, QUAL >= 30)
+
+```
+
+
+```{r}
+# les positions couvertes à moins de 4 reads seront concidéré comme non couverte
+# l'allèle alternatif doit être supporté par au moins 2 reads.
+vcf.tidy.flt <- dplyr::mutate(vcf.tidy.flt.q, gt_DP = if_else(gt_DP < 4, 0, as.numeric(gt_DP)),
+                                            gt_alt.AD = if_else(gt_alt.AD < 2, 0, as.numeric(gt_alt.AD)))
+
+# on peut aussi appliquer des filtre sur l'allèle ratio
+```
+
+> Petit exercice :
+
+Dans le cours Filtre et annotation ([Filtre et annotation](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit#slide=id.g45fc5e30f7_9_0)) de EBAIIn1 nous avons appliqué un filtre qualité avec la fonction VariantFiltration et SelectVariants de la suite GATK. Appliquer les mêmes filtres sur l'objet vcf.tidy.flt.q en utilisant la fonction "filter" de "dplyr".
+```{r}
+# 
+
+```
+
+
+# Statistiques discriptives
+
+## Croisement des variants entre les 3 échantillons
+
+On besoin d'extraire une matrice des allèles ratio (pour quoi AR?) avec les variants en lignes et les échantillons en colonnes
+```{r}
+# transformer la matrice de données en format "wide" -> ID en lignes et Indiv en colonne
+vcf.mat.AR <- reshape2::dcast(vcf.tidy.flt, ID~Indiv, value.var="gt_AR")
+head(vcf.mat.AR)
+
+# retirer la colonne ID -> pas utile
+vcf.mat.AR <- dplyr::select(vcf.mat.AR, -ID)
+
+# remplacer les NA par des 0 
+vcf.mat.AR <- dplyr::mutate_at(vcf.mat.AR, .vars = names(vcf.mat.AR),
+                                           .funs = function(x){dplyr::if_else(is.na(x), 0, as.double(x))})
+head(vcf.mat.AR)
+
+```
+
+On peut comparer les variants des 3 échantiilons avec un diagramme de venn.
+```{r venn, , out.width="70%", fig.align="center"}
+# la fonction venn necessite une marice binaire : absence, présence.
+vcf.mat.bin <- dplyr::mutate_at(vcf.mat.AR, .vars = names(vcf.mat.AR), 
+                                            .funs = function(x){dplyr::if_else(x > 0, 1, 0)})
+head(vcf.mat.bin)
+
+# dessiner le diagramme de venn
+venn::venn(vcf.mat.bin, zcolor = "style")
+```
+
+ou un upset plot : 
+```{r upset , out.width="70%", fig.align="center"}
+UpSetR::upset(vcf.mat.bin, sets=names(vcf.mat.AR),
+              order.by = "freq", nintersects = NA,
+              mainbar.y.label = "SNV Intersections", 
+              sets.x.label = "Number of SNV")
+
+```
+
+## Clustering hiérarchique des accessions.
+
+```{r dendrogram, , out.width="70%", fig.align="center"}
+# calcul la distance entre les lignes de la matrice
+dist  <- dist(t(vcf.mat.AR), method = "euclidean")
+# clustering hiérarchique
+hc    <- hclust(dist)
+# arranger la structure du dendrogramme
+dend  <- as.dendrogram(hc)
+
+# dessiner le dendrogramme
+plot(dend, main = "Sample clustering using all variants")
+
+```
+
+# Recherche de la mutation responsable
+
+La mutation recherchée :
+
+* se situe dans un gène codant pour une protéine, 
+* variation missence (changement de l'acide aminé),
+* présente seulement sur le locus QTL- (SRR1262731)
+
+
+Appliquer les filtres nécessaires pour cerner la mutation d'interêt.
+
+Pour garder que les variants sur des gènes codant et les variants annotés missences.
+```{r}
+#L'information de l'annotation est decrite dans la colonne "ANN"
+# vcf.tidy.flt.q$ANN[1]
+
+# 1) garder que les variants situées dans des gènes codants et annotées comme "missense_variant"
+vcf.tidy.flt.ann <- dplyr::filter(vcf.tidy.flt, grepl("protein_coding"    ,ANN), 
+                                                grepl("missense_variant"  ,ANN))
+vcf.tidy.flt.ann %>% head()
+```
+
+Pour sélectionner que les variants qui portent l'allèle référent sur les échantillons QTL+ et l'aalèle alternatif sur l'echantillons QTL-.
+```{r}
+
+# extraire une matrice avec variants (position) en lignes et échantillons en colonne.
+# avec l'allele ratio  (value.var)
+vcf.mat.AR.ann <-  reshape2::dcast(vcf.tidy.flt.ann, ID~Indiv, value.var="gt_AR")
+vcf.mat.AR.ann
+
+# filtre
+mutations <- filter(vcf.mat.AR.ann, SRR1262731 !=  0 & SRR1205973 == 0 & SRR1205992 == 0)
+mutations
+
+resultats <- dplyr::filter(vcf.tidy, ID == mutations$ID)
+
+resultats
+
+```
+
