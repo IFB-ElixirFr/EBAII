@@ -52,6 +52,6 @@ From there, you can also find a link to download the whole repository with `git`
 | Fichier                  | Intervenant      | Supports                                    |
 |--------------------------|------------------|---------------------------------------------|
 | Introduction et rappel   | Nadia Bessoltane | [[Slides](https://docs.google.com/presentation/d/1E-buwG1NDitZp7mUsZ5PiFSb8DQWYDkN/edit#slide=id.p1)] |
-| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_data1.html)] |
-| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_data2.html)] |
+| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/2021_EBAIIn2_DNAseq_data1.Rmd)]  [[html](DNAseq/2021_EBAIIn2_DNAseq_data1.html)] |
+| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/2021_EBAIIn2_DNAseq_data2.Rmd)]  [[html](DNAseq/2021_EBAIIn2_DNAseq_data2.html)] |
 | Copy Number Variants | Bastien Job | |
