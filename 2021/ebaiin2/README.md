@@ -25,7 +25,7 @@ From there, you can also find a link to download the whole repository with `git`
 | dplyr     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S02dplyr.html)] | [[Lien](https://learnr.pasteur.fr/T02dplyr/)] [[R Markdown](01R/tidyViz/inst/tutorials/T02dplyr/T02dplyr.Rmd)] |
 | ggplot2   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S03ggplot2.html)] | [[Lien](https://learnr.pasteur.fr/T03ggplot2/)] [[R Markdown](01R/tidyViz/inst/tutorials/T03ggplot2/T03ggplot2.Rmd)] |
 | couleurs  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S04couleurs.html)] | [[Lien](https://learnr.pasteur.fr/T04couleurs)] [[R Markdown](01R/tidyViz/inst/tutorials/T04couleurs/T04couleurs.Rmd)] |
-| pheatmap  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S05pheatmap.html)] | [[Lien](https://learnr.pasteur.fr/T05pheatmap)] [[R Markdown](01R/tidyViz/inst/tutorials/T04gggenes/T05pheatmap.Rmd)] |
+| pheatmap  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S05pheatmap.html)] | [[Lien](https://learnr.pasteur.fr/T05pheatmap)] [[R Markdown](01R/tidyViz/inst/tutorials/T05pheatmap/T05pheatmap.Rmd)] |
 | upset     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S06upset.html)] | [[Lien](https://learnr.pasteur.fr/T06upset)] [[R Markdown](01R/tidyViz/inst/tutorials/T06upset/T06upset.Rmd)] |
 | gggenes   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S07gggenes.html)] | [[Lien](https://learnr.pasteur.fr/T07gggenes)] [[R Markdown](01R/tidyViz/inst/tutorials/T07gggenes/T07gggenes.Rmd)] |
 
@@ -51,7 +51,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Fichier                  | Intervenant      | Supports                                    |
 |--------------------------|------------------|---------------------------------------------|
-| Introduction et rappel   | Nadia Bessoltane | [pdf](DNAseq/EBAIIn2_DNAseq_Introduction_Rappel.Rmd) |
-| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
-| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
+| Introduction et rappel   | Nadia Bessoltane | [[Slides](https://docs.google.com/presentation/d/1E-buwG1NDitZp7mUsZ5PiFSb8DQWYDkN/edit#slide=id.p1)] |
+| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/2021_EBAIIn2_DNAseq_data1.Rmd)]  [[html](DNAseq/2021_EBAIIn2_DNAseq_data1.html)] |
+| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/2021_EBAIIn2_DNAseq_data2.Rmd)]  [[html](DNAseq/2021_EBAIIn2_DNAseq_data2.html)] |
 | Copy Number Variants | Bastien Job | |
