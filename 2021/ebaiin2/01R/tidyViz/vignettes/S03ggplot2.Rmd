@@ -657,7 +657,18 @@ g + facet_grid(factorow ~ factocol)
 
 CONSEIL : pour l'utilisation de facettes, faites attention à bien nommer les modalités de vos facteurs pour rendre le graphe plus clair.
 
+# Sauvegarder un graphe
 
+## Méthode conseillée : avec ggsave
+
+Fonctionnement et exemple : 
+
+```
+g <- ggplot(fruits, aes(groupe)) + geom_bar()
+ggsave(filename = "mongraphe.png", plot = g)
+```
+
+L'extension donnée dans `filename` sera magiquement détectée pour sauvegarder le fichier au bon format !
 
 
 # Conclusion
