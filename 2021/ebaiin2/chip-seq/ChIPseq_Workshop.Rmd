@@ -177,7 +177,7 @@ barplot(sapply(peaks,length))
 ```
 
 Let's create a barplot with ggplot2 out of this data.
-```{r enhancedbarplot, include=TRUE, out.width="50%"}
+```{r enhancedbarplot, include=TRUE, out.width="50%",fig.align = 'center'}
 # Load ggplot2 library
 library(ggplot2)
 # create a table with the data to display
@@ -1057,7 +1057,7 @@ names(logFC.cl4) <- geneList.cl4
 pathview(logFC.cl4,pathway.id = "hsa04110",species = "hsa")
 ```
 
-[](data/hsa04110.pathview.png)
+[Pathview](data/hsa04110.pathview.png)
 
 ### Are there published data I could use to enrich my analysis ?
 
