@@ -65,4 +65,5 @@ Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers 
 | Introduction et rappel   | Nadia Bessoltane | [[Slides](https://docs.google.com/presentation/d/1nXKT_iyAzfBZkB495JmtXAB-Es7XF7Ci/edit#slide=id.p1)] |
 | Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
 | Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
-| Copy Number Alterations | Bastien Job | [pdf](DNAseq/EBAI2021n2_DNAseq_CNA_srun_BJ.pdf) [pptx](DNAseq/EBAI2021n2_DNAseq_CNA_srun_BJ.pptx)|
+| Copy Number Alterations | Bastien Job | [[pdf](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pdf)] [[pptx](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pptx)]|
+| Single Cell (on request) | Bastien Job | [[pdf](DNAseq/Intro_Single-Cell_20210119.pdf)]
