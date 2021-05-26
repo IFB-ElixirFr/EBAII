@@ -29,6 +29,14 @@ From there, you can also find a link to download the whole repository with `git`
 | upset     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S06upset.html)] | [[Lien](https://learnr.pasteur.fr/T06upset)] [[R Markdown](01R/tidyViz/inst/tutorials/T06upset/T06upset.Rmd)] |
 | gggenes   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S07gggenes.html)] | [[Lien](https://learnr.pasteur.fr/T07gggenes)] [[R Markdown](01R/tidyViz/inst/tutorials/T07gggenes/T07gggenes.Rmd)] |
 
+### FAIR
+
+| Cours                 | Intervenants | Supports                            |
+|-----------------------|--------------|-------------------------------------|
+| Sciences ouvertes et principes FAIR  | Thomas Denecker | [pdf](https://doi.org/10.6084/m9.figshare.14677941.v1)  |
+
+
+
 
 ### ChIP-seq
 
