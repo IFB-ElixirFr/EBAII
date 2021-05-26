@@ -62,7 +62,7 @@ Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers 
 
 | Fichier                  | Intervenant      | Supports                                    |
 |--------------------------|------------------|---------------------------------------------|
-| Introduction et rappel   | Nadia Bessoltane | [pdf](DNAseq/EBAIIn2_DNAseq_Introduction_Rappel.Rmd) |
+| Introduction et rappel   | Nadia Bessoltane | [Slides](DNAseq/2021-05-26_EBAIIn2_DNAseq.pptx) |
 | Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
 | Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
 | Copy Number Alterations | Bastien Job | [pdf](DNAseq/EBAI2021n2_DNAseq_CNA_srun_BJ.pdf) [pptx](DNAseq/EBAI2021n2_DNAseq_CNA_srun_BJ.pptx)|
