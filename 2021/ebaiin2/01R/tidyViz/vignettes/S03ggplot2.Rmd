@@ -158,7 +158,7 @@ Nous allons voir ensemble quelques géométries particulières qui permettent de
 
 On a déjà vu comment faire : 
 
-```{r geom_bar_ter}
+```{r geom_bar_ter, fig.height = 3}
 ggplot(fruits, aes(cut(Eau, c(0, 84.2, 100)))) + 
   geom_bar(fill = "steelblue")
 ```
@@ -306,15 +306,17 @@ ggplot(data=fruits, aes(x=groupe, y=Sucres)) +
 
 ## Avec des violons {.columns-2 .smaller}
 
-```{r violinplot, fig.height = 4}
-ggplot(data=fruits, aes(x = Sucres, y = 1)) + 
+```{r violinplot, fig.height = 3, fig.width = 3}
+ggplot(data=fruits, 
+       aes(x = Sucres, y = 1)) + 
   geom_violin()
 ```
 
 <p class="forceBreak"></p>
 
-```{r violinplot2, fig.height = 4}
-ggplot(data=fruits, aes(x = groupe, y = Sucres)) + 
+```{r violinplot2, fig.height = 3, fig.width = 3}
+ggplot(data=fruits, 
+       aes(x = groupe, y = Sucres)) + 
   geom_violin()
 ```
 

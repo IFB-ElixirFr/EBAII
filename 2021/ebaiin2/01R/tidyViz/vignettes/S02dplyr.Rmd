@@ -3,12 +3,12 @@ title: "Manipulation de données avec dplyr"
 author: "Vincent Guillemot"
 date: "Mardi 25 mai 2021"
 output: 
-    ioslides_presentation:
-        css: styles.css
+  ioslides_presentation:
+    css: styles.css
 vignette: >
   %\VignetteIndexEntry{02dplyr}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 <style>
@@ -34,7 +34,7 @@ knitr::opts_chunk$set(
  * Avant : `f(g(x))` 
  * Après :  `g(x) %>% f()`
 
-![](img/S02dplyr/maggritr.png){height=100%}
+![](img/S02dplyr/maggritr.jpeg){width=30%}
 
 ## Exemple {.columns-2 .bigger}
 
