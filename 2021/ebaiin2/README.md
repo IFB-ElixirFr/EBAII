@@ -20,14 +20,17 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Thématique| Intervenant        | Lien vers la présentation | Tutoriel|
 |-----------|--------------------|---------------------------------------|-----------|
-| Programme | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S00programme.html)] | [[Lien](https://learnr.pasteur.fr/T00tuto/)] [[R Markdown](01R/tidyViz/inst/tutorials/T00tuto/T00tuto.Rmd)] |
-| Packages  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S01packages.html)] | [[Lien](https://learnr.pasteur.fr/T01packages/)] [[R Markdown](01R/tidyViz/inst/tutorials/T01packages/T01packages.Rmd)] |
-| dplyr     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S02dplyr.html)] | [[Lien](https://learnr.pasteur.fr/T02dplyr/)] [[R Markdown](01R/tidyViz/inst/tutorials/T02dplyr/T02dplyr.Rmd)] |
-| ggplot2   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S03ggplot2.html)] | [[Lien](https://learnr.pasteur.fr/T03ggplot2/)] [[R Markdown](01R/tidyViz/inst/tutorials/T03ggplot2/T03ggplot2.Rmd)] |
-| couleurs  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S04couleurs.html)] | [[Lien](https://learnr.pasteur.fr/T04couleurs)] [[R Markdown](01R/tidyViz/inst/tutorials/T04couleurs/T04couleurs.Rmd)] |
-| pheatmap  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S05pheatmap.html)] | [[Lien](https://learnr.pasteur.fr/T05pheatmap)] [[R Markdown](01R/tidyViz/inst/tutorials/T05pheatmap/T05pheatmap.Rmd)] |
-| upset     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S06upset.html)] | [[Lien](https://learnr.pasteur.fr/T06upset)] [[R Markdown](01R/tidyViz/inst/tutorials/T06upset/T06upset.Rmd)] |
-| gggenes   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S07gggenes.html)] | [[Lien](https://learnr.pasteur.fr/T07gggenes)] [[R Markdown](01R/tidyViz/inst/tutorials/T07gggenes/T07gggenes.Rmd)] |
+| Programme | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S00programme.html) [PDF](01R/tidyViz/vignettes/S00programme.pdf)] | [[Lien](https://learnr.pasteur.fr/T00tuto/)] [[R Markdown](01R/tidyViz/inst/tutorials/T00tuto/T00tuto.Rmd)] |
+| Packages  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S01packages.html) [PDF](01R/tidyViz/vignettes/S01packages.pdf)] | [[Lien](https://learnr.pasteur.fr/T01packages/)] [[R Markdown](01R/tidyViz/inst/tutorials/T01packages/T01packages.Rmd)] |
+| dplyr     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S02dplyr.html) [PDF](01R/tidyViz/vignettes/S02dplyr.pdf)] | [[Lien](https://learnr.pasteur.fr/T02dplyr/)] [[R Markdown](01R/tidyViz/inst/tutorials/T02dplyr/T02dplyr.Rmd)] |
+| ggplot2   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S03ggplot2.html) [PDF](01R/tidyViz/vignettes/S03ggplot2.pdf)] | [[Lien](https://learnr.pasteur.fr/T03ggplot2/)] [[R Markdown](01R/tidyViz/inst/tutorials/T03ggplot2/T03ggplot2.Rmd)] |
+| couleurs  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S04couleurs.html) [PDF](01R/tidyViz/vignettes/S04couleurs.pdf)] | [[Lien](https://learnr.pasteur.fr/T04couleurs)] [[R Markdown](01R/tidyViz/inst/tutorials/T04couleurs/T04couleurs.Rmd)] |
+| pheatmap  | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S05pheatmap.html) [PDF](01R/tidyViz/vignettes/S05pheatmap.pdf)] | [[Lien](https://learnr.pasteur.fr/T05pheatmap)] [[R Markdown](01R/tidyViz/inst/tutorials/T05pheatmap/T05pheatmap.Rmd)] |
+| upset     | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S06upset.html) [PDF](01R/tidyViz/vignettes/S06upset.pdf)] | [[Lien](https://learnr.pasteur.fr/T06upset)] [[R Markdown](01R/tidyViz/inst/tutorials/T06upset/T06upset.Rmd)] |
+| gggenes   | Vincent Guillemot  | [[Slides](01R/tidyViz/vignettes/S07gggenes.html) [PDF](01R/tidyViz/vignettes/S07gggenes.pdf)] | [[Lien](https://learnr.pasteur.fr/T07gggenes)] [[R Markdown](01R/tidyViz/inst/tutorials/T07gggenes/T07gggenes.Rmd)] |
+
+Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers dossier compressé](01R/tidyViz/inst/extdata/ebaiin2_01Rvisu.zip)
+
 
 ### FAIR
 
