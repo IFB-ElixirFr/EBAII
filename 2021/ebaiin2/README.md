@@ -75,4 +75,4 @@ Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers 
 |--------------------------|------------------|---------------------------------------------|
 | Présentation             | Jérôme Mariette  | [[Slides](Integration/2021_EBAII.pdf)]      |
 | MixOmics                 | Jérôme Mariette  | [[R 1](Integration/TP_mixOmics.R)] [[R 2](Integration/TP_mixOmics2.R)] |
-| MixKernel                | Jérôme Mariette  | [[Slides](Integration/TP_mixKernel.pdf)] [[Slides](Integration/TP_mixKernel.Rmd)] |
+| MixKernel                | Jérôme Mariette  | [[Slides](Integration/TP_mixKernel.pdf)] [[Rmd](Integration/TP_mixKernel.Rmd)] |
