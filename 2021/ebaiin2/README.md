@@ -67,3 +67,12 @@ Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers 
 | Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
 | Copy Number Alterations | Bastien Job | [[pdf](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pdf)] [[pptx](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pptx)]|
 | Single Cell (on request) | Bastien Job | [[pdf](DNAseq/Intro_Single-Cell_20210119.pdf)]
+
+
+### Intégration de données
+
+| Fichier                  | Intervenant      | Supports                                    |
+|--------------------------|------------------|---------------------------------------------|
+| Présentation             | Jérôme Mariette  | [[Slides](Integration/2021_EBAII.pdf)]      |
+| MixOmics                 | Jérôme Mariette  | [[R 1](Integration/TP_mixOmics.R)] [[R 2](Integration/TP_mixOmics2.R)] |
+| MixKernel                | Jérôme Mariette  | [[Slides](Integration/TP_mixKernel.pdf)] [[Slides](Integration/TP_mixKernel.Rmd)] |
