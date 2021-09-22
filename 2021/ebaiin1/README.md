@@ -27,7 +27,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
-| Introduction à R | Thomas Denecker, Jacques van Helden, Hugo Varet | [[pdf](R/Intro_R_2020.pdf)] [[pptx](R/Intro_R_2020.pptx)] [[odp](R/Intro_R_2020.odp)] |
+| Introduction à R | Thomas Denecker, Jacques van Helden, Stevenn Volant | [[pdf](R/Intro_R_2020.pdf)] [[pptx](R/Intro_R_2020.pptx)] [[odp](R/Intro_R_2020.odp)] |
 | Script  | | [[R script](R/script_intro_R_2020.r)] |
 | Données | | [[expression.txt](R/expression.txt)] [[annotation.csv](R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
@@ -64,13 +64,13 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction  | Maria Bernard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [gslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
+| Introduction  | Elodie Girard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [gslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
 |  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1cfdGX-3rjhNAFGSBsk2NhBU44f7A4lkFeS_8ptdlLEw/edit?usp=sharing) |
 | Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [gslides](https://docs.google.com/presentation/d/1GbfYjfXeeow6wkRRLR0MmDie5OTd1j3Cg02xgfGlUeI/edit?usp=sharing) |
 | Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [gslides](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit?usp=sharing) |
 | Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
-| Applications sous R | Maria Bernard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Maria Bernard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
+| Applications sous R | Elodie Girard |[html](DNA-seq/EBAII2020_variants.html)|
+| Workflow et conclusion | Elodie Girard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
 | Schéma récapitulatif | | [Schema](DNA-seq/variantCalling_pipeline.pdf) |
 
 ### ChIP-seq
@@ -96,7 +96,6 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) [soluce](croisement_donnees/solution.html) |
-| Intégration de données | Laura Cantini |[pdf](croisement_donnees/CANTINI_NGS_AVIESAN_IFB.pdf) |
 
 ### Initiation Slurm
 
