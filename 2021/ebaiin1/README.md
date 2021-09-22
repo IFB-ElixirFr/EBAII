@@ -44,7 +44,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard , Rachel Legendre, Olivier Quenez, Bastien Job| [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
+| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Elodie Girard , Rachel Legendre, Bastien Job| [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
 
 
 ### RNA-seq
