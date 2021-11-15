@@ -21,7 +21,6 @@ From there, you can also find a link to download the whole repository with `git`
 |----------------------------------|--------------|----------|
 | Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
-| Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
 ### (Re)découverte de R 
 
@@ -64,14 +63,14 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction  | Elodie Girard, Olivier Rué |[pdf](DNA-seq/1-Introduction-Atelier-Variant.pdf) [gslides](https://docs.google.com/presentation/d/1xOwOgrEDZvF-XV9waKNIpTXbGNLDCb5_APL5gXFSycc/edit?usp=sharing)   |
-|  Processing Post-Alignement | Olivier Rué | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1cfdGX-3rjhNAFGSBsk2NhBU44f7A4lkFeS_8ptdlLEw/edit?usp=sharing) |
-| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [gslides](https://docs.google.com/presentation/d/1GbfYjfXeeow6wkRRLR0MmDie5OTd1j3Cg02xgfGlUeI/edit?usp=sharing) |
-| Filtrage et annotation | Olivier Rué | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [gslides](https://docs.google.com/presentation/d/17INp7S2o4IDxWOklkThMlut8ij1t4CZWGB8v73vmQc0/edit?usp=sharing) |
-| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/17CfyWqUNaCL1LnPgwX8J8srOKzZHlqxQj_e1j0Xy8-w/edit?usp=sharing) |
-| Applications sous R | Elodie Girard |[html](DNA-seq/EBAII2020_variants.html)|
-| Workflow et conclusion | Elodie Girard | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1nFRswgW8G1IAB-JIqp6D4tX_b94lKCWQ8kre6AZfClo/edit?usp=sharing) |
-| Schéma récapitulatif | | [Schema](DNA-seq/variantCalling_pipeline.pdf) |
+| Introduction  | Elodie Girard |[pdf](DNA-seq/1-Introduction-fastqc-mapping.pdf) [gslides](https://docs.google.com/presentation/d/1y38ostLE1dk5uXeOk9xeXHqq_QkPWBTG/)   |
+|  Processing Post-Alignement | Odile Rogier | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1GwWt6gSLdwVVeCIRKu6R31mBdEHf0XvB) |
+| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [gslides](https://docs.google.com/presentation/d/1ywn8bB3ejyY0E25VNmIHa5zwn3wKNa3s) |
+| Filtrage et annotation | Mathieu Charles | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1msBwblYTor0fJknQ8WKIDu34y3NVs_fV) |
+| Variants structuraux | Olivier Quenez | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1xQFztasps08aP8NgEnp1fQpGCQDr7uFY/) |
+| Applications sous R | Elodie Girard |[html](DNA-seq/EBAII2021_variants.html)|
+| Workflow et conclusion | Odile Rogier | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/16NN7wBr4V_hqVyKSN53J8_jzGqelQQH7/) |
+
 
 ### ChIP-seq
 
