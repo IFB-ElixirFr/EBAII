@@ -23,12 +23,12 @@ From there, you can also find a link to download the whole repository with `git`
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 | Read mapping | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
-### R
+### (Re)découverte de R 
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
 | Introduction à R | Thomas Denecker, Jacques van Helden, Stevenn Volant | [[pdf](intro_R/Intro_R_2021.pdf)] [[pptx](intro_R/Intro_R_2021.pptx)] [[odp](intro_R/Intro_R_2021.odp)] |
-| Script  | | [[R script](intro_R/script_intro_R_2020.r)] |
+| Script  | | [[R script](intro_R/script_intro_R_2021.r)] |
 | Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
