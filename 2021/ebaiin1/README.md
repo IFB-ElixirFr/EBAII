@@ -27,9 +27,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
-| Introduction à R | Thomas Denecker, Jacques van Helden, Stevenn Volant | [[pdf](R/Intro_R_2020.pdf)] [[pptx](R/Intro_R_2020.pptx)] [[odp](R/Intro_R_2020.odp)] |
-| Script  | | [[R script](R/script_intro_R_2020.r)] |
-| Données | | [[expression.txt](R/expression.txt)] [[annotation.csv](R/annotation.csv)] |
+| Introduction à R | Thomas Denecker, Jacques van Helden, Stevenn Volant | [[pdf](intro_R/Intro_R_2021.pdf)] [[pptx](intro_R/Intro_R_2021.pptx)] [[odp](intro_R/Intro_R_2021.odp)] |
+| Script  | | [[R script](intro_R/script_intro_R_2020.r)] |
+| Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
 
