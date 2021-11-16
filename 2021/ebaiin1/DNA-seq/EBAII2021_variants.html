@@ -11,7 +11,7 @@
 
 <meta name="author" content="Elodie Girard - Maria Bernard" />
 
-<meta name="date" content="2021-11-15" />
+<meta name="date" content="2021-11-16" />
 
 <title>EBAII 2021 Atelier variants - Résumé</title>
 
@@ -320,7 +320,7 @@ div.tocify {
 <h1 class="title toc-ignore">EBAII 2021 Atelier variants - Résumé</h1>
 <h3 class="subtitle">Ecole de Bioinformatique AVIESAN-IFB-INSERM, 21 au 26 Novembre 2021, Roscoff</h3>
 <h4 class="author">Elodie Girard - Maria Bernard</h4>
-<h4 class="date">2021-11-15</h4>
+<h4 class="date">2021-11-16</h4>
 
 </div>
 
@@ -820,35 +820,45 @@ mean_cov</code></pre></div>
 <span class="st"> cat filter_and_annot/GATK_varscan_inter.annot.coding.nosyn.vcf | SnpSift filter -Xmx8G \</span>
 <span class="st"> </span><span class="dt">\&quot;</span><span class="st">ANN[*].EFFECT = 'missense_variant' &amp; isHet( GEN[2] ) &amp; isVariant( GEN[2] ) &amp; isRef( GEN[0] ) &amp; isRef( GEN[1] ) </span><span class="dt">\&quot;</span><span class="st"> \</span>
 <span class="st">&gt; filter_and_annot/GATK_varscan_inter.annot.coding.nosyn.filtered.vcf&quot;</span></code></pre></div>
-<!-- # Interlude R N° 3 -->
-<!-- ```{bash filt,message=FALSE,eval=FALSE} -->
-<!-- # Représentation des variants détectés sur un chromosome -->
-<!-- R # ouvre R en interactif -->
-<!-- ``` -->
-<!-- ```{r vcfR1,eval=FALSE} -->
-<!-- ## Chargement de la librairie vcfR qui aide déouvrir et gérer les fichiers au format vcf -->
-<!-- library(vcfR) -->
-<!-- ## Chargement du fichier vcf avec la commande spéciale read.vcfR -->
-<!-- vcf<-read.vcfR("GATK/vcf/SRR1262731_extract_GATK.vcf") -->
-<!-- ## Chargement du fichier fasta avec la commande spéciale read.dna du package ape -->
-<!-- dna <- ape::read.dna("genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa", format ="fasta") -->
-<!-- ## Chargement du fichier gff contenant les informations sur les gènes du chr6 -->
-<!-- gff<-read.table("genome/Bos_taurus.UMD3.1.93.chromosome.6.gff3",quote="",sep="\t") -->
-<!-- ## Chargement du fichier gff contenant les informations sur les gènes du chr6 -->
-<!-- bed <-read.table("additionnal_data/QTL_BT6.bed")  -->
-<!-- start_region<-bed[1,2] -->
-<!-- end_region<-bed[nrow(bed),3] -->
-<!-- chrom <- create.chromR(name='chr6', vcf=vcf, seq=dna, ann=gff) -->
-<!-- chrom <- proc.chromR(chrom, verbose=TRUE) -->
-<!-- chromoqc(chrom, xlim=c(start_region, end_region)) -->
-<!-- head(chrom) -->
-<!-- dp <- extract.gt(chrom, element="DP", as.numeric=TRUE)  -->
-<!-- ad <- extract.gt(chrom,element="AD", as.numeric=TRUE) -->
-<!-- all_ratio<-data.frame(round(ad*100/dp,2)) -->
-<!-- head(all_ratio) -->
-<!-- q("no")  -->
-<!-- ``` -->
 </div>
+</div>
+<div id="interlude-r-n-3" class="section level1">
+<h1>Interlude R N° 3</h1>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># Représentation des variants détectés sur un chromosome</span>
+
+<span class="ex">R</span> <span class="co"># ouvre R en interactif</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Chargement de la librairie vcfR qui aide déouvrir et gérer les fichiers au format vcf
+<span class="kw">library</span>(vcfR)
+
+## Chargement du fichier vcf avec la commande spéciale read.vcfR
+vcf &lt;-<span class="st"> </span><span class="kw">read.vcfR</span>(<span class="st">&quot;GATK/vcf/SRR1262731_extract_GATK.vcf&quot;</span>)
+
+## Chargement du fichier fasta avec la commande spéciale read.dna du package ape
+dna &lt;-<span class="st"> </span>ape<span class="op">::</span><span class="kw">read.dna</span>(<span class="st">&quot;genome/Bos_taurus.UMD3.1.dna.toplevel.6.fa&quot;</span>, <span class="dt">format =</span><span class="st">&quot;fasta&quot;</span>)
+
+## Chargement du fichier gff contenant les informations sur les gènes du chr6
+gff &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;genome/Bos_taurus.UMD3.1.93.chromosome.6.gff3&quot;</span>,<span class="dt">quote=</span><span class="st">&quot;&quot;</span>,<span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)
+
+## Chargement du fichier gff contenant les informations sur les gènes du chr6
+bed &lt;-<span class="kw">read.table</span>(<span class="st">&quot;additionnal_data/QTL_BT6.bed&quot;</span>)
+start_region &lt;-<span class="st"> </span>bed[<span class="dv">1</span>,<span class="dv">2</span>]
+end_region &lt;-<span class="st"> </span>bed[<span class="kw">nrow</span>(bed),<span class="dv">3</span>]
+
+chrom &lt;-<span class="st"> </span><span class="kw">create.chromR</span>(<span class="dt">name=</span><span class="st">'chr6'</span>, <span class="dt">vcf=</span>vcf, <span class="dt">seq=</span>dna, <span class="dt">ann=</span>gff)
+chrom &lt;-<span class="st"> </span><span class="kw">proc.chromR</span>(chrom, <span class="dt">verbose=</span><span class="ot">TRUE</span>)
+<span class="kw">chromoqc</span>(chrom, <span class="dt">xlim=</span><span class="kw">c</span>(start_region, end_region))
+
+<span class="kw">plot</span>(chrom)
+
+<span class="kw">head</span>(chrom)
+
+dp &lt;-<span class="st"> </span><span class="kw">extract.gt</span>(chrom, <span class="dt">element=</span><span class="st">&quot;DP&quot;</span>, <span class="dt">as.numeric=</span><span class="ot">TRUE</span>)
+ad &lt;-<span class="st"> </span><span class="kw">extract.gt</span>(chrom,<span class="dt">element=</span><span class="st">&quot;AD&quot;</span>, <span class="dt">as.numeric=</span><span class="ot">TRUE</span>)
+all_ratio &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">round</span>(ad<span class="op">*</span><span class="dv">100</span><span class="op">/</span>dp,<span class="dv">2</span>))
+
+<span class="kw">head</span>(all_ratio)
+
+<span class="kw">q</span>(<span class="st">&quot;no&quot;</span>)</code></pre></div>
 </div>
 <div id="recherche-de-variants-structuraux" class="section level1">
 <h1>Recherche de Variants Structuraux</h1>
@@ -921,7 +931,7 @@ mean_cov</code></pre></div>
 <span class="fu">rm</span> sniffles/sniffles_del_start.txt sniffles/sniffles_del_stop.txt sniffles/sniffles_del_infos.txt</code></pre></div>
 </div>
 </div>
-<div id="interlude-r-n-3" class="section level1">
+<div id="interlude-r-n-3-1" class="section level1">
 <h1>Interlude R N° 3</h1>
 <p>Test comparatif des tailles des délétions détectées par delly vs sniffles</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># ouvre R en interactif</span>
