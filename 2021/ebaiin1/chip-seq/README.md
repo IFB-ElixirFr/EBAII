@@ -1,7 +1,7 @@
-## EBAII 2020 - ChIP-seq course
+## EBAII 2021 - ChIP-seq course
 
 ### Hands-on
-Go to [hands-on](/2020/chip-seq/hands-on/)
+Go to [hands-on](/2021/chip-seq/hands-on/)
 
 ### Planning
 
@@ -10,11 +10,11 @@ Go to [hands-on](/2020/chip-seq/hands-on/)
 
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
-| 10:45 | 12:25 | 02:00 | Experimental design | St |
+| 10:45 | 12:25 | 02:00 | Experimental design | Stéphanie Le Gras |
 | 12:45 | 14:30 | 01:45 | **Lunch Break** |  |
-| 14:30 | 16:00 | 01:30 | Mapping | St |
+| 14:30 | 16:00 | 01:30 | Mapping | Stéphanie Le Gras |
 | 16:00 | 16:30 | 00:30 | **Break** |  |
-| 16:30 | 17:45 | 01:15 | Mapping QC, Visualization | Tao |
+| 16:30 | 17:45 | 01:15 | Mapping QC, Visualization | Tao Ye |
 
 
 
@@ -23,8 +23,8 @@ Go to [hands-on](/2020/chip-seq/hands-on/)
 
 | **Start** | **End** | **Duration** | **Topics** | **Teacher** |
 | -------- | --------- | --------- | ----------- | ----------- |
-| 08:30 | 10:15 | 01:45 | Peak-calling | St |
-| 10:15 | 10:45 | 00:30 | **Break** |  |
-| 10:45 | 12:45 | 02:00 | Motif analysis | El |
-| 12:45 | 14:30 | 01:45 | **Lunch Break** |  |
-| 14:30 | 16:00 | 01:30 | Peak annotation | Tao |
+| 10:45 | 12:25 | 02:00 | Mapping QC, Visualization, Peak-calling | Tao Ye |
+| 12:45 | 14:30 | 01:45 | **Break** |  |
+| 14:30 | 16:00 | 01:30 | Motif analysis | Morgane Thomas-Chollier |
+| 16:00 | 16:30 | 00:30 | **Break** |  |
+| 16:30 | 17:45 | 01:15 | Peak annotation | Elodie Darbo |
