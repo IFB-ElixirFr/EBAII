@@ -1,4 +1,4 @@
-# ChIP-seq Hands-on Roscoff 2020
+# ChIP-seq Hands-on Roscoff 2021
 
 
 1. [Introduction](#introduction)  
