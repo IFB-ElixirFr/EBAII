@@ -22,7 +22,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
 | Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
 
-### (Re)découverte de R 
+### (Re)découverte de R
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
@@ -85,9 +85,9 @@ From there, you can also find a link to download the whole repository with `git`
 | Design expérimental, Contrôle qualité | Stéphanie Le Gras |
 | Alignement | Stéphanie Le Gras |
 | Contrôle qualité des alignements, visualisation | Tao Ye |
-| Peak-calling | Stéphanie Le Gras |
-| Analyse des motifs | Elodie Darbo |
-| Annotation des pics | Tao Ye |
+| Peak-calling | Tao Ye |
+| Analyse des motifs | Morgane Thomas-Chollier |
+| Annotation des pics | Elodie Darbo |
 
 
 ### Croisement et intégration des données
