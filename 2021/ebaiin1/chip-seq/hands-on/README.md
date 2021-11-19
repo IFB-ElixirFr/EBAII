@@ -70,16 +70,7 @@ Although direct access to the SRA database at the NCBI is doable, SRA does not s
 **At this point, you have three FASTQ files, two IPs, one control (INPUT).**
 
 ## Connect to the server and set up your environment <a name="setup"></a>
-### 1 - Sign in on the server
-  * On MobaXterm
-> Session : ssh  
-> Host : core.cluster.france-bioinformatique.fr
-> Specify username : ticked and filled in  
-> Advanced SSH settings : X11-Forwarding  
-  * On MacOS and Linux
-```bash
-ssh -XY <login>@core.cluster.france-bioinformatique.fr
-```
+### 1 - Sign in to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr) and open a Terminal
 
 ### 2 - Set up your working environment
 1. Go to your project directory
@@ -88,21 +79,21 @@ cd /shared/projects/<your_project>
 ```
 2. Create a directory that will contain all results of the upcoming analyses.
 ```bash
-mkdir EBA2020_chipseq
+mkdir EBAII2021_chipseq
 ```
 3. Go to the newly created directory
 ```bash
-cd EBA2020_chipseq
+cd EBAII2021_chipseq
 ```
 4. Copy the directory containing data
 
 ```bash
-srun cp -r /shared/home/slegras/EBA2020_chipseq/data .
+srun cp -r /shared/home/slegras/EBAII2021_chipseq/data .
 ```
 
 7. Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 ```
@@ -130,7 +121,7 @@ cd 01-QualityControl
 
 Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
@@ -160,13 +151,13 @@ ls
 ```bash
 ### OPEN A NEW TERMINAL
 ## Create a directory where to put generated files ON YOUR COMPUTER
-mkdir ~/Desktop/EBA2020_chipseq
+mkdir ~/Desktop/EBAII2021_chipseq
 
 ## Go to the location on your computer, where you want to put the data, for example:
-cd ~/Desktop/EBA2020_chipseq
+cd ~/Desktop/EBAII2021_chipseq
 
 ## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2020_chipseq/01-QualityControl/SRR576933_fastqc.html .
+scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBAII2021_chipseq/01-QualityControl/SRR576933_fastqc.html .
 # Enter your password
 ```
 8. On your machine, open this file with your favourite web browser.  
@@ -262,7 +253,7 @@ cd IP/repA
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
@@ -330,7 +321,7 @@ Open the file SRR576938.out. How many reads were mapped?**
 
 1. Go to the directory with alignment file of the first replicate, repA (IP)
 ```bash
-cd /shared/projects/<your_project>/EBA2020_chipseq/02-Mapping/IP/repA
+cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/IP/repA
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -365,7 +356,7 @@ module add samtools/1.10
 srun samtools flagstat Marked_SRR576933.bam
 ```
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq/)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq/)
 ```bash
 ## Unload picard and samtools
 module rm samtools/1.10 picard/2.22.0
@@ -397,23 +388,23 @@ srun plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/IP/repA/SRR576933.
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```bash
-cp /shared/home/slegras/EBA2020_chipseq/03-ChIPQualityControls/fingerprint.png .
+cp /shared/home/slegras/EBAII2021_chipseq/03-ChIPQualityControls/fingerprint.png .
 ```
 5. Download the file fingerprint.png on your local machine (either with ` scp ` or Cyberduck). Using ` scp ` it would look like this.
 ```bash
 ### OPEN A NEW TERMINAL
 ## Go to the location on your computer, where you want to put the data
-cd ~/Desktop/EBA2020_chipseq
+cd ~/Desktop/EBAII2021_chipseq
 
 ## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBA2020_chipseq/03-ChIPQualityControls/fingerprint.png .
+scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBAII2021_chipseq/03-ChIPQualityControls/fingerprint.png .
 # Enter your password
 ```
 
 **Look at the result files fingerprint.png. What do you think of it?**  
 
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2020_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2021_chipseq)
 ```bash
 ## Unload deepTools
 module rm deeptools/3.2.0
@@ -472,7 +463,7 @@ cd 04-Visualization
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
@@ -519,7 +510,7 @@ srun --mem=3G bamCoverage --bam ../02-Mapping/IP/repA/Marked_SRR576933.bam \
 **Go back to the genes we looked at earlier: pepT, ycfP. Look at the shape of the signal.**  
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq)
 ```bash
 ## If you are in 04-Visualization
 cd ..
@@ -601,7 +592,7 @@ cd idr
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
@@ -645,7 +636,7 @@ srun idr --samples ../repA/FNR_Anaerobic_A_peaks.narrowPeak ../repB/FNR_Anaerobi
 --plot
 ```
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBA2020_chipseq)
+4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq)
 ```bash
 module rm macs2/2.1.1.20160309
 module rm idr/2.0.4.2
@@ -681,7 +672,7 @@ cd 06-MotifAnalysis
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBA2020_chipseq
+/shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
@@ -900,7 +891,7 @@ tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promote
 srun gzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
 ```
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBA2020_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2021_chipseq)
 ```bash
 ## If you are in 07-PeakAnnotation
 cd ..
@@ -927,7 +918,7 @@ From now on, we will work locally on your personal machine.
 0. We will download the already called peak files in bed format from GEO.
 Create a new folder and go in it.
 ```bash
-cd /shared/projects/<your_project>/EBA2020_chipseq
+cd /shared/projects/<your_project>/EBAII2021_chipseq
 mkdir 07-PeakAnnotation-bonus
 cd 07-PeakAnnotation-bonus
 ```
@@ -969,7 +960,7 @@ col = brewer.pal(9,'Set1')
 
 ```r
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBA2020_chipseq/07-PeakAnnotation-bonus")
+setwd("/shared/projects/<your_project>/EBAII2021_chipseq/07-PeakAnnotation-bonus")
 
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
@@ -1148,6 +1139,6 @@ Ramírez, F., Ryan, D.P., Grüning, B., Bhardwaj, V., Kilpert, F., Richter, A.S.
 Download mapping results already generated (as it takes a while to download)
 ```bash
 cd <some directory you want on your computer>
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBA2020_chipseq/02-Mapping/*/*bam* .
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBA2020_chipseq/02-Mapping/*/*/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBAII2021_chipseq/02-Mapping/*/*bam* .
+scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBAII2021_chipseq/02-Mapping/*/*/*bam* .
 ```
