@@ -54,7 +54,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Bioinformatics | Emilie Drouineau | [pdf](RNA-seq/EBAI2021_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
 | General statistics | Stevenn Volant | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNA-seq/TP_differential_analysis/Practice_SARTools.zip) |
-| Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) [R script](RNA-seq/GSEA/GSEA.R)|
+| Gene set analysis | Thibault Dayris | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
 | De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2021_red.pdf)  |
 | Workflow | Rachel Legendre, Emilie Drouineau | [pdf](RNA-seq/workflow_RNA.pdf)  |
 
