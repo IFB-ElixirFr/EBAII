@@ -19,8 +19,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
-| Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
+| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/1-presentation_linux_quick_2021.pdf) [gslides](https://docs.google.com/presentation/d/19Z96DlG41kd0e3B86HP-oNCVfDJekR84F_gNaTdcF1I/edit?usp=sharing) |
+| Qualités et alignement | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](intro_linux/2-pre_processessing_and_mapping_2021.pdf) [gslides](https://docs.google.com/presentation/d/1RMfu1FxqRz1EC_2BnHH3e_xLyMCcppfjUE2G4BHFq8A/edit?usp=sharing) |
 
 ### (Re)découverte de R
 
