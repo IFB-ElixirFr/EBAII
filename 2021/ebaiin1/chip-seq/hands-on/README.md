@@ -334,7 +334,7 @@ INPUT=SRR576933.bam \
 OUTPUT=Marked_SRR576933.bam \
 METRICS_FILE=metrics \
 VALIDATION_STRINGENCY=STRICT
-            
+
 picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576938.bam \
@@ -1081,15 +1081,15 @@ This file will work directly in IGV
 
 ## References <a name="ref"></a>
 
-[geo]: https://github.com/slegras/EBAI2017/blob/master/images/1_GEO.png "GEO"
-[geo2]: https://github.com/slegras/EBAI2017/blob/master/images/2_GEO.png "GEO2"
-[geo3]: https://github.com/slegras/EBAI2017/blob/master/images/3_GEO.png "GEO3"
-[ebi4]: https://github.com/slegras/EBAI2017/blob/master/images/4_EBI.png "EBI"
-[ebi5]: https://github.com/slegras/EBAI2017/blob/master/images/5_EBI.png "EBI"
-[genome6]: https://github.com/slegras/EBAI2017/blob/master/images/6_Genomes.png "E. Coli K-12"
-[jupebai]: https://github.com/slegras/EBAI2017/blob/master/images/jupyterHub_profile.png "Jupyterhub EBAII"
-[fastqc]: https://github.com/slegras/EBAI2017/blob/master/images/fastqc.png "Jupyterhub FastQC"
-[launchrstudio]: https://github.com/slegras/EBAI2017/blob/master/images/launchRstudio.png "Launch Rstudio"
+[geo]: ../images/1_GEO.png "GEO"
+[geo2]: ../images/2_GEO.png "GEO2"
+[geo3]: ../images/3_GEO.png "GEO3"
+[ebi4]: ../images/4_EBI.png "EBI"
+[ebi5]: ../images/5_EBI.png "EBI"
+[genome6]: ../images/6_Genomes.png "E. Coli K-12"
+[jupebai]: ../images/jupyterHub_profile.png "Jupyterhub EBAII"
+[fastqc]: ../images/fastqc.png "Jupyterhub FastQC"
+[launchrstudio]: ../images/launchRstudio.png "Launch Rstudio"
 
 Dobin, A., Davis, C.A., Schlesinger, F., Drenkow, J., Zaleski, C., Jha, S., Batut, P., Chaisson, M., and Gingeras, T.R. (2013). STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29, 15–21.
 Langmead, B., and Salzberg, S.L. (2012). Fast gapped-read alignment with Bowtie 2. Nat. Methods 9, 357–359.
