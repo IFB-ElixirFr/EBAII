@@ -36,7 +36,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [gslides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
+| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20211122.pdf) [gslides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) [video](single_cell/Droplet-based-microfluidics-ESPCI-LBC-SingleCell.mp4) |
 | Long reads | Claude Thermes | [ppt](long_reads/20201006_THERMES_ROSCOFF9_V3.pptx) |
 
 ### Visualisation
