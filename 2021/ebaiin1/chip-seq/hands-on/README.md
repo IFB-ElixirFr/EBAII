@@ -316,13 +316,15 @@ Open the file SRR576938.out. How many reads were mapped?**
 ```bash
 cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
 ```
+	
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
   * INPUT: input file name to mark for duplicate reads
   * OUTPUT: output file name
   * METRICS: file with duplicates marking statistics
   * VALIDATION_STRINGENCY: Validation stringency for all SAM files read by picard.
-```bash
+
+```bash	
 ## Load picard
 module add picard/2.22.0
 
