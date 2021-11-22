@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # ChIP-seq Hands-on Roscoff 2021
 
 
