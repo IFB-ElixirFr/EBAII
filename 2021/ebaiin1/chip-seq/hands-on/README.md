@@ -15,12 +15,11 @@
 12. [Bonus: Peak annotation using R](#peakr)
 13. [FAQ](#faq)
 14. [References](#ref)
-15. [During Tuesday lunch break](#lunch)
-
 
 ## Introduction <a name="introduction"></a>
 ### Goal
 The aim is to :
+
   * understand the nature of ChIP-Seq data
   * perform a complete analysis workflow including quality check (QC), read mapping, visualization in a genome browser and peak-calling. Use command line and open source software for each step of the workflow and feel the complexity of the task
   * have an overview of some possible downstream analyses
@@ -31,6 +30,7 @@ This training gives an introduction to ChIP-seq data analysis, covering the proc
 
 ### Dataset description
 For this training, we will use two datasets:
+
 * a dataset produced by Myers et al [Pubmed](http://www.ncbi.nlm.nih.gov/pubmed/23818864) involved in the regulation of gene expression under anaerobic conditions in bacteria. We will focus on one factor: **FNR**. The advantage of this dataset is its small size, allowing real time execution of all steps of the dataset
 * a dataset of ChIP-seq peaks obtained in different mouse tissues for the p300 co-activator protein by Visel et al. [Pubmed](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2745234/); we will use this dataset to illustrate downstream annotation of peaks using R.
 
@@ -127,13 +127,14 @@ cd 01-QualityControl
 ```
 
 Your directory structure should be like this
- ```
+```
 /shared/projects/<your_project>/EBAII2021_chipseq
 │
 └───data
 │   
-└───01-QualityControl <- you should be in this folder
+└───01-QualityControl <- you should be here
 ```
+
 3. Get FastQC available in your environment
 ```bash
 module add fastqc/0.11.9
@@ -317,6 +318,7 @@ Open the file SRR576938.out. How many reads were mapped?**
 cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
+
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
   * INPUT: input file name to mark for duplicate reads
   * OUTPUT: output file name
@@ -374,6 +376,7 @@ mkdir 03-ChIPQualityControls
 cd 03-ChIPQualityControls
 ```
 3. Run Deeptools [plotFingerprint](http://deeptools.readthedocs.io/en/latest/content/tools/plotFingerprint.html) (Fidel et al, NAR, 2016) to draw the Lorenz curve
+
   * -b: List of indexed BAM files
   * -plot: File name of the output figure (extension can be either “png”, “eps”, “pdf” or “svg”)
 ```bash
@@ -408,6 +411,7 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 
 ### 2 - Viewing the raw alignment data in IGV
 1. Download the following files from the server onto your computer
+
   * data/Escherichia_coli_K12.fasta
   * data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz
   * 02-Mapping/bam/SRR576933.bam
@@ -418,9 +422,11 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
   * 02-Mapping/bam/SRR576938.bam.bai
 2. Open IGV on your computer
 3. Load the genome
+
   * Genomes / Load Genome from File...
   * Select the fasta file Escherichia_coli_K12.fasta located into the data directory
 4. Load an annotation file named Escherichia_coli_K12_MG1655.annotation.gff3 into IGV
+
   * File / Load from File...
   * Select the annotation file. The positions of the genes are now loaded.
 5. Load the three bam files (SRR576933.bam, SRR576934.bam and SRR576938.bam) in IGV.
@@ -466,6 +472,7 @@ Your directory structure should be like this:
 ```
 
 4. Generate a scaled bigwig file on the IP with bamCoverage
+
   * --bam: BAM file to process
   * --outFileName: output file name
   * --outFileFormat: output file type
@@ -482,13 +489,16 @@ bamCoverage --bam ../02-Mapping/bam/Marked_SRR576933.bam \
 
 5. Do it for the replicate and the control.
 6. Download the three bigwig files you have just generated
+
   * 04-Visualization/SRR576933_nodup.bw
   * 04-Visualization/SRR576934_nodup.bw  
   * 04-Visualization/SRR576938_nodup.bw
 7. Load the three bigwig files in IGV
+
   * File / Load from File...
   * Select the three bigwig files.
 8. Set the visualization of the three bigwig files to be autoscaled
+
   * Click right on the name of the tracks and select **Autoscale**
 
 **Go back to the genes we looked at earlier: pepT, ycfP. Look at the shape of the signal.**  
@@ -525,6 +535,7 @@ macs2 callpeak
 This prints the help of the program.
 
 4. Let's see the parameters of MACS before launching the mapping:
+
   * ChIP-seq tag file (-t) is the name of our experiment (treatment) mapped read file SRR576933.bam
   * ChIP-seq control file (-c) is the name of our input (control) mapped read file SRR576938.bam
   * --format BAM indicates the input file are in BAM format. Other formats can be specified (SAM,BED...)
@@ -601,6 +612,7 @@ Your directory structure should be like this:
 module add idr/2.0.4.2
 idr --help
 ```
+
 * --samples : peak files of each individual replicate
 * --peak-list : the peak file of the pooled replicates, it will be used as a master peak set to compare with the regions from each replicates
 * --input-file-type : format of the peak file, in our case it is narrowPeak
@@ -627,6 +639,7 @@ cd ../..
 ### 5 - Visualize peaks into IGV
 
 1. Download the following BED files from the server into your computer to visualise in IGV :
+
 * 05-PeakCalling/repA/FNR_Anaerobic_A_peaks.bed
 * 05-PeakCalling/repB/FNR_Anaerobic_B_peaks.bed
 * 05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed
@@ -688,11 +701,14 @@ bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 
 ### 2 - Motif discovery with RSAT
 1. Open a connection to a Regulatory Sequence Analysis Tools server. You can choose between various website mirrors.
+
   * Teaching Server  (recommended for this training) [http://pedagogix-tagc.univ-mrs.fr/rsat/](http://pedagogix-tagc.univ-mrs.fr/rsat/)
 2. In the left menu, click on **NGS ChIP-seq** and then click on **peak-motifs**. A new page opens, with a form
 3. The default peak-motifs web form only displays the essential options. There are only two mandatory parameters.
+
   * The **title box**, which you will set as **FNR Anaerobic** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **FNR_anaerobic_idr_peaks.fa** from your computer.
 4. We will now modify some of the advanced options in order to fine-tune the analysis according to your data set.
+
   * Open the "Reduce peak sequences" title, and make sure the **Cut peak sequences: +/- ** option is set to **0** (we wish to analyze our full dataset)
   * Open the “Motif Discovery parameters” title, and check the **oligomer sizes 6 and 7** (but not 8). Check "Discover over-represented spaced word pairs **[dyad-analysis]**"
   * Under “Compare discovered motifs with databases”, **remove** "JASPAR core vertebrates" and **add RegulonDB prokaryotes** (2015_08) as the studied organism is the bacteria E. coli.
@@ -1080,16 +1096,6 @@ perl -pe 's/^chr/gi\|49175990\|ref\|NC_000913.2\|/' Escherichia_coli_K_12_MG1655
 This file will work directly in IGV
 
 ## References <a name="ref"></a>
-
-[geo]: ../images/1_GEO.png "GEO"
-[geo2]: ../images/2_GEO.png "GEO2"
-[geo3]: ../images/3_GEO.png "GEO3"
-[ebi4]: ../images/4_EBI.png "EBI"
-[ebi5]: ../images/5_EBI.png "EBI"
-[genome6]: ../images/6_Genomes.png "E. Coli K-12"
-[jupebai]: ../images/jupyterHub_profile.png "Jupyterhub EBAII"
-[fastqc]: ../images/fastqc.png "Jupyterhub FastQC"
-[launchrstudio]: ../images/launchRstudio.png "Launch Rstudio"
 
 Dobin, A., Davis, C.A., Schlesinger, F., Drenkow, J., Zaleski, C., Jha, S., Batut, P., Chaisson, M., and Gingeras, T.R. (2013). STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29, 15–21.
 Langmead, B., and Salzberg, S.L. (2012). Fast gapped-read alignment with Bowtie 2. Nat. Methods 9, 357–359.
