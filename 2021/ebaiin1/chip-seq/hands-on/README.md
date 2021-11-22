@@ -548,6 +548,7 @@ macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
 3. Run macs2 for replicate A, then go to repB directory and run macs2 for replicate B by changing the treatment file (-t), the output file name (-n) and the log file (&>), this should take a few minutes each.
 
 4. In a new directory called pool, run macs2 for the pooled replicates A and B by giving both bam files as input treatment files (-t).
+
 ```bash
 # If you are in 05-PeakCalling
 mkdir pool
