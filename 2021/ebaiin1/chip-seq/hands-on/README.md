@@ -324,9 +324,7 @@ cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
   * METRICS: file with duplicates marking statistics
   * VALIDATION_STRINGENCY: Validation stringency for all SAM files read by picard.
 
-
 ```bash	
-prout
 ## Load picard
 module add picard/2.22.0
 
