@@ -94,7 +94,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) [soluce](croisement_donnees/solution.html) |
+| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/1IE8uBw0NPEliLF79s7hV1T2LaRLxoYzBttWn6B_4pPI/edit?usp=sharing) [soluce](https://docs.google.com/document/d/1oHT_OfGeAMB-61igEoXfC0JhqJMD0dowlvNX6cv8C1Y/edit?usp=sharing) |
 
 ### Initiation Slurm
 
