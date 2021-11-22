@@ -49,7 +49,7 @@ We will thus use the **GSE41195** identifier to retrieve the dataset from the **
 ### 2 - Accessing GSE41195 from GEO
 1.  The GEO database hosts processed data files and many details related to the experiments. SRA (Sequence Read Archive) stores the actual raw sequence data.
 2. Search in Google **GSE41195**. Click on the first link to directly access the correct page on the GEO database.
-![alt text][geo]
+![geo](../images/1_GEO.png)
 3. This GEO entry is a mixture of expression analysis (Nimblegen Gene Expression Array), chip-chip and chip-seq. At the bottom of the page, click on the subseries related to the chip-seq datasets. (this subseries has its own identifier: **GSE41187**).
 ![alt text][geo2]
 4. From this page, we will focus on the experiment **FNR IP ChIP-seq Anaerobic A**. At the bottom of the page, click on the link "**GSM1010219** - FNR IP ChIP-seq Anaerobic A".
