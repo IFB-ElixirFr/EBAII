@@ -71,6 +71,13 @@ Although direct access to the SRA database at the NCBI is doable, SRA does not s
 
 ## Connect to the server and set up your environment <a name="setup"></a>
 ### 1 - Sign in to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr) and open a Terminal
+1. Go to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr)
+2. select a job profile: EBAII and click on "Start"
+![alt text][jupebai]
+3. In the launcher, click on "Terminal" in "Other" section. You should be in your home directory by default. Check it:
+```bash
+pwd
+```
 
 ### 2 - Set up your working environment
 1. Go to your project directory
@@ -147,21 +154,10 @@ ls
 ```
 > SRR576933_fastqc.html  SRR576933_fastqc.zip
 
-7. Download the HTML file SRR576933_fastqc.html on your local machine (either with ssh or the program you used to upload your data on the server). Using a bash command it would look like this.
-```bash
-### OPEN A NEW TERMINAL
-## Create a directory where to put generated files ON YOUR COMPUTER
-mkdir ~/Desktop/EBAII2021_chipseq
+7. Go to the directory /shared/projects/<your_project>/EBAII2021_chipseq/1-QualityControl in the tree diretory on the left of the jupyterhub panel and double click on SRR576933_fastqc.html to visualize the file.
+![alt text][fastqc]
 
-## Go to the location on your computer, where you want to put the data, for example:
-cd ~/Desktop/EBAII2021_chipseq
-
-## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBAII2021_chipseq/01-QualityControl/SRR576933_fastqc.html .
-# Enter your password
-```
-8. On your machine, open this file with your favourite web browser.  
-9. Launch the FASTQC program on the replicate (SRR576934.fastq.gz) and on the control file (SRR576938.fastq.gz)
+8. Launch the FASTQC program on the replicate (SRR576934.fastq.gz) and on the control file (SRR576938.fastq.gz)
 
 **Analyze the result of the FASTQC program:  
 How many reads are present in each file ?  
@@ -273,7 +269,8 @@ Your directory structure should be like this:
   * 2> SRR576933.out will output some statistics about the mapping in the file SRR576933.out
 ```bash  
 ## Run alignment
-bowtie -p 10 ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam
+## Tip: first type bowtie command line then add quotes around and prefix it with "sbatch --cpus 10 --wrap="
+sbatch --cpus-per-task 10 --wrap="bowtie -p 10 ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam"
 ```  
 This should take few minutes as we work with a small genome. For the human genome, we would need either more time and more resources.
 
@@ -328,20 +325,23 @@ cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
 ```bash
 ## Load picard
 module add picard/2.22.0
+
 ## Run picard
 picard MarkDuplicates \
+
 CREATE_INDEX=true \
 INPUT=SRR576933.bam \
 OUTPUT=Marked_SRR576933.bam \
 METRICS_FILE=metrics \
 VALIDATION_STRINGENCY=STRICT
-```
+            
 picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576938.bam \
 OUTPUT=Marked_SRR576938.bam \
 METRICS_FILE=metrics \
 VALIDATION_STRINGENCY=STRICT
+```
 
 To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
 
@@ -386,16 +386,7 @@ plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02
 ```bash
 cp /shared/home/slegras/EBAII2021_chipseq/03-ChIPQualityControls/fingerprint.png .
 ```
-5. Download the file fingerprint.png on your local machine (either with ` scp ` or Cyberduck). Using ` scp ` it would look like this.
-```bash
-### OPEN A NEW TERMINAL
-## Go to the location on your computer, where you want to put the data
-cd ~/Desktop/EBAII2021_chipseq
-
-## Download the file
-scp <login>@core.cluster.france-bioinformatique.fr:/shared/projects/<your_project>/EBAII2021_chipseq/03-ChIPQualityControls/fingerprint.png .
-# Enter your password
-```
+5. Go to the file using the directory tree on the left of the Jupyterhub panel and click on the fingerprint.png file to display it in Jupyterhub.
 
 **Look at the result files fingerprint.png. What do you think of it?**  
 
@@ -547,7 +538,7 @@ This prints the help of the program.
   <!-- * --diag is optional and increases the running time. It tests the saturation of the dataset, and gives an idea of how many peaks are found with subsets of the initial dataset. -->
   * &> MACS.out will output the verbosity (=information) in the file MACS.out
 ```bash
-srun macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
+macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
 -c ../../02-Mapping/bam/SRR576938.bam --format BAM \
 --gsize 4639675 --name 'FNR_Anaerobic_A' --bw 400 \
 --fix-bimodal -p 1e-2 &> repA_MACS.out
@@ -577,7 +568,7 @@ macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam ../../02-Mapping/bam/SRR576
 In order to take advantage of having biological replicates, we will create a combine set of peaks based on the reproducibility of each individual replicate peak calling. We will use the **Irreproducible Discovery Rate** (IDR) algorithm.
 
 1. Create a new directory to store the peak coordinates resulting after idr analysis
-```
+```bash
 ## If you are in 05-PeakCalling
 mkdir idr
 cd idr
@@ -782,15 +773,14 @@ annotatePeaks.pl \
   > FNR_anaerobic_idr_annotated_peaks.tsv
 ```
 
-5. Load R in your environment
-```bash
-module add r/4.0.2
-```
+5. Open an Rstudio tab in Jupyterhub
+![alt text][launchrstudio]
 
 6. Add gene symbol annotation using R
 ```R
-## Launch R
-R
+
+## set working directory
+setwd("/shared/projects/<your_project>/EBAII2021_chipseq/07-PeakAnnotation")
 
 ## read the file with peaks annotated with homer
 ## data are loaded into a data frame
@@ -808,8 +798,7 @@ gene.symbol <- read.table("../data/Escherichia_coli_K_12_MG1655.annotation.tsv.g
 ## by.x gives the columns name in which the common field is for the d data frame
 ## by.y gives the columns name in which the common field is for the gene.symbol data frame
 ## d contains several columns with no information. We select only interesting columns
-## -> d[,c(seq(1,6,1),8,10,11)]
-d.annot <- merge(d[,c(seq(1,6,1),8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
+d.annot <- merge(d[,c(1,2,3,4,5,6,8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
 
 ## Change column names of the resulting data frame
 colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
@@ -822,11 +811,6 @@ colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
 ## quote=F: don't put quote around text.
 write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T, row.names=F, sep="\t", quote=F)
 
-## Leave R
-quit()
-
-## Do not save the environment
-n
 ```
 
 **What information is listed in each column of the file?**
@@ -841,16 +825,14 @@ n
 tail -n 2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
 ```
 
+
 8. Count occurences of each associated feature type
 ```bash
 # sort | uniq -c to list and count occurences of each item
 tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
 ```
 
-[//]: # They are all associated with genes (promoter-TSS, TTS, exon ...) --> I would change for How many peaks are associated with promoters ?
-	
-**How many protein-coding genes are there in the file?**
-
+How many peaks are associated with promoters ?
 ```bash
 tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
 ```
@@ -920,8 +902,7 @@ Now, we will use **RStudio** to perform the rest of the analysis in R. For the a
    * [mouse functional annotation](http://bioconductor.org/packages/release/data/annotation/html/org.Mm.eg.db.html)
    * [clusterProfiler: Gene set annotation tool](http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html)
 
-1. Go to the [IFB Rstudio](https://rstudio.cluster.france-bioinformatique.fr/)
-2. load the required packages
+1. Go to Rstudio
 ```r
 # load the required libraries
 library(RColorBrewer)
@@ -934,7 +915,7 @@ txdb = TxDb.Mmusculus.UCSC.mm9.knownGene
 col = brewer.pal(9,'Set1')
 ````
 
-3. read the peak files for the three datasets:
+2. read the peak files for the three datasets:
 
 ```r
 # set the working directory to the folder in which the peaks are stored
@@ -1106,17 +1087,12 @@ This file will work directly in IGV
 [ebi4]: https://github.com/slegras/EBAI2017/blob/master/images/4_EBI.png "EBI"
 [ebi5]: https://github.com/slegras/EBAI2017/blob/master/images/5_EBI.png "EBI"
 [genome6]: https://github.com/slegras/EBAI2017/blob/master/images/6_Genomes.png "E. Coli K-12"
+[jupebai]: https://github.com/slegras/EBAI2017/blob/master/images/jupyterHub_profile.png "Jupyterhub EBAII"
+[fastqc]: https://github.com/slegras/EBAI2017/blob/master/images/fastqc.png "Jupyterhub FastQC"
+[launchrstudio]: https://github.com/slegras/EBAI2017/blob/master/images/launchRstudio.png "Launch Rstudio"
 
 Dobin, A., Davis, C.A., Schlesinger, F., Drenkow, J., Zaleski, C., Jha, S., Batut, P., Chaisson, M., and Gingeras, T.R. (2013). STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29, 15–21.
 Langmead, B., and Salzberg, S.L. (2012). Fast gapped-read alignment with Bowtie 2. Nat. Methods 9, 357–359.
 Langmead, B., Trapnell, C., Pop, M., and Salzberg, S.L. (2009). Ultrafast and memory-efficient alignment of short DNA sequences to the human genome. Genome Biol. 10, R25.
 Li, H., and Durbin, R. (2009). Fast and accurate short read alignment with Burrows–Wheeler transform. Bioinformatics 25, 1754–1760.
 Ramírez, F., Ryan, D.P., Grüning, B., Bhardwaj, V., Kilpert, F., Richter, A.S., Heyne, S., Dündar, F., and Manke, T. (2016). deepTools2: a next generation web server for deep-sequencing data analysis. Nucleic Acids Res. 44, W160–W165.
-
-## During Tuesday lunch break <a name="lunch"></a>
-Download mapping results already generated (as it takes a while to download)
-```bash
-cd <some directory you want on your computer>
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBAII2021_chipseq/02-Mapping/*/*bam* .
-scp -r <your login>@core.cluster.france-bioinformatique.fr:/shared/home/slegras/EBAII2021_chipseq/02-Mapping/*/*/*bam* .
-```

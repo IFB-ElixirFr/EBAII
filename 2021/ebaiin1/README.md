@@ -19,8 +19,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/intro_linux_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1acl8ekE_FwzWbYlct8dEG-IeFV0d99UaHUJJWse0S5s/edit?usp=sharing) |
-| Qualités des lectures | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](preprocessing_mapping/preprocessing_mapping_ebaii_2020.pdf) [gslides](https://docs.google.com/presentation/d/1YSa5WAL2g85e4R0qDvc2g1w4MFZfbVj82ZaS-X_2Ivs/edit?usp=sharing) |
+| Introduction à Linux + arborescence| Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche |  [pdf](intro_linux/1-presentation_linux_quick_2021.pdf) [gslides](https://docs.google.com/presentation/d/19Z96DlG41kd0e3B86HP-oNCVfDJekR84F_gNaTdcF1I/edit?usp=sharing) |
+| Qualités et alignement | Denis Puthier, Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](intro_linux/2-pre_processessing_and_mapping_2021.pdf) [gslides](https://docs.google.com/presentation/d/1RMfu1FxqRz1EC_2BnHH3e_xLyMCcppfjUE2G4BHFq8A/edit?usp=sharing) |
 
 ### (Re)découverte de R
 
@@ -36,7 +36,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20201005.pdf) [gslides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) |
+| Single-cell | Bastien Job | [pdf](single_cell/Intro_Single-Cell_20211122.pdf) [gslides](https://drive.google.com/file/d/1eFYJ-kRoUnYg_iCZG5pLd6zFDT6br0V8/view?usp=sharing) [video](single_cell/Droplet-based-microfluidics-ESPCI-LBC-SingleCell.mp4) |
 | Long reads | Claude Thermes | [ppt](long_reads/20201006_THERMES_ROSCOFF9_V3.pptx) |
 
 ### Visualisation
@@ -51,12 +51,12 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNAseq/README.md) |
-| Bioinformatics | Emilie Drouineau | [pdf](RNA-seq/EBAI2021_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
-| General statistics | Stevenn Volant | [pdf](RNA-seq/RNASeq_differential_analysis.pdf) |
-| Practice SARTools | Stevenn Volant | [ZIP archive](RNA-seq/TP_differential_analysis/Practice_SARTools.zip) |
-| Gene set analysis | Thibault Dayris | [pdf](RNA-seq/GSEA/GSEA.pdf) [R script](RNA-seq/GSEA/GSEA.R)|
-| De novo assembly | Erwan Corre | [pdf](RNA-seq/RNASeq_denovo_EBAII2021_red.pdf)  |
-| Workflow | Rachel Legendre, Emilie Drouineau | [pdf](RNA-seq/workflow_RNA.pdf)  |
+| Bioinformatics | Emilie Drouineau | [pdf](RNAseq/EBAI2021_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
+| General statistics | Stevenn Volant | [pdf](RNAseq/RNASeq_differential_analysis.pdf) |
+| Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
+| Gene set analysis | Thibault Dayris | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
+| De novo assembly | Erwan Corre | [pdf](RNAseq/RNASeq_denovo_EBAII2021_red.pdf)  |
+| Workflow | Rachel Legendre, Emilie Drouineau | [pdf](RNAseq/RNA-Workflow_Conclusion.pdf)  |
 
 ### Variants
 
@@ -94,7 +94,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/15qE95kW9H6fAha-2LnCVpMZxEwUDKZyedESeopzR704/edit?usp=sharing) [pdf](croisement_donnees/Cours.pdf) [soluce](croisement_donnees/solution.html) |
+| Croisement de données | Bastien Job, Claire Toffano-Nioche, Matthias Zytnicki | [gslides](https://docs.google.com/presentation/d/1IE8uBw0NPEliLF79s7hV1T2LaRLxoYzBttWn6B_4pPI/edit?usp=sharing) [soluce](https://docs.google.com/document/d/1oHT_OfGeAMB-61igEoXfC0JhqJMD0dowlvNX6cv8C1Y/edit?usp=sharing) |
 
 ### Initiation Slurm
 
