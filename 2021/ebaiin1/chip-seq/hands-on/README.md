@@ -237,15 +237,13 @@ cd ..
 ```
 
 ### 4 - Mapping the IP samples
-1. Create a directory named **IP** and two directories named **repA** and **repB** within to put mapping results for IP
+1. Create a directory named **IP** to put mapping results for IP
 ```bash
-mkdir IP
-mkdir IP/repA
-mkdir IP/repB
+mkdir bam
 ```
-2. Go to the newly created directory for replicate A
+2. Go to the newly created directory bam
 ```bash
-cd IP/repA
+cd bam
 ```
 Your directory structure should be like this:
 ```
@@ -257,9 +255,7 @@ Your directory structure should be like this:
 │   
 └───02-Mapping
 |    └───index
-|    └───IP
-│       ├── repA <- you should be here
-│       ├── repB
+|    └───bam <- you should be here
 ```
 
 
@@ -274,7 +270,7 @@ Your directory structure should be like this:
 ```bash  
 ## Run alignment
 ## Tip: first type bowtie command line then add quotes around and prefix it with "sbatch --cpus 10 --wrap="
-sbatch --cpus 10 --wrap="bowtie -p 10 ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam"
+sbatch --cpus-per-task 10 --wrap="bowtie -p 10 ../../index/Escherichia_coli_K12 ../../../data/SRR576933.fastq.gz -v 2 -m 1 -3 1 -S 2> SRR576933.out > SRR576933.sam"
 ```  
 This should take few minutes as we work with a small genome. For the human genome, we would need either more time and more resources.
 
@@ -286,7 +282,7 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
 ## First load samtools
 module add samtools/1.10
 ## Then run samtools
-samtools sort SRR576933.sam | srun samtools view -b > SRR576933.bam
+samtools sort SRR576933.sam | samtools view -b > SRR576933.bam
 ```
 
 5. Create an index for the bam file
@@ -308,7 +304,7 @@ module rm samtools/1.10 bowtie/1.2.3
 ```
 
 ### 5 - Map the second replicate and the control
-1. Repeat the steps above (in 4 - Mapping the experiment) for the files SRR576934.fastq.gz and SRR576938.fastq.gz in directories named "**IP/repB**" and "**Control**" respectively within the directory 02-Mapping.
+1. Repeat the steps above (in 4 - Mapping the experiment) for the files SRR576934.fastq.gz and SRR576938.fastq.gz in the directory named "**bam**" within the directory 02-Mapping.
 
 **Analyze the result of the mapped reads:  
 Open the file SRR576938.out. How many reads were mapped?**
@@ -316,9 +312,9 @@ Open the file SRR576938.out. How many reads were mapped?**
 ## Estimating the number of duplicated reads <a name="dup"></a>
 **Goal**: Duplicated reads i.e reads mapped at the same positions in the genome are present in ChIP-seq results. They can arise for several reasons including a biased amplification during the PCR step of the library prep, DNA fragment coming from repetitive elements of the genome, sequencing saturation or the same clusters read several times on the flowcell (i.e optical duplicates). As analyzing ChIP-Seq data consist at some point in detecting signal enrichment, we can not keep duplicated reads for subsequent analysis. So let's detect them using [Picard](http://broadinstitute.github.io/picard/)   
 
-1. Go to the directory with alignment file of the first replicate, repA (IP)
+1. Go to the directory with alignment files
 ```bash
-cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/IP/repA
+cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -332,12 +328,13 @@ module add picard/2.22.0
 
 ## Run picard
 picard MarkDuplicates \
-  CREATE_INDEX=true \
-  INPUT=SRR576933.bam \
-  OUTPUT=Marked_SRR576933.bam \
-  METRICS_FILE=metrics \
-  VALIDATION_STRINGENCY=STRICT
 
+CREATE_INDEX=true \
+INPUT=SRR576933.bam \
+OUTPUT=Marked_SRR576933.bam \
+METRICS_FILE=metrics \
+VALIDATION_STRINGENCY=STRICT
+            
 picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576938.bam \
@@ -359,8 +356,8 @@ Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021
 ```bash
 ## Unload picard and samtools
 module rm samtools/1.10 picard/2.22.0
-## If you are in 02-Mapping/IP/repA
-cd ../../..
+## If you are in 02-Mapping/bam
+cd ../..
 ```
 
 ## ChIP quality controls <a name="cqc"></a>
@@ -383,7 +380,7 @@ cd 03-ChIPQualityControls
 ## Load deeptools in your environment
 module add deeptools/3.2.0
 ## Run deeptools fingerprint
-plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/IP/repA/SRR576933.bam ../02-Mapping/IP/repB/SRR576934.bam ../02-Mapping/Control/SRR576938.bam -plot fingerprint_10000.png
+plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02-Mapping/bam/SRR576934.bam ../02-Mapping/bam/SRR576938.bam -plot fingerprint_10000.png
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```bash
@@ -413,12 +410,12 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 1. Download the following files from the server onto your computer
   * data/Escherichia_coli_K12.fasta
   * data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz
-  * 02-Mapping/IP/repA/SRR576933.bam
-  * 02-Mapping/IP/repA/SRR576933.bam.bai
-  * 02-Mapping/IP/repB/SRR576934.bam
-  * 02-Mapping/IP/repB/SRR576934.bam.bai  
-  * 02-Mapping/Control/SRR576938.bam
-  * 02-Mapping/Control/SRR576938.bam.bai
+  * 02-Mapping/bam/SRR576933.bam
+  * 02-Mapping/bam/SRR576933.bam.bai
+  * 02-Mapping/bam/SRR576934.bam
+  * 02-Mapping/bam/SRR576934.bam.bai  
+  * 02-Mapping/bam/SRR576938.bam
+  * 02-Mapping/bam/SRR576938.bam.bai
 2. Open IGV on your computer
 3. Load the genome
   * Genomes / Load Genome from File...
@@ -461,10 +458,7 @@ Your directory structure should be like this:
 │   
 └───02-Mapping
 |    └───index
-|    └───IP
-│       ├── repA
-│       └── repB
-|    └───Control
+|    └───bam
 │   
 └───03-ChIPQualityControls
 │   
@@ -481,12 +475,12 @@ Your directory structure should be like this:
   * --extendReads 200: Extend reads to fragment size
   * --ignoreDuplicates: reads that have the same orientation and start position will be considered only once
 ```bash
-bamCoverage --bam ../02-Mapping/IP/repA/Marked_SRR576933.bam \
+bamCoverage --bam ../02-Mapping/bam/Marked_SRR576933.bam \
 --outFileName SRR576933_nodup.bw --outFileFormat bigwig --effectiveGenomeSize 4639675 \
 --normalizeUsing RPGC --skipNonCoveredRegions --extendReads 200 --ignoreDuplicates
 ```
 
-5. Do it for the replicate and the control (be careful for the control you will need **5G** of memory to process the file).
+5. Do it for the replicate and the control.
 6. Download the three bigwig files you have just generated
   * 04-Visualization/SRR576933_nodup.bw
   * 04-Visualization/SRR576934_nodup.bw  
@@ -513,15 +507,14 @@ cd ..
 There are multiple programs to perform the peak-calling step. Some are more directed towards histone marks (broad peaks) while others are specific to narrow peaks (transcription factors). Here we will use the callpeak function of MACS2 (version 2.1.1.20160309) because it's known to produce generally good results, and it is well-maintained by the developer.
 
 ### 2 - Calling the peaks
-1. Create a directory named **05-PeakCalling** and two directories named **repA** and **repB** within to store peaks coordinates.
+1. Create a directory named **05-PeakCalling** and one directory named **replicates** within to store peaks coordinates.
 ```bash
 mkdir 05-PeakCalling
-mkdir 05-PeakCalling/repA
-mkdir 05-PeakCalling/repB
+mkdir 05-PeakCalling/replicates
 ```
-2. Go to the newly created directory for replicate A
+2. Go to the newly created directory replicates
 ```bash
-cd 05-PeakCalling/repA
+cd 05-PeakCalling/replicates
 ```
 3. Try out MACS2
 ```bash
@@ -545,12 +538,12 @@ This prints the help of the program.
   <!-- * --diag is optional and increases the running time. It tests the saturation of the dataset, and gives an idea of how many peaks are found with subsets of the initial dataset. -->
   * &> MACS.out will output the verbosity (=information) in the file MACS.out
 ```bash
-macs2 callpeak -t ../../02-Mapping/IP/repA/SRR576933.bam \
--c ../../02-Mapping/Control/SRR576938.bam --format BAM \
+macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
+-c ../../02-Mapping/bam/SRR576938.bam --format BAM \
 --gsize 4639675 --name 'FNR_Anaerobic_A' --bw 400 \
---fix-bimodal -p 1e-2 &> MACS.out
+--fix-bimodal -p 1e-2 &> repA_MACS.out
 ```
-3. Run macs2 for replicate A, then go to repB directory and run macs2 for replicate B by changing the treatment file (-t) and the output file name (-n), this should take a few minutes each.
+3. Run macs2 for replicate A, then go to repB directory and run macs2 for replicate B by changing the treatment file (-t), the output file name (-n) and the log file (&>), this should take a few minutes each.
 
 4. In a new directory called pool, run macs2 for the pooled replicates A and B by giving both bam files as input treatment files (-t).
 ```bash
@@ -559,10 +552,10 @@ mkdir pool
 cd pool
 
 # Run macs2 for pooled replicates
-macs2 callpeak -t ../../02-Mapping/IP/repA/SRR576933.bam ../../02-Mapping/IP/repB/SRR576934.bam \
--c ../../02-Mapping/Control/SRR576938.bam --format BAM \
+macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam ../../02-Mapping/bam/SRR576934.bam \
+-c ../../02-Mapping/bam/SRR576938.bam --format BAM \
 --gsize 4639675 --name 'FNR_Anaerobic_pool' --bw 400 \
---fix-bimodal -p 1e-2 &> MACS.out
+--fix-bimodal -p 1e-2 &> pool_MACS.out
 ```
 
 ### 3 - Analyzing the MACS results
@@ -590,18 +583,14 @@ Your directory structure should be like this:
 │   
 └───02-Mapping
 |    └───index
-|    └───IP
-│       ├── repA
-│       └── repB
-|    └───Control
+|    └───bam
 │   
 └───03-ChIPQualityControls
 │   
 └───04-Visualization
 |
 └───05-PeakCalling
-|    └───repA
-|    └───repB
+|    └───replicates
 |    └───pool
 |    └───idr <- you should be in this folder
 ```
@@ -614,13 +603,13 @@ idr --help
 ```
 * --samples : peak files of each individual replicate
 * --peak-list : the peak file of the pooled replicates, it will be used as a master peak set to compare with the regions from each replicates
-* --input-file-type : format of the peak file, in our case it's narrowPeak
+* --input-file-type : format of the peak file, in our case it is narrowPeak
 * --output-file : name of the result file
 * --plot : plot additional diagnosis plot
 
 3. Run idr
 ```bash
-idr --samples ../repA/FNR_Anaerobic_A_peaks.narrowPeak ../repB/FNR_Anaerobic_B_peaks.narrowPeak \
+idr --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak ../replicates/FNR_Anaerobic_B_peaks.narrowPeak \
 --peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
 --input-file-type narrowPeak --output-file FNR_anaerobic_idr_peaks.bed \
 --plot
@@ -670,9 +659,7 @@ Your directory structure should be like this:
 │   
 └───02-Mapping
 |    └───index
-|    └───IP
-│       ├── repA
-│       └── repB
+|    └───bam
 │   
 └───03-ChIPQualityControls
 │   
@@ -716,7 +703,7 @@ bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 ### 3 - OPTIONAL : Motif discovery with RSAT (short peaks)
 1. Restrict the dataset to the summit of the peaks +/- 100bp using bedtools slop. Using bedtools slop to extend genomic coordinates allow not to go beyond chromosome boundaries as the user give the size of chromosomes as input (see fai file).
 ```bash
-bedtools slop -b 100 -i ../05-PeakCalling/repA/FNR_Anaerobic_A_summits.bed -g ../data/Escherichia_coli_K12.fasta.fai > FNR_Anaerobic_A_summits+-100.bed
+bedtools slop -b 100 -i ../05-PeakCalling/replicates/FNR_Anaerobic_A_summits.bed -g ../data/Escherichia_coli_K12.fasta.fai > FNR_Anaerobic_A_summits+-100.bed
 ```
 2. Extract the sequences for this BED file
 ```bash
@@ -835,17 +822,17 @@ write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T
 7. Retrieve the list of closest genes
 
 ```bash
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
+tail -n 2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
 ```
 
-8. Retrieve only the genes that encode for proteins
+
+8. Count occurences of each associated feature type
 ```bash
 # sort | uniq -c to list and count occurences of each item
 tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
 ```
 
-**How many protein-coding genes are there in the file?**
-
+How many peaks are associated with promoters ?
 ```bash
 tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
 ```
