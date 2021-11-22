@@ -51,19 +51,19 @@ We will thus use the **GSE41195** identifier to retrieve the dataset from the **
 2. Search in Google **GSE41195**. Click on the first link to directly access the correct page on the GEO database.
 ![geo](../images/1_GEO.png)
 3. This GEO entry is a mixture of expression analysis (Nimblegen Gene Expression Array), chip-chip and chip-seq. At the bottom of the page, click on the subseries related to the chip-seq datasets. (this subseries has its own identifier: **GSE41187**).
-![alt text][geo2]
+![geo2](../images/2_GEO.png)
 4. From this page, we will focus on the experiment **FNR IP ChIP-seq Anaerobic A**. At the bottom of the page, click on the link "**GSM1010219** - FNR IP ChIP-seq Anaerobic A".
 5. In the new page, go to the bottom to find the SRA identifier. This is the identifier of the raw dataset stored in the SRA database.  
-![alt text][geo3]
+![geo3](../images/3_GEO.png)
 6. Copy the identifier **SRX189773** (do not click on the link that would take you to the SRA database, see below why)
 
 ### 3 - Downloading FASTQ file from the ENA database
 Although direct access to the SRA database at the NCBI is doable, SRA does not store sequences in a FASTQ format. So, in practice, it's simpler (and quicker!!) to download datasets from the ENA database (European Nucleotide Archive) hosted by EBI (European Bioinformatics Institute) in UK. ENA encompasses the data from SRA.
 
 1. Go to the [EBI](http://www.ebi.ac.uk/) website. Paste your SRA identifier (SRX189773) and click on the button "search".
-![alt text][ebi4]
+![ebi4](../images/4_EBI.png)
 2. Click on the first result. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded and is available in the "data" folder (SRR576933.fastq.gz)  
-![alt text][ebi5]
+![ebi5](../images/5_EBI.png)
 
 **tip**: To download the replicate and control datasets, we should redo the same steps starting from the GEO web page specific to the chip-seq datasets (see step 2.4) and choose **FNR IP ChIP-seq Anaerobic B** and **anaerobic INPUT DNA**. Downloaded FASTQ files are available in the data folder (SRR576934.fastq.gz and SRR576938.fastq.gz respectively)
 
@@ -73,7 +73,7 @@ Although direct access to the SRA database at the NCBI is doable, SRA does not s
 ### 1 - Sign in to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr) and open a Terminal
 1. Go to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr)
 2. select a job profile: EBAII and click on "Start"
-![alt text][jupebai]
+![jupebai](../images/jupyterHub_profile.png)
 3. In the launcher, click on "Terminal" in "Other" section. You should be in your home directory by default. Check it:
 ```bash
 pwd
@@ -155,7 +155,7 @@ ls
 > SRR576933_fastqc.html  SRR576933_fastqc.zip
 
 7. Go to the directory /shared/projects/<your_project>/EBAII2021_chipseq/1-QualityControl in the tree diretory on the left of the jupyterhub panel and double click on SRR576933_fastqc.html to visualize the file.
-![alt text][fastqc]
+![fastqc](../images/fastqc.png)
 
 8. Launch the FASTQC program on the replicate (SRR576934.fastq.gz) and on the control file (SRR576938.fastq.gz)
 
@@ -774,7 +774,7 @@ annotatePeaks.pl \
 ```
 
 5. Open an Rstudio tab in Jupyterhub
-![alt text][launchrstudio]
+![launchrstudio](../images/launchRstudio.png)
 
 6. Add gene symbol annotation using R
 ```R
