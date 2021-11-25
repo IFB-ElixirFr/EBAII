@@ -1,5 +1,6 @@
 ## Exemple de solution du TP de croisement de données, en version "chemins absolus"
-
+## WARNING : ce script est à utiliser dans un environnement contrôlé (Jupyter) sur une machine de faible puissance (1CPU 1GB RAM suffit)
+## WARNING : pour l'utiliser directement sur le cluster ifb, il faut recourir à "srun" pour toutes les commandes non-système (et toute commande derrière un pipe "|" )
 
 # PREPARATION
 ## Aller dans un espace de travail
@@ -30,14 +31,14 @@ less -S /shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3
 wc -l /shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3 # 2814993
 wc -l /shared/projects/form_2021_26/data/atelier_croisement/differentially_expressed_genes.txt # 162
 ### On sélectionne du GFF total les lignes correspondant à nos gènes différentiellement exprimés
-  grep -f /shared/projects/form_2021_26/data/atelier_croisement/differentially_expressed_genes.txt \
-  /shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3 > differentially_expressed_from_genelist.gff
+grep -f /shared/projects/form_2021_26/data/atelier_croisement/differentially_expressed_genes.txt \
+/shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3 > differentially_expressed_from_genelist.gff
 ### On dénombre combien de lignes ont ainsi été sélectionnées
 wc -l /shared/projects/form_2021_26/data/atelier_croisement/differentially_expressed_genes.txt \
 differentially_expressed_from_genelist.gff # 1106 ?!
 ## PROBLEME : on a beaucoup de lignes qui ne sont pas des gènes (transcrits, linc, etc) dont il faut les filtrer pur ne conserver que les entrées marquées 'gene' dans la colonne 3
 less -S differentially_expressed_from_genelist.gff
-  awk '($3 == "gene")' differentially_expressed_from_genelist.gff > differentially_expressed_genes.gff
+awk '($3 == "gene")' differentially_expressed_from_genelist.gff > differentially_expressed_genes.gff
 wc -l /shared/projects/form_2021_26/data/atelier_croisement/differentially_expressed_genes.txt \
 differentially_expressed_genes.gff # 162 : OK !::
 less -S differentially_expressed_genes.gff
@@ -46,21 +47,21 @@ less -S differentially_expressed_genes.gff
 ## '-u' (unique) ne rapporte qu'une occurrence de A s'il y a plusieurs matches avec B
 less -S /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed
 wc -l /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed # 52422
-  bedtools intersect -a differentially_expressed_genes.gff \
-  -b /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
-  -u > differentially_expressed_genes_h3k4me3_k562.gff
+bedtools intersect -a differentially_expressed_genes.gff \
+-b /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
+-u > differentially_expressed_genes_h3k4me3_k562.gff
 ## Sélection des entrées du gff croisé pour lesquelles la 3e colonne a la valeur "gene", de la même façon que tout à l'heure
-  awk '($3 == "gene")' /shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3 > ALL_genes.gff
+awk '($3 == "gene")' /shared/bank/homo_sapiens/GRCh38/gff3/Homo_sapiens.GRCh38.94.gff3 > ALL_genes.gff
 wc -l ALL_genes.gff # 21492 genes au total
 ## intersection "inversée" (exclusion) de ce GFF gènes totaux avec le GFF des gènes différentiellement exprimés, pour avoir les gènes non différentiellement exprimés
 ## -v : Ne donne que les entrées de A qui N'ONT PAS d'overlap avec B (similaire à 'grep -v' dans sa syntaxe)
-  bedtools intersect -v -a ALL_genes.gff \
-  -b differentially_expressed_genes.gff > NOT_differentially_expressed_genes.gff
+bedtools intersect -v -a ALL_genes.gff \
+-b differentially_expressed_genes.gff > NOT_differentially_expressed_genes.gff
 wc -l NOT_differentially_expressed_genes.gff # 21180 genes non différentiels (tous les gènes moins 162)
 ## intersection du gff des non-différentiels avec le bed de méthylation
-  bedtools intersect -a NOT_differentially_expressed_genes.gff \
-  -b /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
-  -u > NOT_differentially_expressed_genes_h3k4me3_k562.gff
+bedtools intersect -a NOT_differentially_expressed_genes.gff \
+-b /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
+-u > NOT_differentially_expressed_genes_h3k4me3_k562.gff
 ## dénombrement pour chaque gff
 wc -l differentially_expressed_genes.gff \
 differentially_expressed_genes_h3k4me3_k562.gff \
@@ -79,21 +80,21 @@ perl -e 'print "\n\t\tINACT\t/ ALL\nDIFF:\t\t77\t/ 162\t= ".(77/162)."\nNON-DIFF
 ## -r 0 : pas indispensable, mais par sécurité je précise que je ne veux pas de région flanquante à droite du gène
 ## -g : fichier génome donnant la position de fin de chaque chromosome (pour capper les nouveaux intervales à générer)
 ## -s : pour définir l'orientation de '-l' non pas sur le sens positif du génome, mais sur le strand du gène (lu dans le GFF)
-  bedtools flank -i differentially_expressed_genes.gff -l 2000 -r 0 \
-  -g /shared/projects/form_2021_26/data/atelier_croisement/chrs.len \
-  -s > differentially_expressed_genes_prom2k.gff
+bedtools flank -i differentially_expressed_genes.gff -l 2000 -r 0 \
+-g /shared/projects/form_2021_26/data/atelier_croisement/chrs.len \
+-s > differentially_expressed_genes_prom2k.gff
 ## Je compare les coordonnées que j'obtiens pour les 2 premiers gènes (1er en brin+, 2e en brin-) avec ses coordonnées originelles
 head -n 2 differentially_expressed_genes.gff
 head -n 2 differentially_expressed_genes_prom2k.gff
 
 ## Bonus : Intersection "par la gauche uniquement" avec le paramètre "-loj" : donne le nombre de promoteurs ayant des SNP dedans
 wc -l /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf
-  bedtools intersect -a differentially_expressed_genes_prom2k.gff \
-  -b /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
-  -loj > differentially_expressed_genes_prom2k_snps.gff # 450
+bedtools intersect -a differentially_expressed_genes_prom2k.gff \
+-b /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
+-loj > differentially_expressed_genes_prom2k_snps.gff # 450
 
 ## Pour répondre réellement à la question : croisement du vcf des SNP avec les régions promoteur des gènes différentiels
-  bedtools intersect -a /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
+bedtools intersect -a /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
 -b differentially_expressed_genes_prom2k.gff  > snps_in_prom2k.vcf # 405
 wc -l snps_in_prom2k.vcf
 
@@ -101,11 +102,11 @@ wc -l snps_in_prom2k.vcf
 
 ## Question complémentaire : dénombrer les SNPs matchés par promoteur :
 ## Option '-c' pour donner le dénombrement
-srun bedtools intersect -a differentially_expressed_genes_prom2k.gff \
+bedtools intersect -a differentially_expressed_genes_prom2k.gff \
 -b /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
 -c > differentially_expressed_genes_prom2k_n_snps.gff
 ## Vérification (somme des valeurs de comptage du gff)
-srun awk -F '\t' 'BEGIN{s=0}{s+=$NF}END{print s}' differentially_expressed_genes_prom2k_n_snps.gff # 405
+awk -F '\t' 'BEGIN{s=0}{s+=$NF}END{print s}' differentially_expressed_genes_prom2k_n_snps.gff # 405
 
 ## REPONSE 2prime : valeur par ligne dont la somme fait bien 405
 
@@ -113,15 +114,15 @@ srun awk -F '\t' 'BEGIN{s=0}{s+=$NF}END{print s}' differentially_expressed_genes
 # QUESTION 3
 
 ## Croisement pics de méthylations avec les variants du VCF
-srun bedtools intersect -a /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
+bedtools intersect -a /shared/projects/form_2021_26/data/atelier_croisement/h3k4me3_k562.bed \
 -b /shared/projects/form_2021_26/data/atelier_croisement/common_all_20180418_div.vcf \
 -u > h3k4me3_k562_snps.bed
 
 ## Tri sur les colonnes 1 (chr) puis 2 (start, en numérique) car 'bedtools closest' requière obligatoirement un fichier trié
-srun sort -k1,1 -k2,2n h3k4me3_k562_snps.bed > h3k4me3_k562_snps_sorted.bed
+sort -k1,1 -k2,2n h3k4me3_k562_snps.bed > h3k4me3_k562_snps_sorted.bed
 
 ## Recherche des régions proximales des gènes (mode par défaut : avec ou sans overlap, des deux côtés)
-srun bedtools closest -a h3k4me3_k562_snps_sorted.bed \
+bedtools closest -a h3k4me3_k562_snps_sorted.bed \
 -b differentially_expressed_genes.gff3 > differentially_expressed_genes_closest_h3k4me3_k562_snps.bed
 
 ##
@@ -132,12 +133,12 @@ srun bedtools closest -a h3k4me3_k562_snps_sorted.bed \
 ##              valeur négative) de B
 ## cut :      on récupère toutes les colonnes de la 5e jusqu'à la fin de ligne, puis de la 1e à la 9e (à tester en 5-13)
 ## sort :     on trie en mode unique ('-u')
-srun bedtools closest -a h3k4me3_k562_snps_sorted.bed \
+bedtools closest -a h3k4me3_k562_snps_sorted.bed \
 -b differentially_expressed_genes.gff3 -D b \
-| srun awk -F "\t" '($14 <= 0 && $14 >= -2000)' \
-| srun cut -f 5- \
-| srun cut -f -9 \
-| srun sort -u > differentially_expressed_genes_closest_h3k4me3_k562_snps_selected.bed
+| awk -F "\t" '($14 <= 0 && $14 >= -2000)' \
+| cut -f 5- \
+| cut -f -9 \
+| sort -u > differentially_expressed_genes_closest_h3k4me3_k562_snps_selected.bed
 
 ## REPONSE 3 : contenu du bed final
 
