@@ -99,4 +99,4 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| IFB Core Cluster - Introduction slides | Thomas Denecker, Gildas Le Corguillé, Julien Seiler |[html](https://ifb-elixirfr.gitlab.io/cluster/trainings/slurm/index.html#1) |
+| IFB Core Cluster - Introduction slides | Thomas Denecker, Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
