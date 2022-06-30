@@ -18,21 +18,20 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### Cours généraux
 
-| Cours     | Intervenants | Supports |
-|-----------|--------------|----------|
-| Intro     | À venir      |  À venir |
-| QC        | À venir      |  À venir |
-| Métriques | À venir      |  À venir |
-| Visu      | À venir      |  À venir |
+| Cours                   | Intervenants | Supports |
+|-------------------------|--------------|----------|
+| Introduction            | À venir      |  À venir |
+| QC des lectures         | À venir      |  À venir |
+| Validation d'assemblage | À venir      |  À venir |
 
 
 ### Assemblage
 
-| Cours      | Intervenants | Supports |
-|------------|--------------|----------|
-| Procaryote | À venir      |  À venir |
-| Eucaryote  | À venir      |  À venir |
-| Scaffold   | À venir      |  À venir |
+| Cours         | Intervenants | Supports |
+|---------------|--------------|----------|
+| Assemblage    | À venir      |  À venir |
+| Polishing     | À venir      |  À venir |
+| Scaffolding   | À venir      |  À venir |
 
 ### Annotation
 
