@@ -3,7 +3,7 @@
 
 ## Assemblage et annotation de novo de génomes
 
-**Du 25-09-2022 au 30-09-2022 à la Station biologique de Roscof**
+**Du 25-09-2022 au 30-09-2022 à la Station biologique de Roscoff**
 
 
 ## Web site
@@ -18,20 +18,21 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### Cours généraux
 
-| Cours                   | Intervenants | Supports |
-|-------------------------|--------------|----------|
-| Introduction            | À venir      |  À venir |
-| QC des lectures         | À venir      |  À venir |
-| Validation d'assemblage | À venir      |  À venir |
+| Cours                             | Intervenants         | Supports |
+|-----------------------------------|----------------------|----------|
+| Introduction                      | A. Cormier; E. Corre |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html>|
+| QC des lectures                   | O. Rué               |  À venir |
+| Validation d'assemblage (Theorie) | E. Corre; A. Cormier |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html> |
+| Validation d'assemblage (TP)      |A. Cormier; E. Corre  |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html> |
 
 
 ### Assemblage
 
-| Cours         | Intervenants | Supports |
-|---------------|--------------|----------|
-| Assemblage    | À venir      |  À venir |
-| Polishing     | À venir      |  À venir |
-| Scaffolding   | À venir      |  À venir |
+| Cours         | Intervenants        | Supports |
+|---------------|---------------------|----------|
+| Assemblage    | D. Naquin; C. Klopp |  À venir |
+| Polishing     | À venir             |  À venir |
+| Scaffolding   | À venir             |  À venir |
 
 ### Annotation
 
