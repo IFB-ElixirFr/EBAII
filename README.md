@@ -5,6 +5,7 @@
 
 ## Teaching material
 
+- [Session 2022 Assemblage et annotation](2022/Assemblage/README.md)
 - [Session 2021 niveau 1](2021/ebaiin1/README.md)
 - [Session 2021 niveau 2](2021/ebaiin2/README.md)
 - [Session 2020](2020/README.md)
@@ -14,4 +15,3 @@
 
 - Github repo: <https://github.com/IFB-ElixirFr/EBAII/>
 - Web pages: <https://ifb-elixirfr.github.io/EBAII/>
-
