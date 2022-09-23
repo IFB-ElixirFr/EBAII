@@ -14,16 +14,25 @@ From there, you can also find a link to download the whole repository with `git`
 
 ****
 
+## Accès à Galaxy
+
+Tous les TPs se feront sur [UseGalaxy.fr](https://usegalaxy.fr). Chaque participant doit se connecter à son compte personnel (à créer avant la formation).
+
+Pour bénéficier des ressources de calcul réservées pour cette formation, chaque participant doit :
+
+- se connecter sur [UseGalaxy.fr](https://usegalaxy.fr)
+- cliquer sur [ce lien](https://usegalaxy.fr/join-training/ebaii_aa/)
+
 ## Supports de cours
 
 ### Cours généraux
 
 | Cours                             | Intervenants         | Supports |
 |-----------------------------------|----------------------|----------|
-| Introduction                      | A. Cormier; E. Corre |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html>|
+| Introduction                      | A. Cormier; E. Corre |  [Cours Intro](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)|
 | QC des lectures                   | O. Rué               |  À venir |
-| Validation d'assemblage (Theorie) | E. Corre; A. Cormier |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html> |
-| Validation d'assemblage (TP)      |A. Cormier; E. Corre  |  GTN:<https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html> |
+| Validation d'assemblage (Theorie) | E. Corre; A. Cormier |  [Cours QC](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html) |
+| Validation d'assemblage (TP)      |A. Cormier; E. Corre  |  [TP validation](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) |
 
 
 ### Assemblage
@@ -39,7 +48,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours      | Intervenants | Supports |
 |------------|--------------|----------|
 | Procaryote | À venir      |  À venir |
-| Eucaryote  | À venir      |  À venir |
+| Eucaryote  | À venir      |  Cours Repeat masking<br>[TP Repeat masking](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html)<br>[Cours annotation](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP annotation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html)<br>[TP visualisation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser)<br>Cours lncRNA<br>TP lncRNA<br>Cours BUSCO<br>TP BUSCO<br>Cours annot fonctionnelle<br>TP annot fonctionnelle<br>Cours orthologie<br>TP orthologie |
 
 
 ### Analyses tierces
