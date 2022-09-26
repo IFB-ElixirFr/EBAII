@@ -30,7 +30,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Cours                             | Intervenants         | Supports |
 |-----------------------------------|----------------------|----------|
 | Introduction                      | A. Cormier; E. Corre |  [Cours Intro](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)|
-| QC des lectures                   | O. Rué               |  À venir |
+| QC des lectures                   | O. Rué               |  [QC des lectures](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)|
 | Validation d'assemblage (Theorie) | E. Corre; A. Cormier |  [Cours QC](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html) |
 | Validation d'assemblage (TP)      |A. Cormier; E. Corre  |  [TP validation](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) |
 
