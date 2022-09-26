@@ -39,7 +39,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours         | Intervenants        | Supports |
 |---------------|---------------------|----------|
-| Assemblage    | D. Naquin; C. Klopp |  À venir |
+| Assemblage    | D. Naquin; C. Klopp |  [pdf](Genome_Assembly.pdf) |
 | Polishing     | À venir             |  À venir |
 | Scaffolding   | À venir             |  À venir |
 
