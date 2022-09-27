@@ -39,7 +39,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours         | Intervenants        | Supports |
 |---------------|---------------------|----------|
-| Assemblage    | D. Naquin; C. Klopp |  [pdf](Genome_assembly.pdf) |
+| Assemblage    | D. Naquin; C. Klopp |  [Cours assembly](Genome_assembly.pdf) [TP](Genome_assembly_tp.pdf) [Conclusion TP](conclusion_TP.pdf) |
 | Polishing     | J.-M. Aury          |  [Cours polishing](https://docs.google.com/presentation/d/1RAScBkXvWkRCuD2WAbgNLJZ8zJNXz9skkHJ-MGp4VBk/edit?usp=sharing) |
 | Scaffolding   | J. Kreplak; C. Klopp; A. Cormier | [Cours scaffolding](https://drive.google.com/file/d/1SRBBqRPUUTePJ7K1wsqbmaFGqAuvVIt6/view?usp=sharing) |
 
