@@ -45,9 +45,9 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 ### Annotation
 
-| Cours      | Intervenants | Supports |
-|------------|--------------|----------|
-| Procaryote | À venir      |  À venir |
+| Cours      | Intervenants                | Supports |
+|------------|-----------------------------|----------|
+| Procaryote | G. Gautreau; H. Chiapello   |  Introduction<br>[2.1-Dataset-Construction-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)<br>[2.2-Dataset-Analysis-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)<br>[2.3-Dataset-Dereplication-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf) |
 | Eucaryote  | À venir      |  Cours Repeat masking<br>[TP Repeat masking](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html)<br>[Cours annotation](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP annotation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html)<br>[TP visualisation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser)<br>[Cours lncRNA](FEELnc_Sept_2022.pdf)<br>[TP lncRNA](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html)<br>[Cours BUSCO](BUSCO_Sept_2022.pdf)<br>[TP BUSCO]()<br>Cours annot fonctionnelle<br>TP annot fonctionnelle<br>Cours orthologie<br>TP orthologie |
 
 
