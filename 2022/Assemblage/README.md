@@ -27,21 +27,21 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 ### Cours généraux
 
-| Cours                             | Intervenants         | Supports |
-|-----------------------------------|----------------------|----------|
-| Introduction                      | A. Cormier; E. Corre |  [Cours Intro](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)|
-| QC des lectures                   | O. Rué               |  [QC des lectures](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)|
-| Validation d'assemblage (Theorie) | E. Corre; A. Cormier |  [Cours QC](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html) |
-| Validation d'assemblage (TP)      |A. Cormier; E. Corre  |  [TP validation](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html) |
+| Cours                             | Intervenants         | Supports                                                                                                                        |
+|-----------------------------------|----------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Introduction                      | A. Cormier; E. Corre | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html) |
+| QC des lectures                   | O. Rué               | [Cours](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)                                     |
+| Validation d'assemblage (Theorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)    |
+| Validation d'assemblage (TP)      | A. Cormier; E. Corre | [TP](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html)     |
 
 
 ### Assemblage
 
-| Cours         | Intervenants        | Supports |
-|---------------|---------------------|----------|
-| Assemblage    | D. Naquin; C. Klopp |  [Cours assembly](Genome_assembly.pdf) [TP](Genome_assembly_tp.pdf) [Conclusion TP](conclusion_TP.pdf) |
-| Polishing     | J.-M. Aury          |  [Cours polishing](https://docs.google.com/presentation/d/1RAScBkXvWkRCuD2WAbgNLJZ8zJNXz9skkHJ-MGp4VBk/edit?usp=sharing) |
-| Scaffolding   | J. Kreplak; C. Klopp; A. Cormier | [Cours scaffolding](https://drive.google.com/file/d/1SRBBqRPUUTePJ7K1wsqbmaFGqAuvVIt6/view?usp=sharing) |
+| Cours         | Intervenants                     | Supports                                                                                                      |
+|---------------|----------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Assemblage    | D. Naquin; C. Klopp              | [Cours](Genome_assembly.pdf) <br> [TP](Genome_assembly_tp.pdf) <br> [Conclusion TP](conclusion_TP.pdf)        |
+| Polishing     | J.-M. Aury                       | [Cours](https://docs.google.com/presentation/d/1RAScBkXvWkRCuD2WAbgNLJZ8zJNXz9skkHJ-MGp4VBk/edit?usp=sharing) |
+| Scaffolding   | J. Kreplak; C. Klopp; A. Cormier | [Cours](https://drive.google.com/file/d/1SRBBqRPUUTePJ7K1wsqbmaFGqAuvVIt6/view?usp=sharing)                   |
 
 ### Annotation
 
@@ -49,21 +49,21 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours         | Intervenants              | Supports                                                                                                                             |
 |---------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| Introduction  | G. Gautreau; H. Chiapello | [Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)   |
-| Analyse       | G. Gautreau; H. Chiapello | [Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)           |
-| Déreplication | G. Gautreau; H. Chiapello | [Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf) |
+| Introduction  | G. Gautreau; H. Chiapello | [Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                    |
+| Analyse       | G. Gautreau; H. Chiapello | [Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                            |
+| Déreplication | G. Gautreau; H. Chiapello | [Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                  |
 
 #### Annotation eucaryotes
 
-| Cours      | Intervenants                | Supports |
-|------------|-----------------------------|----------|
-| Repeat masking | Jonathan Kreplak | Cours <br>[TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
-| Annotation de gènes | Anthony Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
-| Visualisation | Anthony Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
-| ARN long non-codants | Stéphanie Robin | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
-| BUSCO | Stéphanie Robin | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
-| Annotation fonctionnelle | Johann Joëts | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
-| Orthologie | Johann Joëts |  Cours<br>TP |
+| Cours                    | Intervenants       | Supports |
+|--------------------------|--------------------|----------|
+| Repeat masking           | Jonathan Kreplak   | Cours <br> [TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
+| Annotation de gènes      | Anthony Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
+| Visualisation            | Anthony Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
+| ARN long non-codants     | Stéphanie Robin    | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
+| BUSCO                    | Stéphanie Robin    | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
+| Annotation fonctionnelle | Johann Joëts       | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
+| Orthologie               | Johann Joëts       |  Cours<br>TP |
 
 
 ### Analyses tierces
