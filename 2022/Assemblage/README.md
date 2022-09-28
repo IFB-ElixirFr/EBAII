@@ -47,11 +47,13 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 #### Annotation procaryotes
 
-| Cours         | Intervenants              | Supports                                                                                                                             |
-|---------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| Introduction  | G. Gautreau; H. Chiapello | [Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                    |
-| Analyse       | G. Gautreau; H. Chiapello | [Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                            |
-| Déreplication | G. Gautreau; H. Chiapello | [Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                  |
+
+| Cours         | Intervenants              | Supports                                                                                                                                                         |
+|---------------|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Introduction  | G. Gautreau               | [1. Introduction to prokaryotic genomes annotation.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9662414/1.Introduction.to.prokaryotic.genomes.annotation.pdf)|
+| Dataset       | H. Chiapello              | [Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                                                |
+| Analyse       | G. Gautreau; H. Chiapello | [Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                                                        |
+| Déreplication | G. Gautreau; H. Chiapello | [Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                                              |
 
 #### Annotation eucaryotes
 
