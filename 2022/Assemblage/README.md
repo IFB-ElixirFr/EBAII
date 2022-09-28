@@ -27,12 +27,13 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 ### Cours généraux
 
-| Cours                             | Intervenants         | Supports                                                                                                                        |
-|-----------------------------------|----------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| Introduction                      | A. Cormier; E. Corre | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html) |
-| QC des lectures                   | O. Rué               | [Cours](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)                                     |
-| Validation d'assemblage (Theorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)    |
-| Validation d'assemblage (TP)      | A. Cormier; E. Corre | [TP](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html)     |
+| Cours                             | Intervenants         | Supports                                                                                                                                         |
+|-----------------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| Introduction                      | A. Cormier; E. Corre | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)                  |
+| Outils de séquençage              | J. Kreplak           | [Cours](https://docs.google.com/presentation/d/1rtTCyVF4dz0Trmny5e8r1brzfNab8ZUN/edit?usp=sharing&ouid=109813995176155673766&rtpof=true&sd=true) |
+| QC des lectures                   | O. Rué               | [Cours](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)                                                      |
+| Validation d'assemblage (Theorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)                     |
+| Validation d'assemblage (TP)      | A. Cormier; E. Corre | [TP](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html)                      |
 
 
 ### Assemblage
