@@ -47,17 +47,23 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 #### Annotation procaryotes
 
-| Cours      | Intervenants                | Supports |
-|------------|-----------------------------|----------|
-| Introduction | G. Gautreau; H. Chiapello |  [2.1-Dataset-Construction-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf) |
-| Analyse      | G. Gautreau; H. Chiapello |  [2.2-Dataset-Analysis-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)
-| Déreplication | G. Gautreau; H. Chiapello | [2.3-Dataset-Dereplication-EBAIIA&A.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf) |
+| Cours         | Intervenants              | Supports                                                                                                                             |
+|---------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Introduction  | G. Gautreau; H. Chiapello | [Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)   |
+| Analyse       | G. Gautreau; H. Chiapello | [Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)           |
+| Déreplication | G. Gautreau; H. Chiapello | [Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf) |
 
 #### Annotation eucaryotes
 
 | Cours      | Intervenants                | Supports |
 |------------|-----------------------------|----------|
-| Eucaryote  | À venir      |  Cours Repeat masking<br>[TP Repeat masking](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html)<br>[Cours annotation](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP annotation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html)<br>[TP visualisation](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser)<br>[Cours lncRNA](FEELnc_Sept_2022.pdf)<br>[TP lncRNA](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html)<br>[Cours BUSCO](BUSCO_Sept_2022.pdf)<br>[TP BUSCO]()<br>[Cours annot fonctionnelle](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP annot fonctionnelle<br>Cours orthologie<br>TP orthologie |
+| Repeat masking | Jonathan Kreplak | Cours <br>[TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
+| Annotation de gènes | Anthony Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
+| Visualisation | Anthony Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
+| ARN long non-codants | Stéphanie Robin | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
+| BUSCO | Stéphanie Robin | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
+| Annotation fonctionnelle | Johann Joëts | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
+| Orthologie | Johann Joëts |  Cours<br>TP |
 
 
 ### Analyses tierces
