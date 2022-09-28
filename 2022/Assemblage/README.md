@@ -62,15 +62,15 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 #### Annotation eucaryotes
 
-| Cours                    | Intervenants       | Supports |
-|--------------------------|--------------------|----------|
-| Repeat masking           | Jonathan Kreplak   | [Cours](https://drive.google.com/file/d/1rcF9d7ZG4gPMrMYjt3vhwGzCGhdF2BVy/view?usp=sharing) <br> [TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
-| Annotation de gènes      | Anthony Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
-| Visualisation            | Anthony Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
-| ARN long non-codants     | Stéphanie Robin    | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
-| BUSCO                    | Stéphanie Robin    | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
-| Annotation fonctionnelle | Johann Joëts       | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
-| Orthologie               | Johann Joëts       |  Cours<br>TP |
+| Cours                    | Intervenants  | Supports |
+|--------------------------|---------------|----------|
+| Repeat masking           | J. Kreplak    | [Cours](https://drive.google.com/file/d/1rcF9d7ZG4gPMrMYjt3vhwGzCGhdF2BVy/view?usp=sharing) <br> [TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
+| Annotation de gènes      | A. Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
+| Visualisation            | A. Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
+| ARN long non-codants     | S. Robin      | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
+| BUSCO                    | S. Robin      | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
+| Annotation fonctionnelle | J. Joëts      | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
+| Orthologie               | J. Joëts      |  Cours<br>TP |
 
 
 ### Analyses tierces
