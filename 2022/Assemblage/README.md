@@ -48,17 +48,17 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 #### Annotation procaryotes
 
-| Cours                         | Intervenants | Supports                                                                                                                                                                             |
-|-------------------------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Introduction                  | G. Gautreau  | [1. Introduction to prokaryotic genomes annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662414/1.Introduction.to.prokaryotic.genomes.annotation.pdf)                        |
-| Dataset                       | H. Chiapello | [2.1 Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                                                                |
-| Analyse                       | H. Chiapello | [2.2 Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                                                                        |
-| Déreplication                 | H. Chiapello | [2.3 Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                                                              |
-| CDS prediction                | G. Gautreau  | [3. Prediction of coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9663528/3.Prediction.of.coding.genes.pdf)                                                              |
-| Non coding gene prediction    | G. Gautreau  | [4. Prediction of non coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9662493/4.Prediction.of.non.coding.genes.pdf)                                                    |
-| Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662561/5.Introduction.to.functional.annotation.pdf)                                      |
-| Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9662563/6._7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka.pdf)|
-| InterScan + EggNOG            | J. Joets     | [8. FunctAnnot.jjoets](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)                                                                                   |
+| Cours                         | Intervenants | Supports                                                                                                                                                                              |
+|-------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Introduction                  | G. Gautreau  | [1. Introduction to prokaryotic genomes annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662414/1.Introduction.to.prokaryotic.genomes.annotation.pdf)                         |
+| Dataset                       | H. Chiapello | [2.1 Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                                                                 |
+| Analyse                       | H. Chiapello | [2.2 Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                                                                         |
+| Déreplication                 | H. Chiapello | [2.3 Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                                                               |
+| CDS prediction                | G. Gautreau  | [3. Prediction of coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9663528/3.Prediction.of.coding.genes.pdf)                                                                 |
+| Non coding gene prediction    | G. Gautreau  | [4. Prediction of non coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9662493/4.Prediction.of.non.coding.genes.pdf)                                                         |
+| Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662561/5.Introduction.to.functional.annotation.pdf)                                           |
+| Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9662563/6._7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka.pdf) |
+| InterScan + EggNOG            | J. Joets     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)                                                                                 |
 
 #### Annotation eucaryotes
 
