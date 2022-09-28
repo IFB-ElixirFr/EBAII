@@ -53,7 +53,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Introduction                | G. Gautreau               | [1. Introduction to prokaryotic genomes annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662414/1.Introduction.to.prokaryotic.genomes.annotation.pdf)        |
 | Dataset                     | H. Chiapello              | [2.1 Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)                                                |
 | Analyse                     | H. Chiapello              | [2.2 Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)                                                        |
-| Déreplication               | H. Chiapello              | [2.3 Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)..............................................|
+| Déreplication               | H. Chiapello              | [2.3 Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)                                             |
 | CDS prediction              | G. Gautreau               | [3. Prediction of coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9662470/3.Prediction.of.coding.genes.1.pdf)                                              |
 | Non coding gene prediction  | G. Gautreau               | [4. Prediction of non coding genes.pdf](https://github.com/IFB-ElixirFr/EBAII/files/9662493/4.Prediction.of.non.coding.genes.pdf)                                    |
 
