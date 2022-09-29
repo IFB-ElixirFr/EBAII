@@ -69,8 +69,9 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Visualisation            | A. Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
 | ARN long non-codants     | S. Robin      | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
 | BUSCO                    | S. Robin      | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
-| Annotation fonctionnelle | J. Joëts      | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing)<br>TP |
-| Orthologie               | J. Joëts      |  Cours<br>TP |
+| Annotation fonctionnelle | J. Joëts      | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing) |
+| Analyse intra- & interspécifique | J. Joëts      |  [Cours](https://drive.google.com/file/d/1UQuovplBzxYgk-kIw8E5dIJ-ids2yVmh/view?usp=sharing) |
+| Analyse pangénomique     | J. Joëts      |  [Cours](https://drive.google.com/file/d/1ueTV24RUvvof4rUSKv7dKRYr5HcGvarq/view?usp=sharing) |
 
 
 ### Analyses tierces
