@@ -59,6 +59,11 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662561/5.Introduction.to.functional.annotation.pdf)                                           |
 | Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9662563/6._7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka.pdf) |
 | InterScan + EggNOG            | J. Joëts     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)                                                                                 |
+| Relational annotation (intro) | G. Gautreau  | [9. Introduction to relational annotation]()                                                                                 |
+| Specialized databases/tools   | G. Gautreau  | [10. Discussion on specialized databases/tools]()                                                                                 |
+| Annotation plateform          | G. Gautreau  | [11. Automatic annotation plateform]()                                                                                 |
+| Conclusion                    | G. Gautreau  | [12. Conclusion]()                                                                                 |
+| Introduction to pangenomic    | G. Gautreau  | [13. Introduction to pangenomic]()                                                                                 |
 
 #### Annotation eucaryotes
 
