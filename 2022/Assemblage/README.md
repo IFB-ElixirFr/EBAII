@@ -61,7 +61,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | InterScan + EggNOG            | J. Joëts     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)|
 | Relational annotation (intro) | G. Gautreau  | [9. Introduction to relational annotation](https://github.com/IFB-ElixirFr/EBAII/files/9672462/9.Introduction.to.relational.annotation.pdf)|
 | Specialized databases/tools   | G. Gautreau  | [10. Discussion on specialized databases/tools](https://github.com/IFB-ElixirFr/EBAII/files/9672472/10.Discussion.on.specialized.databases.pdf)|
-| Annotation plateforms          | G. Gautreau  | [11. Automatic annotation plateform](https://github.com/IFB-ElixirFr/EBAII/files/9672495/_11.Automatic.annotation.plateform.pdf)|
+| Annotation plateforms          | G. Gautreau  | [11. Automatic annotation plateforms](https://github.com/IFB-ElixirFr/EBAII/files/9672495/_11.Automatic.annotation.plateform.pdf)|
 | Conclusion                    | G. Gautreau  | [12. Conclusion](https://github.com/IFB-ElixirFr/EBAII/files/9672507/12.Conclusion.pdf)|
 | Introduction to pangenomic    | G. Gautreau  | [13. Introduction to pangenomic](https://github.com/IFB-ElixirFr/EBAII/files/9672513/13.Introduction.to.pangenomic.pdf)|
 
