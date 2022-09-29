@@ -32,7 +32,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Introduction                      | A. Cormier; E. Corre | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)                  |
 | Outils de séquençage              | J. Kreplak           | [Cours](https://docs.google.com/presentation/d/1rtTCyVF4dz0Trmny5e8r1brzfNab8ZUN/edit?usp=sharing&ouid=109813995176155673766&rtpof=true&sd=true) |
 | QC des lectures                   | O. Rué               | [Cours](https://drive.google.com/file/d/1Mv33oQ-_h-ZCxemvlcqYqpQEHd97tJzt/view?usp=sharing)                                                      |
-| Validation d'assemblage (Theorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)                     |
+| Validation d'assemblage (Théorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)                     |
 | Validation d'assemblage (TP)      | A. Cormier; E. Corre | [TP](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html)                      |
 
 
@@ -58,25 +58,25 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 | Non coding gene prediction    | G. Gautreau  | [4. Prediction of non coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9662493/4.Prediction.of.non.coding.genes.pdf)                                                         |
 | Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662561/5.Introduction.to.functional.annotation.pdf)                                           |
 | Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9662563/6._7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka.pdf) |
-| InterScan + EggNOG            | J. Joets     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)                                                                                 |
+| InterScan + EggNOG            | J. Joëts     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)                                                                                 |
 
 #### Annotation eucaryotes
 
-| Cours                    | Intervenants  | Supports |
-|--------------------------|---------------|----------|
-| Repeat masking           | J. Kreplak    | [Cours](https://drive.google.com/file/d/1rcF9d7ZG4gPMrMYjt3vhwGzCGhdF2BVy/view?usp=sharing) <br> [TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
-| Annotation de gènes      | A. Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
-| Visualisation            | A. Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
-| ARN long non-codants     | S. Robin      | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
-| BUSCO                    | S. Robin      | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
-| Annotation fonctionnelle | J. Joëts      | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing) |
+| Cours                            | Intervenants  | Supports |
+|----------------------------------|---------------|----------|
+| Repeat masking                   | J. Kreplak    | [Cours](https://drive.google.com/file/d/1rcF9d7ZG4gPMrMYjt3vhwGzCGhdF2BVy/view?usp=sharing) <br> [TP](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/repeatmasker/tutorial.html) |
+| Annotation de gènes              | A. Bretaudeau | [Cours](https://training.galaxyproject.org/training-material/topics/genome-annotation/slides/introduction.html)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html) |
+| Visualisation                    | A. Bretaudeau | [TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/funannotate/tutorial.html#visualisation-with-a-genome-browser) |
+| ARN long non-codants             | S. Robin      | [Cours](FEELnc_Sept_2022.pdf)<br>[TP](https://training.galaxyproject.org/topics/genome-annotation/tutorials/lncrna/tutorial.html) |
+| BUSCO                            | S. Robin      | [Cours](BUSCO_Sept_2022.pdf)<br>[TP]() |
+| Annotation fonctionnelle         | J. Joëts      | [Cours](https://drive.google.com/file/d/1vP2NMW0c0aOWSRHKwU3FNHzHRovg9GMp/view?usp=sharing) |
 | Analyse intra- & interspécifique | J. Joëts      |  [Cours](https://drive.google.com/file/d/1UQuovplBzxYgk-kIw8E5dIJ-ids2yVmh/view?usp=sharing) |
-| Analyse pangénomique     | J. Joëts      |  [Cours](https://drive.google.com/file/d/1ueTV24RUvvof4rUSKv7dKRYr5HcGvarq/view?usp=sharing) |
+| Analyse pangénomique             | J. Joëts      |  [Cours](https://drive.google.com/file/d/1ueTV24RUvvof4rUSKv7dKRYr5HcGvarq/view?usp=sharing) |
 
 
 ### Analyses tierces
 
-| Cours      | Intervenants | Supports |
-|------------|--------------|----------|
-| Procaryote | À venir      |  À venir |
-| Eucaryote  | À venir      |  À venir |
+| Cours      | Intervenants      | Supports |
+|------------|-------------------|----------|
+| Procaryote | G. Gautreau       |  À venir |
+| Eucaryote  | H. Roest Crollius |  À venir |
