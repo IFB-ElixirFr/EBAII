@@ -50,21 +50,20 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours                         | Intervenants | Supports                                                                                                                                                                              |
 |-------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Introduction                  | G. Gautreau  | [1. Introduction to prokaryotic genomes annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662414/1.Introduction.to.prokaryotic.genomes.annotation.pdf)|
+| Introduction                  | G. Gautreau  | [1. Introduction to prokaryotic genomes annotation](https://github.com/IFB-ElixirFr/EBAII/files/9681928/1.Introduction.to.prokaryotic.genomes.annotation.pdf)|
 | Dataset                       | H. Chiapello | [2.1 Dataset Construction](https://github.com/IFB-ElixirFr/EBAII/files/9659668/2.1-Dataset-Construction-EBAIIA.A.pdf)|
 | Analyse                       | H. Chiapello | [2.2 Dataset Analysis](https://github.com/IFB-ElixirFr/EBAII/files/9659684/2.2-Dataset-Analysis-EBAIIA.A.pdf)|
 | Déreplication                 | H. Chiapello | [2.3 Dataset Dereplication](https://github.com/IFB-ElixirFr/EBAII/files/9659690/2.3-Dataset-Dereplication-EBAIIA.A.pdf)|
-| CDS prediction                | G. Gautreau  | [3. Prediction of coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9663528/3.Prediction.of.coding.genes.pdf)|
-| Non coding gene prediction    | G. Gautreau  | [4. Prediction of non coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9662493/4.Prediction.of.non.coding.genes.pdf)|
-| Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662561/5.Introduction.to.functional.annotation.pdf)|
-| Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9662563/6._7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka.pdf)|
+| CDS prediction                | G. Gautreau  | [3. Prediction of coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9681927/3.Prediction.of.coding.genes.pdf)|
+| Non coding gene prediction    | G. Gautreau  | [4. Prediction of non coding genes](https://github.com/IFB-ElixirFr/EBAII/files/9681926/4.Prediction.of.non.coding.genes.pdf)|
+| Functional annotation (intro) | G. Gautreau  | [5. Introduction to functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9681925/5.Introduction.to.functional.annotation.pdf)|
+| Prokka + Vizualisation        | G. Gautreau  | [6. and 7. Let's play with a prokaryotic annotation tool_ Prokka](https://github.com/IFB-ElixirFr/EBAII/files/9681924/6.and.7.Let.s.play.with.a.prokaryotic.annotation.tool_.Prokka_JBrowse.pdf)|
 | InterScan + EggNOG            | J. Joëts     | [8. Functional annotation](https://github.com/IFB-ElixirFr/EBAII/files/9662567/FunctAnnot.jjoets.pdf)|
-| Relational annotation (intro) | G. Gautreau  | [9. Introduction to relational annotation](https://github.com/IFB-ElixirFr/EBAII/files/9672462/9.Introduction.to.relational.annotation.pdf)|
-| Specialized databases/tools   | G. Gautreau  | [10. Discussion on specialized databases/tools](https://github.com/IFB-ElixirFr/EBAII/files/9672472/10.Discussion.on.specialized.databases.pdf)|
-| Annotation plateforms          | G. Gautreau  | [11. Automatic annotation plateforms](https://github.com/IFB-ElixirFr/EBAII/files/9672495/_11.Automatic.annotation.plateform.pdf)|
-| Conclusion                    | G. Gautreau  | [12. Conclusion](https://github.com/IFB-ElixirFr/EBAII/files/9672507/12.Conclusion.pdf)|
-| Introduction to pangenomic    | G. Gautreau  | [13. Introduction to pangenomic](https://github.com/IFB-ElixirFr/EBAII/files/9672513/13.Introduction.to.pangenomic.pdf)|
-
+| Relational annotation (intro) | G. Gautreau  | [9. Introduction to relational annotation](https://github.com/IFB-ElixirFr/EBAII/files/9681923/9.Introduction.to.relational.annotation.pdf)|
+| Specialized databases/tools   | G. Gautreau  | [10. Discussion on specialized databases/tools](https://github.com/IFB-ElixirFr/EBAII/files/9681921/10.Discussion.on.specialized.databases.pdf)|
+| Annotation plateforms          | G. Gautreau  | [11. Automatic annotation plateforms](https://github.com/IFB-ElixirFr/EBAII/files/9681920/_11.Automatic.annotation.plateform.pdf)|
+| Conclusion                    | G. Gautreau  | [12. Conclusion](https://github.com/IFB-ElixirFr/EBAII/files/9681919/12.Conclusion.prokaryotic.genome.annotation.pdf)|
+| Introduction to pangenomic    | G. Gautreau  | [13. Introduction to pangenomic](https://github.com/IFB-ElixirFr/EBAII/files/9681917/13.Introduction.to.pangenomic.pdf)|
 
 #### Annotation eucaryotes
 
