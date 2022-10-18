@@ -101,7 +101,7 @@ knitr::kable(
 )
 ```
 
-> <span style="color:green"> Info: your foud panes may be blank while two of mines are filled with text. We'll come on that later.</span>
+> <span style="color:green"> Info: your four panes may be blank while two of mines are filled with text. We'll come on that later.</span>
 
 ## The console pane (lower left)
 
@@ -766,6 +766,25 @@ example_table <- readRDS(file = "example_table.RDS")
 head(example_table)
 ```
 
+## Single Cell Tool Kit – Overview
+
+[SingleCellTK](https://www.camplab.net/sctk/) is the graphic interface over Single Cell analysis that we are going to use in this session.
+
+The interface is quite easy to catch on:
+
+![SingleCellTK_overview](images/SingleCellTK_intro_header.png)
+
+A black header holds every section of your analysis. We will get into these sections in details through the week.
+
+![SingleCellTK_data](images/SingleCellTK_data.png)
+
+Click on `Data` button to develop a drop-down menu.
+
+If you're on a trusted SingleCellTK server (yours, or IFB RStudio), then you may upload your data using CSV-count matrices:
+
+![SingleCellTK_import](images/SingleCellTK_import_csv.png)
+
+> <span style="color:#CD853F"> Warning: If you hold human-related genomic datasets. You cannot upload these data anywhere. This is illegal, and doing surch thing may lead to 5 years in prison and up to 300 000€ fine. [Art. 226-16, Section 5, Code pénal](https://www.cnil.fr/fr/les-sanctions-penales).</span>
 
 
 # Why R for EBAII SingleCell ?
