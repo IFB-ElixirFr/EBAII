@@ -20,7 +20,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
 | Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche |  [pdf](intro_linux/1-presentation_linux_quick_2021.pdf) [gslides](https://docs.google.com/presentation/d/19Z96DlG41kd0e3B86HP-oNCVfDJekR84F_gNaTdcF1I/edit?usp=sharing) |
-| Qualités et alignement | Gildas Le Corguillé, Claire Toffano-Nioche | [pdf](intro_linux/2-pre_processessing_and_mapping_2021.pdf) [gslides](https://docs.google.com/presentation/d/1RMfu1FxqRz1EC_2BnHH3e_xLyMCcppfjUE2G4BHFq8A/edit?usp=sharing) |
+| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [pdf](intro_linux/2-pre_processessing_and_mapping_2021.pdf) [gslides](https://docs.google.com/presentation/d/1RMfu1FxqRz1EC_2BnHH3e_xLyMCcppfjUE2G4BHFq8A/edit?usp=sharing) |
 
 ### (Re)découverte de R
 
@@ -49,10 +49,10 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNAseq/README.md) |
-| Bioinformatics | Emilie Drouineau | [pdf](https://ifb-elixirfr.github.io/EBAII/2020/RNA-seq/EBAI2020_RNAseq.pdf) [TP](https://ifb-elixirfr.github.io/EBAII/2020/RNA-seq/runme.sh) [TP corrigé](https://ifb-elixirfr.github.io/EBAII/2020/RNA-seq/runme_corrected.sh)|
+| Bioinformatics | Pierre Pericard | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
 | General statistics | Stevenn Volant | [pdf](RNAseq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
-| Gene set analysis | Thibault Dayris | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
+| Gene set analysis | Emilie Drouineau | [pdf](RNAseq/GSEA_Theory.pdf) [R script](RNAseq/GSEA_TP.R)|
 | De novo assembly | Erwan Corre | [pdf](RNAseq/RNASeq_denovo_EBAII2021_red.pdf)  |
 | Workflow | Pierre Pericard, Emilie Drouineau | [pdf](RNAseq/RNA-Workflow_Conclusion.pdf)  |
 
@@ -98,4 +98,4 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
+| IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
