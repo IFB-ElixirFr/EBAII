@@ -49,12 +49,12 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNAseq/README.md) |
-| Bioinformatics | Pierre Pericard | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
+| Bioinformatics | Emilie Drouineau | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
 | General statistics | Stevenn Volant | [pdf](RNAseq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
 | Gene set analysis | Emilie Drouineau | [pdf](RNAseq/GSEA_Theory.pdf) [R script](RNAseq/GSEA_TP.R)|
 | De novo assembly | Erwan Corre | [pdf](RNAseq/RNASeq_denovo_EBAII2021_red.pdf)  |
-| Workflow | Pierre Pericard, Emilie Drouineau | [pdf](RNAseq/RNA-Workflow_Conclusion.pdf)  |
+| Workflow | Pierre Pericard | [pdf](RNAseq/RNA-Workflow_Conclusion.pdf)  |
 
 ### Variants
 
