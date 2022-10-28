@@ -3,12 +3,12 @@
 
 ## Initiation au traitement des données de génomique obtenues par séquençage à haut débit
 
-**Du 13-11-2021 au 18-11-2021 à la Station biologique de Roscoff**
+**Du 13-11-2022 au 18-11-2022 à la Station biologique de Roscoff**
 
 
 ## Web site
 
-- Web pages: <https://ifb-elixirfr.github.io/EBAII/2021/ebaiin1>
+- Web pages: <https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1>
 
 From there, you can also find a link to download the whole repository with `git`.
 
