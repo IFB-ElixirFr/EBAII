@@ -492,7 +492,7 @@ print(one2three4[1:2, 1])
 
 > <span style="color:green"> If you like maths, you will remember the order `[row, column]`. If you're not familiar with that, then you will do like 99% of all software engineer: you will write `[column, row]`, and you will get an error. Trust me. 99%. Remember, an error is never a problem in informatics</span>
 
-*Question 1*: Can I mix characters and numbers in a data frame *row* ?
+*Question 3*: Can I mix characters and numbers in a data frame *row* ?
 
 <details>
 
@@ -517,7 +517,7 @@ str(one2three4)
 
 </details>
 
-*Question 1*: Can I mix characters and numbers in a data frame *column* ?
+*Question 2*: Can I mix characters and numbers in a data frame *column* ?
 
 <details>
 
@@ -787,6 +787,75 @@ If you're on a trusted SingleCellTK server (yours, or IFB RStudio), then you may
 > <span style="color:#CD853F"> Warning: If you hold human-related genomic datasets. You cannot upload these data anywhere. This is illegal, and doing surch thing may lead to 5 years in prison and up to 300 000€ fine. [Art. 226-16, Section 5, Code pénal](https://www.cnil.fr/fr/les-sanctions-penales).</span>
 
 
+## Global options – default web browser
+
+Some of you may have an web-browser error. Either on your local computer, or on the IFB cluster.
+
+Example of the possible error:
+
+```{r missing_browser_string_error, eval = FALSE}
+> singleCellTK::singleCellTK()
+Loading required package: shiny
+
+Listening on http://127.0.0.1:7290
+Error in utils::browseURL(appUrl) : 
+  'browser' must be a non-empty character string
+```
+
+In human readable terms, this means "Please tell me where to find a web-browser". R uses global [`options`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/options) to store paths to external tools (including web browsers).
+
+Look at the browser your R is looking for:
+
+```{r empty_browser_path, eval = TRUE, echo = FALSE}
+options(browser = '')
+```
+
+```{r default_browser_empty, eval = TRUE}
+getOption("browser")
+```
+
+See ? It's empty. Now fill this with the path to your favorite web browser of all time. You can find the path to your favorite web-browser with the following [_bash_](https://www.gnu.org/software/bash/) command line:
+
+```{bash which_firefox, eval = TRUE}
+which firefox
+```
+
+And then, fill it to R options:
+
+```{r fill_browser_path_with_firefox, eval = TRUE}
+options(browser = "/usr/bin/firefox")
+```
+
+Error solved !
+
+## Global options – SingleCellTK Matrix error
+
+If you use SingleCellTK for the upcoming months, please note that SingleCellTK suffers from a very new R update error. For short: SingleCellTK may stop on error at launch depending on you R version.
+
+In details: the signature of a function in the package [`Matrix`](https://www.rdocumentation.org/packages/Matrix/versions/1.5-1) has been updated. This leads to an error in old versions of SingleCellTK.
+
+> <span style="color:green"> It is a good practice to maintain package versions within a work project. If you update a package (whether by need, or by will), then you should restart your work from the begining. This stands as long as you're not 100% sure the update does not affect your results.</span>
+
+This will lead the following error message:
+
+![singlecelltk_error_matrix](images/SingleCellTK_Error_Matric.png)
+
+Today, we assure you this error message is raised by a simple change in a function name. R has been told to stop when someone uses the "old" function name. We can tell R to keep going. Let's add two parameters in R global [`options`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/options):
+
+```{r fix_gc_matrix_error, eval=FALSE}
+library(Matrix)
+## 1. Override Matrix error status from calling with a deprecated scheme
+## 2. Force using web browser rather than Rstudio (required for better display, zoom in.out, ...)
+options(
+  'Matrix.warnDeprecatedCoerce' = 0, 
+  "shiny.launch.browser" = .rs.invokeShinyWindowExternal
+)
+## Launch scTK
+singleCellTK::singleCellTK()
+```
+
+Problem solved !
+
 # Why R for EBAII SingleCell ?
 
 No programming language is better than any other. Anyone saying the opposite is (over)-specialized in the language they are advertising. This week, we are going to use a package called ["Single Cell Toolkit"](https://www.camplab.net/sctk/). This package appends to be written in R. You are already learning to write both [_bash_](https://www.gnu.org/software/bash/) and [_R_](https://www.r-project.org/) scripts, let's not add another one.
@@ -795,4 +864,4 @@ In the field of bioinformatics, languages used by the community are quite limite
 
 Please, note that this advice is valid today, but may change. Other programming languages are used, some have lost their place on the podium, and others are trying to supersede [_bash_](https://www.gnu.org/software/bash/), [_R_](https://www.r-project.org/), and [_Python_](https://www.python.org/).
 
-<div style="float: right;">Anyway [_Python_](https://www.python.org/) is the best programming language in the WORLD. Dont listen to Bastien.</div>
+<div style="float: right;">Anyway [_Python_](https://www.python.org/) is the best programming language in the WORLD. Don't listen to Bastien.</div>
