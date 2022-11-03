@@ -1,18 +1,16 @@
 ---
 title: Visualization of NGS Data using IGV (v2.4+) - Documentation
-author: "Elodie GIRARD / Olivier QUENEZ"
+author: "Elodie GIRARD, Sarah GUINCHARD, Rachel LEGENDRE, Pierre PERICARD, Olivier QUENEZ, and the EBAII team"
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  html_document: 
     theme: simplex
     highlight: pygments
-    keep_md: yes
     number_sections: yes
     toc: yes
     toc_float: yes
-    df_print: paged
-    dev : png 
-    fig_caption : yes
+    dev: png
+    fig_caption: yes
   github_document: default
   pdf_document:
     keep_tex: yes
