@@ -1,7 +1,7 @@
 ---
 title: Visualization of NGS Data using IGV (v2.4+) - Practical
 author: "Elodie GIRARD / Olivier QUENEZ"
-date: "`r Sys.Date()`"
+date: "2020-10-02"
 output:
   html_document:
     theme: simplex
@@ -23,21 +23,7 @@ output:
     dev: pdf
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      eval.after='fig.cap',
-                      include = TRUE, 
-                      comment = NA,
-                      highlight = TRUE,
-                      fig.align = "center", 
-                      out.width="600px",
-                      cache = TRUE, autodep = FALSE)
 
-require(tidyverse)
-require(knitr)
-require(DT)
-
-```
 <style>
 
 
@@ -93,32 +79,36 @@ Training data is available on : https://tinyurl.com/yxqfyftz
 * Zoom in the **"variant239"** region and observe the heterozygous SNV at the position chr12:11,461,470, indicated by colored bases
 
 
-```{r, echo = FALSE,fig.align="center",out.width="250px",fig.cap="Point mutation"}
-knitr::include_graphics("images/snv.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/snv.png" alt="Point mutation" width="250px" />
+<p class="caption">Point mutation</p>
+</div>
 
 * Zoom in the **"variant230"** region and observe the 3bp-deletion at the position chr12:9,994,446, indicated by a blank space crossed by a black line
 
 
-```{r, echo = FALSE,fig.align="center",out.width="250px",dpi=300,fig.cap="Deletion"}
-knitr::include_graphics("images/del.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/del.png" alt="Deletion" width="250px" />
+<p class="caption">Deletion</p>
+</div>
 
 * Zoom in the **"variant240"** region and observe the insertion at the position chr12:11,461,554 , indicated by a purple bar
 
 
-```{r, echo = FALSE,fig.align="center",out.width="250px",dpi=300,fig.cap="Insertion"}
-knitr::include_graphics("images/insertion.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/insertion.png" alt="Insertion" width="250px" />
+<p class="caption">Insertion</p>
+</div>
 
 
 * In the top menu, select **"New session"**
 * In the top menu, select **"Load from File"** then select the **"TRIO_00*bam"** file
 * Zoom in the chr19:33,493,260-33,493,397 region and observe the two variants in the area, one inherited by the father (002) and the other by the mother (003)
 
-```{r, echo = FALSE,fig.align="center",out.width="250px",dpi=300,fig.cap="Multiple sample"}
-knitr::include_graphics("images/trio.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/trio.png" alt="Multiple sample" width="250px" />
+<p class="caption">Multiple sample</p>
+</div>
 
 * Tips:
     + Always **sort reads by base** at a variant position and **color them by strand**
@@ -134,17 +124,19 @@ knitr::include_graphics("images/trio.png")
 * Zoom in the _*NRXN1*_ region and observe the chr2:51,223,938-51,226,142 region.
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300,fig.cap="Deletion NRXN1"}
-knitr::include_graphics("images/delInit.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/delInit.png" alt="Deletion NRXN1" width="800px" />
+<p class="caption">Deletion NRXN1</p>
+</div>
 
 * Right click on the alignment track, select **"View as pairs"**
 * Right click on the alignment track, select **"Color alignments by"** then **"insert size and pair orientation"**
 * Right click on the alignment track, select **"Sort alignments by"** then **"insert size"**
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300,fig.cap="Deletion NRXN1"}
-knitr::include_graphics("images/delAfter.png")
-```
+<div class="figure" style="text-align: center">
+<img src="images/delAfter.png" alt="Deletion NRXN1" width="800px" />
+<p class="caption">Deletion NRXN1</p>
+</div>
 
 
 
@@ -157,30 +149,22 @@ A variant impacting the splicing site of the exon 6 of the _*OAS1*_ gene (chr12:
 * Zoom in the _*OAS1*_ region. If you see the **"Zoom in to see alignments"** message, zoom in until you see alignments.
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/sashimi1.png")
-```
+<img src="images/sashimi1.png" width="800px" style="display: block; margin: auto;" />
 
 
 * Set the track in its **collapsed mode** by right clicking on the alignment track The blue lines link the different parts of a spanning read that, by definition, map on several exons. Zoom in on the two last exons of OAS1 then sort the alignments by
 base just before the last exon. You can see alignments outside of the known exons of this gene.
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/sashimi2.png")
-```
+<img src="images/sashimi2.png" width="800px" style="display: block; margin: auto;" />
 
 * **Right click** on the alignment track, select **"sashimi-plot"**. You'll see the exons coverage and junctions lines with a number specifying the number of spanning reads for this junction. Zoom in the last 2 exons, move the track and click on an exon to only see junctions involving this exon (click on an intron to see everything).
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/sashimi3.png")
-```
+<img src="images/sashimi3.png" width="800px" style="display: block; margin: auto;" />
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/sashimi4.png")
-```
+<img src="images/sashimi4.png" width="800px" style="display: block; margin: auto;" />
 
 
 * 31 reads span the junction of exon 5 and the cryptic 3' splice site upstream of the mutation
@@ -204,22 +188,16 @@ These data can be access directly via IGV (or load the saved session **"chipseq.
 * In the top menu, select **"File"** then **"Load from ENCODE (2012)"**
 
 
-```{r, echo = FALSE,fig.align="center",out.width="600px",dpi=300}
-knitr::include_graphics("images/load.png")
-```
+<img src="images/load.png" width="600px" style="display: block; margin: auto;" />
 
 * Write the following keywords: **"mcf-7 gata3 usc SC-268"** and select the following tracks then click on **"Load"**
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/mcf7.png")
-```
+<img src="images/mcf7.png" width="800px" style="display: block; margin: auto;" />
 
 * Repeat the operation and write the following keywords to import the INPUT signal: **"mcf-7 input usc signal"** and select the following track then click on **"Load"**
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/mcf7ip.png")
-```
+<img src="images/mcf7ip.png" width="800px" style="display: block; margin: auto;" />
 
 
 
@@ -231,9 +209,7 @@ knitr::include_graphics("images/mcf7ip.png")
 * Select both Signal tracks by maintaining the **"ctrl"** key and clicking on the names then right-click on one of them and click on **"Group autoscale"** to adapt the scale of both tracks
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/peaks.png")
-```
+<img src="images/peaks.png" width="800px" style="display: block; margin: auto;" />
 
 
 
@@ -244,7 +220,5 @@ knitr::include_graphics("images/peaks.png")
 * Select both Signal tracks by maintaining the **"ctrl"** key and clicking on the names then right-click on one of them and click on **"Overlay"** to display both signals on the same track
 
 
-```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
-knitr::include_graphics("images/overlay.png")
-```
+<img src="images/overlay.png" width="800px" style="display: block; margin: auto;" />
 

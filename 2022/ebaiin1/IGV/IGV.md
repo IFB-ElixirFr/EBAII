@@ -1,7 +1,7 @@
 ---
 title: Visualization of NGS Data using IGV (v2.4+) - Documentation
-author: "Elodie GIRARD"
-date: "2020-10-04"
+author: "Elodie GIRARD / Olivier QUENEZ"
+date: "2020-10-02"
 output:
   html_document:
     theme: simplex
@@ -61,8 +61,8 @@ pre.r {
 </style>
 
 \pagebreak
-
-#Why use IGV?
+# General Information
+## Why use IGV?
 
 * Visualization and interactive exploration of large genomic datasets
 * Large range of accepted file formats
@@ -90,7 +90,7 @@ Table: Main file formats allowed in IGV
 
 [^bai_note]: An indexed BAM is a BAM sorted by chromosome accompanied by its index file (a .bai file)
 
-#How to download IGV?
+## How to download IGV?
 
 * Open your web browser and go to the IGV : https://www.broadinstitute.org/software/igv/download  
 * Follow the instructions (depends on your operating system).
@@ -103,14 +103,7 @@ Table: Main file formats allowed in IGV
 If it doesn’t work, try the **"igv.jar"**.
 
 
-#How to visualize files in IGV from Galaxy?
-
-* Optional: might not be available in all Galaxy instances
-* Click on an adequate dataset (bam,  bed ...) from the current history
-* Choose **"display with IGV web current"** to open a new IGV window and load the BAM file
-* Choose **"display with IGV local"** to load the BAM file into an already opened IGV Main interface
-
-#IGV Main interface 
+## IGV Main interface 
 
 <img src="images/igv_main.png" width="600px" style="display: block; margin: auto;" />
 
@@ -122,25 +115,25 @@ You can access the Online help by clicking on **"Help"** in the bar menu then on
 
 
 <div class="figure" style="text-align: center">
-<img src="images/interface.png" alt="Interface with 2 datasets (Chipseq Peaks &amp; BAM Alignments)" width="600px" />
-<p class="caption">Interface with 2 datasets (Chipseq Peaks & BAM Alignments)</p>
+<img src="images/interface.png" alt="Interface with 2 datasets (Chipseq Peaks and BAM Alignments)" width="600px" />
+<p class="caption">Interface with 2 datasets (Chipseq Peaks and BAM Alignments)</p>
 </div>
 
-#Reference Genome
+## Reference Genome
 
 * Choose an already available genome in the Reference Genome Selector (Human, Mouse, Yeast...) 
     +  **/!\\ Be careful with the assembly (hg19 != hg18) /!\\**
-
+
     + IGV isn’t designed for unassembled references (thousands of contigs)
 * Load your own genome: in the bar menu, click on **"Genomes"** then on **"Load genome from File"**. Your genome should be an indexed FASTA file (.fa or .fasta)
 
 * You can also load a genome from an URL or a server.
     + **Ex**: human genome hg18 (showing all chromosomes by default)
 
-#Navigation
+# Navigation
 
 ## Per region
-* You can **visualize 1 chromosom**e (ex: chr10) on this selector:
+* You can **visualize 1 chromosome** (ex: chr10) on this selector:
 
 <div class="figure" style="text-align: center">
 <img src="images/search.png" alt="Chromosome selector and search box" width="600px" />
@@ -196,7 +189,7 @@ You can access the Online help by clicking on **"Help"** in the bar menu then on
 ## Jump from one interval to the next one     
 * In **"File>Load from File"**, select a Bed File. Once loaded, left click on the name of the bed track (it should appear gray) then simultaneously click on the **"ctrl" and "f"** keys to jump to the next interval (very useful to visualize variants or enriched regions)
 
-## Region Navigator:
+## Region Navigator
 * Import regions of interest in BED format (4 tabulated columns: chr start end name) by clicking on **"Region > Import Region"** in the top menu  
 * Save the regions you found by clicking on this icon:
 
@@ -209,7 +202,7 @@ You can access the Online help by clicking on **"Help"** in the bar menu then on
 * Export saved regions in BED format by clicking on **"Regions > Export regions"**  
 * In **"Regions>Gene lists"**, you can import/export your own gene lists or use available ones.
 
-## Multiple view option:
+## Multiple view option
 * Enter several localization or terms in the search box (space separated). 
     + **Ex**: BRCA1 BRCA2 RB1 or chr17:15000 chr18:10990 chr1:4500-4600
 * In **"Regions>Gene lists"**, select several genes from a list then click on **"View"**
@@ -236,9 +229,7 @@ You can access the Online help by clicking on **"Help"** in the bar menu then on
 * Load data from different locations (local, URL or server):
     + From your computer : click on **"File"** > **"Load From File"** (previously saved from Galaxy using the floppy disk icon in a dataset)
     + From an Url: click on **"File"** > **"Load From URL"**
-    + Open them through Galaxy (if available): all BAM files present in your Galaxy history can be loaded on IGV – if the option is available (Galaxy-dependent).   
-
-<img src="images/galaxy_load.png" width="150px" style="display: block; margin: auto;" />
+   
 
     
 ## Save alignments from visible locus
