@@ -24,19 +24,20 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      eval.after='fig.cap',
-                      include = TRUE, 
-                      comment = NA,
-                      highlight = TRUE,
-                      fig.align = "center", 
-                      out.width="600px",
-                      cache = TRUE, autodep = FALSE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  eval.after = "fig.cap",
+  include = TRUE,
+  comment = NA,
+  highlight = TRUE,
+  fig.align = "center",
+  out.width = "600px",
+  cache = TRUE, autodep = FALSE
+)
 
 require(tidyverse)
 require(knitr)
 require(DT)
-
 ```
 <style>
 
@@ -87,7 +88,8 @@ Training data is available on : https://tinyurl.com/yxqfyftz
 
 ## SNV
 * In the top menu, select **"New session"**
-* In the top menu, select **"Load from File"** then select the **"dnaseq.bam"** and the **"dnaseq.bed"** file  
+* In the first drop-down menu, select the appropriate genome : **Human (GRCh37/hg19)**
+* In the top menu, select **"Load from File"** then select the **"dnaseq.bam"** and the **"dnaseq_variant.bed"** files  
   
   
 * Zoom in the **"variant239"** region and observe the heterozygous SNV at the position chr12:11,461,470, indicated by colored bases
@@ -113,8 +115,8 @@ knitr::include_graphics("images/insertion.png")
 
 
 * In the top menu, select **"New session"**
-* In the top menu, select **"Load from File"** then select the **"TRIO_00*bam"** file
-* Zoom in the chr19:33,493,260-33,493,397 region and observe the two variants in the area, one inherited by the father (002) and the other by the mother (003)
+* In the top menu, select **"Load from File"** then select the **Trio_001.chr19_33493205.bam**, **Trio_002.chr19_33493205.bam** and **Trio_003.chr19_33493205.bam** files
+* Zoom in the chr19:33,493,260-33,493,397 region and observe the two variants in the area, one inherited from the father (002) and the other from the mother (003)
 
 ```{r, echo = FALSE,fig.align="center",out.width="250px",dpi=300,fig.cap="Multiple sample"}
 knitr::include_graphics("images/trio.png")
