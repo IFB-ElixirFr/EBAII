@@ -187,7 +187,7 @@ knitr::include_graphics("images/sashimi4.png")
 * Some options are available by right clicking on the sashimi:
     + **Set color**: to distinguish between different tracks
     + **Save image**: to save your sashimi (svg format is recommended for high resolution picture and can be modified using illustrator or inkscape)
-    + **Set min junction coverage**: alignment data are noisy and there are a lot of junctions with a low number of spanning reads. Put a higher number of minimal junction coverage to only see the higher represented junctions.
+    + **Set Junction Coverage Min**: alignment data are noisy and there are a lot of junctions with a low number of spanning reads. Put a higher number of minimal junction coverage to only see the most represented junctions.
     
 <span style="color:red; background-color: #f4f1f1">
 /!\\ Sashimi plots are very useful to get a descriptive view of RNA-seq data but cannot replace a proper analysis : it's only a visualization tool. /!\\
@@ -226,7 +226,7 @@ knitr::include_graphics("images/mcf7ip.png")
 **Visualization of two peaks** :
 
 * Zoom in this specific region : **chr2:190,349,562-190,354,046**
-* Right click on the name of the **"MCF-7 GATA3"** IP Signal and click on **"Change track Color (positive values)"** then select the color red
+* Right click on the name of the **"MCF-7 GATA3"** IP Signal and click on **"Change Track Color..."** then select the color red
 * Repeat the operation for the **"MCF-7 Input"** Signal and select the color light blue
 * Select both Signal tracks by maintaining the **"ctrl"** key and clicking on the names then right-click on one of them and click on **"Group autoscale"** to adapt the scale of both tracks
 
