@@ -241,7 +241,7 @@ knitr::include_graphics("images/peaks.png")
 
 * Remove the alignment track by right clicking on the name then select **"Remove track"**
 * Zoom in this specific region : **chr20:55,741,582-55,790,445**
-* Select both Signal tracks by maintaining the **"ctrl"** key and clicking on the names then right-click on one of them and click on **"Overlay"** to display both signals on the same track
+* Select both Signal tracks by maintaining the **"ctrl"** key and clicking on the names then right-click on one of them and click on **"Overlay tracks"** to display both signals on the same track
 
 
 ```{r, echo = FALSE,fig.align="center",out.width="800px",dpi=300}
