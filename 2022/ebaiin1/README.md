@@ -64,7 +64,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](DNA-seq/1-Intro_Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) | 
 | Variant calling & Annotation | Vivien Deshaies | [pdf](DNA-seq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
 | Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf](DNA-seq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
-| Applications sous R | Nadia Bessoltane |[html](DNA-seq/?)|
+| Applications sous R | Nadia Bessoltane | [pdf](DNA-seq/?) [gslides](?) [html](DNA-seq/?) |
 | Workflow et conclusion | Nadia Bessoltane & Vivien Deshaies | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1-nON-453OfocMrXJ95fMc-JaU9KRcNnB/) |
 
 
