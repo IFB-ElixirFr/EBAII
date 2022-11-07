@@ -83,6 +83,7 @@ Training data is available on : https://github.com/IFB-ElixirFr/EBAII/raw/master
 
 
 # Visualization of variants in DNAseq data
+In this section we are going to visualize two types of DNA variants. First, we will look at single nucleotide variations (SNV) in an individual's genome, and compare those SNVs with those present in the two parents'. Then, we are going to have a look at a copy number variation (CNV) type of genomic variant. 
 
 ## SNV
 * In the top menu, select **"New session"**
