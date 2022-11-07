@@ -61,13 +61,11 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction  | Nadia Bessoltane |[pdf](DNA-seq/1-Introduction-fastqc-mapping.pdf) [gslides](https://docs.google.com/presentation/d/1y38ostLE1dk5uXeOk9xeXHqq_QkPWBTG/)   |
-|  Processing Post-Alignement | Nadia Bessoltane | [pdf](DNA-seq/2-Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1GwWt6gSLdwVVeCIRKu6R31mBdEHf0XvB) |
-| Variant calling | Nadia Bessoltane | [pdf](DNA-seq/3-Variant-calling.pdf) [gslides](https://docs.google.com/presentation/d/1ywn8bB3ejyY0E25VNmIHa5zwn3wKNa3s) |
-| Filtrage et annotation | Nadia Bessoltane | [pdf](DNA-seq/4-Filtrage-Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1msBwblYTor0fJknQ8WKIDu34y3NVs_fV) |
-| Variants structuraux | Nadia Bessoltane | [pdf](DNA-seq/5-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1xQFztasps08aP8NgEnp1fQpGCQDr7uFY/) |
-| Applications sous R | Nadia Bessoltane |[html](DNA-seq/EBAII2021_variants.html)|
-| Workflow et conclusion | Nadia Bessoltane | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/16NN7wBr4V_hqVyKSN53J8_jzGqelQQH7/) |
+| Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](DNA-seq/1-Intro_Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) | 
+| Variant calling & Annotation | Vivien Deshaies | [pdf](DNA-seq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
+| Variants structuraux | Nadia Bessoltane & Vivien Deshaies | [pdf](DNA-seq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
+| Applications sous R | Nadia Bessoltane |[html](DNA-seq/?)|
+| Workflow et conclusion | Nadia Bessoltane | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1-nON-453OfocMrXJ95fMc-JaU9KRcNnB/) |
 
 
 ### ChIP-seq
