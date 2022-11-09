@@ -37,11 +37,23 @@ knitr::opts_chunk$set(
   
 );
 
-base::library(package = "dplyr")
 ```
 
 <style type="text/css">
 details:hover { cursor: pointer }
+</style>
+
+<style>
+.column-left{
+  float: left;
+  width: 47%;
+  text-align: left;
+}
+.column-right{
+  float: right;
+  width: 47%;
+  text-align: left;
+}
 </style>
 
 ![logos](images/logos.png)
@@ -51,8 +63,13 @@ details:hover { cursor: pointer }
 In this presentation, there will be screen captures, for you to follow the lesson. There will also be R command lines (hidden by default). Do not take care of the command lines if you find them too challenging. Our goal here, is to understand the main mechanism of Differential Expression Analysis. R is just a tool.
 
 ```{r load_libraries, eval=TRUE}
-library("singleCellTK")
-library("Seurat")
+library(package = "knitr")
+library(package = "dplyr")
+library(package = "singleCellTK")
+library(package = "Seurat")
+library(package = "ggplot2")
+library(package = "ggpubr")
+library(package = "rstatix")
 ```
 
 ## Load RDS dataset
@@ -87,4 +104,124 @@ head(integrated_sctk)
 We can see the name of the normalized dataset and raw counts, we read the name of the dimension reduction steps, we can see the number of cells (7311) and the list of available metadata (8). This information is quite precious when you recieve an unknown dataset, but here, we know where these data come from.
 
 
-# Raw counts, normalized counts
+# Hands on a single gene
+
+Question is now to guess wether a gene is differnetially expressed or not.
+
+
+## Case of the gene Jund
+
+Let's have a look at the gene named ['Jund'](https://www.genecards.org/cgi-bin/carddisp.pl?gene=jund), involved in senescence and apoptosis.
+
+```{r expression_of_jund_violinplot, eval=TRUE}
+singleCellTK::plotSCEViolin(
+  inSCE=integrated_sctk, 
+  feature="Jund", 
+  slotName="assays", 
+  itemName="SLNst", 
+  groupBy="sample", 
+  ylab="Expression", 
+  xlab="Sample", 
+  defaultTheme=FALSE,
+  title="Expression of Jund in both conditions"
+)
+```
+
+Using 'intuition', is that gene differentially expressed ?
+
+I can give you expression density for that gene if it helps:
+
+```{r expression_density_of_jund_violinplot, eval=TRUE}
+singleCellTK::plotSCEDensity(
+  inSCE=integrated_sctk, 
+  feature="Jund", 
+  slotName="assays", 
+  itemName="SLNst", 
+  groupBy="sample", 
+  ylab="Expression", 
+  xlab="Sample", 
+  defaultTheme=FALSE, 
+  title="Expression density of Jund in both conditions"
+)
+```
+
+Okay, let's have some informations about these distributions.
+
+<div class="column-left">
+Within the G3 group:
+
+```{r Jund_summaries_G3, eval=TRUE}
+countsG3 <- as.data.frame(
+  SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
+) %>% select( matches("^G3."))
+
+JundG3 <- as.data.frame(t(countsG3["Jund", ]))
+JundG3$Group <- "G3"
+
+summary(JundG3)
+```
+</div>
+<div class="column-right">
+Withing the G4 group:
+
+```{r Jund_summaries_G4, eval=TRUE}
+countsG4 <- as.data.frame(
+  SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
+) %>% select( matches("^G4."))
+
+JundG4 <- as.data.frame(t(countsG4["Jund", ]))
+JundG4$Group <- "G4"
+
+summary(JundG4)
+```
+</div>
+
+## From biology to statistics
+
+Okay, let us resort on statistics to evaluate our chances to be guess correctly.
+
+We have lots of observations: 3 468 cells in G3 group, and 3 843 cells in G4 groups. Statisticians really like to have a lot of observations! Ideally, statisticians always want to have more observation than tests. We have a total of `r 3468 + 3843` observations and we are testing 1 gene. For them, this is a dream come true!
+
+Our cells are supposed to be interactig with each others ? Are they independent from each others ? This is very important, and usually, it requires a discussion.
+
+Does the expression in our cells follow a normal distribution ? It's easy to check. Let's draw the expression like we did above:
+
+```{r distribution_Jund, eval=TRUE}
+Jund <- rbind(JundG3, JundG4)
+gghistogram(Jund, x="Jund", y = "..density..", fill = "steelblue", bins=15, add_density=TRUE)
+```
+
+Our distribution seems to be binomial we will have to rely on non-parametric tests.
+
+Let's run a non-parametric test base on the mean of distributions, since it's the clothest to our 'intuitive' approach. Let there be [Wilcoxon](https://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test) test.
+
+In R, it's quite straightforward: we have the function [`wilcoxon_test`](https://www.rdocumentation.org/packages/rstatix/versions/0.7.1) to perform the test, then we can plot the result.
+
+```{r wilcoxon_jund, eval = TRUE}
+stat.test <- Jund %>% wilcox_test(Jund ~ Group) %>% add_significance()
+eff.size <- Jund %>% wilcox_effsize(Jund ~ Group)
+```
+
+```{r display_wilcoxon_jund_result, echo = FALSE, eval = TRUE, results = "asis"}
+kable(stat.test, caption = "Wilcoxon test result")
+```
+
+And graphically, we have:
+
+```{r boxplots_manual, eval = TRUE}
+singleCellTK::plotSCEViolin(
+  inSCE=integrated_sctk, 
+  feature="Jund", 
+  slotName="assays", 
+  itemName="SLNst", 
+  groupBy="sample", 
+  ylab="Expression", 
+  xlab="Sample", 
+  defaultTheme=FALSE,
+  title="Expression of Jund in both conditions"
+) + stat_pvalue_manual(
+  stat.test, tip.length = 0
+) + labs(
+  subtitle = get_test_label(stat.test, detailed = TRUE)
+)
+```
