@@ -61,7 +61,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNA-seq/) |
-| Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](DNA-seq/1-Intro_Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) | 
+| Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](DNA-seq/1-Intro_Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) |
 | Variant calling & Annotation | Vivien Deshaies | [pdf](DNA-seq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
 | Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf](DNA-seq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
 | Applications sous R | Nadia Bessoltane | [pdf](DNA-seq/?) [gslides](https://docs.google.com/presentation/d/1oOiJfcdnbIaY3G3F_CI-1nt-Op0W0aR8/) |
@@ -84,7 +84,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Contrôle qualité des alignements, visualisation | Tao Ye |
 | Peak-calling | Tao Ye |
 | Analyse des motifs | Stéphanie Le Gras |
-| Annotation des pics | Stéphanie Le Gras |
+| Annotation des pics | Tao Ye |
 
 
 ### Croisement et intégration des données
