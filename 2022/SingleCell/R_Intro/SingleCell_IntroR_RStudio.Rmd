@@ -105,6 +105,8 @@ knitr::kable(
 
 ## The console pane (lower left)
 
+![console_pane_image](images/td_consolePane.png)
+
 This is a simple R console. Open your bash terminal, enter the following command: `R`, and you will get the same console.
 
 > <span style="color:#CD853F"> Warning: Here, we are in a RStudio session powered by the *IFB*. Your local RStudio might differ: the version of R, the list of available packages, etc. On *your* local machine, RStudio console will match with the R available in *your* terminal.</span>
@@ -128,6 +130,8 @@ When you need help with R, whether on a function error, on a script result or an
 > <span style="color:green"> Info: There is a **syntax coloration**, there is a good **autocompletion** and parameter suggestion. _If I ever see anyone writing down a complete command without typing the tabulation key, then I'll have to steal their dessert. And I'm always hungry enough for desserts._ </span>
 
 ## The environment/history pane (upper right)
+
+![envhit_pane](images/td_envHistoryPane.png)
 
 ### Environment
 
@@ -157,6 +161,8 @@ Now click on **Session** -> **Clear Work space**: and see your work disappear. T
 
 ### History
 
+![goto_history](images/td_goToHistory.png)
+
 This tab is quite important: while you test and search in the console, your history keeps a track of each command line you entered. This will definitely help you to build your scripts, to pass your command lines to your coworkers, and to revert possible unfortunate errors.
 
 Each history is related to a session. You may see many commands in your history. Some of them are not even listed in your console. R Studio in writes there every command, even the ones that were masked for the sake of your eyes (knitting commands, display commands, help commands, etc.)
@@ -169,6 +175,8 @@ Sys.setenv(R_HISTSIZE = new_number)
 ```
 
 ## The help/plot/file pane
+
+![help_file_pane](images/td_helpFIlePane.png)
 
 ### Help
 
@@ -219,6 +227,8 @@ file.remove("example.txt")
 ```
 
 ## The script pane (upper left)
+
+![script_pane](images/td_scriptPane.png)
 
 This is where you write your R scripts. This also accepts other languages (e.g. _bash_, _python_, ...), but R Studio shines for its R integration.
 
