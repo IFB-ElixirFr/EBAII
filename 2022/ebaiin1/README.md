@@ -26,7 +26,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
-| Introduction à R | Thomas Denecker, Stevenn Volant | [[pdf](intro_R/Intro_R_2021.pdf)] |
+| Introduction à R | Thomas Denecker, Stevenn Volant | [[gslides](https://docs.google.com/presentation/d/1jK9-lZVmgSlPilTs4946_EiFaoQJmbvV/edit?usp=sharing&ouid=116446740554003676596&rtpof=true&sd=true)] |
 | Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
