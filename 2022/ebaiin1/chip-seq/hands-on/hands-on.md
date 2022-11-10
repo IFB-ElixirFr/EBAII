@@ -86,21 +86,21 @@ cd /shared/projects/<your_project>
 ```
 2. Create a directory that will contain all results of the upcoming analyses.
 ```bash
-mkdir EBAII2021_chipseq
+mkdir EBAII2022_chipseq
 ```
 3. Go to the newly created directory
 ```bash
-cd EBAII2021_chipseq
+cd EBAII2022_chipseq
 ```
 4. Copy the directory containing data
 
 ```bash
-cp -r /shared/home/slegras/EBAII2021_chipseq/data .
+cp -r /shared/home/slegras/EBAII2022_chipseq/data .
 ```
 
 7. Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 ```
@@ -128,7 +128,7 @@ cd 01-QualityControl
 
 Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 │   
@@ -154,7 +154,7 @@ ls
 ```
 > SRR576933_fastqc.html  SRR576933_fastqc.zip
 
-7. Go to the directory /shared/projects/<your_project>/EBAII2021_chipseq/1-QualityControl in the tree diretory on the left of the jupyterhub panel and double click on SRR576933_fastqc.html to visualize the file.
+7. Go to the directory /shared/projects/<your_project>/EBAII2022_chipseq/1-QualityControl in the tree diretory on the left of the jupyterhub panel and double click on SRR576933_fastqc.html to visualize the file.
 ![alt text][fastqc]
 
 8. Launch the FASTQC program on the replicate (SRR576934.fastq.gz) and on the control file (SRR576938.fastq.gz)
@@ -247,7 +247,7 @@ cd bam
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 │   
@@ -314,7 +314,7 @@ Open the file SRR576938.out. How many reads were mapped?**
 
 1. Go to the directory with alignment files
 ```bash
-cd /shared/projects/<your_project>/EBAII2021_chipseq/02-Mapping/bam
+cd /shared/projects/<your_project>/EBAII2022_chipseq/02-Mapping/bam
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -352,7 +352,7 @@ module add samtools/1.10
 samtools flagstat Marked_SRR576933.bam
 ```
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq/)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq/)
 ```bash
 ## Unload picard and samtools
 module rm samtools/1.10 picard/2.22.0
@@ -384,14 +384,14 @@ plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```bash
-cp /shared/home/slegras/EBAII2021_chipseq/03-ChIPQualityControls/fingerprint.png .
+cp /shared/home/slegras/EBAII2022_chipseq/03-ChIPQualityControls/fingerprint.png .
 ```
 5. Go to the file using the directory tree on the left of the Jupyterhub panel and click on the fingerprint.png file to display it in Jupyterhub.
 
 **Look at the result files fingerprint.png. What do you think of it?**  
 
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2021_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2022_chipseq)
 ```bash
 ## Unload deepTools
 module rm deeptools/3.2.0
@@ -450,7 +450,7 @@ cd 04-Visualization
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 │   
@@ -494,7 +494,7 @@ bamCoverage --bam ../02-Mapping/bam/Marked_SRR576933.bam \
 **Go back to the genes we looked at earlier: pepT, ycfP. Look at the shape of the signal.**  
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq)
 ```bash
 ## If you are in 04-Visualization
 cd ..
@@ -575,7 +575,7 @@ cd idr
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 │   
@@ -615,7 +615,7 @@ idr --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak ../replicates/FNR_A
 --plot
 ```
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2021_chipseq)
+4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq)
 ```bash
 module rm macs2/2.1.1.20160309
 module rm idr/2.0.4.2
@@ -651,7 +651,7 @@ cd 06-MotifAnalysis
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2021_chipseq
+/shared/projects/<your_project>/EBAII2022_chipseq
 │
 └───data
 │   
@@ -780,7 +780,7 @@ annotatePeaks.pl \
 ```R
 
 ## set working directory
-setwd("/shared/projects/<your_project>/EBAII2021_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/<your_project>/EBAII2022_chipseq/07-PeakAnnotation")
 
 ## read the file with peaks annotated with homer
 ## data are loaded into a data frame
@@ -851,7 +851,7 @@ tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promote
 gzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
 ```
 
-Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2021_chipseq)
+Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2022_chipseq)
 ```bash
 ## If you are in 07-PeakAnnotation
 cd ..
@@ -878,7 +878,7 @@ From now on, we will work locally on your personal machine.
 0. We will download the already called peak files in bed format from GEO.
 Create a new folder and go in it.
 ```bash
-cd /shared/projects/<your_project>/EBAII2021_chipseq
+cd /shared/projects/<your_project>/EBAII2022_chipseq
 mkdir 07-PeakAnnotation-bonus
 cd 07-PeakAnnotation-bonus
 ```
@@ -919,7 +919,7 @@ col = brewer.pal(9,'Set1')
 
 ```r
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBAII2021_chipseq/07-PeakAnnotation-bonus")
+setwd("/shared/projects/<your_project>/EBAII2022_chipseq/07-PeakAnnotation-bonus")
 
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
