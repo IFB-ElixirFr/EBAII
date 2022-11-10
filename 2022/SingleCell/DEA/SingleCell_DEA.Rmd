@@ -213,7 +213,7 @@ Wilcoxon test says: the distributions are different, with a 9.31 * 10^-280 % of 
 
 Let's have a look at the gene named ['Mindy1'](https://www.genecards.org/cgi-bin/carddisp.pl?gene=Mindy1), mutation in that gene are associated with Encephalitis.
 
-```{r expression_of_jund_violinplot, eval=TRUE}
+```{r expression_of_mindy1_violinplot, eval=TRUE}
 singleCellTK::plotSCEViolin(
   inSCE=integrated_sctk, 
   feature="Mindy1", 
@@ -231,7 +231,7 @@ Using 'intuition', is that gene differentially expressed ?
 
 I can give you expression density for that gene if it helps:
 
-```{r expression_density_of_jund_violinplot, eval=TRUE}
+```{r expression_density_of_mindy1_violinplot, eval=TRUE}
 singleCellTK::plotSCEDensity(
   inSCE=integrated_sctk, 
   feature="Mindy1", 
@@ -250,7 +250,7 @@ Okay, let's have some informations about these distributions.
 <div class="column-left">
 Within the G3 group:
 
-```{r Jund_summaries_G3, eval=TRUE}
+```{r mindy1_summaries_G3, eval=TRUE}
 countsG3 <- as.data.frame(
   SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
 ) %>% select( matches("^G3."))
@@ -264,7 +264,7 @@ summary(Mindy1G3)
 <div class="column-right">
 Withing the G4 group:
 
-```{r Jund_summaries_G4, eval=TRUE}
+```{r mindy1_summaries_G4, eval=TRUE}
 countsG4 <- as.data.frame(
   SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
 ) %>% select( matches("^G4."))
@@ -274,7 +274,7 @@ Mindy1G4$Group <- "G4"
 
 summary(Mindy1G4)
 Mindy1 <- rbind(Mindy1G3, Mindy1G4)
-Mindy1$Cells <- names(Mindy1)
+Mindy1$Cells <- rownames(Mindy1)
 Mindy1$Mindy1 <- NULL
 ```
 </div>
