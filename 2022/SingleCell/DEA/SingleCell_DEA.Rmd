@@ -31,8 +31,7 @@ knitr::opts_chunk$set(
   message = FALSE,    # Print messages
   prompt = FALSE,     # Do not display prompt
   comment = NA,       # No comments on this section
-  warning = TRUE#,    # Display warnings
-  
+  warning = FALSE#,    # Display warnings
   # width = 100       # Number of characters per line
   
 );
@@ -63,13 +62,16 @@ details:hover { cursor: pointer }
 In this presentation, there will be screen captures, for you to follow the lesson. There will also be R command lines (hidden by default). Do not take care of the command lines if you find them too challenging. Our goal here, is to understand the main mechanism of Differential Expression Analysis. R is just a tool.
 
 ```{r load_libraries, eval=TRUE}
+library(package = "BiocParallel")
+library(package = "DT")
+library(package = "ggplot2")
+library(package = "ggpubr")
+library(package = "rstatix")
 library(package = "knitr")
 library(package = "dplyr")
 library(package = "singleCellTK")
 library(package = "Seurat")
-library(package = "ggplot2")
-library(package = "ggpubr")
-library(package = "rstatix")
+register(MulticoreParam(6))
 ```
 
 ## Load RDS dataset
@@ -104,12 +106,11 @@ head(integrated_sctk)
 We can see the name of the normalized dataset and raw counts, we read the name of the dimension reduction steps, we can see the number of cells (7311) and the list of available metadata (8). This information is quite precious when you recieve an unknown dataset, but here, we know where these data come from.
 
 
-# Hands on a single gene
+# Hands on a single gene: Jund
 
-Question is now to guess wether a gene is differnetially expressed or not.
+Question is now to guess wether this gene is differnetially expressed or not.
 
-
-## Case of the gene Jund
+## Cell observations
 
 Let's have a look at the gene named ['Jund'](https://www.genecards.org/cgi-bin/carddisp.pl?gene=jund), involved in senescence and apoptosis.
 
@@ -188,7 +189,7 @@ Does the expression in our cells follow a normal distribution ? It's easy to che
 
 ```{r distribution_Jund, eval=TRUE}
 Jund <- rbind(JundG3, JundG4)
-gghistogram(Jund, x="Jund", y = "..density..", fill = "steelblue", bins=15, add_density=TRUE)
+gghistogram(Jund, x="Jund", y = '..density..', fill = "steelblue", bins=15, add_density=TRUE)
 ```
 
 Our distribution seems to be binomial we will have to rely on non-parametric tests.
@@ -206,22 +207,242 @@ eff.size <- Jund %>% wilcox_effsize(Jund ~ Group)
 kable(stat.test, caption = "Wilcoxon test result")
 ```
 
-And graphically, we have:
+Wilcoxon test says: the distributions are different, with a 9.31 * 10^-280 % of risks of being wrong. The gene Jund can safely be said differentially expressed. We can compute a fold change and conclude.
 
-```{r boxplots_manual, eval = TRUE}
+# Hands on a second gene: Mindy1
+
+Let's have a look at the gene named ['Mindy1'](https://www.genecards.org/cgi-bin/carddisp.pl?gene=Mindy1), mutation in that gene are associated with Encephalitis.
+
+```{r expression_of_jund_violinplot, eval=TRUE}
 singleCellTK::plotSCEViolin(
   inSCE=integrated_sctk, 
-  feature="Jund", 
+  feature="Mindy1", 
   slotName="assays", 
   itemName="SLNst", 
   groupBy="sample", 
   ylab="Expression", 
   xlab="Sample", 
   defaultTheme=FALSE,
-  title="Expression of Jund in both conditions"
-) + stat_pvalue_manual(
-  stat.test, tip.length = 0
-) + labs(
-  subtitle = get_test_label(stat.test, detailed = TRUE)
+  title="Expression of Mindy1 in both conditions"
 )
 ```
+
+Using 'intuition', is that gene differentially expressed ?
+
+I can give you expression density for that gene if it helps:
+
+```{r expression_density_of_jund_violinplot, eval=TRUE}
+singleCellTK::plotSCEDensity(
+  inSCE=integrated_sctk, 
+  feature="Mindy1", 
+  slotName="assays", 
+  itemName="SLNst", 
+  groupBy="sample", 
+  ylab="Expression", 
+  xlab="Sample", 
+  defaultTheme=FALSE, 
+  title="Expression density of Mindy1 in both conditions"
+)
+```
+
+Okay, let's have some informations about these distributions.
+
+<div class="column-left">
+Within the G3 group:
+
+```{r Jund_summaries_G3, eval=TRUE}
+countsG3 <- as.data.frame(
+  SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
+) %>% select( matches("^G3."))
+
+Mindy1G3 <- as.data.frame(t(countsG3["Mindy1", ]))
+Mindy1G3$Group <- "G3"
+
+summary(Mindy1G3)
+```
+</div>
+<div class="column-right">
+Withing the G4 group:
+
+```{r Jund_summaries_G4, eval=TRUE}
+countsG4 <- as.data.frame(
+  SummarizedExperiment::assay(x=integrated_sctk, i="SLNst")
+) %>% select( matches("^G4."))
+
+Mindy1G4 <- as.data.frame(t(countsG4["Mindy1", ]))
+Mindy1G4$Group <- "G4"
+
+summary(Mindy1G4)
+Mindy1 <- rbind(Mindy1G3, Mindy1G4)
+Mindy1$Cells <- names(Mindy1)
+Mindy1$Mindy1 <- NULL
+```
+</div>
+
+```{r deseq2_whole_run, eval=FALSE}
+dds <- DESeq2::DESeqDataSetFromMatrix(
+  countData=as.data.frame(SummarizedExperiment::assay(x=integrated_sctk, i="counts")) + 1,
+  colData=Mindy1,
+  design=as.formula("~Group")
+)
+ddsr <- DESeq2::DESeq(object=dds, parallel=T)
+ddsr <- DESeq2::DESeq(
+  object=dds, 
+  useT=T, 
+  minmu=1e-6, 
+  fitType = "glmGamPoi", 
+  minReplicatesForReplace=Inf, 
+  test="LRT", 
+  reduce=ddsr
+)
+```
+
+```{r, deseq2_speed, eval=TRUE, echo=FALSE}
+ddsr <- readRDS(file="DDS.RDS")
+```
+
+
+
+# Apply to all genes with SingleCellTK
+
+# Select a method
+
+![dea_methods](images/DEA_main.png)
+
+There are many DEA methods available in SingleCellTK:
+
+1. [wilcox](https://www.rdocumentation.org/packages/rstatix/versions/0.7.1): The wilcoxon test we jus saw. It tests the mean of expression and looks for a difference in these means.
+1. [MAST](https://www.bioconductor.org/packages/release/bioc/vignettes/MAST/inst/doc/MAST-Intro.html): This tool has been built for Single Cell. It is based on a statistical model called ["Hurdle Model"](https://en.wikipedia.org/wiki/Hurdle_model), which excells with data that contains lots of zeros (which is our case in Single Cell RNA-Seq: most of the genes are *not* expressed.)
+1. [DESeq2](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#recommendations-for-single-cell-analysis): This tool has originally been built for bulk RNA-Seq but now includes specific funcitons for Single Cell. It performs well when counts are highly variable or when you wand to compare a handful of cells.
+1. [Limma](https://bioconductor.org/packages/release/bioc/html/limma.html): This tool is based on similar methods as DESeq2, and IMHO their results are quite alike.
+1. [ANOVA](https://en.wikipedia.org/wiki/Analysis_of_variance): ANOVA stands for "Analysis of Variance" and is also called "Fisher analysis of Variance".
+
+The main question now is **how to choose the right test**: spoilers, there are no option better than another in all ways.
+
+From Soneson & Robinson (2018) Nature Methods:
+
+![de_tools](images/DE_tools.png)
+
+Here, researchers have designed an artificial dataset where they knew in advance the list of differentially expressed genes. They have used all these algorithms and consigned the results.
+
+1. DESeq2, Limma seems to have a higher number of false positives (genes called differentially expressed while they were not.)
+1. Wilcoxon seems to be better in general
+1. Mast performs well in absolute
+
+ANOVA was not present in this study.
+
+In conclusion, to select your method, use the following:
+
+1. If you have already done a study with one of these methods, keep using the same. This is crutial if you ever want to compare your new result with the old ones.
+1. If you want to compare your study with a published one, use the same method.
+1. If you have no idea, use Wilcoxon.
+1. If you have bulk data analyzed with DESeq2/Limma, use DESeq2/Limma. It will be easier to take both works in consideration.
+
+Please, never use a simple Wilcoxon on bulk RNA-Seq data.
+
+# Select a dataset
+
+There it is quite easier:
+
+```{r choose_counts, eval=TRUE, results='asis', echo=FALSE}
+choose_counts <- as.data.frame(t(data.frame(
+  wilcox = "Normalized counts",
+  MAST = "Raw counts",
+  DESeq2 = "Raw counts",
+  Limma = "Raw counts",
+  ANOVA = "Normalized counts"
+)))
+colnames(choose_counts) <- c("Counts")
+kable(choose_counts, caption = "How to select your counts")
+```
+
+## Name your conditions
+
+![name_conditions](images/Conditions_setting_1.png)
+
+You may want to manually select your cells, here we have `r 3468 + 3843` cells, we won't click them one-by-one.
+
+Name your conditions the way you want them to be named in your publication, or you'll have to re-run all this work.
+
+## Choose your annotation
+
+![annotation_class](images/Annotation_class_1.png)
+
+A missing annotation class here, means a missing parameter in your SingleCellExperiment object.
+
+## Choose parameters
+
+![parameters_choise](images/Parameters_1.png)
+
+### FDR and Fold Change
+
+About thresholds on FDR (False Discovery Rate) and Log2(FC) (Log of the Fold Change), there are many discussions.
+
+Remember, here the threshold on Fold Change is Logged. A `log2(1) = ``r log2(1)`. And keep in mind the following:
+
+1. If one selects a fold change threshold above 1.7, then their study concludes that smoking is not related to lung cancer.
+1. If one selects a fold change threshold above 1, then their study concludes that a fast-food based diet does not lead to weight gain.
+1. If one selects a fold change threshold above 1/25 000 000, then their study concludes: it is a complete hazard that mice have featal malformation when in presence of Bisphanol.
+
+In conclusion, there one, and only one reason to filter on fold change: in my experience, a fold change below 0.7 will be hard to see/verify on wet-lab (qRT).
+
+If you need to reduce a too large number of differentially expressed genes, then reduce the FDR to 0.01, or even better, to 0.001. With that, you reduce your number of false claims.
+
+Now run the differential analysis.
+
+```{r run_wilcoxon, eval=TRUE, cache=TRUE}
+dea <- singleCellTK::runWilcox(
+  inSCE=integrated_sctk, 
+  groupName1="G3", 
+  groupName2="G4", 
+  analysisName="G3_vs_G4", 
+  log2fcThreshold=0.01, 
+  fdrThreshold=0.05, 
+  class="sample", 
+  useAssay="SLNst", 
+  classGroup1="G3", 
+  classGroup2="G4"
+)
+```
+
+# Results and interpretation
+
+## Big table
+
+```{r dea_result_table, eval=TRUE, echo=FALSE, result='asis'}
+dea_results <- dea@metadata$diffExp$G3_vs_G4$result
+datatable(dea_results, caption = "Wilcoxon result for differential analysis")
+```
+
+There you have the results, make sure to download it.
+
+Remember, a p-value can never be an absolute 0. Here, the numbers are so small, that R rounded them to 0.
+
+Never consider raw P-Values, adjusted P-Values are better by far. So FDR column is the one that decides wether a gene is DE or not.
+
+Note this table contains only `r dim(dea_results)` entries, so `r dim(dea_results)` genes. This means that a "missing" gene is a non-differentially-expressed gene.
+
+Remember the FC a logged in your conclusions.
+
+What about our genes: Jund and Mindy1
+
+```{r jund_results_wilcox, eval=TRUE}
+Jund_results <- dea@metadata$diffExp$G3_vs_G4$result[c("Jund", "Mindy1"), ]
+```
+
+```{r jund_results_wilcox_display, eval=TRUE, echo=FALSE}
+kable(Jund_results, caption="DE status of Jund and Mindy1")
+```
+
+
+## Heatmap
+
+![heatmap](images/heatmap_1.png)
+
+## Violin plot
+
+![violin_plot](images/violin_plot_1.png)
+
+## Linear model plot
+
+![regression_plot](images/linear_model_1.png)
