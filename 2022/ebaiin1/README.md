@@ -19,8 +19,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche |  [pdf](intro_linux/1-presentation_linux_quick_2021.pdf) [gslides](https://docs.google.com/presentation/d/19Z96DlG41kd0e3B86HP-oNCVfDJekR84F_gNaTdcF1I/edit?usp=sharing) |
-| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [pdf](intro_linux/2-pre_processessing_and_mapping_2021.pdf) [gslides](https://docs.google.com/presentation/d/1RMfu1FxqRz1EC_2BnHH3e_xLyMCcppfjUE2G4BHFq8A/edit?usp=sharing) |
+| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing) |
+| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) |
 
 ### (Re)découverte de R
 
