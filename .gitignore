@@ -2,10 +2,16 @@
 .Rhistory
 .RData
 .Ruserdata
+*.RDS
+*.rds
+*.zip
+*.RData
+*.rdb
+*.rdx
+*.tsv
 README.html
 *~
 .DS_Store
 2021/ebaiin2/RNASeq/EBAIIn2_RNASeq_cache/
 2021/ebaiin2/RNASeq/EBAIIn2_RNASeq_files/
 2021/ebaiin2/RNASeq/EBAIIn2_RNASeq_apprenants_cache/
-2022/SingleCell/DEA/dataset/INTEGRATED_02d_ClustLab.rds
