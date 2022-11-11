@@ -59,6 +59,8 @@ details:hover { cursor: pointer }
 
 # Forewords
 
+## R for advanced users
+
 In this presentation, there will be screen captures, for you to follow the lesson. There will also be R command lines (hidden by default). Do not take care of the command lines if you find them too challenging. Our goal here, is to understand the main mechanism of Differential Expression Analysis. R is just a tool.
 
 ```{r load_libraries, eval=TRUE, echo=FALSE}
@@ -114,7 +116,26 @@ integrated_sctk <- singleCellTK::runDESeq(
 
 Our goal is to understand these lines, not to be able to write them.
 
+## Purpose of this session
+
+Up to now, we have:
+
+1. Identified to which cell each sequenced reads come from
+1. Identified to which gene each read come from
+1. Identified possible bias in gene expression for each cell
+1. Annotated cell clusters
+
+We would like to identify the list of genes that caracterize differences between G3 and G4 groups.
+
+At the end of this session you will know:
+
+1. how to select a differential analysis method
+1. how to select the correct normalization (if any?) that must be provided to your differential analysis method
+1. How to read differential expression results
+
 ## Load RDS dataset
+
+You aleady have a dataset loaded ? Good. Keep on going with it ! You don't have one ? Use mine:
 
 In SingleCellTK, click "Data".
 
