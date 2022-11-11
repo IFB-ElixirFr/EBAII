@@ -85,7 +85,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Peak-calling | Tao Ye |
 | Analyse des motifs | Stéphanie Le Gras |
 | Annotation des pics | Tao Ye |
-
+| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
 ### Croisement et intégration des données
 
