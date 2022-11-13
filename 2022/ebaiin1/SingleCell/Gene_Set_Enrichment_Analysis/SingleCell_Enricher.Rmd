@@ -114,13 +114,48 @@ At the end of this session you will know:
 1. How to perform an enrichment analysis
 1. How to read Gene set analysis results
 
+# Enricher
+
+## How to do enrichement analysis ?
+
+We are interested in the genes Jund and Mindy1. Manually, as we are working with mice, we go to [MGI](http://www.informatics.jax.org/) (Mouse Genome Informatics), and look for ["Jund"](http://www.informatics.jax.org/marker/MGI:96648).
+
+![jund_mgi](images/pathways_jund.png)
+
+Multiple pathways are found, clicking gives us more information:
+
+![jund_pathways](images/jund_mgi.png)
+
+With lots of genes, and lots of databases, this will be tedious.
+
+## Enricher with SingleCell TK
+
+Enricher does the same as the above: look for the list of genes provided, to a list of databases provided.
+
+![enricher_first_part](images/gse_enricher_1.png)
+
+You can either enter a small list of genes, or let SingleCellTK select the list of genes of interest.
+
+```{r Jund_Mindy_Enrich, eval = TRUE, results="asis", echo = FALSE}
+datatable(head(enrich_result, 100), caption = "EnrichR results")
+```
+
+Magnitude of the fold change, order of the genes entered, all these information does not count. The only important thing that matters is the name of the genes.
+
+
 # Gene set enrichment analysis
 
 ## Why ?
 
-The large table containing 7 000 differentially expressed genes is not usefull for humans. You won't be searching the list of pathways and metabolic chains each of these 7 000 genes are involved in.
+The large table containing 7 000 differentially expressed genes is not usefull for humans.
 
-Gene set analysis methods are used to run this kind of analysis.
+Gene set analysis methods searches gene names against pathways:
+
+![gene_sets](images/gene_sets.png)
+
+Gene set analysis also searches for genes against protein databases:
+
+![gene_sets_ppi](images/ppis.png)
 
 Most of you know these methods under the umbrella term of "GSEA". Please, be aware that [GSEA](https://www.gsea-msigdb.org/gsea/index.jsp) is the name of a tool developped by the broad institure.
 
@@ -156,31 +191,10 @@ Ensembl-id, Uniprot-id, Entrez-id, each database has its own gene/protein/transc
 
 Lots of tools are used to "translate" these identifiers to human readable ones. SingleCellTK graphic interface does not allow to make these translations. GSEA lesson in RNA-Seq bulk has the example R code required for surch translation.
 
-# Enricher
+## Databases
 
-## How to do enrichement analysis ?
+![database_selection](images/gse_enricher_3.png)
 
-We are interested in the genes Jund and Mindy1. Manually, as we are working with mice, we go to [MGI](http://www.informatics.jax.org/) (Mouse Genome Informatics), and look for ["Jund"](http://www.informatics.jax.org/marker/MGI:96648).
+You may enter any gene set file as long as you provided any in the input pane:
 
-![jund_mgi](images/pathways_jund.png)
-
-Multiple pathways are found, clicking gives us more information:
-
-![jund_pathways](images/jund_mgi.png)
-
-With lots of genes, and lots of databases, this will be tedious.
-
-## Enricher with SingleCell TK
-
-Enricher does the same as the above: look for the list of genes provided, to a list of databases provided.
-
-![enricher_first_part](images/gse_enricher_1.png)
-
-You can either enter a small list of genes, or let SingleCellTK select the list of genes of interest.
-
-```{r Jund_Mindy_Enrich, eval = TRUE, results="asis", echo = FALSE}
-datatable(head(enrich_result, 100), caption = "EnrichR results")
-```
-
-Magnitude of the fold change, order of the genes entered, all these information does not count. The only important thing that matters is the name of the genes.
-
+![dataset_list](images/database_list.png)
