@@ -49,7 +49,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNAseq/README.md) |
-| Bioinformatics | Emilie Drouineau | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
+| Bioinformatics | Emilie Drouineau | [pdf](https://docs.google.com/presentation/d/1CnNzhI8PzWfw-inCTZjFTBLeAdoqHfOO9a0Sp8_FCoU/edit#slide=id.g18a6186c91b_0_8) [TP](https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/RNAseq/Mapping/runme.sh) [TP corrigé](https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/RNAseq/Mapping/runme_corrected.sh)|
 | General statistics | Stevenn Volant | [pdf](RNAseq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
 | Gene set analysis | Emilie Drouineau | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
