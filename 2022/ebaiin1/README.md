@@ -35,7 +35,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Long reads | Claude Thermes | [pdf](long_reads/20211123_ROSCOFF10_v14.pdf) |
+| Long reads | Claude Thermes | [pdf](long_reads/20221114_ROSCOFF11_v7.pdf) |
 
 ### Visualisation
 
@@ -49,7 +49,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | Programme de l'atelier RNA-seq | |  [Program](RNAseq/README.md) |
-| Bioinformatics | Emilie Drouineau | [pdf](RNA-seq/EBAI2020_RNAseq.pdf) [TP](RNA-seq/runme.sh) [TP corrigé](RNA-seq/runme_corrected.sh)|
+| Bioinformatics | Emilie Drouineau | [pdf](https://docs.google.com/presentation/d/1CnNzhI8PzWfw-inCTZjFTBLeAdoqHfOO9a0Sp8_FCoU/edit#slide=id.g18a6186c91b_0_8) [TP](https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/RNAseq/Mapping/runme.sh) [TP corrigé](https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/RNAseq/Mapping/runme_corrected.sh)|
 | General statistics | Stevenn Volant | [pdf](RNAseq/RNASeq_differential_analysis.pdf) |
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
 | Gene set analysis | Emilie Drouineau | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
@@ -73,8 +73,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Support | Lien |
 |----------------------------------|------------------|
-| Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
-| Partie pratique | [TD](chip-seq/hands-on/) |
+| Partie théorique | [gslides](https://docs.google.com/presentation/d/1d2fjTy081bhrqM1HbjZ7SZPv9KNDa3Qx4u4NTsLCXmA/edit?usp=sharing) |
+| Partie pratique | [html](chip-seq/hands-on/hands-on.html) |
+| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
@@ -85,7 +86,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Peak-calling | Tao Ye |
 | Analyse des motifs | Stéphanie Le Gras |
 | Annotation des pics | Tao Ye |
-| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
+| Workflow et conclusion | Rachel Legendre |
 
 
 ### Single Cell RNA-Seq
@@ -113,6 +114,3 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
-
-
-
