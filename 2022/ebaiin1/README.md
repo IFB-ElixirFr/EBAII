@@ -93,8 +93,8 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours                            | Intervenants     | Supports |
 |----------------------------------|------------------|----------|
-| Technologie 10X et analyses primaires(1)| Morgane Thomas-Chollier, Rémi Montagne | [[gslides](https://docs.google.com/presentation/d/1rYptI4sdxeKNNbRdszlgQTa-BqBb6s2pNIYjy1GUG7A/edit#slide=id.g18915492416_1_58)] |
-| Visualisation IGV et analyses primaires(2)| Sophie Lemoine, Rémi Montagne | [[gslides - à venir]()] [ [pratique sur IGV - à venir]()] |
+| Technologie 10X et analyses primaires(1)| Morgane Thomas-Chollier | [[gslides](https://docs.google.com/presentation/d/1rYptI4sdxeKNNbRdszlgQTa-BqBb6s2pNIYjy1GUG7A/edit#slide=id.g18915492416_1_58)] |
+| Visualisation IGV et analyses primaires(2)| Sophie Lemoine, Rémi Montagne | [[gslides](https://docs.google.com/presentation/d/1TF4_31hWuuRtKS7oKk5izFxsEk8PYScxuN-ykLoptms/edit#slide=id.g188fbf08b5b_0_1260)] [ [pratique sur IGV](https://github.com/IFB-ElixirFr/EBAII/tree/master/2022/ebaiin1/SingleCell/IGV)] |
 | Intro R                          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html)] |
 | Analyses secondaires(1) : QC, filtrages, normalisation | Rémi Montagne, Nathalie Lehmann | [[gslides - à venir]()] |
 | Differential Gene Expression          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
