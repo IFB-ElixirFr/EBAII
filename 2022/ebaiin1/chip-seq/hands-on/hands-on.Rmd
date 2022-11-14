@@ -83,9 +83,10 @@ SRA stores sequences in a FASTQ format.
 # - Connect to the server and set up your environment
 ## - Sign in to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr) and open a Terminal
 1. Go to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr)
-2. select a job profile: EBAII and click on "Start"
+2. select reservation: **form_2022_32_0**, CPUS: **4** and Memory (in GB): **10**
 ![alt text][jupebai]
-3. In the launcher, click on "Terminal" in "Other" section. You should be in your home directory by default. Check it:
+3. Click on "Start"
+4. In the launcher, click on "Terminal" in "Other" section. You should be in your home directory by default. Check it:
 ```{bash eval=FALSE}
 pwd
 ```
@@ -203,7 +204,7 @@ There are multiple programs to perform the mapping step. For reads produced by a
 ## - Bowtie
 1. Load Bowtie
 ```{bash eval=FALSE}
-module add bowtie/1.2.3
+module add bowtie/1.3.1
 ```
 2. Try out bowtie
 ```{bash eval=FALSE}
@@ -292,9 +293,9 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
   * -b: output BAM
 ```{bash eval=FALSE}
 ## First load samtools
-module add samtools/1.10
+module add samtools/1.15.1
 ## Then run samtools
-samtools sort SRR576933.sam | samtools view -b > SRR576933.bam
+samtools sort -o SRR576933.bam -O BAM SRR576933.sam
 ```
 
 5. Create an index for the bam file
@@ -312,7 +313,7 @@ Open the file SRR576933.out (for example using the ` less ` command), which cont
 
 7. Once it's done, unload the tools you used
 ```{bash eval=FALSE}
-module rm samtools/1.10 bowtie/1.2.3
+module rm samtools/1.15.1 bowtie/1.3.1
 ```
 
 ## - Map the second replicate and the control
@@ -339,30 +340,31 @@ cd /shared/projects/<your_project>/EBAII2022_chipseq/02-Mapping/bam
 
 ```{bash eval=FALSE}
 ## Load picard
-module add picard/2.22.0
+module add picard/2.23.5
 
 ## Run picard
-picard MarkDuplicates \
-
+sbatch --mem=5G --wrap=\
+"picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576933.bam \
 OUTPUT=Marked_SRR576933.bam \
-METRICS_FILE=metrics \
-VALIDATION_STRINGENCY=STRICT
+METRICS_FILE=metrics_SRR576933.txt \
+VALIDATION_STRINGENCY=STRICT"
 
-picard MarkDuplicates \
+sbatch --mem=5G --wrap=\
+"picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576938.bam \
 OUTPUT=Marked_SRR576938.bam \
-METRICS_FILE=metrics \
-VALIDATION_STRINGENCY=STRICT
+METRICS_FILE=metrics_SRR576938.txt \
+VALIDATION_STRINGENCY=STRICT"
 ```
 
 To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
 
 ```{bash eval=FALSE}
 ## Add samtools to your environment
-module add samtools/1.10
+module add samtools/1.15.1
 ## run samtools
 samtools flagstat Marked_SRR576933.bam
 ```
@@ -370,7 +372,7 @@ samtools flagstat Marked_SRR576933.bam
 Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq/)
 ```{bash eval=FALSE}
 ## Unload picard and samtools
-module rm samtools/1.10 picard/2.22.0
+module rm samtools/1.15.1 picard/2.23.5
 ## If you are in 02-Mapping/bam
 cd ../..
 ```
@@ -394,7 +396,7 @@ cd 03-ChIPQualityControls
   * -plot: File name of the output figure (extension can be either “png”, “eps”, “pdf” or “svg”)
 ```{bash eval=FALSE}
 ## Load deeptools in your environment
-module add deeptools/3.2.0
+module add deeptools/3.5.0
 ## Run deeptools fingerprint
 plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02-Mapping/bam/SRR576934.bam ../02-Mapping/bam/SRR576938.bam -plot fingerprint_10000.png
 ```
@@ -410,7 +412,7 @@ cp /shared/home/slegras/EBAII2022_chipseq/03-ChIPQualityControls/fingerprint.png
 Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2022_chipseq)
 ```{bash eval=FALSE}
 ## Unload deepTools
-module rm deeptools/3.2.0
+module rm deeptools/3.5.0
 ## If you are in 03-ChIPQualityControls
 cd ..
 ```
@@ -454,7 +456,7 @@ However, looking at BAM file as such does not allow to directly compare the two 
 1. Try it out
 ```{bash eval=FALSE}
 ## Load deeptools in your environment
-module add deeptools/3.2.0
+module add deeptools/3.5.0
 ## run bamCoverage
 bamCoverage --help
 ```
@@ -572,6 +574,8 @@ macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
 4. In a new directory called pool, run macs2 for the pooled replicates A and B by giving both bam files as input treatment files (-t).
 
 ```{bash eval=FALSE}
+## if needed
+cd ..
 # If you are in 05-PeakCalling
 mkdir pool
 cd pool
@@ -594,6 +598,8 @@ In order to take advantage of having biological replicates, we will create a com
 
 1. Create a new directory to store the peak coordinates resulting after idr analysis
 ```{bash eval=FALSE}
+## if needed
+cd ..
 ## If you are in 05-PeakCalling
 mkdir idr
 cd idr
@@ -643,7 +649,7 @@ idr --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak ../replicates/FNR_A
 
 4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq)
 ```{bash eval=FALSE}
-module rm macs2/2.1.1.20160309
+module rm macs2/2.2.7.1
 module rm idr/2.0.4.2
 
 ## If you are in 05-PeakCalling/idr
@@ -654,8 +660,8 @@ cd ../..
 
 1. Download the following BED files from the server into your computer to visualise in IGV :
 
-* 05-PeakCalling/repA/FNR_Anaerobic_A_peaks.bed
-* 05-PeakCalling/repB/FNR_Anaerobic_B_peaks.bed
+* 05-PeakCalling/replicates/FNR_Anaerobic_A_peaks.narrowPeak
+* 05-PeakCalling/replicates/FNR_Anaerobic_B_peaks.narrowPeak
 * 05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed
 
 **Go back again to the genes we looked at earlier: pepT, ycfP. Do you see peaks?**
@@ -701,12 +707,12 @@ Your directory structure should be like this:
 3. Extract peak sequence in fasta format
 ```{bash eval=FALSE}
 ## First load samtools
-module add samtools/1.10
+module add samtools/1.15.1
 ## Create an index of the genome fasta file
 samtools faidx ../data/Escherichia_coli_K12.fasta
 
 ## First load bedtools
-module add bedtools/2.29.2
+module add bedtools/2.30.0
 ## Extract fasta sequence from genomic coordinate of peaks
 bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 -bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed -fo FNR_anaerobic_idr_peaks.fa
@@ -752,6 +758,9 @@ and setting the title box to **FNR Anaerobic A summit +/-100bp**
 
 1. Create a directory named **07-PeakAnnotation**
 ```{bash eval=FALSE}
+## if needed
+cd ..
+
 mkdir 07-PeakAnnotation
 ```
 2. Go to the newly created directory
@@ -779,7 +788,7 @@ cut -f1-5 ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed | \
 3. Try annotatePeaks.pl
 ```{bash eval=FALSE}
 ## First load bedtools
-module add homer/4.10
+module add homer/4.11
 
 ## run Homer annotatePeaks
 annotatePeaks.pl --help
