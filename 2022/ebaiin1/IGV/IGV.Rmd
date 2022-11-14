@@ -97,17 +97,10 @@ knitr::include_graphics("images/file_format.png")
 
 [^bai_note]: An indexed BAM is a BAM sorted by chromosome accompanied by its index file (a .bai file)
 
-## How to download IGV?
+## How to download and install IGV?
 
 * Open your web browser and go to the IGV : https://www.broadinstitute.org/software/igv/download  
 * Follow the instructions (depends on your operating system).
-* You don’t have to install IGV, only to execute it each time you want to use it (no admin/root rights)
-* To launch IGV, double click on:
-    * __Windows__ : **"igv.bat"**
-    * __Mac__: **"igv.command"**
-    * __Unix__: **"igv.sh"** then on **"Launch in Terminal"**
-    
-If it doesn’t work, try the **"igv.jar"**.
 
 
 ## IGV Main interface 
