@@ -272,7 +272,7 @@ Depending on the file format, some graphical options will be available by right 
     + Overlay tracks (bigwig only): with both **"ctrl"** key and left click, select > 1 bigwig tracks then right click on the name of one of them and click on **"Overlay"** (respectively Separate). Can be useful to compare visually both normalized IP and INPUT or several normalized IPs.    
 
 ```{r, echo = FALSE,fig.align="center",out.width="600px",fig.cap="Sashimi plot"}
-knitr::include_graphics("images/sashimi.png")
+knitr::include_graphics("images/sashimi3.png")
 ```
 
 * _For the (gray) coverage track_ : this track should always be available once a BAM file is loaded on IGV (if not, right click on the BAM track and select **"Show coverage track"**).  
