@@ -1,7 +1,7 @@
 ## EBAII 2022 - ChIP-seq course
 
 ### Hands-on
-Go to [hands-on](/2022/chip-seq/hands-on/)
+Go to [hands-on](hands-on/hands-on.html)
 
 ### Planning
 

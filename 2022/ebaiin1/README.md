@@ -19,14 +19,14 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing) |
-| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) |
+| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing)  [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
+| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
 
 ### (Re)découverte de R
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
-| Introduction à R | Thomas Denecker, Stevenn Volant | [[gslides](https://docs.google.com/presentation/d/1jK9-lZVmgSlPilTs4946_EiFaoQJmbvV/edit?usp=sharing&ouid=116446740554003676596&rtpof=true&sd=true)] |
+| Introduction à R | Thomas Denecker, Stevenn Volant | [[gslides](https://docs.google.com/presentation/d/1jK9-lZVmgSlPilTs4946_EiFaoQJmbvV/edit?usp=sharing&ouid=116446740554003676596&rtpof=true&sd=true)]|
 | Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
@@ -35,7 +35,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Long reads | Claude Thermes | [pdf](long_reads/20211123_ROSCOFF10_v14.pdf) |
+| Long reads | Claude Thermes | [pdf](long_reads/20221114_ROSCOFF11_v7.pdf) |
 
 ### Visualisation
 
@@ -60,7 +60,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Programme de l'atelier Variant | | [Program](DNA-seq/) |
+| Programme de l'atelier Variant | | [Program](DNAseq/) |
 | Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](DNA-seq/1-Intro_Processing-Post-Alignement.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) |
 | Variant calling & Annotation | Vivien Deshaies | [pdf](DNA-seq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
 | Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf](DNA-seq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
@@ -73,8 +73,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Support | Lien |
 |----------------------------------|------------------|
-| Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
-| Partie pratique | [TD](chip-seq/hands-on/) |
+| Partie théorique | [gslides](https://docs.google.com/presentation/d/1d2fjTy081bhrqM1HbjZ7SZPv9KNDa3Qx4u4NTsLCXmA/edit?usp=sharing) |
+| Partie pratique | [html](chip-seq/hands-on/hands-on.html) |
+| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
@@ -85,7 +86,21 @@ From there, you can also find a link to download the whole repository with `git`
 | Peak-calling | Tao Ye |
 | Analyse des motifs | Stéphanie Le Gras |
 | Annotation des pics | Tao Ye |
-| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
+| Workflow et conclusion | Rachel Legendre |
+
+
+### Single Cell RNA-Seq
+
+| Cours                            | Intervenants     | Supports |
+|----------------------------------|------------------|----------|
+| Technologie 10X et analyses primaires(1)| Morgane Thomas-Chollier, Rémi Montagne | [[gslides](https://docs.google.com/presentation/d/1rYptI4sdxeKNNbRdszlgQTa-BqBb6s2pNIYjy1GUG7A/edit#slide=id.g18915492416_1_58)] |
+| Visualisation IGV et analyses primaires(2)| Sophie Lemoine, Rémi Montagne | [[gslides - à venir]()] [ [pratique sur IGV - à venir]()] |
+| Intro R                          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html)] |
+| Analyses secondaires(1) : QC, filtrages, normalisation | Rémi Montagne, Nathalie Lehmann | [[gslides - à venir]()] |
+| Differential Gene Expression          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
+| Gene Set analysis                     | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
+
+
 
 ### Croisement et intégration des données
 
@@ -93,17 +108,9 @@ From there, you can also find a link to download the whole repository with `git`
 |----------------------------------|------------------|----------|
 | Croisement de données | Claire Toffano-Nioche, Pauline François | [gslides](https://docs.google.com/presentation/d/1IE8uBw0NPEliLF79s7hV1T2LaRLxoYzBttWn6B_4pPI/edit?usp=sharing) [soluce](https://docs.google.com/document/d/1oHT_OfGeAMB-61igEoXfC0JhqJMD0dowlvNX6cv8C1Y/edit?usp=sharing) [soluce_v2](croisement_donnees/soluce_long.sh) |
 
+
 ### Initiation Slurm
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
-
-
-### Single Cell RNA-Seq
-
-| Cours                            | Intervenants     | Supports |
-|----------------------------------|------------------|----------|
-| Intro R                          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html) |
-| Differential Gene Expression          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html) |
-| Gene Set analysis                     | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html) |
