@@ -73,8 +73,9 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Support | Lien |
 |----------------------------------|------------------|
-| Partie théorique | [gslides](https://docs.google.com/presentation/d/1v1_yncOrakL0vH_GvykNtuChM6TXI0V9c7pruSe9QOA/edit?usp=sharing) |
-| Partie pratique | [TD](chip-seq/hands-on/) |
+| Partie théorique | [gslides](https://docs.google.com/presentation/d/1d2fjTy081bhrqM1HbjZ7SZPv9KNDa3Qx4u4NTsLCXmA/edit?usp=sharing) |
+| Partie pratique | [html](chip-seq/hands-on.html) |
+| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
 | Cours | Intervenants |
 |----------------------------------|------------------|
@@ -85,7 +86,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Peak-calling | Tao Ye |
 | Analyse des motifs | Stéphanie Le Gras |
 | Annotation des pics | Tao Ye |
-| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
+| Workflow et conclusion | Rachel Legendre |
 
 
 ### Single Cell RNA-Seq
@@ -113,6 +114,3 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
 | IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
-
-
-
