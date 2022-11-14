@@ -1,31 +1,14 @@
 # IGV Single-cell Hands-on Roscoff 2022
 
+*Sophie Lemoine and Morgane Thomas-Chollier*
 
-1. [Introduction](#introduction)  
-2. [Downloading ChIP-seq reads from NCBI](#download)
-3. [Connect to the server and set up your environment](#setup)
-4. [Quality control of the reads and statistics](#qc)
-5. [Mapping the reads with Bowtie](#mapping)
-6. [Estimating the number of duplicated reads](#dup)
-7. [ChIP quality controls](#cqc)
-8. [Visualizing the data in a genome browser](#visualize)
-9. [Peak calling with MACS](#macs)
-10. [Motif analysis](#motif)
-11. [Peak annotation](#annotation)
-12. [Bonus: Peak annotation using R](#peakr)
-13. [FAQ](#faq)
-14. [References](#ref)
 
 ## Introduction <a name="introduction"></a>
 ### Goal
 The aim is to :
 
-  * blah balh
-View the data in their genomic context, to check whether the IP worked 
-
-### Summary
-Some text
-
+  * View the scRNA-seq signal in its genomic context
+  * Better understand the 3' biais in 10X Genomics datasets
 
 ## Connect to the server and set up your environment <a name="setup"></a>
 ### Connect to JupytherHub
@@ -74,22 +57,29 @@ You should see a BAM file (= mapped reads), a BAI file (for technical reasons th
     └── pbmc1k_rdx.bed
 ```
 
-
-
 ## Visualizing the signal in a genome browser <a name="visualize"></a>
 
+### 1 - Download the following files from the server onto your computer (laptop)
+1. In JupytherHub, use the menu on the left to navigate to your project folder. 
+![img1](jupyterlab_igv1.png)
 
-### 1 - Viewing the raw alignment data in IGV
-1. Download the following files from the server onto your computer (laptop)
+
+2. Once you get to the **Visualization** folder, right-click on the following files and choose **Download** to save them on your laptop
+
+![img1](jupyterlab_igv7.png)
+
   * pbmc1k_rdx.bam
   * pbmc1k_rdx.bam.bai
   * pbmc1k_rdx.bed
-2. Open IGV on your computer
-3. Keep the default genome (GRCh38/hg38)
-4. Load BAM file : 
+
+### 2 - Viewing the raw alignment data in IGV
+
+1. Open IGV on your computer
+2. Keep the default genome (GRCh38/hg38)
+3. Load BAM file : 
   * File / Load from File...
   * Select the BAM file **pbmc1k_rdx.bam**
-5. Load the BED file **pbmc1k_rdx.bed**
+4. Load the BED file **pbmc1k_rdx.bed**
 
 (the BAI file does not need to be loaded)
 
