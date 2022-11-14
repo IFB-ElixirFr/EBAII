@@ -343,21 +343,19 @@ cd /shared/projects/<your_project>/EBAII2022_chipseq/02-Mapping/bam
 module add picard/2.23.5
 
 ## Run picard
-sbatch --mem=5G --wrap=\
-"picard MarkDuplicates \
+picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576933.bam \
 OUTPUT=Marked_SRR576933.bam \
 METRICS_FILE=metrics_SRR576933.txt \
-VALIDATION_STRINGENCY=STRICT"
+VALIDATION_STRINGENCY=STRICT
 
-sbatch --mem=5G --wrap=\
-"picard MarkDuplicates \
+picard MarkDuplicates \
 CREATE_INDEX=true \
 INPUT=SRR576938.bam \
 OUTPUT=Marked_SRR576938.bam \
 METRICS_FILE=metrics_SRR576938.txt \
-VALIDATION_STRINGENCY=STRICT"
+VALIDATION_STRINGENCY=STRICT
 ```
 
 To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
@@ -429,12 +427,12 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 
   * data/Escherichia_coli_K12.fasta
   * data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf.gz
-  * 02-Mapping/bam/SRR576933.bam
-  * 02-Mapping/bam/SRR576933.bam.bai
-  * 02-Mapping/bam/SRR576934.bam
-  * 02-Mapping/bam/SRR576934.bam.bai  
-  * 02-Mapping/bam/SRR576938.bam
-  * 02-Mapping/bam/SRR576938.bam.bai
+  * 02-Mapping/bam/Marked_SRR576933.bam
+  * 02-Mapping/bam/Marked_SRR576933.bai
+  * 02-Mapping/bam/Marked_SRR576934.bam
+  * 02-Mapping/bam/Marked_SRR576934.bai  
+  * 02-Mapping/bam/Marked_SRR576938.bam
+  * 02-Mapping/bam/Marked_SRR576938.bai
 2. Open IGV on your computer
 3. Load the genome
 
@@ -952,7 +950,7 @@ library(org.Mm.eg.db)
 txdb = TxDb.Mmusculus.UCSC.mm9.knownGene
 # define colors
 col = brewer.pal(9,'Set1')
-````
+```
 
 2. read the peak files for the three datasets:
 

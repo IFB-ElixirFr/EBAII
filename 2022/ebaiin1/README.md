@@ -74,7 +74,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Support | Lien |
 |----------------------------------|------------------|
 | Partie théorique | [gslides](https://docs.google.com/presentation/d/1d2fjTy081bhrqM1HbjZ7SZPv9KNDa3Qx4u4NTsLCXmA/edit?usp=sharing) |
-| Partie pratique | [html](chip-seq/hands-on.html) |
+| Partie pratique | [html](chip-seq/hands-on/hands-on.html) |
 | Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
 | Cours | Intervenants |
