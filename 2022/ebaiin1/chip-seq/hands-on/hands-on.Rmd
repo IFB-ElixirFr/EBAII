@@ -107,7 +107,7 @@ cd EBAII2022_chipseq
 4. Copy the directory containing data
 
 ```{bash eval=FALSE}
-cp -r /shared/home/slegras/EBAII2022_chipseq/data .
+cp -r /shared/projects/form_2022_32/chipseq/EBAII2022_chipseq/data .
 ```
 
 7. Your directory structure should be like this
