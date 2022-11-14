@@ -87,6 +87,17 @@ From there, you can also find a link to download the whole repository with `git`
 | Annotation des pics | Tao Ye |
 | Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1HbueGiV3rab8a7TCHRePlXqgWIFXfCHla9jgehD9DA4/edit?usp=sharing) |
 
+
+### Single Cell RNA-Seq
+
+| Cours                            | Intervenants     | Supports |
+|----------------------------------|------------------|----------|
+| Intro R                          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html) |
+| Differential Gene Expression          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html) |
+| Gene Set analysis                     | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html) |
+
+
+
 ### Croisement et intégration des données
 
 | Cours | Intervenants | Supports |
@@ -100,10 +111,4 @@ From there, you can also find a link to download the whole repository with `git`
 | IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
 
 
-### Single Cell RNA-Seq
 
-| Cours                            | Intervenants     | Supports |
-|----------------------------------|------------------|----------|
-| Intro R                          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html) |
-| Differential Gene Expression          | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html) |
-| Gene Set analysis                     | Thibault Dayris  | [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html) |
