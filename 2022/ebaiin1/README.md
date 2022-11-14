@@ -35,7 +35,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Long reads | Claude Thermes | [pdf](long_reads/20211123_ROSCOFF10_v14.pdf) |
+| Long reads | Claude Thermes | [pdf](long_reads/20221114_ROSCOFF11_v7.pdf) |
 
 ### Visualisation
 
