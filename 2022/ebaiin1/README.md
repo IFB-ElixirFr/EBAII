@@ -19,14 +19,14 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|--------------|----------|
-| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing) |
-| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) |
+| Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing)  [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
+| Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
 
 ### (Re)découverte de R
 
 | Cours | Intervenants | Supports |
 |-----------------------|--------------|-------------------------------------|
-| Introduction à R | Thomas Denecker, Stevenn Volant | [[gslides](https://docs.google.com/presentation/d/1jK9-lZVmgSlPilTs4946_EiFaoQJmbvV/edit?usp=sharing&ouid=116446740554003676596&rtpof=true&sd=true)] |
+| Introduction à R | Thomas Denecker, Stevenn Volant | [[gslides](https://docs.google.com/presentation/d/1jK9-lZVmgSlPilTs4946_EiFaoQJmbvV/edit?usp=sharing&ouid=116446740554003676596&rtpof=true&sd=true)]|
 | Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
