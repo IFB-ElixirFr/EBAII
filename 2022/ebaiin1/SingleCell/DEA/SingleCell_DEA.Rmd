@@ -102,7 +102,7 @@ integrated_sctk <- singleCellTK::runDESeq(
   inSCE=integrated_sctk, 
   groupName1="G3", 
   groupName2="G4", 
-  analysisName="G3_vs_G4_Wilcox", 
+  analysisName="G3_vs_G4_DESeq", 
   log2fcThreshold=0.01, 
   fdrThreshold=0.05, 
   class="sample", 
@@ -489,7 +489,7 @@ Remember, a p-value can never be an absolute 0. Here, the numbers are so small, 
 
 Never consider raw P-Values, adjusted P-Values are better by far. So FDR column is the one that decides wether a gene is DE or not.
 
-Note this table contains only `r dim(dea_results)` entries, so `r dim(dea_results)` genes. This means that a "missing" gene is a non-differentially-expressed gene.
+Note this table contains only `r dim(dea_results)[1]` entries, so `r dim(dea_results)[1]` genes. This means that a "missing" gene is a non-differentially-expressed gene.
 
 Remember the FC a logged in your conclusions.
 
@@ -498,12 +498,48 @@ What about our genes: Jund and Mindy1 ?
 
 ## Heatmap
 
+```{r plot_deg_heatmap, eval=FALSE}
+singleCellTK::plotDEGHeatmap(
+  inSCE=integrated_sctk,
+  useResults="G3_vs_G4_Wilcox",
+  log2fcThreshold=0.01,
+  fdrThreshold=0.05,
+  class="sample", 
+  useAssay="SLNst"
+)
+```
+
 ![heatmap](images/heatmap_1.png)
 
 ## Violin plot
+
+```{r plot_deg_violin, eval=FALSE}
+singleCellTK::plotDEGViolin(
+  inSCE=integrated_sctk,
+  useResults="G3_vs_G4_Wilcox"
+)
+```
 
 ![violin_plot](images/violin_plot_1.png)
 
 ## Linear model plot
 
+```{r plot_deg_regression, eval=FALSE}
+singleCellTK::plotDEGRegression(
+  inSCE=integrated_sctk,
+  useResults="G3_vs_G4_Wilcox"
+)
+```
+
 ![regression_plot](images/linear_model_1.png)
+
+# TLDR – Too long, didn't read
+
+ <span style="color:green"> 
+ 
+1. Perform differential analysis with Wilxocon as long as you have lots of cells (> 300)
+1. Use the same method as the paper/work you're referring to
+1. Don't filter on Fold Change if you don't have good reasons
+1. Save your results regularly
+
+</span>
