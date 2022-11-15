@@ -22,6 +22,19 @@ From there, you can also find a link to download the whole repository with `git`
 | Introduction à Linux + arborescence|  Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1181lS4gavBcVo0Yz70n6bawAvWdUlX-H3p0cFZ4Uadg/edit?usp=sharing)  [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
 | Qualités et alignement | Thomas Denecker, Claire Toffano-Nioche | [gslides](https://docs.google.com/presentation/d/1ccuvsU7ibsn3GWMgp8wN0fOh7QmIgkIpCB-Mpt1vldU/edit?usp=sharing) [book](https://ifb-elixirfr.github.io/LinuxEBAII/00_home.html) |
 
+
+### Exposés d'ouverture
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Long reads | Claude Thermes | [pdf](long_reads/20221114_ROSCOFF11_EBAII_N1_CT.pdf) |
+
+### Visualisation
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Rachel Legendre, Pierre Pericard| [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
+
 ### (Re)découverte de R
 
 | Cours | Intervenants | Supports |
@@ -30,19 +43,6 @@ From there, you can also find a link to download the whole repository with `git`
 | Données | | [[expression.txt](intro_R/expression.txt)] [[annotation.csv](intro_R/annotation.csv)] |
 | Serveur RStudio IFB | | <https://rstudio.cluster.france-bioinformatique.fr/> |
 | Serveur Jupyter IFB | | <https://jupyterhub.cluster.france-bioinformatique.fr/> |
-
-### Exposés d'ouverture
-
-| Cours | Intervenants | Supports |
-|----------------------------------|--------------|----------|
-| Long reads | Claude Thermes | [pdf](long_reads/20221114_ROSCOFF11_v7.pdf) |
-
-### Visualisation
-
-| Cours | Intervenants | Supports |
-|----------------------------------|--------------|----------|
-| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Rachel Legendre, Pierre Pericard| [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
-
 
 ### RNA-seq
 
