@@ -62,8 +62,8 @@ From there, you can also find a link to download the whole repository with `git`
 |----------------------------------|------------------|----------|
 | Programme de l'atelier Variant | | [Program](DNAseq/) |
 | Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/1-Intro_Processing-Post-Alignement.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) |
-| Variant calling & Annotation | Vivien Deshaies | [pdf]([https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/DNAseq](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
-| Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf]([https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/master/2022/ebaiin1/DNAseq](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
+| Variant calling & Annotation | Vivien Deshaies | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/2-Variant-calling_Annotation.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
+| Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/3-Variants-Structuraux.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
 | Applications sous R | Nadia Bessoltane | [pdf](DNA-seq/?) [gslides](https://docs.google.com/presentation/d/1oOiJfcdnbIaY3G3F_CI-1nt-Op0W0aR8/) |
 | Manipuler des VCF sous R | Nadia Bessoltane | [pdf](DNA-seq/?) [gslides](https://docs.google.com/presentation/d/10W-EipRAc6146UZwVIRQCvS3Riau3QO4/) [html](DNA-seq/?) |
 | Workflow et conclusion | Nadia Bessoltane & Vivien Deshaies | [pdf](DNA-seq/6-Workflow_Conclusion.pdf) [gslides](https://docs.google.com/presentation/d/1-nON-453OfocMrXJ95fMc-JaU9KRcNnB/) |
