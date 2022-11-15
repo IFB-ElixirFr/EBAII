@@ -35,7 +35,7 @@ cd ebaii22_igv
 4. Copy the directory containing data
 
 ```bash
-cp -r /shared/project/form_22_32/SingleCellRNASeq/Visualization .
+cp -r /shared/projects/form_2022_32/SingleCellRNASeq/Visualization .
 ```
 
 7. Your directory structure should be like this
