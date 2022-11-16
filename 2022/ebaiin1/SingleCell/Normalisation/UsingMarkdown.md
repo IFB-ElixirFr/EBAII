@@ -2,7 +2,7 @@
 
 ## Initiation à l'utilisation du R markdown et knitR
 
-### Pourquoi utiliser de fichier ?
+### Pourquoi utiliser ce type de fichier ?
 
 Le fichier R markdown est un fichier dans lequel vous pouvez écrire du texte et des commandes R. Ce fichier permet ensuite de générer un rapport contenant à la fois les commandes et les résultats de ces commandes.
 
