@@ -100,6 +100,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Analyses secondaires(1) : QC, filtrages, normalisation | Rémi Montagne, Nathalie Lehmann | [[gslides](https://docs.google.com/presentation/d/1G2Tqqhj8I-Hh7xkBzaIdCB4bKSrok6KyOqcyRm7XZ2U/edit#slide=id.g18c821d1de2_1_62)] [[Regression illustrated](https://docs.google.com/presentation/d/1JEfa445mhku9RfR9VO2AkJ87gAe9Km0YnlWGkLXbZZs/edit?usp=share_link)] |
 | Analyses secondaires(2) : Visualization (PCA, UMAP, Clustering) | Audrey Onfroy | [[gslides](https://docs.google.com/presentation/d/1s_7RUSdovYipQfQDJ-CylNg-WZSp1-RGPD5L6UHVQQA/edit#slide=id.p)] |
 | Analyses secondaires(2) : Normalisation with Seurat | Bastien Job | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Normalisation/Normalization.html)] [[markdown à compléter](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Normalisation/RMarkdown.header.Rmd)] |
+| Tutoriel R markdown | Morgane Thomas-Chollier | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Normalisation/UsingMarkdown.html)] |
 | Differential Gene Expression          | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
 | Gene Set analysis                     | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
 
