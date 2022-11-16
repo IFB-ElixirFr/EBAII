@@ -111,7 +111,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Croisement de données | Claire Toffano-Nioche, Pauline François | [gslides](https://docs.google.com/presentation/d/1IE8uBw0NPEliLF79s7hV1T2LaRLxoYzBttWn6B_4pPI/edit?usp=sharing) [soluce](https://docs.google.com/document/d/1oHT_OfGeAMB-61igEoXfC0JhqJMD0dowlvNX6cv8C1Y/edit?usp=sharing) [soluce_v2](croisement_donnees/soluce_long.sh) |
+| Croisement de données | Claire Toffano-Nioche, Pauline François | [gslides](https://docs.google.com/presentation/d/1RtjDQv0BKndYUapsfagoEZhSsmGZ_ZwbIp_onxzeGIc/edit?usp=sharing) |
 
 
 ### Initiation Slurm
