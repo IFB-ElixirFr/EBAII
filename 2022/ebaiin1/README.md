@@ -94,14 +94,14 @@ From there, you can also find a link to download the whole repository with `git`
 | Cours                            | Intervenants     | Supports |
 |----------------------------------|------------------|----------|
 | Technologie 10X et analyses primaires(1)| Morgane Thomas-Chollier | [[gslides](https://docs.google.com/presentation/d/1rYptI4sdxeKNNbRdszlgQTa-BqBb6s2pNIYjy1GUG7A/edit#slide=id.g18915492416_1_58)] |
-| Visualisation IGV | Sophie Lemoine | [[gslides](https://docs.google.com/presentation/d/1TF4_31hWuuRtKS7oKk5izFxsEk8PYScxuN-ykLoptms/edit#slide=id.g188fbf08b5b_0_1260)] [ [pratique sur IGV](https://github.com/IFB-ElixirFr/EBAII/tree/master/2022/ebaiin1/SingleCell/IGV)] |
-| Intro R                          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html)] |
-| Analyses primaires(2)                         | Rémi Montagne et Bastien Job  | [[gslides](https://docs.google.com/presentation/d/1TF4_31hWuuRtKS7oKk5izFxsEk8PYScxuN-ykLoptms/edit#slide=id.g188fbf08b5b_0_1260)] [[TD](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/TD_03_Preprocessing.html)] [[SCE object](https://docs.google.com/presentation/d/162X1w-drYyvtPpSKJwHKbPlHpKeeEq3J1mcn3HaidFU/edit?usp=share_link)] |
+| Visualisation IGV | Sophie Lemoine | [[gslides](https://docs.google.com/presentation/d/1TF4_31hWuuRtKS7oKk5izFxsEk8PYScxuN-ykLoptms/edit#slide=id.g188fbf08b5b_0_1260)] [ [pratique sur IGV](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/IGV)] |
+| Intro R                          | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/R_Intro/SingleCell_IntroR_RStudio.html)] |
+| Analyses primaires(2)                         | Rémi Montagne et Bastien Job  | [[gslides](https://docs.google.com/presentation/d/1TF4_31hWuuRtKS7oKk5izFxsEk8PYScxuN-ykLoptms/edit#slide=id.g188fbf08b5b_0_1260)] [[TD](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/TD_03_Preprocessing.html)] [[SCE object](https://docs.google.com/presentation/d/162X1w-drYyvtPpSKJwHKbPlHpKeeEq3J1mcn3HaidFU/edit?usp=share_link)] |
 | Analyses secondaires(1) : QC, filtrages, normalisation | Rémi Montagne, Nathalie Lehmann | [[gslides](https://docs.google.com/presentation/d/1G2Tqqhj8I-Hh7xkBzaIdCB4bKSrok6KyOqcyRm7XZ2U/edit#slide=id.g18c821d1de2_1_62)] [[Regression illustrated](https://docs.google.com/presentation/d/1JEfa445mhku9RfR9VO2AkJ87gAe9Km0YnlWGkLXbZZs/edit?usp=share_link)] |
 | Analyses secondaires(2) : Visualization (PCA, UMAP, Clustering) | Audrey Onfroy | [[gslides](https://docs.google.com/presentation/d/1s_7RUSdovYipQfQDJ-CylNg-WZSp1-RGPD5L6UHVQQA/edit#slide=id.p)] |
 | Analyses secondaires(2) : Normalisation with Seurat | Bastien Job | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Normalisation/Normalization.html)] [[markdown à compléter](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Normalisation/RMarkdown.header.Rmd)] |
-| Differential Gene Expression          | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
-| Gene Set analysis                     | Thibault Dayris  | [[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
+| Differential Gene Expression          | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
+| Gene Set analysis                     | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
 
 
 
