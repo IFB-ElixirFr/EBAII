@@ -859,26 +859,26 @@ write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T
 7. Retrieve the list of closest genes
 
 ```{bash eval=FALSE}
-tail -n 2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{print $10}'
 ```
 
 
 8. Count occurences of each associated feature type
 ```{bash eval=FALSE}
 # sort | uniq -c to list and count occurences of each item
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{print $7}' | sort | uniq -c
 ```
 
 How many peaks are associated with promoters ?
 ```{bash eval=FALSE}
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}'
 ```
 
 **Is the number of genes in your file consistent with the previous reply?**
 
 ```{bash eval=FALSE}
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' \
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}' | wc -l
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}' \
 > FNR_anaerobic_idr_final_peaks_annotation_officialGeneSymbols.tsv
 ```
 
