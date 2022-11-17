@@ -54,7 +54,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Practice SARTools | Stevenn Volant | [ZIP archive](RNAseq/Practice_SARTools.zip) |
 | Gene set analysis | Emilie Drouineau | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_Theory.pdf) [R script](https://github.com/IFB-ElixirFr/EBAII/blob/master/2021/ebaiin1/RNAseq/GSEA_TP.R)|
 | De novo assembly | Erwan Corre | [pdf](RNAseq/RNASeq_denovo_EBAII2022_red.pdf)  |
-| Workflow | Pierre Pericard | [pdf](RNAseq/RNA-Workflow_Conclusion.pdf)  |
+| Workflow | Pierre Pericard | [gslide](https://docs.google.com/presentation/d/1O8chaQRaZsIawhHFJBpAzB8nIOaogWiL82qG96E4OE0/edit?usp=sharing)  |
 
 ### Variants
 
