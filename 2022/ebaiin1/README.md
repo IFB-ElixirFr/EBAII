@@ -104,6 +104,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Differential Gene Expression          | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
 | Gene Set analysis                     | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
 | Annotation automatique | Audrey Onfroy | [[gslides](https://docs.google.com/presentation/d/1jxU8Yjhw2hOMAeoXoW_6T7BY2jCTqz99RLR9D-3IXHM/edit?usp=share_link)] [[TD](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Annotation_SingleR.html)] |
+| scRNAseq ... beyond! | Bastien Job| [[gslides](https://docs.google.com/presentation/d/12KQbmuMkxCCrDnrFFUtKDQlD_j_kwMmiyWXHSqYfpjg/edit?usp=share_link)] |
 
 
 ### Croisement et intégration des données
