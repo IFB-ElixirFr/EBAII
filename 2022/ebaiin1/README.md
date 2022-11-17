@@ -60,7 +60,6 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| Programme de l'atelier Variant | | [Program](DNAseq/) |
 | Introduction & Processing Post-Alignement | Nadia Bessoltane & Vivien Deshaies |[pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/1-Intro_Processing-Post-Alignement.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) |
 | Variant calling & Annotation | Vivien Deshaies | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/2-Variant-calling_Annotation.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
 | Variants structuraux | Vivien Deshaies & Nadia Bessoltane | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/3-Variants-Structuraux.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
