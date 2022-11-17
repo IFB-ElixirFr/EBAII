@@ -118,4 +118,4 @@ From there, you can also find a link to download the whole repository with `git`
 
 | Cours | Intervenants | Supports |
 |----------------------------------|------------------|----------|
-| IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/cluster_slurm/20211125%20-%20EBAII2021-%20Slides%20cluster.pdf) |
+| IFB Core Cluster - Introduction slides | Gildas Le Corguillé, Julien Seiler |[gslides](https://docs.google.com/presentation/d/11r_1pqyT0jCSJ9R3w23a7mMr57eFq9fsh7ph4LmYwT0/edit?usp=sharing) |
