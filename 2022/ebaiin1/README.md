@@ -103,7 +103,7 @@ From there, you can also find a link to download the whole repository with `git`
 | Analyses secondaires(2) : Visualization (PCA, UMAP, Clustering) | Bastien Job | [[html]()] |
 | Differential Gene Expression          | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/DEA/SingleCell_DEA.html)] |
 | Gene Set analysis                     | Thibault Dayris  | [[html](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Gene_Set_Enrichment_Analysis/SingleCell_Enricher.html)] |
-| Annotation automatique | Audrey Onfroy | [[gslides](https://docs.google.com/presentation/d/1jxU8Yjhw2hOMAeoXoW_6T7BY2jCTqz99RLR9D-3IXHM/edit?usp=share_link)] [[TD](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Annotation_SingleR.html)] |
+| Annotation automatique | Audrey Onfroy | [[gslides](https://docs.google.com/presentation/d/1jxU8Yjhw2hOMAeoXoW_6T7BY2jCTqz99RLR9D-3IXHM/edit?usp=share_link)] [[TD](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/Annotation_SingleR.html)] [[workflow TP](https://ifb-elixirfr.github.io/EBAII/2022/ebaiin1/SingleCell/workflow_tableau/5_analyses_secondaires.jpg)] |
 | scRNAseq ... beyond! | Bastien Job| [[gslides](https://docs.google.com/presentation/d/12KQbmuMkxCCrDnrFFUtKDQlD_j_kwMmiyWXHSqYfpjg/edit?usp=share_link)] |
 
 
