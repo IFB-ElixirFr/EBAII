@@ -48,6 +48,9 @@ La formation approfondira progressivement l’usage de ces environnements au fil
 *Prochaines dates*:
 5 au 10 novembre 2023.
 
+*Site de demande d'inscription*:
+Pas encore ouvert.
+
 
 #### Niveau 2
 
