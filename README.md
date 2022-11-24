@@ -24,7 +24,7 @@ Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheu
 L'hébergement et la restauration sont inclus.
 Les frais de transport demeurent à la charge des participants. 
 
-![Formations](Figures/Copy_of_Maquettes_des_cours.png)
+![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
 
 
 ### Formation "traitement des données de variants, ChIP-Seq, bulk RNA-Seq, et single-cell RNA-Seq"
