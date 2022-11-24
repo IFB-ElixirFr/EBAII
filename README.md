@@ -5,6 +5,8 @@
 
 ## Description
 
+![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
+
 EBAII propose plusieurs école différentes.
 
 Elles sont basées sur une alternance de courtes sessions théoriques et d'ateliers pratiques.
@@ -23,8 +25,6 @@ Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheu
 1000€ HT pour les académiques et EPIC; 2500€ HT pour les industriels.
 L'hébergement et la restauration sont inclus.
 Les frais de transport demeurent à la charge des participants. 
-
-![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
 
 
 ### Formation "traitement des données de variants, ChIP-Seq, bulk RNA-Seq, et single-cell RNA-Seq"
