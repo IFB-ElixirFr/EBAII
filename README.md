@@ -13,7 +13,11 @@ Les participants bénéficieront d’un tutorat personnalisé pour élaborer leu
 
 *Le tutorat n'a pas pour vocation de réaliser l’analyse complète des données des participants.*
 
+*Langue*:
 Les cours seront prodigués uniquement en Français.
+
+*Public visé*: 
+Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheurs, enseignants-chercheurs, praticiens…) confrontés à l’analyse de données NGS, et qui ne disposent pas des compétences bioinformatiques suffisantes, ou cherchent à les consolider (en fonction du niveau de la formation).
 
 *Frais d’inscription*:
 1000€ HT pour les académiques et EPIC; 2500€ HT pour les industriels.
@@ -29,8 +33,7 @@ Cette formation propose pour l'instant deux niveaux (débutant, et initié).
 #### Niveau 1
 
 *Objectifs*:
-La formation s'adresse à des biologistes directement impliqués dans des projets "Next Generation Sequencing" (NGS).
-Cette édition de l'école aborde les nouveaux enjeux technologiques: elle s'articulera autour de quatre ateliers thématiques en session parallèle (single-cell RNA-Seq, bulk RNA-seq, ChIP-seq/ATAC-seq, variants DNA-seq).
+L'école s'articulera autour de quatre ateliers thématiques en session parallèle (single-cell RNA-Seq, bulk RNA-seq, ChIP-seq/ATAC-seq, variants DNA-seq).
 L'école inclura également une introduction aux technologies "long reads".
 
 L'école vise à introduire les concepts et à manipuler les outils informatiques et à en interpréter les résultats.
@@ -55,14 +58,7 @@ Pas encore ouvert.
 #### Niveau 2
 
 *Objectifs*:
-La formation s'adresse à des biologistes directement impliqués dans des projets "Next Generation Sequencing" (NGS).
-Cette édition de l'école aborde les nouveaux enjeux technologiques: elle s'articulera autour de trois ateliers thématiques en session parallèle (RNA-seq, ChIP-seq, variants DNA-seq), et abordera la visualisation et l'intégration des données. 
-
-*Langue*:
-Les cours seront prodigués uniquement en français.
-
-*Public visé*: 
-Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheurs, enseignants-chercheurs, praticiens…) confrontés à l’analyse de données NGS, et qui cherchent à consolider leurs connaissances en bioinformatique afin d’analyser des plans expérimentaux relativement complexes. 
+L'école s'articulera autour de trois ateliers thématiques en session parallèle (RNA-seq, ChIP-seq, variants DNA-seq), et abordera la visualisation et l'intégration des données. 
 
 *Environnement de travail*:
 L'ensemble de la formation reposera sur l’utilisation de commandes en ligne (terminal Linux) et du langage R. 
@@ -82,16 +78,12 @@ Pas encore ouvert.
 Il n'y a pour l'instant qu'un seul niveau.
 
 *Objectifs*:
-La formation s'adresse à des biologistes directement impliqués dans des projets "Next Generation Sequencing" (NGS), pour l'assemblage et l'annotation de novo de génomes.
-Cette édition de l’école aborde les nouveaux enjeux technologiques: elle s'articulera autour des différentes étapes qui mèneront à l'obtention d’un génome annoté à partir de données "long reads" et "hybride": contrôle qualité des données, assemblage, scaffolding, polishing, annotation structurale et fonctionnelle (en session parallèle pour les procaryotes et les eucaryotes). 
+L'école s'articulera autour des différentes étapes qui mèneront à l'obtention d’un génome annoté à partir de données "long reads" et "hybride": contrôle qualité des données, assemblage, scaffolding, polishing, annotation structurale et fonctionnelle (en session parallèle pour les procaryotes et les eucaryotes). 
 
 L'école vise à introduire les concepts, à manipuler les outils informatiques et à en interpréter les résultats.
 
 *Durée*:
 Du lundi, 9h, au vendredi, 14h.
-
-*Public visé*: 
-Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheurs, enseignants-chercheurs, praticiens…) confrontés à l'analyse de données NGS, et qui ne disposent pas des compétences bioinformatiques suffisantes. 
 
 *Environnement de travail*:
 L'ensemble de la formation reposera sur l'utilisation de Galaxy. 
