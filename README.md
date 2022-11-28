@@ -32,7 +32,7 @@ Les frais de transport demeurent à la charge des participants. 
 
 Cette formation propose pour l'instant deux niveaux (débutant, et initié).
 
-#### Niveau 1
+#### Niveau débutant
 
 *Objectifs*:
 L'école s'articulera autour de quatre ateliers thématiques en session parallèle (single-cell RNA-Seq, bulk RNA-seq, ChIP-seq/ATAC-seq, variants DNA-seq).
@@ -57,7 +57,7 @@ La formation approfondira progressivement l’usage de ces environnements au fil
 Pas encore ouvert.
 
 
-#### Niveau 2
+#### Niveau intermédiaire
 
 *Objectifs*:
 L'école s'articulera autour de trois ateliers thématiques en session parallèle (RNA-seq, ChIP-seq, variants DNA-seq), et abordera la visualisation et l'intégration des données. 
@@ -66,7 +66,7 @@ L'école s'articulera autour de trois ateliers thématiques en session parallèl
 L'ensemble de la formation reposera sur l’utilisation de commandes en ligne (terminal Linux) et du langage R. 
 
 *Prérequis*:
-Les candidats doivent avoir acquis les compétences enseignées durant l'école de niveau 1: un niveau de base en ligne de commande, R, et (au choix) RNA-seq, ChIP-seq ou variants DNA-seq.
+Les candidats doivent avoir acquis les compétences enseignées durant l'école de niveau débutant: un niveau de base en ligne de commande, R, et (au choix) RNA-seq, ChIP-seq ou variants DNA-seq.
 
 *Prochaines dates*:
 4 au 9 juin 2023.
@@ -75,7 +75,7 @@ Les candidats doivent avoir acquis les compétences enseignées durant l'école 
 Pas encore ouvert.
 
 
-### Une formation "assemblage et annotation de génomes procaryotes et eucaryotes"
+### Formation "assemblage et annotation de génomes procaryotes et eucaryotes"
 
 Il n'y a pour l'instant qu'un seul niveau.
 
@@ -109,12 +109,23 @@ Pas encore ouvert.
 
 ## Matériel pédagogique
 
-- [Session 2022 niveau 1](2022/ebaiin1/README.md)
-- [Session 2022 Assemblage et annotation](2022/Assemblage/README.md)
-- [Session 2021 niveau 1](2021/ebaiin1/README.md)
-- [Session 2021 niveau 2](2021/ebaiin2/README.md)
-- [Session 2020](2020/README.md)
-- [Sessions précédentes](http://france-bioinformatique.fr/)
+### 2022
+
+- [Analyse et traitement de données NGS, niveau débutant](2022/ebaiin1/README.md)
+- [Assemblage et annotation](2022/Assemblage/README.md)
+
+### 2021
+
+- [Analyse et traitement de données NGS, niveau débutant](2021/ebaiin1/README.md)
+- [Analyse et traitement de données NGS, niveau intermédiare](2021/ebaiin2/README.md)
+
+### 2020
+
+- [Analyse et traitement de données NGS, niveau débutant](2020/README.md)
+
+### Sessions précédentes
+
+[Voir le site de l'IFB](http://france-bioinformatique.fr/)
 
 
 ## Liens
