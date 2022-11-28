@@ -7,7 +7,7 @@
 
 ![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
 
-EBAII propose plusieurs école différentes.
+EBAII propose plusieurs écoles différentes.
 
 Elles sont basées sur une alternance de courtes sessions théoriques et d'ateliers pratiques.
 
