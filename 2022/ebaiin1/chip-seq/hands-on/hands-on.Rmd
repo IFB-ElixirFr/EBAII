@@ -149,7 +149,7 @@ Your directory structure should be like this
 
 3. Get FastQC available in your environment
 ```{bash eval=FALSE}
-module add fastqc/0.11.9
+module load fastqc/0.11.9
 ```
 4. Check the help page of the program to see its usage and parameters.
 
@@ -180,7 +180,7 @@ Are there any concerns raised by the report ? If so, can you tell where the prob
 
 10. Once you are done with FastQC, unload it
 ```{bash eval=FALSE}
-module rm fastqc/0.11.9
+module unload fastqc/0.11.9
 ```
 
 <!-- ### 2 - Organism length
@@ -204,7 +204,7 @@ There are multiple programs to perform the mapping step. For reads produced by a
 ## - Bowtie
 1. Load Bowtie
 ```{bash eval=FALSE}
-module add bowtie/1.3.1
+module load bowtie/1.3.1
 ```
 2. Try out bowtie
 ```{bash eval=FALSE}
@@ -293,7 +293,7 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
   * -b: output BAM
 ```{bash eval=FALSE}
 ## First load samtools
-module add samtools/1.15.1
+module load samtools/1.15.1
 ## Then run samtools
 samtools sort -o SRR576933.bam -O BAM SRR576933.sam
 ```
@@ -313,7 +313,7 @@ Open the file SRR576933.out (for example using the ` less ` command), which cont
 
 7. Once it's done, unload the tools you used
 ```{bash eval=FALSE}
-module rm samtools/1.15.1 bowtie/1.3.1
+module unload samtools/1.15.1 bowtie/1.3.1
 ```
 
 ## - Map the second replicate and the control
@@ -340,7 +340,7 @@ cd /shared/projects/<your_project>/EBAII2022_chipseq/02-Mapping/bam
 
 ```{bash eval=FALSE}
 ## Load picard
-module add picard/2.23.5
+module load picard/2.23.5
 
 ## Run picard
 picard MarkDuplicates \
@@ -362,7 +362,7 @@ To determine the number of duplicated reads marked by Picard, we can run the `sa
 
 ```{bash eval=FALSE}
 ## Add samtools to your environment
-module add samtools/1.15.1
+module load samtools/1.15.1
 ## run samtools
 samtools flagstat Marked_SRR576933.bam
 ```
@@ -370,7 +370,7 @@ samtools flagstat Marked_SRR576933.bam
 Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq/)
 ```{bash eval=FALSE}
 ## Unload picard and samtools
-module rm samtools/1.15.1 picard/2.23.5
+module unload samtools/1.15.1 picard/2.23.5
 ## If you are in 02-Mapping/bam
 cd ../..
 ```
@@ -394,7 +394,7 @@ cd 03-ChIPQualityControls
   * -plot: File name of the output figure (extension can be either “png”, “eps”, “pdf” or “svg”)
 ```{bash eval=FALSE}
 ## Load deeptools in your environment
-module add deeptools/3.5.0
+module load deeptools/3.5.0
 ## Run deeptools fingerprint
 plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02-Mapping/bam/SRR576934.bam ../02-Mapping/bam/SRR576938.bam -plot fingerprint_10000.png
 ```
@@ -410,7 +410,7 @@ cp /shared/home/slegras/EBAII2022_chipseq/03-ChIPQualityControls/fingerprint.png
 Go back to working home directory (i.e /shared/projects/training/\<login\>/EBAII2022_chipseq)
 ```{bash eval=FALSE}
 ## Unload deepTools
-module rm deeptools/3.5.0
+module unload deeptools/3.5.0
 ## If you are in 03-ChIPQualityControls
 cd ..
 ```
@@ -454,7 +454,7 @@ However, looking at BAM file as such does not allow to directly compare the two 
 1. Try it out
 ```{bash eval=FALSE}
 ## Load deeptools in your environment
-module add deeptools/3.5.0
+module load deeptools/3.5.0
 ## run bamCoverage
 bamCoverage --help
 ```
@@ -542,7 +542,7 @@ cd 05-PeakCalling/replicates
 3. Try out MACS2
 ```{bash eval=FALSE}
 ## Load macs2 in your environment
-module add macs2/2.2.7.1
+module load macs2/2.2.7.1
 macs2 callpeak
 ```
 This prints the help of the program.
@@ -627,7 +627,7 @@ Your directory structure should be like this:
 2. Load the module idr and have a look at its parameters
 ```{bash eval=FALSE}
 ## Load idr in your environment
-module add idr/2.0.4.2
+module load idr/2.0.4.2
 idr --help
 ```
 
@@ -647,8 +647,8 @@ idr --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak ../replicates/FNR_A
 
 4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2022_chipseq)
 ```{bash eval=FALSE}
-module rm macs2/2.2.7.1
-module rm idr/2.0.4.2
+module unload macs2/2.2.7.1
+module unload idr/2.0.4.2
 
 ## If you are in 05-PeakCalling/idr
 cd ../..
@@ -705,12 +705,12 @@ Your directory structure should be like this:
 3. Extract peak sequence in fasta format
 ```{bash eval=FALSE}
 ## First load samtools
-module add samtools/1.15.1
+module load samtools/1.15.1
 ## Create an index of the genome fasta file
 samtools faidx ../data/Escherichia_coli_K12.fasta
 
 ## First load bedtools
-module add bedtools/2.30.0
+module load bedtools/2.30.0
 ## Extract fasta sequence from genomic coordinate of peaks
 bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 -bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed -fo FNR_anaerobic_idr_peaks.fa
@@ -786,7 +786,7 @@ cut -f1-5 ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed | \
 3. Try annotatePeaks.pl
 ```{bash eval=FALSE}
 ## First load bedtools
-module add homer/4.11
+module load homer/4.11
 
 ## run Homer annotatePeaks
 annotatePeaks.pl --help
@@ -859,26 +859,26 @@ write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T
 7. Retrieve the list of closest genes
 
 ```{bash eval=FALSE}
-tail -n 2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{print $10}'
 ```
 
 
 8. Count occurences of each associated feature type
 ```{bash eval=FALSE}
 # sort | uniq -c to list and count occurences of each item
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{print $7}' | sort | uniq -c
 ```
 
 How many peaks are associated with promoters ?
 ```{bash eval=FALSE}
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}'
 ```
 
 **Is the number of genes in your file consistent with the previous reply?**
 
 ```{bash eval=FALSE}
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' \
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}' | wc -l
+tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk -F "\t" '{if ($7=="promoter-TSS") print $10}' \
 > FNR_anaerobic_idr_final_peaks_annotation_officialGeneSymbols.tsv
 ```
 

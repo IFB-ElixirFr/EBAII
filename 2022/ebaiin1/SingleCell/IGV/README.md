@@ -35,7 +35,7 @@ cd ebaii22_igv
 4. Copy the directory containing data
 
 ```bash
-cp -r /shared/project/form_22_32/SingleCellRNASeq/Visualization .
+cp -r /shared/projects/form_2022_32/SingleCellRNASeq/Visualization .
 ```
 
 7. Your directory structure should be like this
@@ -49,7 +49,7 @@ You can check your directory structure:
  ```bash
  tree
 ```
-You should see a BAM file (= mapped reads), a BAI file (for technical reasons this file must be present for IGV) and a BED file (contains a summary of the BAM with alignment position. This file is not mandatory, but it can be useful as less heavy than BAM)
+You should see a **BAM** file (= mapped reads), a **BAI** file (for technical reasons this file must be present for IGV) and a **BED** file (contains a summary of the BAM with alignment position. This file is not mandatory, but it can be useful as less heavy than BAM)
  ```
  └── Visualization
     ├── pbmc1k_rdx.bam
@@ -68,6 +68,8 @@ You should see a BAM file (= mapped reads), a BAI file (for technical reasons th
 
 ![img1](jupyterlab_igv7.png)
 
+You should have these 3 files on your laptop :
+
   * pbmc1k_rdx.bam
   * pbmc1k_rdx.bam.bai
   * pbmc1k_rdx.bed
@@ -84,6 +86,6 @@ You should see a BAM file (= mapped reads), a BAI file (for technical reasons th
 (the BAI file does not need to be loaded)
 
 **Browse around in the genome. Do you see peaks?** 
-**Where are located the peaks, in refence to the annotated genes ?**   
+**Where are located the peaks, in reference to the annotated genes ?**   
 
 
