@@ -9,6 +9,11 @@
 *.rdb
 *.rdx
 *.tsv
+*.log
+2023/ebaiin1/Example/Session_example_ipynb/ipython-notebook/
+2023/ebaiin1/Example/Session_example_html/ipython-notebook/
+2023/ebaiin1/Example/Session_example_rmd/rmarkdown/
+2023/ebaiin1/Example/jupyter-book/
 README.html
 *~
 .DS_Store
