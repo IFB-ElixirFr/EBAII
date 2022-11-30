@@ -1,3 +1,3 @@
 # Pure Markdown: Theory
 
-Jupyter notebook allow direct inclusion of Markdown files.
+Jupyter notebook allow direct inclusion of [Markdown](https://www.markdownguide.org/) files.

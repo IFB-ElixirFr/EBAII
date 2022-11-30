@@ -1,18 +1,22 @@
 Pure Ipynb: practice part
 =========================
 
-Feel free to add things here too.
+Inclusion of IPython notebook is quite straightforward.
 
-.. code:: ipython3
+Environment conda:
+``mamba env create -f environment.yaml -p ./ipython-notebook``
 
-    print("python is the best language in the world")
+Load conda environment: ``conda activate --no-stack ./ipython-notebook``
 
+Convert ipython-notebook to rst:
+``jupyter nbconvert --to rst Practice.ipynb`` for Practice.rst, and
+``jupyter nbconvert --to rst Theory.ipynb``
 
-.. parsed-literal::
+Now go to general section to compile the whole book.
 
-    python is the best language in the world
+PS:
+^^^
 
-
-::
-
-   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Note you can activate a conda environment within a notebook. See on
+`StackOverflow <https://stackoverflow.com/questions/74597051/activate-conda-environment-inside-r-script>`__.
+But I would highly discourage it.

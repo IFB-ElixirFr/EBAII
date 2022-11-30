@@ -1,14 +1,19 @@
-Pure Ipynb: Theory
-==================
+Pure Ipython-notebook: Theory
+=============================
 
-You can work here as you would in any other ipython notebok.
+Find more information about:
+
+1. `Ipython-notebooks <https://ipython.org/notebook>`__
 
 .. code:: ipython3
 
-    print "You can write R/perl/python/sh ... in a ipython notebook."
+    print("You can write R/perl/python/sh ... in a ipython notebook.")
 
 
 .. parsed-literal::
 
-    Theory with code
+    You can write R/perl/python/sh ... in a ipython notebook.
 
+
+Ipython notebooks can be included as either restructured text, or
+markdown.

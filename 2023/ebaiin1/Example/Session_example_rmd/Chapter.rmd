@@ -1,8 +1,0 @@
----
-title: "R Notebook Theory for Example Session"
-output: html_document
----
-
-# Chapter "pure RMarkdown"
-
-Please see here results of pure r-markdown examples.
