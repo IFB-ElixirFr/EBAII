@@ -102,9 +102,8 @@ Pas encore ouvert.
 
 ## Contacts
 
-[Renseignements](mailto:ecole-bioinfo@aviesan.fr)
-
-[Compte twitter](https://twitter.com/EBAI_Roscoff)
+ - [Renseignements](mailto:ecole-bioinfo@aviesan.fr)
+ - [Compte twitter](https://twitter.com/EBAI_Roscoff)
 
 
 ## Matériel pédagogique
