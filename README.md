@@ -69,11 +69,10 @@ L'ensemble de la formation reposera sur l’utilisation de commandes en ligne (t
 Les candidats doivent avoir acquis les compétences enseignées durant l'école de niveau débutant: un niveau de base en ligne de commande, R, et (au choix) RNA-seq, ChIP-seq ou variants DNA-seq.
 
 *Prochaines dates*:
-4 au 9 juin 2023.
+5 au 9 juin 2023.
 
 *Site de demande d'inscription*:
-Pas encore ouvert.
-
+https://sondages.inrae.fr/index.php/327339?lang=fr
 
 ### Formation "assemblage et annotation de génomes procaryotes et eucaryotes"
 
