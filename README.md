@@ -72,7 +72,7 @@ Les candidats doivent avoir acquis les compétences enseignées durant l'école 
 5 au 9 juin 2023.
 
 *Site de demande d'inscription*:
-https://sondages.inrae.fr/index.php/327339?lang=fr
+[https://sondages.inrae.fr/index.php/327339?lang=fr](https://sondages.inrae.fr/index.php/327339?lang=fr)
 
 ### Formation "assemblage et annotation de génomes procaryotes et eucaryotes"
 
