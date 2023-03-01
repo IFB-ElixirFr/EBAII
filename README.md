@@ -2,6 +2,12 @@
 
 **Ecole de Bioinformatique Aviesan - IFB - Inserm (EBAII)**
 
+---
+
+*Les demandes d'inscriptions pour la formation de niveau débutant sont ouvertes sur [le site d'inscription](https://sondages.inrae.fr/index.php/42796?lang=fr).*
+
+---
+
 
 ## Description
 
@@ -54,7 +60,7 @@ La formation approfondira progressivement l’usage de ces environnements au fil
 5 au 10 novembre 2023.
 
 *Site de demande d'inscription*:
-Pas encore ouvert.
+https://sondages.inrae.fr/index.php/42796?lang=fr 
 
 
 #### Niveau intermédiaire
@@ -72,7 +78,7 @@ Les candidats doivent avoir acquis les compétences enseignées durant l'école 
 5 au 9 juin 2023.
 
 *Site de demande d'inscription*:
-[https://sondages.inrae.fr/index.php/327339?lang=fr](https://sondages.inrae.fr/index.php/327339?lang=fr)
+Clos.
 
 ### Formation "assemblage et annotation de génomes procaryotes et eucaryotes"
 
