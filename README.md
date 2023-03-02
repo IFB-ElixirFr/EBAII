@@ -4,7 +4,7 @@
 
 ---
 
-*Les demandes d'inscriptions pour la formation de niveau débutant sont ouvertes sur [le site d'inscription](https://sondages.inrae.fr/index.php/42796?lang=fr).*
+*Les demandes d'inscriptions pour la formation de niveau débutant (du 5 au 10 novembre 2023) sont ouvertes sur [le site d'inscription](https://sondages.inrae.fr/index.php/42796?lang=fr).*
 
 ---
 
