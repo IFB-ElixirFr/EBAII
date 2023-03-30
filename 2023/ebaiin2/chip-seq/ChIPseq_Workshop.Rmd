@@ -1,0 +1,1399 @@
+---
+title: "EBAIIn2 - ChIP-seq Workshop"
+author: "Elodie Darbo$^{1}$ - elodie.darbo@u-bordeaux.fr; Stephanie Le Gras$^{2}$ - slegras@igbmc.fr"
+date: "2021 May"
+output:
+  html_document:
+    fig_caption: yes
+    toc: true
+    toc_depth: 5
+    toc_float: true
+    number_sections: true
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    toc: true
+    toc_depth: 3
+params:
+  ensembl: 103
+  assembly: hg38
+  organism: Homo sapiens
+  chipseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/ChIPseq/
+  mapping.chipseq: stats_mappingChIPseq.tsv
+  peakcalling.chipseq: stats_peakCalling.tsv
+  #chipseq: /Users/elodiedarbo/Documents/enseignement/EBAIIv2_2021/data/ChIPseq/
+  brg1: BRG1siCTRL_CHIP-seq_peaks.narrowPeak
+  mitf: MITF_CHIP-seq_peaks.narrowPeak
+  sox10: SOX10_CHIP-seq_peaks.narrowPeak
+  brg1.bw: BRG1siCTRL_CHIP-seq.bw
+  mitf.bw: MITF_CHIP-seq.bw
+  sox10.bw: SOX10_CHIP-seq.bw
+  rnaseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData
+  #rnaseq: /Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData
+  annot: "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/annot.RData"
+  #annot: "/Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/data/annot.RData"
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
+#knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
+```
+
+$^1$ Université de Bordeaux, INSERM U1218
+
+$^2$ GenomEast platform, IGBMC
+
+```{r,echo=F,warning=F,message=F}
+library(EnrichedHeatmap)
+library(ggplot2)
+library(ChIPpeakAnno)
+library(ChIPseeker)
+library(circlize)
+library(rtracklayer)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+library(org.Hs.eg.db)
+
+```
+
+
+```{r, eval=F,echo=F}
+params <- list(chipseq = "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/ChIPseq/",
+              mapping.chipseq= "stats_mappingChIPseq.tsv",
+              peakcalling.chipseq="stats_peakCalling.tsv",
+              brg1= "BRG1siCTRL_CHIP-seq_peaks.narrowPeak",
+              mitf= "MITF_CHIP-seq_peaks.narrowPeak",
+              sox10= "SOX10_CHIP-seq_peaks.narrowPeak",
+              brg1.bw= "BRG1siCTRL_CHIP-seq.bw",
+              mitf.bw= "MITF_CHIP-seq.bw",
+              sox10.bw= "SOX10_CHIP-seq.bw",
+              rnaseq= "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData",
+              annot="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/annot.Rdata"
+)
+```
+
+# Introduction
+During this training session, we are going to use ChIP-seq and RNA-seq data from Laurette et al. [@laurette_transcription_2015] which are available in GEO as [GSE61967](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE61967). Data have already been processed.
+
+## Processing of RNA-seq data
+### Preprocessing
+Reads were preprocessed in order to remove adapter, polyA and low-quality sequences (Phred quality score below 20). After this preprocessing, reads shorter than 40 bases were discarded for further analysis. These preprocessing steps were performed using cutadapt [@martin_cutadapt_2011] version 1.10.
+
+### Mapping
+Reads were mapped onto the hg38 assembly of Homo sapiens genome using STAR [@dobin_star:_2013] version 2.5.3a.
+
+### Quantification
+Gene expression quantification was performed from uniquely aligned reads using htseq-count version 0.6.1.p1 [@anders_htseqpython_2015], with annotations from Ensembl version 103 and “union” mode. Only non-ambiguously assigned reads have been retained for further analyses.
+
+### Normalization
+Read counts have been normalized across samples with the median-of-ratios method proposed by Anders and Huber [@AND2010], to make these counts comparable between samples.
+
+### Differential expression analysis
+Differential expressed genes between wild type ans shBRG1 cells was performed using the `edgeR` R package [@Robinson2010]. We called significant changes when FDR < 0.01, absolute log fold change over 1 and minimum average log normalized count over 5.
+
+## Processing of ChIP-seq data
+### Mapping
+Reads were mapped to ``r params$organism`` genome (assembly ``r params$assembly``) using Bowtie [@langmead_ultrafast_2009] v1.0.0 with default parameters except for "-p 3 -m 1 --strata --best --chunkmbs 128". The following table shows the number of reads aligned to the ``r params$organism`` genome.
+
+```{r stats.chipseq, echo=FALSE}
+align.stat <- read.table(paste0(params$chipseq, params$mapping.chipseq), sep="\t", quote="", header=T, check.names = F)
+library(knitr)
+align.stat = align.stat[order(align.stat$"Sample ID"),]
+kable(align.stat, caption = "Mapping statistics of ChIP-seq data analyzed during this training session. Column \"Raw reads\" corresponds to the number of input reads. Column \"Aligned reads\" corresponds to the number of reads aligned exactly 1 time. Column \"Multimapped\" corresponds to the number of reads aligned > 1 times. Column \"Unmapped\" corresponds to the number of reads aligned 0 time.", row.names = FALSE)
+```
+
+### Peak Calling
+Prior to peak calling, reads falling into Encode blacklisted regions [@anshulkundaje_2014] were removed using bedtools intersect v2.26.0 [@quinlan_bedtools:_2010]. Then peak calling was done with Macs2 v2.1.1 with default parameters.
+
+```{r peakcalling, echo=FALSE}
+peak.stat <- read.table(paste0(params$chipseq,params$peakcalling.chipseq), sep="\t", quote="", header=T, check.names = F)
+peak.stat = peak.stat[order(peak.stat$"IP sample"),]
+kable(peak.stat, caption = "Number of peaks detected", row.names = FALSE)
+```
+
+### Generation of BigWig files
+Normalized BigWig files were generated using Homer [@heinz_simple_2010] makeUCSCfile v4.11.0 with the following parameter ’-norm 1e7’ meaning that data were normalized to 10M reads.
+
+## Define the paths to the data
+
+We create a list containing the absolute paths to the data we will use along the practice and their file names.
+
+```{r, eval=F,echo=T}
+params <- list(
+  chipseq= "/shared/projects/ebai2021_n2/data/chip_seq/ChIPseq/",
+  mapping.chipseq= "stats_mappingChIPseq.tsv",
+  peakcalling.chipseq="stats_peakCalling.tsv",
+  brg1= "BRG1siCTRL_CHIP-seq_peaks.narrowPeak",
+  mitf= "MITF_CHIP-seq_peaks.narrowPeak",
+  sox10= "SOX10_CHIP-seq_peaks.narrowPeak",
+  brg1.bw= "BRG1siCTRL_CHIP-seq.bw",
+  mitf.bw= "MITF_CHIP-seq.bw",
+  sox10.bw= "SOX10_CHIP-seq.bw",
+  rnaseq= "/shared/projects/ebai2021_n2/data/chip_seq/RNAseq/RNAseq_diff_norm.RData"
+  )
+```
+
+# Description and statistics of BRG1 dataset
+## Load data
+Peak files are in narrowPeak format which is of the form ([source](https://genome.ucsc.edu/FAQ/FAQformat.html#format12)):
+
+1. chrom - Name of the chromosome (or contig, scaffold, etc.).
+2. chromStart - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.
+3. chromEnd - The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature. For example, the first 100 bases of a chromosome are defined as chromStart=0, chromEnd=100, and span the bases numbered 0-99.
+4. name - Name given to a region (preferably unique). Use "." if no name is assigned.
+5. score - Indicates how dark the peak will be displayed in the browser (0-1000). If all scores were "'0"' when the data were submitted to the DCC, the DCC assigned scores 1-1000 based on signal value. Ideally the average signalValue per base spread is between 100-1000.
+6. strand - +/- to denote strand or orientation (whenever applicable). Use "." if no orientation is assigned.
+7. signalValue - Measurement of overall (usually, average) enrichment for the region.
+8. pValue - Measurement of statistical significance (-log10). Use -1 if no pValue is assigned.
+9. qValue - Measurement of statistical significance using false discovery rate (-log10). Use -1 if no qValue is assigned.
+10. peak - Point-source called for this peak; 0-based offset from chromStart. Use -1 if no point-source called.
+
+```{r loadData, include=TRUE}
+## The package ChIPseeker provides a function to load peak files such as narrowPeaks as GRanges objects
+## Here BRG1 peak set is loaded into a list of peaks
+## this list can be extended if there are more datasets
+library(ChIPseeker)
+peaks <- list()
+peaks[["BRG1"]] <- readPeakFile(paste0(params$chipseq, params$brg1), as="GRanges")
+peaks
+```
+
+Peaks are stored as **GenomicRanges** objects; this is an R format which look like the bed format, but is optimized in terms of memory requirements and speed of execution.
+
+We can start by computing some basic statistics on the peak sets.
+
+## How many peaks were called?
+Compute the number of peaks per dataset. We use here a function from the `apply` family which help to apply recursively a given function on elements of the object. We will use these functions all along the course.
+```{r peaksStats2, include=TRUE}
+# sapply() function takes list, vector or data frame as input and gives output in vector or matrix
+# sapply apply the same function (here length) to all elements
+# of the list "peaks"
+sapply(peaks,length)
+```
+
+Make a simple `barplot` showing the number of BRG1 peaks.
+
+<details>
+  <summary> Show code: barplot </summary>
+```{r simplebarplot, include=TRUE, out.width="50%", fig.align = 'center'}
+barplot(sapply(peaks,length))
+```
+</details>
+
+Let's create a barplot with ggplot2 out of this data.
+\
+Step by step:
+\
+- Do not forget to load the ggplot2 library.
+
+<details>
+  <summary> Show code: load ggplot2 </summary>
+```{r loadggplot, include=TRUE}
+# Load ggplot2 library
+library(ggplot2)
+```
+</details>
+
+- Create a data.frame with two columns: IP contains names of the chipped TFs and NbPeaks contains the number of peaks.
+
+<details>
+  <summary> Show code: create the data.frame </summary>
+```{r peakLengths, include=TRUE}
+# create a table with the data to display
+peak.lengths <- data.frame(IP=names(peaks),
+                           NbPeaks=sapply(peaks,length))
+```
+</details>
+
+- use ggplot2 with the appropriate geometric object `geom_*`
+
+<details>
+  <summary> Show code: barplot with ggplot2 </summary>
+```{r enhancedbarplot, include=TRUE, out.width="50%",fig.align = 'center'}
+# make the barplot
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks)) +
+         geom_col()
+```
+</details>
+
+We can customize the plots by changing colors.
+
+```{r enhancedbarplotBis, include=TRUE}
+# Let's add colors to the barplot
+# In R it exists some already defined colors palettes
+# the most widely used palette is RColorBrewer.
+# This R library offers several color palettes
+# See:
+library(RColorBrewer)
+par(mar=c(3,4,2,2))
+display.brewer.all()
+```
+
+
+Now lets add colors to the barplot.
+\
+Step by step:
+\
+- Add the new information fill=IP to let ggplot know that colors change based on chipped protein
+
+<details>
+  <summary> Show code: color according to the chipped TF (column IP) </summary>
+```{r enhancedbarplotfollow1, include=TRUE, fig.show="hold", out.width="50%", fig.align = 'center'}
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_col()
+```
+</details>
+
+We want to use colors from `RColorBrewer` library with the "Set1" color palette. To set your own colors to fill the plot, several functions are available (`scale_fill_*`), here we use `scale_fill_brewer`.
+
+<details>
+  <summary> Show code: color according to the chipped TF (column IP) and set RColorBrewer palette to Set1 </summary>
+```{r enhancedbarplotfollow2, include=TRUE, fig.show="hold", out.width="50%", fig.align = 'center'}
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_col()+
+         scale_fill_brewer(palette="Set1")
+```
+</details>
+
+## How large are these peaks?
+
+BRG1 peaks were loaded as a `GRanges` object.
+\
+- To manipulate it we load the library `GenomicRanges`
+- Use the appropriate function to retrieve the **width** of the peaks from the `GRanges`
+- Use a function to summarize the peak length (display the statistics (minimum, maximum, quartiles) of the distribution)
+
+
+<details>
+  <summary> Show code: Display peak length statistics </summary>
+```{r peakWidth, message=FALSE, include=TRUE}
+## we use the function width() from GenomicRanges
+library(GenomicRanges)
+summary(width(peaks$BRG1))
+# or quantile(width(peaks$BRG1))
+```
+</details>
+
+Create a simple `boxplot` of the peak sizes.
+
+<details>
+  <summary> Show code: Display peak length statistics as a boxplot </summary>
+```{r simpleboxplot, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+peak.width <- lapply(peaks,width)
+boxplot(peak.width)
+```
+</details>
+
+
+Now, create a nice looking boxplot with `ggplot2`. `ggplot` takes a data frame as input. We can either create a date frame, this is what we have done when we created the barplot. Here, we are going to use the package `reshape2` which, among all its features, can create a data frame from other types of data:
+```{r reshape, message=FALSE, include=TRUE}
+# Load the package
+library(reshape2)
+peak.width.table <- melt(peak.width)
+head(peak.width.table)
+```
+
+Create a ggplot object with correct aesthetics to display a boxplot according the chipped TF (x-axis) and their width (y-axis). Then use appropriate geometric object `geom_*`.
+
+<details>
+  <summary> Show code: Display peak length statistics with ggplot2 </summary>
+```{r boxplot, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+## create boxplot
+ggplot(peak.width.table, aes(x=L1, y=value)) +
+         geom_boxplot()
+```
+</details>
+
+By default, the background color is grey and often does not allow to highlight properly the graphs. Many `theme` are available defining different graphics parameters, they are often added with a function `theme_*()`, the function `theme()` allows to tune your plot parameter by parameter. We propose here to use `theme_classic()` that changes a grey background to white background. Some peaks are very long and squeeze the distribution, one way to make the distribution easier to visualize is to transform the axis to log scale. Finally, we want to remove the x label, change the y label to 'Peak sizes' and the legend relative to the fill color from "L1" to "TF".
+\
+Using the ggplot2 documentation (*e.g.* https://ggplot2.tidyverse.org/ or [google it](https://www.letmegooglethat.com/?q=ggplot+change+label), try to enhance the boxplot.
+
+
+<details>
+  <summary>Enhance it !</summary>
+```{r enhancedboxplot2, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+# - theme_classic() change grey background to white background
+# - fill=L1 and scale_fill_brewer(palette="Set1") colors boxplots
+# based on chipped protein and with colors from RColorBrewer Set1 palette
+# - labs changes x and y axis labels and legend title
+# - scale_y_log10() set y axis to a log scale so that we can have a nice
+# view of the data in small values
+ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
+         geom_boxplot()+
+         theme_classic()+
+         scale_fill_brewer(palette="Set1")+
+         labs(x = "", y = "Peak sizes", fill = "TF")+
+         scale_y_log10()
+```
+</details>
+
+
+## Peak filtering
+To make sure we keep only high quality data. We are going to select those peaks having a qValue >= 8. The qValue corresponds to the 9th column of narrowPeak files. So, we are going to set a threshold on this. How many peaks are selected ?
+
+<details>
+  <summary>Show the code: select high quality peaks</summary>
+```{r peakFilteringBRG1, message=FALSE, include=TRUE}
+## Select high quality peaks
+peaks$BRG1 <- peaks$BRG1[peaks$BRG1$V9 >= 8]
+## Compute the number of remaining peaks
+length(peaks$BRG1)
+```
+</details>
+
+## Where are the peaks located over the whole genome?
+Sometime, peaks may occur more in some chromosomes than others. We can display the genomic distribution of peaks along the chromosomes, using the `covplot` function from `ChIPSeeker`. Height of peaks is drawn based on the peak scores.
+
+```{r peakGenomeDistribution, cache=TRUE, include=TRUE, fig.align = 'center'}
+# genome wide BRG1 peak distribution
+covplot(peaks$BRG1, weightCol="V5")
+# chromosome wide BRG1 peak distribution
+covplot(peaks$BRG1, chrs=c("chr1", "chr2"), weightCol="V5")
+```
+
+## Functional annotation: genomic features enriched in BRG1 peaks
+### Generate annotation
+We can assign peaks to the closest genes and genomic features (introns, exons, promoters, distal regions, etc...). We load ready-to-use annotation objects from Bioconductor: a OrgDB `org.Hs.eg.db` and a TxDB `TxDb.Hsapiens.UCSC.hg38.knownGene` objects.
+
+```{r LibraryannotatePeaksBRG1, eval=TRUE, message=FALSE, include=TRUE}
+## org.Hs.eg.db is an R object that contains mappings between Entrez Gene identifiers and GenBank accession numbers.
+library(org.Hs.eg.db)
+## Load transcript annotation
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+```
+
+This is done using the function `annotatePeak` which compares peak positions with the genomic feature positions of the reference genome. This function returns a complex object which contains all this information. As for the peaks coordinates, we store the peak annotations in a list that we first initialize as an empty list `peakAnno <- list()`. We define here the TSS regions as TSS positions -1000 bp +100 bp. Using the help of the function and annotation objects we have loaded, try to write the correct command line to annotate BRG1 peaks.
+
+
+<details>
+  <summary>Show code: annotate BRG1 peaks</summary>
+
+```{r annotatePeaksBRG1, eval=TRUE, message=FALSE, include=TRUE}
+## Annotate peaks for all datasets and store it in a list
+## Here TSS regions are regions -1000Kb/+100b arount TSS positions
+## Peak annotations are stored in a list
+peakAnno <- list()
+peakAnno[["BRG1"]] = annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+class(peakAnno$BRG1)
+## Visualize and export annotation as a data table
+# as.data.frame(peakAnno$BRG1)
+head(as.data.frame(peakAnno$BRG1))
+```
+</details>
+
+All peak information contained in the peak list will be retained in the output of `annotatePeak`. Positions and strand information of nearest genes are reported. The distance from peak to the TSS of its **nearest gene** is also reported. The genomic region of the peak is reported in annotation column. Since some annotation may overlap, ChIPseeker adopted the following priority in genomic annotation :
+
+  * Promoter
+  * 5’ UTR
+  * 3’ UTR
+  * Exon
+  * Intron
+  * Downstream
+  * Intergenic
+  * Downstream is defined as the downstream of gene end.
+
+This hierachy can be customized using the parameter *genomicAnnotationPriority*.
+
+The annotatePeak function report(s)  detail(led) information  when the annotation is Exon or Intron(.) (F)or tion when the annotation is Exon or Intron, for instance “Exon (uc002sbe.3/9736, exon 69 of 80),” means that the peak is overlap(ing) with an Exon of transcript uc002sbe.3, (whose) corresponding Entrez gene ID is 9736 (Transcripts that belong to the same gene ID may differ in splice events), and this (contains/harbors).
+
+The "annoDb" parameter is optional. If it is provided, some extra columns including SYMBOL, GENENAME, ENSEMBL/ENTREZID will be added.
+
+--
+
+Reminder: The TxDb class is a container for storing transcript annotations.
+
+- Bioconductor provides several packages containing TxDb objects for model organisms sur as Human and mouse. For instance, TxDb.Hsapiens.UCSC.hg38.knownGene, TxDb.Hsapiens.UCSC.hg19.knownGene for human genome hg38 and hg19, TxDb.Mmusculus.UCSC.mm10.knownGene and TxDb.Mmusculus.UCSC.mm9.knownGene for mouse genome mm10 and mm9, etc.
+
+- User can also prepare their own TxDb by retrieving information from UCSC Genome Bioinformatics and BioMart data resources by R function makeTxDbFromBiomart and makeTxDbFromUCSC.
+
+- One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
+
+<details>
+  <summary>Expand to find Coturnix japonica example</summary>
+
+```{r createTxDbGTF, include=TRUE, eval=FALSE}
+## download GTF file
+download.file("https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/93934/101/GCF_001577835.2_Coturnix_japonica_2.1/GCF_001577835.2_Coturnix_japonica_2.1_genomic.gtf.gz", "Coturnix_japonica_2.1.annotation.gtf.gz")
+## Build TxDb object
+library(GenomicFeatures)
+txdb = makeTxDbFromGFF("Coturnix_japonica_2.1.annotation.gtf.gz")
+## To save the txdb database
+library(AnnotationDbi)
+saveDb(txdb, 'txdb.Coturnix_japonica_2.1.sqlite')
+## load it when needed
+library(AnnotationDbi)
+txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
+```
+
+</details>
+
+--
+
+### Visualize genomic annotation
+
+We can now perform a more detailed analysis of genomic features associated to our peaks (introns, exons, promoters, distal regions,...) visualizing the genomic distribution either as a pie chart with `plotAnnoPie` or as a bar chart `plotAnnoBar`.
+
+<details>
+  <summary>Show code: Display peak distribution of genomic features</summary>
+```{r genomicFeatureDistribution, include=TRUE, eval=TRUE, fig.align = 'center'}
+## distribution of genomic features for BRG1 peaks
+# as a pie chart - which is the most widely used representation in publication
+plotAnnoPie(peakAnno$BRG1)
+# as a barplot
+plotAnnoBar(peakAnno$BRG1)
+```
+</details>
+
+However since some annotation overlap, ChIPseeker provides functions that help having a view of full annotation overlap.
+
+```{r upsetR, include=TRUE, eval=TRUE, fig.align = 'center'}
+library(UpSetR)
+upsetplot(peakAnno$BRG1)
+```
+
+## Heatmaps: visualisation of binding profiles
+
+Heatmap(s) are widely used representation(s) of ChIP-seq data as they allow simultaneous visualization of read enrichment at various locations. For instance, one may want to represent reads related to a chipped protein in regions spanning +/-5Kb around all TSS of the reference genome. Another objective would be to compare read enrichment at the same locations in many chip-seq datasets.
+
+### BRG1 peak distribution
+We want to know if BRG1 is binding large and/or narrow regions, unique and/or tandem etc.
+
+First of all, for calculating the profile of ChIP peaks binding to the BRG1 center, we need to define peak centers and extend them each side. We will select the 10000 best q-value peaks (column V9) to lighten the matrix. Then (we need to) align the peaks that are mapped to these regions, and to generate the `tagMatrix`. The resulting matrix will be 2000*2+1 columns and 10000 lines which is quite big to display as a heatmap.
+
+Step by step:
+\
+- Compute the center of BRG1 peaks using the GenomicRanges methods `start` and `end`. Assign the results to a new column in metadata of the BRG1 peaks object.
+
+<details>
+  <summary>Show code: compute the peak centers </summary>
+```{r BRG1peakcenter, message=FALSE, include=TRUE, fig.align = 'center'}
+# Compute the center of the peaks and attribute it to a new
+# column in the metadata of the BRG1 peak GRanges
+peaks$BRG1$center.peak <- (start(peaks$BRG1) + end(peaks$BRG1))/2
+```
+</details>
+
+- Sort the peaks in decreasing `order` (column V9) and select the top 10,000.
+
+<details>
+  <summary>Show code: order and select peaks </summary>
+```{r BRG1peaktop10K, message=FALSE, include=TRUE, fig.align = 'center'}
+# For computation and memory efficiency reasons,
+# we subset the top 10K peaks according to the FDR column (V9)
+top.10000 <- peaks$BRG1[order(peaks$BRG1$V9,decreasing=T)][1:10000]
+```
+</details>
+
+- Create a `GRanges` object containing genomic positions of the 10K peak centers. You need to define `seqnames` and `ranges` in an `IRanges` object: `IRanges(start,end)`.
+
+<details>
+  <summary>Show code: Create GRanges object with peak center </summary>
+```{r BRG1peakcenterGR, message=FALSE, include=TRUE, fig.align = 'center'}
+# Generate peak center GRanges for the 10K top peaks
+centers.BRG1 <- GRanges(seqnames(top.10000),
+                        IRanges(start=top.10000$center.peak,
+                                end=top.10000$center.peak))
+```
+</details>
+
+- Extend the ranges each side of 2000 bp using the function `resize`. Fill the parameters `width` and `fix`.
+
+<details>
+  <summary>Show code: resize the peak regions </summary>
+```{r resizePeaks, message=FALSE, include=TRUE, fig.align = 'center'}
+# Extend each side of 2000 bp
+extended.2K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+4000, fix = "center")
+```
+</details>
+
+- You now have the regions you want to map the peaks to. Create the matrix using the `getTagMatrix` function and the parameter `windows`. Display it with `tagHeatmap` and its parameters `xlim` and `color` which correspond to the presence of peaks in the region.
+
+<details>
+  <summary>Show code: create the matrix and display the heatmap </summary>
+
+```{r signalAroundBRG1center, message=FALSE, include=TRUE, fig.align = 'center'}
+## compute the density of peaks within the promoter regions
+tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.2K.BRG1)
+## plot the density
+tagHeatmap(tagMatrix, xlim=c(-2000, 2000), color="red")
+```
+</details>
+
+The regions are ordered relative to their peak enrichment.
+
+We can display a summary of the binding profiles by looking at the corresponding average profiles. This kind of profiles is much less greedy, we can thus extend a bit more (e.g. +/- 5000) from the peak centers redoing the previous steps. Definition of the regions have to be redone. Try to create the `GRanges` and the `tagMatrix`. \
+
+<details>
+  <summary>Show code: Extend 5000bp from TSS and create the matrix </summary>
+```{r extend5000, message=FALSE, include=TRUE}
+# Extend from the peak center
+extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+## compute the density of peaks within the promoter regions
+tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.5K.BRG1)
+```
+</details>
+
+\
+
+Use the `plotAvgProf` function defining the `xlim` and setting the labels of the x and y axis.
+
+<details>
+  <summary>Show code: Plot the average profile of BRG1 binding </summary>
+
+```{r profileBRG1, message=F, warning=F, fig.align = 'center'}
+# Plot the profile
+plotAvgProf(tagMatrix, xlim=c(-5000, 5000),
+            xlab="Distance to peak center", ylab = "Peak Count Frequency")
+```
+
+</details>
+
+It looks like BRG1 is having several binding patterns but the binary nature of the signal (presence/absence of peaks) and row ordering do not allow us to appreciate them.
+
+### Read enrichment in BRG1 peaks
+
+For computation and memory efficiency reasons, we are not going to analyse read coverage at the nucleotide resolution. The strategy is rather to compute coverage in equally sized windows (e.g. 20nt). We thus need to build a matrix composed of rows that are all BRG1 peaks and columns that contain read enrichment in all bins.
+
+This allows to consider a bigger set of peaks and covered region. We will now analyze the whole set of BRG1 peaks over 10Kb (+/- 5000bp). We will ask for a hundred bins each side of the center resulting in 200 windows of 50 bp.
+
+
+#### Prepare the signal matrices
+We need to load bigwig files for all datasets that we want to visualize.
+Data are imported using a function from the `rtracklayer` package.
+
+\
+
+First, create the `GRanges` object containing centers of **all** the peaks and extend them each side of 5000 bp.
+
+<details>
+  <summary>Show code: Create all peak center GRanges object and extend them </summary>
+
+```{r centersBRG15K, message=FALSE, include=TRUE}
+# # Generate peak center GRanges for all the peaks
+centers.BRG1 <- GRanges(seqnames(peaks$BRG1),
+                        IRanges(start=peaks$BRG1$center.peak,
+                                end=peaks$BRG1$center.peak))
+# Extend each side of 5000 bp
+extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+```
+</details>
+
+We then load the `rtracklayer` library and import the read coverage from a bigWig file.
+
+```{r loadBigwigs, message=FALSE, include=TRUE}
+# load the library
+library(rtracklayer)
+# load the bw file for BRG1
+cvg.BRG1 <- import(paste0(params$chipseq,params$brg1.bw),format="BigWig",
+                      which=extended.5K.BRG1,
+                      as="RleList")
+cvg.BRG1
+```
+
+We can now create a matrix of read enrichment at the positions of interest with `featureAlignedSignal` from the `ChIPpeakAnno` package.
+
+\
+
+Load the library and find the required parameters. Be careful to the type of the required objects.
+
+<details>
+  <summary>Show code: Create the read enrichment matrix </summary>
+```{r prepareMatrix, message=FALSE, include=TRUE}
+# load library
+library(ChIPpeakAnno)
+# featureAlignedSignal needs the coverage (cvg) stored in a list.
+cvglist <- list(BRG1=cvg.BRG1)
+sig <- featureAlignedSignal(cvglists = cvglist, feature.gr = centers.BRG1,n.tile=200,
+                           upstream=5000, downstream=5000)
+dim(sig$BRG1)
+```
+</details>
+
+#### Create heatmaps
+
+Let's draw the heatmaps using the `EnrichedHeatmap` library. We need first to transform our enrichment matrix in an object readable for the `EnrichedHeatmap` function. We use the function `as.normalizedMatrix` for which many parameters need to be set. What do they control ?
+
+```{r Heatmap, message=FALSE, include=TRUE, fig.align = 'center'}
+## Load the library
+library(EnrichedHeatmap)
+## Create a list of normalizedMatrix that is the input format
+## for EnrichedHeatmap
+mat1 <- list()
+mat1[["BRG1"]] <- as.normalizedMatrix(as.matrix(sig[["BRG1"]]),
+    k_upstream = 100,
+    k_downstream = 100,
+    k_target = 0,
+    extend = c(5000, 5000),
+    signal_name = names(sig[["BRG1"]]),
+    target_name = "Peak centers"
+)
+## Create the Heatmap with default parameters
+EnrichedHeatmap(mat1$BRG1, name = "BRG1")
+```
+
+`EnrichedHeatmap` combines the average profile and the density heatmap. We can observe a greater precision of the signal around the peak centers. As with `ChIPpeakAnno`, by default, heatmaps are sorted by read enrichment. However, it would be worth grouping together regions that have similar read enrichment patterns. This can be done using a clustering method such as k-means. This type of clustering requires the number of expected clusters to be set. Moreover, to obtain reproducible clustering results, we need to set a seed.
+
+```{r Kmeans, message=FALSE, include=TRUE, fig.align = 'center'}
+## define a seed value to get the same results when re-running the analysis
+set.seed(123)
+## Create Heatmaps with k-means clustering on BRG1 data
+## We keep the generated object in order to use the clustering
+## information.
+heatmap.kmeans <- EnrichedHeatmap(mat1$BRG1, name = "BRG1", row_km = 8,
+    column_title = "BRG1", row_title_rot = 0)
+## draw the heatmap
+htlist <- draw(heatmap.kmeans)
+```
+
+Let's enhance it!
+
+- We first retrieve the peak clusters from `htlist` object to use them as a pre-defined partition in our enhanced heatmap.
+
+```{r retreiveCl, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+# Use the row_order function to retrieve peaks index
+# belonging to each cluster
+clusters <- row_order(htlist)
+# rename the clusters
+names(clusters) <- paste0("cluster",names(clusters))
+# transform to a vector
+# Check the class and length of the resulting object
+class(clusters)
+length(clusters)
+# Check what is actually in the list elements
+head(clusters[[1]])
+# Each element of the list contain the indexes of the peaks in the
+# original object
+# Check cluster sizes
+lapply(clusters,length)
+
+# create the partition by transforming the list in vector
+partition <- unlist(clusters)
+head(partition)
+# names of the elements were extended with a number
+# We thus trim them to retrieve the cluster name
+names(partition) <- substring(first = 1,last = 8,text=names(partition))
+# The numbers are the indexes of the rows, we need to
+# sort the indexes to get the right order of cluster
+# labels
+partition <- names(partition)[order(partition)]
+
+# keep this information with you BRG1 peaks
+peaks$BRG1$cluster <- partition
+head(peaks$BRG1)
+```
+
+- Now, customize the enrichment colors and differentiate clusters with colors.
+
+```{r enhancedHeatmap, message=FALSE, include=TRUE, fig.align = 'center'}
+library(circlize)
+# Define new colors for each heatmap
+col_brg1 <- colorRamp2(c(0,10,15), c("white", "blue","black"))
+# create a legend for the cluster labels
+lgd <- Legend(at = c("cluster1", "cluster2", "cluster3", "cluster4","cluster5","cluster6","cluster7","cluster8"),
+    title = "Clusters",
+    type = "lines", legend_gp = gpar(col = 2:9))
+# Add a first column containing the cluster assignment
+ht_list <- Heatmap(partition, col = structure(2:9, names = paste0("cluster", 1:8)), name = "partition", show_row_names = FALSE, width = unit(3, "mm")) +
+EnrichedHeatmap(mat1$BRG1, name = "BRG1", col=col_brg1, # specify the heat colors
+  # color per cluster
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:9))),
+  column_title = "BRG1")
+draw(ht_list, split = partition, annotation_legend_list = list(lgd),
+    ht_gap = unit(c(2, 8), "mm"))
+```
+
+
+#### Are BRG1 binding profiles associated with particular genomic regions ?
+
+We will use here the clusters obtained with `EnrichedHeatmap` and look at the genomic distribution of peaks using `TxDb.Hsapiens.UCSC.hg38.knownGene` and `plotAnnoBar`.
+
+```{r clusterKmeans, warning=F,message=F, fig.align = 'center'}
+# The following code uses each element of the list (peaks indexes)
+# to select corresponding peaks in the original data and return them
+BRG1.clusters <- lapply(clusters,function(x,peaks){
+  # x represents one element of the list, one set of
+  # indexes
+  cl <- peaks[x]
+  return(cl)
+},peaks=peaks$BRG1)
+# check names of the resulting list
+names(BRG1.clusters)
+# Transform the list as GRangesList to be able to use it with the annotatePeak
+# function
+BRG1.clusters <- as(BRG1.clusters,"GRangesList")
+# apply annotatePeak function to each element of the BRG1.clusters GRangesList
+peakAnnoList <- lapply(BRG1.clusters, annotatePeak, TxDb=txdb,
+                       tssRegion=c(-1000, 100), annoDb="org.Hs.eg.db",
+                       verbose=FALSE)
+plotAnnoBar(peakAnnoList)
+```
+
+# Data integration: let's compare BRG1 to MITF and SOX10
+## Dataset description
+### Load MITF and SOX10 datasets
+
+Using the `readPeakFile` function, add MITF (MITF_CHIP-seq_peaks.narrowPeak) and SOX10 (SOX10_CHIP-seq_peaks.narrowPeak) peaks to the `peaks` list. The path to these files is stored in the `params` list as the `chipseq` element.
+
+<details>
+  <summary>Show code: Read MITF and SOX10 peak files</summary>
+```{r loadData2, include=TRUE}
+## Let's load MITF and SOX10 peak sets
+peaks[["MITF"]] <- readPeakFile(paste0(params$chipseq, params$mitf), as="GRanges")
+peaks[["SOX10"]] <- readPeakFile(paste0(params$chipseq, params$sox10), as="GRanges")
+```
+</details>
+
+The list `peaks` now contains `r length(peaks)` elements.
+```{r peaksStats1, include=TRUE}
+length(peaks)
+names(peaks)
+```
+
+
+### How many peaks were called?
+
+We want to answer this question using a bar plot with ggplot2. Here we are basically plotting the same graphs as in section 2.2 with more data sets.
+
+Try to create the command lines enabling to get a data.frame containing the number of peaks per chipped protein (use the `sapply` function to compute the length of each peak set). Then, plot the results as a bar plot filled with colors from the brewer palette "Set1" according to the TF name.
+
+
+<details>
+  <summary>Show code: Plot peak set size per TF</summary>
+```{r loadData3, include=TRUE}
+# The `sapply` function makes now completely sense as we have a list with
+# several elements to which we want to apply functions, here the length function.
+peak.lengths <- data.frame(IP=names(peaks),
+                           NbPeaks=sapply(peaks,length))
+# check the object
+peak.lengths
+```
+
+```{r plotpeaksetsize, include=TRUE, eval=F}
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_col()+
+         scale_fill_brewer(palette="Set1")+
+        theme_classic()
+```
+</details>
+
+```{r loadData2print, include=TRUE, echo=F}
+ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
+         geom_col()+
+         scale_fill_brewer(palette="Set1")+
+        theme_classic()
+```
+
+
+### How large are these peaks?
+Compute statistics on all peak sizes as in section 2.3.
+
+- Compute the peak width within each peak set
+- Look at the structure of the return object (`str()`)
+- Use the `melt` function from the reshape2 package to obtain a data.frame with one column with all the peak width and one column containing the name of the peak set they come from.
+
+<details>
+  <summary>Show code: create a data.frame containing all peak widths</summary>
+```{r reshapeAll, message=FALSE, include=TRUE}
+peak.width = lapply(peaks,width)
+str(peak.width)
+peak.width.table <- melt(peak.width)
+head(peak.width.table)
+```
+</details>
+
+In this table, there are as many rows as the total number of peaks in all peak sets. It contains all possible pairs IP <-> number of peaks possible.
+```{r reshapeCheck, message=FALSE, include=TRUE}
+# Number of peaks per chipped protein
+sapply(peaks, length)
+# total number of peaks
+sum(sapply(peaks, length))
+# size of the table we've just generated
+dim(peak.width.table)
+```
+
+We now want to represent the log transformed peak length distribution as boxplots filled with the corresponding colors. See bellow:
+
+```{r peakWidthNiceplot, message=FALSE, warning=F, include=TRUE, fig.align = 'center',echo=F}
+ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
+         geom_boxplot()+
+         theme_classic()+
+         scale_fill_brewer(palette="Set1")+
+         labs(x = "", y = "log10(Peak sizes)", fill = "")+
+         scale_y_log10()
+```
+
+<details>
+  <summary>Show code: plot the distribution on peak length per experiment</summary>
+```{r peakWidthNice, message=FALSE, include=TRUE, fig.align = 'center',eval=F}
+ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
+         geom_boxplot()+
+         theme_classic()+
+         scale_fill_brewer(palette="Set1")+
+         labs(x = "", y = "log10(Peak sizes)", fill = "")+
+         scale_y_log10()
+```
+</details>
+
+
+## Peak filtering
+In order to discard poor quality peaks, a threshold is set on qValue. The following code aims at selecting peaks with a qValue greater than 4. The qValue corresponds to the 9th column of narrowPeak files. So, we are going to set a threshold on this.
+
+```{r peakFiltering, message=FALSE, include=TRUE}
+## We will filter the peaks in each set using lapply. We first define
+## a function to be applied to each set
+
+filter_V9 <- function(x){
+    res <- x[x$V9 >= 4,]
+    return(res)
+}
+
+## Select high quality peaks in each element of the list peaks
+peaks <- lapply(peaks, filter_V9)
+## Compute the number of remaining peaks
+sapply(peaks, length)
+```
+
+### Peak annotation
+
+Load and add MITF and SOX10 annotations to the `peakAnno` list that already contains BRG1 annotations using `annotatePeak` as in 2.6.1.
+
+<details>
+  <summary>Show code: annotate the peaks</summary>
+
+```{r annotatePeaksAll, eval=TRUE, message=FALSE, include=TRUE, fig.align = 'center'}
+peakAnno[["MITF"]] = annotatePeak(peaks$MITF, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+peakAnno[["SOX10"]] = annotatePeak(peaks$SOX10, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
+```
+</details>
+
+And plot the distribution of genomic feature of the peaks as a barplot.
+
+<details>
+  <summary>Show code: Plot genomic feature distribution per experiment</summary>
+```{r plotAnnoAllpeaks,message=FALSE, include=TRUE, fig.align = 'center'}
+plotAnnoBar(peakAnno)
+```
+</details>
+
+## Are BRG1, MITF and SOX10 co-localizing ?
+### Compare BRG1, MITF and SOX10 peak positions (Venn Diagram)
+Overlaps between peak datasets can be evaluated using a Venn diagram. Such approach is implemented in the ChIPpeakAnno package.
+
+```{r ovlPeaks, include=TRUE, eval=TRUE,warning=F,message=F}
+library(ChIPpeakAnno)
+# We first compute the overlap between peak sets, keeping the information
+# of all peaks overlapping in each set (see ?findOverlapsOfPeaks for help)
+ovl <- findOverlapsOfPeaks(peaks, connectedPeaks="keepAll")
+```
+
+ChIPpeakAnno imposes, while plotting the Venn diagram, to compute the significance of the pairwise associations using a hypergeometric test. To this end, we need to estimate the number of all potential binding events which is used by the `makeVennDiagram` function through the `totalTest` number. It is used for the hypergeometric sampling that is used to determine if the overlap between two datasets is more than would be expected by chance. This is not a trivial question, the answer is driven by what you know about the binding properties of your factors (eg. sequence specific, mainly intergenic etc). You can find an interesting discussion [here](https://stat.ethz.ch/pipermail/bioconductor/2010-November/036540.html).
+In our case we can refer to the genomic distribution of the peaks that we have plotted previously. We can assume that our TFs have a gene body binding preference. Genes cover roughly 10% of the genome.
+
+```{r defineHyperTot, include=TRUE, eval=TRUE,warning=F,message=F}
+# Estimate the average size of the peaks ...
+averagePeakWidth <- mean(width(unlist(GRangesList(ovl$peaklist))))
+# ... to count how many potential sites could have been bound in coding regions.
+tot <- ceiling(3.3e+9 * 0.1 / averagePeakWidth)
+```
+
+**TIPS**: We can define the colors attributed to each set using the function `colours()`. In any case you want to set a color you can use this function. Please, have a look to [this page](https://github.com/EarlGlynn/colorchart/wiki/Color-Chart-in-R) or more generally [this page](https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf) if you are interested in finely customizing colors of your plots.
+
+<!-- ![R chart colours](/Users/elodiedarbo/Documents/file_general/R_chart_colors.png) -->
+
+```{r VennAnno, fig.width=7,fig.height=7,warning=F,message=F, fig.align = 'center'}
+makeVennDiagram(ovl, totalTest=tot, connectedPeaks="keepAll",
+                fill=brewer.pal(3,"Set1"), # circle fill color
+                col=brewer.pal(3,"Set1"), #circle border color
+                cat.col=brewer.pal(3,"Set1"))
+```
+
+According to the hypergeometric test p-values all pairwise comparisons are highly significant (=0). This has to be taken very carefully as it depends largely on the background estimation that we may have over-estimated. If you are not sure about your estimation, you will prefer to use a non-parametric approach based on your peak genomic distribution to estimate randomness. To this end the `TxDb.Hsapiens.UCSC.hg38.knownGene` is used.
+
+#### Is the overlap significant?
+ChIPpeakAnno provides the `preparePool` and `peakPermTest` functions to compute this test. These tests are made by pair, we will look at SOX10/MITF overlap significance as an example.
+
+```{r permPeaks, warning=F,message=F,cache=T, fig.align = 'center'}
+# Prepare a pool of random peaks following the characteristics of our peak sets
+pool <- preparePool(txdb,peaks$SOX10,bindingType="TSS",featureType="transcript",seqn=paste0("chr",c(1:22,"X","Y")))
+# Create the permPool object needed for peakPermTest
+pool <- new("permPool",grs=pool$grs[1],N=length(peaks$SOX10))
+SOX10.MITF <- peakPermTest(peaks$SOX10, peaks$MITF, pool=pool, seed=1, force.parallel=FALSE)
+SOX10.MITF
+plot(SOX10.MITF)
+```
+
+Venn diagrams are widely used to represent overlaps, intersections. However, in ChIP-seq analysis, the definition of the peaks is dependent on the peak caller, the FDR thresholds (what about peaks just bellow the threshold). The overlap is also difficult to assess, indeed do we call an overlap a 1 nucleotide an intersection ? It is one of the numerous parameters that can be tuned ...
+
+Are different combinations of TFs bind specific genomic regions ?
+
+```{r}
+coocs <- as(ovl$peaklist,"GRangesList")
+# apply annotatePeak to each set of peaks in the list coocs
+peakAnnoList <- lapply(coocs, annotatePeak, TxDb=txdb,
+                        tssRegion=c(-1000, 100), annoDb="org.Hs.eg.db",
+                        verbose=FALSE)
+# Plot peak distribution relatively to gene features
+plotAnnoBar(peakAnnoList)
+# Plot peak distribution relatively to their distance to the TSS
+plotDistToTSS(peakAnnoList)
+```
+
+### Heatmaps / Profiles
+
+One way to circumvent hard thresholds and relatively arbitrary choices, we can choose to use heatmap and average profile representations. To this end, we need to define the reference point of view. We use the BRG1 peak centers.
+
+Load bigwig file for MITF and SOX10 **at BRG1 peaks**.
+
+```{r cvglistPlus, warning=F,message=F}
+# Load and add bigwig profiles for MITF and SOX10 in cvglist already containing
+# BRG1
+names(cvglist)
+cvglist$MITF <- import(file.path(params$chipseq,params$mitf.bw),format="BigWig",
+                      which=extended.5K.BRG1,
+                      as="RleList")
+cvglist$SOX10 <- import(file.path(params$chipseq,params$sox10.bw),format="BigWig",
+                      which=extended.5K.BRG1,
+                      as="RleList")
+names(cvglist)
+```
+
+Prepare the matrices binned in 50bp windows.
+
+```{r prepareMatrices, message=FALSE, include=TRUE}
+sig <- featureAlignedSignal(cvglist, centers.BRG1,
+                           upstream=5000, downstream=5000,n.tile=200)
+lapply(sig, dim)
+```
+
+Create normalized matrices.
+
+```{r CreateTSSNorm, warning=F,message=F}
+## Create a list of normalizedMatrix that is the input format
+## for EnrichedHeatmap
+BRG1.mat <- lapply(sig, function(x){
+  # x represent each element of the sig list
+  mat <- as.normalizedMatrix(as.matrix(x),
+                      k_upstream = 100,
+                      k_downstream = 100,
+                      k_target = 0,
+                      extend = c(5000, 5000),
+                      #signal_name = names(sig[["MITF"]]),
+                      target_name = "Peak center"
+                      )
+  return(mat)
+})
+```
+
+We use the partition we computed in section 2.7.2.2
+
+```{r TSSheatmapKmeans, message=F,warning=F, fig.align = 'center'}
+# Define new colors for each heatmap
+col_sox10 <-colorRamp2(c(0,3,4), c("white", "blue","black"))
+col_mitf <- colorRamp2(c(0,4,5), c("white", "blue","black"))
+col_brg1 <- colorRamp2(c(0,5,6), c("white", "blue","black"))
+# create a legend for the cluster labels
+lgd <- Legend(at = c("cluster1", "cluster2", "cluster3", "cluster4","cluster5","cluster6","cluster7","cluster8"),
+    title = "Clusters",
+    type = "lines", legend_gp = gpar(col = 2:9))
+# Add a first column containing the cluster assignment
+ht_list <- Heatmap(partition, col = structure(2:9, names = paste0("cluster", 1:8)), name = "partition", show_row_names = FALSE, width = unit(3, "mm")) +
+EnrichedHeatmap(BRG1.mat$BRG1, name = "BRG1", col=col_brg1,
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:9))),
+  column_title = "BRG1") +
+EnrichedHeatmap(BRG1.mat$MITF, name = "MITF",
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:9))),
+  column_title = "MITF", row_title_rot = 0, col=col_mitf) +
+EnrichedHeatmap(BRG1.mat$SOX10, name = "SOX10",
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:9))),
+  column_title = "SOX10", row_title_rot = 0, col=col_sox10)
+draw(ht_list, split = partition, annotation_legend_list = list(lgd),
+    ht_gap = unit(c(2, 8, 8,8), "mm"))
+```
+
+Lets have a look at the TF binding profiles in cluster 5.
+
+```{r plotClustBRG1, fig.align = 'center'}
+# For each matrix, filter peaks from cluster 5
+sig.tmp <- lapply(sig,function(x,part){
+    mat <- x[part=="cluster5",]
+    return(mat)
+  },part=partition)
+
+# plot the average profiles
+featureAlignedDistribution(sig.tmp, centers.BRG1,
+                           upstream=5000, downstream=5000,
+                           type="l",n.tile=200)
+
+```
+
+
+## Is gene expression influenced by TF binding to their promoters ?
+
+- We will concentrate on genes having BRG1 binding close to their TSS. To do that we will plot a heatmap centered on TSS.
+
+First retrieve the TSS positions from the TxDB object
+
+```{r TSStxdb, message=FALSE, warning=FALSE, include=TRUE}
+# Generate TSS and promoter GRanges, the function promoters allows to retrieve the
+# gene ID (entrez)
+TSS <- GenomicFeatures::promoters(txdb, upstream=0, downstream=0, columns="gene_id")
+```
+
+Clean the TSS list removing TSS with no gene ID assigned (column `gene_id` in the metadata) and on scaffolds (`seqnames`).
+\
+The column gene_id is of type characterList, this type is difficult to manipulate. We then decide to transform it to a character vector. We can't directly `unlist` the object because, to save memory, not annotated TSS are assigned empty elements which disappear when unlisting.
+
+```{r geneidTSS, message=FALSE, warning=FALSE, include=TRUE}
+# For each element of the characterList we check it's length, if it is 0
+# we fill the element with NA. We the unlist.
+gene_ids <- unlist(lapply(TSS$gene_id,function(x){
+  if (length(x)==0){
+     NA
+  }
+  else {
+    x
+  }
+} ))
+# Keep TSS on selected chromosomes annotated with a gene ID and remove
+# duplicate IDs due to transcript isoforms. Here, the selection of the
+# isoform is random.
+TSS <- TSS[as.vector(seqnames(TSS))%in%paste0("chr",c(1:22,"X","Y")) & !is.na(gene_ids) & !duplicated(gene_ids)]
+
+# extend TSS both direction
+TSS.extended <- resize(TSS, width = width(TSS)+4000, fix = "center")
+```
+
+Load bigwig profiles for TSS extended regions, create matrices and transform in the `enrichedHeatmap` recognized format.
+
+```{r loadBigwigs2, message=FALSE, warning=FALSE, include=TRUE}
+# load the bw file for all TFs within the promoter
+cvglist <- list()
+cvglist$BRG1 <- import(file.path(params$chipseq,params$brg1.bw),format="BigWig",
+                      which=TSS.extended,
+                      as="RleList")
+cvglist$MITF <- import(file.path(params$chipseq,params$mitf.bw),format="BigWig",
+                      which=TSS.extended,
+                      as="RleList")
+cvglist$SOX10 <- import(file.path(params$chipseq,params$sox10.bw),format="BigWig",
+                      which=TSS.extended,
+                      as="RleList")
+# Produce the signal matrices
+sig <- featureAlignedSignal(cvglist, TSS,n.tile=400,
+                           upstream=2000, downstream=2000)
+# Transform the signal matrices as normalizedMatrix
+TSS.mat <- lapply(sig, function(x){
+  # x represent each element of the sig list
+  mat <- as.normalizedMatrix(as.matrix(x),
+                      k_upstream = 200,
+                      k_downstream = 200,
+                      k_target = 0,
+                      extend = c(2000, 2000),
+                      target_name = "TSS"
+                      )
+  return(mat)
+})
+```
+
+We will compute K-means clustering with `kmeans` function to define the partitions of the TSS based on BRG1 signal.
+
+```{r plotHeatmapTSS, message=FALSE, warning=FALSE, include=TRUE, fig.align = 'center'}
+# Compute a partition using the kmeans function, asking for 5 clusters
+set.seed(20210526)
+partition.TSS = paste0("cluster", kmeans(TSS.mat$BRG1, centers = 5)$cluster)
+# Specify colors for the position enrichment for each matrix
+col_sox10 = colorRamp2(c(0,3,4), c("white", "blue","black"))
+col_mitf = colorRamp2(c(0,4,5), c("white", "blue","black"))
+col_brg1 = colorRamp2(c(0,5,6), c("white", "blue","black"))
+lgd = Legend(at = c("cluster1", "cluster2", "cluster3", "cluster4","cluster5"),
+    title = "Clusters",
+    type = "lines", legend_gp = gpar(col = 2:6))
+ht_list = Heatmap(partition.TSS, col = structure(2:7, names = paste0("cluster", 1:5)), name = "partition", show_row_names = FALSE, width = unit(3, "mm")) +
+EnrichedHeatmap(TSS.mat$BRG1, name = "BRG1", col=col_brg1,
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:6))),
+  column_title = "BRG1") +
+EnrichedHeatmap(TSS.mat$MITF, name = "MITF",
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:6))),
+  column_title = "MITF", row_title_rot = 0, col=col_mitf) +
+EnrichedHeatmap(TSS.mat$SOX10, name = "SOX10",
+  top_annotation = HeatmapAnnotation(lines = anno_enriched(gp = gpar(col = 2:6))),
+  column_title = "SOX10", row_title_rot = 0, col=col_sox10)
+draw(ht_list, split = partition.TSS, annotation_legend_list = list(lgd),
+    ht_gap = unit(c(2, 8, 8,8), "mm"))
+```
+
+Lets have a look at the TF binding profiles in cluster 4.
+
+```{r plotClustTSS, fig.align = 'center'}
+# For each matrix, filter peaks from cluster 5
+sig.tmp <- lapply(sig,function(x,part){
+    mat <- x[part=="cluster4",]
+    return(mat)
+  },part=partition.TSS)
+
+# plot the average profiles
+featureAlignedDistribution(sig.tmp, TSS,
+                           upstream=2000, downstream=2000,
+                           type="l",n.tile=400)
+
+```
+
+- Let's integrate expression data from RNA-seq experiment.
+
+The goal is to visualize the gene expression according to the cluster the TSS belong.
+
+```{r}
+# load RNA-seq normalized expression data
+load(params$rnaseq) # RNAseq
+head(RNAseq)
+```
+
+RNA-seq columns:
+- Ensembl.Gene.ID: Gene idenfier from ensEMBL (ENSG*****)
+- WT.norm: normalized expression for wild type cell lines
+- shBGR1.norm: normalized expression for shBRG1 cell lines
+- logCPM: average log transformed overall expression
+- logFC: log fol change between the two conditions
+- FDR: multi-testing corrected p-value from edgeR statistical test
+- signif (up, down, stable): significance was set as: FDR < 0.01, logCPM > 5, abs(logFC) > 1
+
+Reads from RNA-seq were assigned to genes modeled from ensEMBL and thus are identified with ensEMBL ID. However, the TSS are annotated with ENTREZ IDs, we thus need to map together the identifiers. We use an `OrgDB` object for the human genome the available information are displayed using `columns()`.
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+We then use the function `mapIds` from `AnnotationDbi` package with the keys `ENSEMBL` and `ENTREZID`. You can see that other identifiers are available from this object (e.g: SYMBOL, REFSEQ, UNIPROT etc).
+
+```{r}
+conv <- mapIds(x=org.Hs.eg.db,
+              keys=RNAseq$Ensembl.Gene.ID, # what do we want to be mapped
+              column="ENTREZID", # which type of ID we want
+              keytype="ENSEMBL") # what type of ID we give
+head(conv)
+# names of the vector are ENSEMBL IDs and elements are ENTREZ IDs
+```
+
+We use the `match` function that allows to return match between the IDs in `RNAseq` and the ensEMBL IDs from the conversion vector
+
+```{r}
+m <- match(RNAseq$Ensembl.Gene.ID,names(conv))
+head(m)
+# m contains NA for element in the first vector not present in the 2nd
+# or the index of the element of the 2nd vector corresponding the those
+# in the first
+# Attribute the matched ENTREZ ID
+RNAseq$ENTREZID <- conv[m]
+head(RNAseq)
+```
+
+We can now associate RNA-seq and TSS information using the ENTREZ IDs and the `match` function.
+
+```{r}
+# We add the partition (clusters) to the TSS object in order to add the
+# clusters to the RNA-seq object
+TSS$cluster <- partition.TSS
+# The common IDs this time are the ENTREZ IDs
+m <- match(RNAseq$ENTREZID,unlist(TSS$gene_id))
+RNAseq$cluster <- TSS$cluster[m]
+head(RNAseq)
+```
+
+We first want to compare the expression between this to condition in the different clusters.
+\
+We need to melt the `RNAseq` object keeping only the expression values in the "WT.norm" and the "shBGR1.norm" columns and the cluster assignment. We want to evaluate the differences using boxplots as bellow.
+
+```{r boxplotexprPlot, fig.align = 'center',echo=F,warning=F,message=F}
+# melt the RNAseq table to get a data.frame with a column indicating
+# the experimental condition, a column with the cluster assignment
+# and the expression values
+
+expr.melt <- melt(RNAseq[,c("WT.norm","shBGR1.norm","cluster")])
+head(expr.melt)
+
+ggplot(expr.melt,aes(x=cluster,y=log2(value+1))) +
+  geom_boxplot(aes(color=variable)) +
+  theme_bw() + theme(legend.position = "top") +
+  scale_color_manual(values=c(WT.norm="black",shBGR1.norm=colours()[613]))
+```
+
+<details>
+  <summary>Show code: plot expression distribution in both condition</summary>
+
+```{r boxplotexpr, fig.align = 'center',eval=F}
+# melt the RNAseq table to get a data.frame with a column indicating
+# the experimental condition, a column with the cluster assignment
+# and the expression values
+
+expr.melt <- melt(RNAseq[,c("WT.norm","shBGR1.norm","cluster")])
+head(expr.melt)
+
+ggplot(expr.melt,aes(x=cluster,y=log2(value+1))) +
+  geom_boxplot(aes(color=variable)) +
+  theme_bw() + theme(legend.position = "top") +
+  scale_color_manual(values=c(WT.norm="black",shBGR1.norm=colours()[613]))
+```
+</details>
+
+
+We can see that there are no visible difference between the conditions even if cluster 3, which has the less BRG1 signal, is much less expressed than the others. We can check if the distribution of significantly differentially expressed genes differs among the clusters using barplots.
+
+```{r, fig.align = 'center',echo=F,warning=F,message=F}
+# Distribution of differentially expressed genes as barplots
+ggplot(RNAseq,aes(x=cluster)) +
+  geom_bar(aes(fill=signif),position = "fill",color="black") +
+  theme_bw() +
+  scale_fill_manual(values=c(up="red",down="blue",stable="white"))
+```
+
+
+<details>
+  <summary>Show code: plot significantly differentially expressed genes in clusters</summary>
+
+```{r, fig.align = 'center',eval=F}
+# Distribution of differentially expressed genes as barplots
+ggplot(RNAseq,aes(x=cluster)) +
+  geom_bar(aes(fill=signif),position = "fill",color="black") +
+  theme_bw() +
+  scale_fill_manual(values=c(up="red",down="blue",stable="white"))
+```
+
+
+</details>
+
+## Are there particular biological function associated with the differentially expressed genes having different BRG1 binding patterns ?
+
+To answer this question, we use the R package `clusterProfiler` to compute hypergeometric enrichment of biological function in each cluster using KEGG annotation database.
+\
+`clusterProfiler` provide the function `compareCluster` that allows to analyze and compare enrichment in different group of genes. This function recognize ENTREZ identifiers.
+
+\
+
+![Représentation simplifiée graphique du test hypergéometrique](data/hypergeometric.png)
+
+
+
+```{r funcEnr, message=F,warning=F}
+# load the library
+library(clusterProfiler)
+# Select genes whose gene expression is significantly changing
+# between conditions
+geneList <- RNAseq[RNAseq$signif!="stable",]
+# The function split help at splitting a vector to a list following categories
+# in an other vector.
+geneList <- split(geneList$ENTREZID,geneList$cluster)
+names(geneList)
+head(geneList$cluster1)
+compKEGG <- compareCluster(geneCluster   = geneList,
+                         fun           = "enrichKEGG",
+                         pvalueCutoff  = 0.05,
+                         pAdjustMethod = "BH")
+dotplot(compKEGG, showCategory = 15, title = "KEGG Pathway Enrichment Analysis")
+```
+
+Let's focus on cluster 4 and visualize which genes of the the KEGG pathway "Cell cycle" (hsa04110) are both differentially expressed and bound by BRG1 and MITF. We use the `pathview` package which maps differential gene expression values to KEGG maps and create a PNG file in your current directory that you get with `getwd()`.
+
+
+```{r funcEnrcl4, message=F,warning=F}
+# load the library
+library(pathview)
+# Retrieve gene id from cluster 4
+geneList.cl4 <- geneList$cluster4
+# use match function to select correspondant logFC from RNA-seq data
+m <- match(geneList.cl4,RNAseq$ENTREZID)
+logFC.cl4 <- RNAseq$logFC[m]
+names(logFC.cl4) <- geneList.cl4
+# call the function
+pathview(logFC.cl4,pathway.id = "hsa04110",species = "hsa")
+```
+
+![Pathview](data/hsa04110.pathview.png)
+
+### Are there published data I could use to enrich my analysis ?
+
+- Data Mining with ChIP seq data deposited in GEO with `ChIPSeeker`
+
+There are many ChIP seq data sets that have been published and deposited in GEO database. We can compare our own dataset to those deposited in GEO to search for significant overlap data. Significant overlap of ChIP seq data by different binding proteins may be used to infer cooperative regulation and thus can be used to generate hypotheses.
+
+We collect about 17,000 bed files deposited in GEO, user can use getGEOspecies to get a summary based on spieces.
+
+```{r geospecies, message=F,warning=F}
+getGEOspecies()
+```
+
+User can access the detail information by getGEOInfo, for each genome version.
+
+```{r}
+hg38 <- getGEOInfo(genome="hg38", simplify=TRUE)
+head(hg38)
+```
+
+ChIPseeker provides the function `downloadGEObedFiles` to download all the bed files of a particular genome.
+
+```{r, eval=FALSE}
+downloadGEObedFiles(genome="hg38", destDir="hg38")
+```
+
+Or a vector of GSM accession number by `downloadGSMbedFiles`.
+
+```{r, eval=FALSE}
+gsm <- hg38$gsm[sample(nrow(hg38), 10)]
+downloadGSMbedFiles(gsm, destDir="hg38")
+```
+
+After the download of bed files from GEO, we can pass them to `enrichPeakOverlap` for testing the significant of overlap. Parameter targetPeak can be the folder, e.g. hg19, that containing bed files. `enrichPeakOverlap` will parse the folder and compare all the bed files. It is possible to test the overlap with bed files that are mapped to different genome or different genome versions: `enrichPeakOverlap` provides a parameter `chainFile` that can pass a chain file and liftOver the `targetPeak` to the genome version consistent with `queryPeak.` Signifcant overlap can be used to generate hypothesis of cooperative regulation. By mining the data deposited in GEO, we can identify some putative complex or interacted regulators in gene expression regulation or chromosome remodelling for further validation.
+
+- The (mod)ENCODE project [link](https://www.encodeproject.org/chip-seq-matrix/?type=Experiment&replicates.library.biosample.donor.organism.scientific_name=Homo%20sapiens&assay_title=TF%20ChIP-seq&status=released)
+
+- The UCSC genome browser [link](https://genome-euro.ucsc.edu/cgi-bin/hgGateway?redirect=manual&source=genome.ucsc.edu)
+
+# Importance of the annotation databases
+In previous annotation steps, we have annotated peaks using annotation from UCSC's knownGene. The database chosen for annotation can have an impact on subsequent results including data integration such as comparison between genes associated to peaks and gene expression using RNA-seq data for instance.
+
+Let's look at the overlap between genes expressed in RNA-seq data with genes associated to peaks (let's remind that peaks are associated to closest genes if no other evidences are used).
+
+```{r compareAnnot, eval=TRUE, fig.align = 'center', message=FALSE, include=TRUE}
+## Download GTF files
+library(GenomicFeatures)
+
+## Import BRG1 peaks annotated with Ensembl and Refseq annotation
+load(params$annot)
+
+## Here is how annotation data were downloaded
+# txdb.ensembl = makeTxDbFromGFF("data/ChIPseq/Homo_sapiens.GRCh38.103_UCSC_chr.gtf.gz")
+# txdb.refseq = makeTxDbFromUCSC(genome="hg38", tablename="refGene")
+
+## Here is how annotation was performed
+# annot <- list()
+# annot[["ensembl"]] <- annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb.ensembl, annoDb="org.Hs.eg.db")
+# annot[["refseq"]] <- annotatePeak(peaks$BRG1, tssRegion=c(-1000, 100), TxDb=txdb.refseq, annoDb="org.Hs.eg.db")
+
+## Add Gene symbols to RNAseq data
+conv.symbol <- mapIds(x=org.Hs.eg.db,
+              keys=RNAseq$Ensembl.Gene.ID, # what do we want to be mapped
+              column=c("SYMBOL"), # which type of ID we want
+              keytype="ENSEMBL") # what type of ID we give
+
+m <- match(RNAseq$Ensembl.Gene.ID,names(conv.symbol))
+
+RNAseq$SYMBOL <- conv.symbol[m]
+
+## Now let's create a venn diagram that compares peak annotation with
+## refseq or Ensembl
+library(ggVennDiagram)
+x <- list(RNAseq=RNAseq[RNAseq$signif=="up",]$SYMBOL,
+          Ensembl=as.data.frame(annot$ensembl)$SYMBOL,
+          Refseq=as.data.frame(annot$refseq)$SYMBOL
+)
+
+ggVennDiagram(x) + scale_fill_gradient(low="white",high = "blue")
+
+```
+
+# Session info
+```{r sessionInfo, include=TRUE, eval=TRUE}
+sessionInfo()
+```
+
+# References
