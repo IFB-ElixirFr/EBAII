@@ -3,17 +3,23 @@ title: "EBAIIn2 - ChIP-seq Workshop"
 author: "Elodie Darbo$^{1}$ - elodie.darbo@u-bordeaux.fr; Stephanie Le Gras$^{2}$ - slegras@igbmc.fr"
 date: "2021 May"
 output:
-  html_document:
-    fig_caption: yes
-    toc: true
-    toc_depth: 5
-    toc_float: true
-    number_sections: true
-  pdf_document:
-    fig_caption: yes
-    keep_tex: yes
-    toc: true
-    toc_depth: 3
+  # html_document:
+  #   fig_caption: yes
+  #   toc: true
+  #   toc_depth: 5
+  #   toc_float: true
+  #   number_sections: true
+  # pdf_document:
+  #   fig_caption: yes
+  #   keep_tex: yes
+  #   toc: true
+  #   toc_depth: 3
+  knitrBootstrap::bootstrap_document:
+    title: "Test file"
+    theme: amelia
+    highlight: sunburst
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
 params:
   ensembl: 103
   assembly: hg38
