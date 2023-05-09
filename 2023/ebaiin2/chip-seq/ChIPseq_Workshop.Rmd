@@ -1,30 +1,20 @@
 ---
 title: "EBAIIn2 - ChIP-seq Workshop"
-author: "Elodie Darbo$^{1}$ - elodie.darbo@u-bordeaux.fr; Stephanie Le Gras$^{2}$ - slegras@igbmc.fr"
-date: "2021 May"
-output:
-  # html_document:
-  #   fig_caption: yes
-  #   toc: true
-  #   toc_depth: 5
-  #   toc_float: true
-  #   number_sections: true
-  # pdf_document:
-  #   fig_caption: yes
-  #   keep_tex: yes
-  #   toc: true
-  #   toc_depth: 3
-  knitrBootstrap::bootstrap_document:
-    title: "Test file"
-    theme: amelia
-    highlight: sunburst
-    theme.chooser: TRUE
-    highlight.chooser: TRUE
+author: "**Autrices**: Elodie Darbo et Stephanie Le Gras; **Contributrices**: Rachel Legendre et Lucie Khamvongsa-Charbonnier"
+date:  '`r format(Sys.Date(), "%B %d, %Y")`'
+
+output: 
+  rmdformats::material:
+    use_bookdown: true
+    thumbnails: true
+    cards: false
+    
 params:
   ensembl: 103
   assembly: hg38
   organism: Homo sapiens
-  chipseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/ChIPseq/
+  #chipseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/ChIPseq/
+  chipseq: ~/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/ChIPseq/
   mapping.chipseq: stats_mappingChIPseq.tsv
   peakcalling.chipseq: stats_peakCalling.tsv
   #chipseq: /Users/elodiedarbo/Documents/enseignement/EBAIIv2_2021/data/ChIPseq/
@@ -34,21 +24,21 @@ params:
   brg1.bw: BRG1siCTRL_CHIP-seq.bw
   mitf.bw: MITF_CHIP-seq.bw
   sox10.bw: SOX10_CHIP-seq.bw
-  rnaseq: /Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData
+  rnaseq: ~//Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData
   #rnaseq: /Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData
-  annot: "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/annot.RData"
+  annot: "~/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/annot.RData"
   #annot: "/Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/data/annot.RData"
 bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
+knitr::opts_knit$set(echo = TRUE,  root.dir="~/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/", fig.path = "images/")
 #knitr::opts_knit$set(echo = TRUE,  root.dir="/Users/elodiedarbo/Documents/enseignement/EBAII/2021/ebaiin2/chip-seq/", fig.path = "images/")
 ```
 
-$^1$ Université de Bordeaux, INSERM U1218
+<!-- $^1$ Université de Bordeaux, INSERM U1218 -->
 
-$^2$ GenomEast platform, IGBMC
+<!-- $^2$ GenomEast platform, IGBMC -->
 
 ```{r,echo=F,warning=F,message=F}
 library(EnrichedHeatmap)
@@ -65,7 +55,7 @@ library(org.Hs.eg.db)
 
 
 ```{r, eval=F,echo=F}
-params <- list(chipseq = "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/ChIPseq/",
+params <- list(chipseq = "~/lkhamvongsa/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/ChIPseq/",
               mapping.chipseq= "stats_mappingChIPseq.tsv",
               peakcalling.chipseq="stats_peakCalling.tsv",
               brg1= "BRG1siCTRL_CHIP-seq_peaks.narrowPeak",
@@ -74,8 +64,8 @@ params <- list(chipseq = "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2
               brg1.bw= "BRG1siCTRL_CHIP-seq.bw",
               mitf.bw= "MITF_CHIP-seq.bw",
               sox10.bw= "SOX10_CHIP-seq.bw",
-              rnaseq= "/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData",
-              annot="/Users/slegras/Documents/Formations/EBAII/2021/ebaiin2/chip-seq/data/annot.Rdata"
+              rnaseq= "~/lkhamvongsa/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/RNAseq/RNAseq_diff_norm.RData",
+              annot="~/lkhamvongsa/Documents/GitHub/EBAII/2023/ebaiin2/chip-seq/data/annot.Rdata"
 )
 ```
 
@@ -181,8 +171,9 @@ sapply(peaks,length)
 Make a simple `barplot` showing the number of BRG1 peaks.
 
 <details>
-  <summary> Show code: barplot </summary>
+  <summary style="color: DarkCyan"> Show code: barplot </summary>
 ```{r simplebarplot, include=TRUE, out.width="50%", fig.align = 'center'}
+
 barplot(sapply(peaks,length))
 ```
 </details>
@@ -194,7 +185,7 @@ Step by step:
 - Do not forget to load the ggplot2 library.
 
 <details>
-  <summary> Show code: load ggplot2 </summary>
+  <summary style="color: DarkCyan"> Show code: load ggplot2 </summary>
 ```{r loadggplot, include=TRUE}
 # Load ggplot2 library
 library(ggplot2)
@@ -204,7 +195,7 @@ library(ggplot2)
 - Create a data.frame with two columns: IP contains names of the chipped TFs and NbPeaks contains the number of peaks.
 
 <details>
-  <summary> Show code: create the data.frame </summary>
+  <summary style="color: DarkCyan"> Show code: create the data.frame </summary>
 ```{r peakLengths, include=TRUE}
 # create a table with the data to display
 peak.lengths <- data.frame(IP=names(peaks),
@@ -215,8 +206,9 @@ peak.lengths <- data.frame(IP=names(peaks),
 - use ggplot2 with the appropriate geometric object `geom_*`
 
 <details>
-  <summary> Show code: barplot with ggplot2 </summary>
+  <summary style="color: DarkCyan"> Show code: barplot with ggplot2 </summary>
 ```{r enhancedbarplot, include=TRUE, out.width="50%",fig.align = 'center'}
+# 
 # make the barplot
 ggplot(peak.lengths, aes(x=IP, y=NbPeaks)) +
          geom_col()
@@ -244,8 +236,9 @@ Step by step:
 - Add the new information fill=IP to let ggplot know that colors change based on chipped protein
 
 <details>
-  <summary> Show code: color according to the chipped TF (column IP) </summary>
+  <summary style="color: DarkCyan"> Show code: color according to the chipped TF (column IP) </summary>
 ```{r enhancedbarplotfollow1, include=TRUE, fig.show="hold", out.width="50%", fig.align = 'center'}
+
 ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
          geom_col()
 ```
@@ -254,8 +247,9 @@ ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
 We want to use colors from `RColorBrewer` library with the "Set1" color palette. To set your own colors to fill the plot, several functions are available (`scale_fill_*`), here we use `scale_fill_brewer`.
 
 <details>
-  <summary> Show code: color according to the chipped TF (column IP) and set RColorBrewer palette to Set1 </summary>
+  <summary style="color: DarkCyan"> Show code: color according to the chipped TF (column IP) and set RColorBrewer palette to Set1 </summary>
 ```{r enhancedbarplotfollow2, include=TRUE, fig.show="hold", out.width="50%", fig.align = 'center'}
+
 ggplot(peak.lengths, aes(x=IP, y=NbPeaks, fill=IP)) +
          geom_col()+
          scale_fill_brewer(palette="Set1")
@@ -272,7 +266,7 @@ BRG1 peaks were loaded as a `GRanges` object.
 
 
 <details>
-  <summary> Show code: Display peak length statistics </summary>
+  <summary style="color: DarkCyan"> Show code: Display peak length statistics </summary>
 ```{r peakWidth, message=FALSE, include=TRUE}
 ## we use the function width() from GenomicRanges
 library(GenomicRanges)
@@ -284,8 +278,9 @@ summary(width(peaks$BRG1))
 Create a simple `boxplot` of the peak sizes.
 
 <details>
-  <summary> Show code: Display peak length statistics as a boxplot </summary>
+  <summary style="color: DarkCyan"> Show code: Display peak length statistics as a boxplot </summary>
 ```{r simpleboxplot, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+
 peak.width <- lapply(peaks,width)
 boxplot(peak.width)
 ```
@@ -303,8 +298,9 @@ head(peak.width.table)
 Create a ggplot object with correct aesthetics to display a boxplot according the chipped TF (x-axis) and their width (y-axis). Then use appropriate geometric object `geom_*`.
 
 <details>
-  <summary> Show code: Display peak length statistics with ggplot2 </summary>
+  <summary style="color: DarkCyan"> Show code: Display peak length statistics with ggplot2 </summary>
 ```{r boxplot, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+
 ## create boxplot
 ggplot(peak.width.table, aes(x=L1, y=value)) +
          geom_boxplot()
@@ -317,8 +313,9 @@ Using the ggplot2 documentation (*e.g.* https://ggplot2.tidyverse.org/ or [googl
 
 
 <details>
-  <summary>Enhance it !</summary>
+  <summary style="color: DarkCyan">Enhance it !</summary>
 ```{r enhancedboxplot2, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+
 # - theme_classic() change grey background to white background
 # - fill=L1 and scale_fill_brewer(palette="Set1") colors boxplots
 # based on chipped protein and with colors from RColorBrewer Set1 palette
@@ -339,7 +336,7 @@ ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
 To make sure we keep only high quality data. We are going to select those peaks having a qValue >= 8. The qValue corresponds to the 9th column of narrowPeak files. So, we are going to set a threshold on this. How many peaks are selected ?
 
 <details>
-  <summary>Show the code: select high quality peaks</summary>
+  <summary style="color: DarkCyan">Show the code: select high quality peaks</summary>
 ```{r peakFilteringBRG1, message=FALSE, include=TRUE}
 ## Select high quality peaks
 peaks$BRG1 <- peaks$BRG1[peaks$BRG1$V9 >= 8]
@@ -374,7 +371,7 @@ This is done using the function `annotatePeak` which compares peak positions wit
 
 
 <details>
-  <summary>Show code: annotate BRG1 peaks</summary>
+  <summary style="color: DarkCyan">Show code: annotate BRG1 peaks</summary>
 
 ```{r annotatePeaksBRG1, eval=TRUE, message=FALSE, include=TRUE}
 ## Annotate peaks for all datasets and store it in a list
@@ -417,7 +414,7 @@ Reminder: The TxDb class is a container for storing transcript annotations.
 - One can also create a TxDb objects for his favourite organism using an annotation file in GTF/GFF format using the function makeTxDbFromGFF or the package GenomicFeatures.
 
 <details>
-  <summary>Expand to find Coturnix japonica example</summary>
+  <summary style="color: DarkCyan">Expand to find Coturnix japonica example</summary>
 
 ```{r createTxDbGTF, include=TRUE, eval=FALSE}
 ## download GTF file
@@ -442,7 +439,7 @@ txdb = loadDb(file = 'txdb.Coturnix_japonica_2.1.sqlite')
 We can now perform a more detailed analysis of genomic features associated to our peaks (introns, exons, promoters, distal regions,...) visualizing the genomic distribution either as a pie chart with `plotAnnoPie` or as a bar chart `plotAnnoBar`.
 
 <details>
-  <summary>Show code: Display peak distribution of genomic features</summary>
+  <summary style="color: DarkCyan">Show code: Display peak distribution of genomic features</summary>
 ```{r genomicFeatureDistribution, include=TRUE, eval=TRUE, fig.align = 'center'}
 ## distribution of genomic features for BRG1 peaks
 # as a pie chart - which is the most widely used representation in publication
@@ -473,7 +470,7 @@ Step by step:
 - Compute the center of BRG1 peaks using the GenomicRanges methods `start` and `end`. Assign the results to a new column in metadata of the BRG1 peaks object.
 
 <details>
-  <summary>Show code: compute the peak centers </summary>
+  <summary style="color: DarkCyan">Show code: compute the peak centers </summary>
 ```{r BRG1peakcenter, message=FALSE, include=TRUE, fig.align = 'center'}
 # Compute the center of the peaks and attribute it to a new
 # column in the metadata of the BRG1 peak GRanges
@@ -484,7 +481,7 @@ peaks$BRG1$center.peak <- (start(peaks$BRG1) + end(peaks$BRG1))/2
 - Sort the peaks in decreasing `order` (column V9) and select the top 10,000.
 
 <details>
-  <summary>Show code: order and select peaks </summary>
+  <summary style="color: DarkCyan">Show code: order and select peaks </summary>
 ```{r BRG1peaktop10K, message=FALSE, include=TRUE, fig.align = 'center'}
 # For computation and memory efficiency reasons,
 # we subset the top 10K peaks according to the FDR column (V9)
@@ -495,7 +492,7 @@ top.10000 <- peaks$BRG1[order(peaks$BRG1$V9,decreasing=T)][1:10000]
 - Create a `GRanges` object containing genomic positions of the 10K peak centers. You need to define `seqnames` and `ranges` in an `IRanges` object: `IRanges(start,end)`.
 
 <details>
-  <summary>Show code: Create GRanges object with peak center </summary>
+  <summary style="color: DarkCyan">Show code: Create GRanges object with peak center </summary>
 ```{r BRG1peakcenterGR, message=FALSE, include=TRUE, fig.align = 'center'}
 # Generate peak center GRanges for the 10K top peaks
 centers.BRG1 <- GRanges(seqnames(top.10000),
@@ -507,23 +504,27 @@ centers.BRG1 <- GRanges(seqnames(top.10000),
 - Extend the ranges each side of 2000 bp using the function `resize`. Fill the parameters `width` and `fix`.
 
 <details>
-  <summary>Show code: resize the peak regions </summary>
+  <summary style="color: DarkCyan">Show code: resize the peak regions </summary>
 ```{r resizePeaks, message=FALSE, include=TRUE, fig.align = 'center'}
 # Extend each side of 2000 bp
-extended.2K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+4000, fix = "center")
+#extended.2K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+4000, fix = "center")
+# Lucie : rencontre des soucis avec getTagMatrix : Error in getTagMatrix(peaks$BRG1, windows = extended.2K.BRG1) :
+#windows should be made from getPromoters()/getBioRegion()/makeBioRegionFromGranges()
+extended.2K.BRG1 <- makeBioRegionFromGranges(centers.BRG1,by="peaks", type= "start_site", upstream = 2000, downstream = 2000)
 ```
 </details>
 
 - You now have the regions you want to map the peaks to. Create the matrix using the `getTagMatrix` function and the parameter `windows`. Display it with `tagHeatmap` and its parameters `xlim` and `color` which correspond to the presence of peaks in the region.
 
 <details>
-  <summary>Show code: create the matrix and display the heatmap </summary>
+  <summary style="color: DarkCyan">Show code: create the matrix and display the heatmap </summary>
 
 ```{r signalAroundBRG1center, message=FALSE, include=TRUE, fig.align = 'center'}
 ## compute the density of peaks within the promoter regions
 tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.2K.BRG1)
 ## plot the density
-tagHeatmap(tagMatrix, xlim=c(-2000, 2000), color="red")
+#tagHeatmap(tagMatrix, xlim=c(-2000, 2000), color="red")
+tagHeatmap(tagMatrix)
 ```
 </details>
 
@@ -532,10 +533,13 @@ The regions are ordered relative to their peak enrichment.
 We can display a summary of the binding profiles by looking at the corresponding average profiles. This kind of profiles is much less greedy, we can thus extend a bit more (e.g. +/- 5000) from the peak centers redoing the previous steps. Definition of the regions have to be redone. Try to create the `GRanges` and the `tagMatrix`. \
 
 <details>
-  <summary>Show code: Extend 5000bp from TSS and create the matrix </summary>
+  <summary style="color: DarkCyan">Show code: Extend 5000bp from TSS and create the matrix </summary>
 ```{r extend5000, message=FALSE, include=TRUE}
 # Extend from the peak center
-extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+#extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+#Lucie modif
+extended.5K.BRG1 <- makeBioRegionFromGranges(centers.BRG1,by="peaks", type= "start_site", upstream = 5000, downstream = 5000)
+
 ## compute the density of peaks within the promoter regions
 tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.5K.BRG1)
 ```
@@ -546,7 +550,7 @@ tagMatrix <- getTagMatrix(peaks$BRG1, windows=extended.5K.BRG1)
 Use the `plotAvgProf` function defining the `xlim` and setting the labels of the x and y axis.
 
 <details>
-  <summary>Show code: Plot the average profile of BRG1 binding </summary>
+  <summary style="color: DarkCyan">Show code: Plot the average profile of BRG1 binding </summary>
 
 ```{r profileBRG1, message=F, warning=F, fig.align = 'center'}
 # Plot the profile
@@ -574,7 +578,7 @@ Data are imported using a function from the `rtracklayer` package.
 First, create the `GRanges` object containing centers of **all** the peaks and extend them each side of 5000 bp.
 
 <details>
-  <summary>Show code: Create all peak center GRanges object and extend them </summary>
+  <summary style="color: DarkCyan">Show code: Create all peak center GRanges object and extend them </summary>
 
 ```{r centersBRG15K, message=FALSE, include=TRUE}
 # # Generate peak center GRanges for all the peaks
@@ -582,7 +586,9 @@ centers.BRG1 <- GRanges(seqnames(peaks$BRG1),
                         IRanges(start=peaks$BRG1$center.peak,
                                 end=peaks$BRG1$center.peak))
 # Extend each side of 5000 bp
-extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+#extended.5K.BRG1 <- resize(centers.BRG1, width = width(centers.BRG1)+10000, fix = "center")
+#Lucie modif
+extended.5K.BRG1 <- makeBioRegionFromGranges(centers.BRG1,by="peaks", type= "start_site", upstream = 5000, downstream = 5000)
 ```
 </details>
 
@@ -605,7 +611,7 @@ We can now create a matrix of read enrichment at the positions of interest with 
 Load the library and find the required parameters. Be careful to the type of the required objects.
 
 <details>
-  <summary>Show code: Create the read enrichment matrix </summary>
+  <summary style="color: DarkCyan">Show code: Create the read enrichment matrix </summary>
 ```{r prepareMatrix, message=FALSE, include=TRUE}
 # load library
 library(ChIPpeakAnno)
@@ -658,6 +664,7 @@ Let's enhance it!
 - We first retrieve the peak clusters from `htlist` object to use them as a pre-defined partition in our enhanced heatmap.
 
 ```{r retreiveCl, message=FALSE, include=TRUE, out.width="50%", fig.align = 'center'}
+
 # Use the row_order function to retrieve peaks index
 # belonging to each cluster
 clusters <- row_order(htlist)
@@ -743,7 +750,7 @@ plotAnnoBar(peakAnnoList)
 Using the `readPeakFile` function, add MITF (MITF_CHIP-seq_peaks.narrowPeak) and SOX10 (SOX10_CHIP-seq_peaks.narrowPeak) peaks to the `peaks` list. The path to these files is stored in the `params` list as the `chipseq` element.
 
 <details>
-  <summary>Show code: Read MITF and SOX10 peak files</summary>
+  <summary style="color: DarkCyan">Show code: Read MITF and SOX10 peak files</summary>
 ```{r loadData2, include=TRUE}
 ## Let's load MITF and SOX10 peak sets
 peaks[["MITF"]] <- readPeakFile(paste0(params$chipseq, params$mitf), as="GRanges")
@@ -766,7 +773,7 @@ Try to create the command lines enabling to get a data.frame containing the numb
 
 
 <details>
-  <summary>Show code: Plot peak set size per TF</summary>
+  <summary style="color: DarkCyan">Show code: Plot peak set size per TF</summary>
 ```{r loadData3, include=TRUE}
 # The `sapply` function makes now completely sense as we have a list with
 # several elements to which we want to apply functions, here the length function.
@@ -800,7 +807,7 @@ Compute statistics on all peak sizes as in section 2.3.
 - Use the `melt` function from the reshape2 package to obtain a data.frame with one column with all the peak width and one column containing the name of the peak set they come from.
 
 <details>
-  <summary>Show code: create a data.frame containing all peak widths</summary>
+  <summary style="color: DarkCyan">Show code: create a data.frame containing all peak widths</summary>
 ```{r reshapeAll, message=FALSE, include=TRUE}
 peak.width = lapply(peaks,width)
 str(peak.width)
@@ -831,7 +838,7 @@ ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
 ```
 
 <details>
-  <summary>Show code: plot the distribution on peak length per experiment</summary>
+  <summary style="color: DarkCyan">Show code: plot the distribution on peak length per experiment</summary>
 ```{r peakWidthNice, message=FALSE, include=TRUE, fig.align = 'center',eval=F}
 ggplot(peak.width.table, aes(x=L1, y=value, fill=L1)) +
          geom_boxplot()+
@@ -866,7 +873,7 @@ sapply(peaks, length)
 Load and add MITF and SOX10 annotations to the `peakAnno` list that already contains BRG1 annotations using `annotatePeak` as in 2.6.1.
 
 <details>
-  <summary>Show code: annotate the peaks</summary>
+  <summary style="color: DarkCyan">Show code: annotate the peaks</summary>
 
 ```{r annotatePeaksAll, eval=TRUE, message=FALSE, include=TRUE, fig.align = 'center'}
 peakAnno[["MITF"]] = annotatePeak(peaks$MITF, tssRegion=c(-1000, 100), TxDb=txdb, annoDb="org.Hs.eg.db")
@@ -877,7 +884,7 @@ peakAnno[["SOX10"]] = annotatePeak(peaks$SOX10, tssRegion=c(-1000, 100), TxDb=tx
 And plot the distribution of genomic feature of the peaks as a barplot.
 
 <details>
-  <summary>Show code: Plot genomic feature distribution per experiment</summary>
+  <summary style="color: DarkCyan">Show code: Plot genomic feature distribution per experiment</summary>
 ```{r plotAnnoAllpeaks,message=FALSE, include=TRUE, fig.align = 'center'}
 plotAnnoBar(peakAnno)
 ```
@@ -1225,7 +1232,7 @@ ggplot(expr.melt,aes(x=cluster,y=log2(value+1))) +
 ```
 
 <details>
-  <summary>Show code: plot expression distribution in both condition</summary>
+  <summary style="color: DarkCyan">Show code: plot expression distribution in both condition</summary>
 
 ```{r boxplotexpr, fig.align = 'center',eval=F}
 # melt the RNAseq table to get a data.frame with a column indicating
@@ -1255,7 +1262,7 @@ ggplot(RNAseq,aes(x=cluster)) +
 
 
 <details>
-  <summary>Show code: plot significantly differentially expressed genes in clusters</summary>
+  <summary style="color: DarkCyan">Show code: plot significantly differentially expressed genes in clusters</summary>
 
 ```{r, fig.align = 'center',eval=F}
 # Distribution of differentially expressed genes as barplots
