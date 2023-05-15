@@ -63,11 +63,9 @@ Lien vers les tutoriels au format R Markdown : [Lien vers dossier compressé](01
 
 | Fichier                                            | Intervenant      | Supports                                                                                               |
 |----------------------------------------------------|------------------|--------------------------------------------------------------------------------------------------------|
-| Introduction et rappel                             | Nadia Bessoltane | [[Slides](https://docs.google.com/presentation/d/1nXKT_iyAzfBZkB495JmtXAB-Es7XF7Ci/edit#slide=id.p1)]  |
-| Analyse des variants post-VCF : Jeux de données #1 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
-| Analyse des variants post-VCF : Jeux de données #2 | Nadia Bessoltane | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
-| Copy Number Alterations                            | Bastien Job      | [[pdf](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pdf)] [[pptx](DNAseq/EBAI2021n2_CNA_jupyter_BJ.pptx)]          |
-| Single Cell (on request)                           | Bastien Job      | [[pdf](DNAseq/Intro_Single-Cell_20210119.pdf)]                                                         |
+| Introduction et rappel                             | Nadia Bessoltane / Vivien Deshaies | [[Slides](https://docs.google.com/presentation/d/1nXKT_iyAzfBZkB495JmtXAB-Es7XF7Ci/edit#slide=id.p1)]  |
+| Analyse des variants post-VCF : small variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
+| Analyse des variants post-VCF : structural variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
 
 
 ### Intégration de données
