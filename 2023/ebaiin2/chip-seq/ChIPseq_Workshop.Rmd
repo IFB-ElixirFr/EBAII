@@ -117,7 +117,7 @@ We create a list containing the absolute paths to the data we will use along the
 
 ```{r, eval=F,echo=T}
 params <- list(
-  chipseq= "/shared/projects/ebai2021_n2/data/chip_seq/ChIPseq/",
+  chipseq= "/shared/projects/2315_ebaii_2/ChIPseq/data/ChIPseq/",
   mapping.chipseq= "stats_mappingChIPseq.tsv",
   peakcalling.chipseq="stats_peakCalling.tsv",
   brg1= "BRG1siCTRL_CHIP-seq_peaks.narrowPeak",
@@ -126,7 +126,7 @@ params <- list(
   brg1.bw= "BRG1siCTRL_CHIP-seq.bw",
   mitf.bw= "MITF_CHIP-seq.bw",
   sox10.bw= "SOX10_CHIP-seq.bw",
-  rnaseq= "/shared/projects/ebai2021_n2/data/chip_seq/RNAseq/RNAseq_diff_norm.RData"
+  rnaseq= "/shared/projects/2315_ebaii_2/ChIPseq/data/RNAseq/RNAseq_diff_norm.RData"
   )
 ```
 
