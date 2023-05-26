@@ -17,28 +17,26 @@ From there, you can also find a link to download the whole repository with `git`
 
 ### Visualisation en R
 
+| Thématique| Intervenant       | Lien vers la présentation |
+|----------:|:-----------------:|:--------------------------|
+| Programme | Vincent Guillemot | [[PDF](01R/S00programme.pdf)] |
+| Packages  | Vincent Guillemot | [[PDF](01R/S01packages.pdf)]  |
+| `dplyr`   | Vincent Guillemot | [[PDF](01R/S02dplyr.pdf)]     |
+| `ggplot2` | Vincent Guillemot | [[PDF](01R/S03ggplot2.pdf)]   |
+| couleurs  | Vincent Guillemot | [[PDF](01R/S04couleurs.pdf)]  |
+| `pheatmap`| Vincent Guillemot | [[PDF](01R/S05pheatmap.pdf)]  |
+| upset     | Vincent Guillemot | [[PDF](01R/S06upset.pdf)]     |
+| `gggenes` | Vincent Guillemot | [[PDF](01R/S07gggenes.pdf)]   |
 
-| Thématique| Intervenant        | Lien vers la présentation | Tutoriel|
-|-----------|--------------------|---------------------------------------|-----------|
-| Programme | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S00programme.html) [PDF](01R/tidyViz/vignettes/S00programme.pdf)] | [[Lien](https://learnr.pasteur.fr/T00tuto/)] |
-| Packages  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S01packages.html) [PDF](01R/tidyViz/vignettes/S01packages.pdf)] | [[Lien](https://learnr.pasteur.fr/T01packages/)] |
-| dplyr     | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S02dplyr.html) [PDF](01R/tidyViz/vignettes/S02dplyr.pdf)] | [[Lien](https://learnr.pasteur.fr/T02dplyr/)] |
-| ggplot2   | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S03ggplot2.html) [PDF](01R/tidyViz/vignettes/S03ggplot2.pdf)] | [[Lien](https://learnr.pasteur.fr/T03ggplot2/)] |
-| couleurs  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S04couleurs.html) [PDF](01R/tidyViz/vignettes/S04couleurs.pdf)] | [[Lien](https://learnr.pasteur.fr/T04couleurs)] |
-| pheatmap  | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S05pheatmap.html) [PDF](01R/tidyViz/vignettes/S05pheatmap.pdf)] | [[Lien](https://learnr.pasteur.fr/T05pheatmap)] |
-| upset     | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S06upset.html) [PDF](01R/tidyViz/vignettes/S06upset.pdf)] | [[Lien](https://learnr.pasteur.fr/T06upset)] |
-| gggenes   | Vincent Guillemot  | [[HTML](01R/tidyViz/vignettes/S07gggenes.html) [PDF](01R/tidyViz/vignettes/S07gggenes.pdf)] | [[Lien](https://learnr.pasteur.fr/T07gggenes)] |
+Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj4ZsQbxgKUJmKTbdbXdmSWeOYkqtVLc/edit?usp=sharing) du cours de R.
 
-Lien vers les scripts que nous avons écrits pendant la journée R : [Lien vers dossier compressé](01R/tidyViz/inst/extdata/ebaiin2_01Rvisu.zip)
-
-Lien vers les tutoriels au format R Markdown : [Lien vers dossier compressé](01R/tidyViz/inst/extdata/tutos.zip). Pour générer une version locale du tutoriel, ouvrez le sur Rstudio, installez les packages manquants et cliquez sur "knit".
+Lien vers les [données](01R/immune_landscape.xlsx).
 
 ### FAIR
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
 | Sciences ouvertes et principes FAIR  | Thomas Denecker | [pdf](https://doi.org/10.6084/m9.figshare.14677941.v1)  |
-
 
 
 
@@ -70,8 +68,13 @@ Lien vers les tutoriels au format R Markdown : [Lien vers dossier compressé](01
 
 ### Intégration de données
 
-| Fichier                  | Intervenant      | Supports                                                                       |
-|--------------------------|------------------|--------------------------------------------------------------------------------|
-| Comparaison outils       | Vincent Guillemot , Laura Cantini    | [           |
-| TP intégration        | Vincent Guillemot  |                                         |
+| Thématique| Intervenant·e·s.  | Lien vers la présentation           |
+|----------:|:-----------------:|:------------------------------------|
+| ACP       | VG + CP + RL + LK | [[PDF](02Integration/01_ACP.pdf)]   |
+| CCA       | VG + CP + RL + LK | [[PDF](02Integration/02_CCA.pdf)]   |
+| RGCCA     | VG + CP + RL + LK | [[PDF](02Integration/03_RGCCA.pdf)] |
+
+Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj4ZsQbxgKUJmKTbdbXdmSWeOYkqtVLc/edit?usp=sharing) du cours de R.
+
+Lien vers les [données](02Integration/integration.zip).
 

@@ -1,0 +1,13 @@
+slides > slide.title-slide {
+    background-image: url("omics.jpg");
+    background-repeat: no-repeat;
+    color: #048;
+}
+
+title {
+  background-color: #010101;
+}
+
+h1,h2,h3 {
+    color: #048;
+}
