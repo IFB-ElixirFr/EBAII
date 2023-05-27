@@ -34,7 +34,7 @@ library(RColorBrewer)
 Nous allons également avoir besoin des données fruits : 
 
 ```{r data}
-data("fruits", package = "tidyViz")
+fruits <- readxl::read_excel("fruits.xlsx")
 ```
 
 # Trois façons de colorier des objets

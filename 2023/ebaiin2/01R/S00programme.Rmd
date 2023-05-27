@@ -20,7 +20,11 @@ knitr::opts_chunk$set(
 
 ## Je me présente {.columns-2 .bigger}
 
-![Vincent Guillemot](img/S00programme/moi.001.jpeg){width=75%}
+![](img/S00programme/moi.001.jpeg){width=75%}
+
+<p class="forceBreak"></p>
+
+Vincent Guillemot
 
  * Biostatisticien
  * Intégration de données
@@ -29,8 +33,7 @@ knitr::opts_chunk$set(
 
 ## Quiz de bienvenue
 
-![Voir le lien et le code sur le chat !](img/S00programme/Kahoot_Logo.svg){width=100%}
-
+![](img/S00programme/Kahoot_Logo.svg){width=100%}
 
 ## Au programme {.columns-2 .bigger}
 
@@ -49,8 +52,6 @@ Plutôt l'après-midi
 
  * `pheatmap` : pour les cartes de chaleur et la classification hiérarchique
  * Diagrammes de Venn et *UpSet* plots
- * `gggenes` 
- * `trackViewer::lolliplot`
  * Quiz de fin
 
 ## Déroulement du cours
@@ -65,8 +66,9 @@ Pour favoriser l'interactivité de ce cours en distanciel, voici ce que je vous 
 
 ## Des données simples... pour moi
 
-![Composition de produits alimentaires (https://ciqual.anses.fr/)](img/S00programme/ciqual.jpg){width=100%}
+![](img/S00programme/ciqual.jpg){width=100%}
 
+Composition de produits alimentaires (https://ciqual.anses.fr/)
 
 ## Ressources
 
@@ -77,7 +79,6 @@ Pour favoriser l'interactivité de ce cours en distanciel, voici ce que je vous 
   * La page STDHA sur [les couleurs](http://www.sthda.com/french/wiki/couleurs-dans-r) (FR)
   * La page de [ggpubr](https://rpkgs.datanovia.com/ggpubr/) (EN)
   * La vignette de [gggenes](https://cran.r-project.org/web/packages/gggenes/vignettes/introduction-to-gggenes.html) (EN)
-  * La vignette de [trackViewer](https://bioconductor.org/packages/release/bioc/vignettes/trackViewer/inst/doc/trackViewer.html) (EN)
   * [R pour les débutants d'Emmanuel Paradis](https://cran.r-project.org/doc/contrib/Paradis-rdebuts_fr.pdf) (FR)
   
   

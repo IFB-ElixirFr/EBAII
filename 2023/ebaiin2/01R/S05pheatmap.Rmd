@@ -33,7 +33,7 @@ library(pheatmap)
 Nous allons également avoir besoin des données fruits : 
 
 ```{r data}
-data("fruits", package = "tidyViz")
+fruits <- readxl::read_excel("fruits.xlsx")
 ```
 
 ## Premier essai

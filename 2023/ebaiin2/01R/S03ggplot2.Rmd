@@ -35,12 +35,13 @@ library(ggplot2)
 Nous allons également avoir besoin des données fruits : 
 
 ```{r data}
-data("fruits", package = "tidyViz")
+fruits <- readxl::read_excel("fruits.xlsx")
 ```
 
 ## Bien choisir sa représentation graphique {.centered}
 
-![From Data to Viz : https://www.data-to-viz.com/](img/S03ggplot2/data-viz.png){width=50%}
+![](img/S03ggplot2/data-viz.png){width=50%}
+From Data to Viz : https://www.data-to-viz.com/
 
 ## Un échantillon de ce qu'il est possible de faire avec ggplot2 {.center}
 
@@ -131,8 +132,10 @@ Comment corriger la commande suivante pour obtenir le graphe à droite ?
 <p class="forceBreak"></p>
 
 
-![Hadley Wickham](img/S03ggplot2/wickham.png){width=50%}
- 
+![](img/S03ggplot2/wickham.png){width=50%}
+Hadley Wickham
+
+
 ## Quelques géométries
 
 Nous allons voir ensemble quelques géométries particulières qui permettent de créer des graphes classiques.

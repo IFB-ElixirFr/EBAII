@@ -48,7 +48,8 @@ rnorm(10) %>% hist()
 ## Le tidyverse {.bigger}
 
 <div class="centered">
-![Tidyverse: https://www.tidyverse.org/](img/S02dplyr/tidyverse.jpg){width=70%}
+![](img/S02dplyr/tidyverse.jpg){width=70%}
+Tidyverse: https://www.tidyverse.org/
 </div>
 
 ## Avant toute chose
@@ -70,7 +71,7 @@ library(tidyverse)
 Et charger les données.
 
 ```{r fruits}
-data("fruits", package = "tidyViz")
+fruits <- readxl::read_excel("fruits.xlsx")
 ```
 
 ## Le format "tibble" {.smaller}
