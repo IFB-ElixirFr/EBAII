@@ -46,7 +46,7 @@ Lien vers les [données fruits](01R/fruitsxlsx).
 |-----------------------|--------------|-------------------------------------|
 | ChIPseq Workshop (Rendu HTML) | Lucie Khamvongsa, Rachel Legendre  | [html](chip-seq/ChIPseq_Workshop.html)  |
 | ChIPseq Workshop (Rmarkdown) | Lucie Khamvongsa, Rachel Legendre | [Rmd](chip-seq/ChIPseq_Workshop.Rmd)  |
-| Diaporama | Lucie Khamvongsa, Rachel Legendre | [Google doc](https://docs.google.com/presentation/d/1twITqohPsRwHDnarQO61BgNdI_5rMrPsznRt0lcPdQo/edit?usp=sharing)  |
+| Diaporama | Lucie Khamvongsa, Rachel Legendre | [Google doc](https://docs.google.com/presentation/d/1kULjxr2eEMq4LtKmYcy5STxsTqHv0wB09q88dQ7LvTI/edit?usp=sharing)  |
 
 ### RNA-seq
 
