@@ -36,7 +36,7 @@ Lien vers les [données fruits](01R/fruitsxlsx).
 
 | Cours                 | Intervenants | Supports                            |
 |-----------------------|--------------|-------------------------------------|
-| Sciences ouvertes et principes FAIR  | Thomas Denecker | [pdf](https://doi.org/10.6084/m9.figshare.14677941.v1)  |
+| Sciences ouvertes et principes FAIR  | Charlotte Berthelier & Thomas Denecker | [pdf](https://doi.org/10.6084/m9.figshare.23275349.v3)  |
 
 
 
