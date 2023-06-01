@@ -49,7 +49,7 @@ library(ggrepel)            # ajouter des labels sur les plots
 library(ggbeeswarm)         # plots avancés
 library(scales)             # transformation log2 dans ggplot
 library(dplyr)              # manipulation de donnees
-library(ggVennDiagram)      # diagrammes de Venn
+library(ggvenn)             # diagrammes de Venn
 library(UpSetR)             # UpSet plot
 library(FactoMineR)         # ACP
 library(factoextra)         # plot de l'ACP
@@ -220,7 +220,7 @@ print(head(d), digits=3)
 x <- list("4h vs 0h"=d %>% filter(padj_4vs0 <= 0.05) %>% pull(gene),
           "8h vs 0h"=d %>% filter(padj_8vs0 <= 0.05) %>% pull(gene),
           "8h vs 4h"=d %>% filter(padj_8vs4 <= 0.05) %>% pull(gene))
-ggVennDiagram(x)
+ggvenn(x)
 ```
 
 Le diagramme généré est plutôt lisible car nous avons croisé seulement 3 listes. Pour croiser davantage de données, les UpSet plots ont récemment vu le jour et sont souvent plus adaptés :
