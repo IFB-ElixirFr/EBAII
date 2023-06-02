@@ -62,8 +62,8 @@ Lien vers les [données fruits](01R/fruitsxlsx).
 | Fichier                                             | Intervenant      | Supports                                                                                               |
 |-----------------------------------------------------|------------------|------------|
 | Introduction et rappel                              | Nadia Bessoltane / Vivien Deshaies | [[Slides](https://docs.google.com/presentation/d/1sxPHYh2s5K3iwm72A-pQBd6kh04rah17/edit#slide=id.p1)]  |
-| Analyse des variants post-VCF : small variants      | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)]  [ZIP](DNASeq/TP_small_variants/data.zip) |
-| Analyse des variants post-VCF : structural variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)]  [ZIP](DNASeq/TP_SV_variants/data.zip) |
+| Analyse des variants post-VCF : small variants      | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)]  [[ZIP]](DNASeq/TP_small_variants/data.zip) |
+| Analyse des variants post-VCF : structural variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)]  [[ZIP]](DNASeq/TP_SV_variants/data.zip) |
 
 
 ### Intégration de données
