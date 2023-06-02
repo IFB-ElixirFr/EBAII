@@ -61,7 +61,7 @@ Lien vers les [données fruits](01R/fruitsxlsx).
 
 | Fichier                                            | Intervenant      | Supports                                                                                               |
 |----------------------------------------------------|------------------|--------------------------------------------------------------------------------------------------------|
-| Introduction et rappel                             | Nadia Bessoltane / Vivien Deshaies | [[Slides](https://docs.google.com/presentation/d/1nXKT_iyAzfBZkB495JmtXAB-Es7XF7Ci/edit#slide=id.p1)]  |
+| Introduction et rappel                             | Nadia Bessoltane / Vivien Deshaies | [[Slides](https://docs.google.com/presentation/d/1sxPHYh2s5K3iwm72A-pQBd6kh04rah17/edit#slide=id.g24854b049af_1_500)]  |
 | Analyse des variants post-VCF : small variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data1.html)] |
 | Analyse des variants post-VCF : structural variants | Nadia Bessoltane / Vivien Deshaies | [[Rmd](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.Rmd)]  [[html](DNAseq/EBAIIn2_DNAseq_Post-VCF_data2.html)] |
 
