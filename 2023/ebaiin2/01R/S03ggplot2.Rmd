@@ -40,8 +40,9 @@ fruits <- readxl::read_excel("fruits.xlsx")
 
 ## Bien choisir sa représentation graphique {.centered}
 
-![](img/S03ggplot2/data-viz.png){width=50%}
 From Data to Viz : https://www.data-to-viz.com/
+
+![](img/S03ggplot2/data-viz.png){width=50%}
 
 ## Un échantillon de ce qu'il est possible de faire avec ggplot2 {.center}
 
@@ -78,18 +79,22 @@ ggplot(data = fruits, aes(x = groupe, fill = groupe)) +
  * `aes` : déclaration des paramètres esthétiques du graphes (position horizontale, verticale, couleur épaisseur, forme, transparence etc...)
  * `geom_bar` : utilisation d'une géométrie 
 
+## Le canevas {.center}
+
+![](img/S03ggplot2/ggplot-1.png){width=100%}
+
 
 ## Les données {.center}
 
-![](img/S03ggplot2/ggplot.001.jpeg){width=100%}
+![](img/S03ggplot2/ggplot-2.png){width=100%}
 
 ## Les paramètres esthétiques {.center}
 
-![](img/S03ggplot2/ggplot.002.jpeg){width=100%}
+![](img/S03ggplot2/ggplot-3.png){width=100%}
 
 ## Les géométries {.center}
 
-![](img/S03ggplot2/ggplot.003.jpeg){width=100%}
+![](img/S03ggplot2/ggplot-4.png){width=100%}
 
 ## L'image à retenir {.center}
 
@@ -110,12 +115,16 @@ Esthétiques  `aes()`   Les paramètres esthétiques de ces formes. Par exemple 
 
 ## A vous ! {.columns-2}
 
+À quoi servent les deux premières lignes ?
 Comment corriger la commande suivante pour obtenir le graphe à droite ?
 
 ```{r acompleter, eval = FALSE}
- ggplot(***, 
+fruits$SucresSup10 <- 
+  fruits$Sucres > 10
+
+ggplot(***, 
      aes(***, 
-     fill = Sucres > 10)) +
+     fill = SucresSup10)) +
    geom_***()
 ```
 
@@ -132,10 +141,8 @@ Comment corriger la commande suivante pour obtenir le graphe à droite ?
 <p class="forceBreak"></p>
 
 
-![](img/S03ggplot2/wickham.png){width=50%}
-Hadley Wickham
-
-
+![Hadley Wickham](img/S03ggplot2/wickham.png){width=50%}
+ 
 ## Quelques géométries
 
 Nous allons voir ensemble quelques géométries particulières qui permettent de créer des graphes classiques.
@@ -157,26 +164,26 @@ Nous allons voir ensemble quelques géométries particulières qui permettent de
 On a déjà vu comment faire : 
 
 ```{r geom_bar_ter, fig.height = 3}
-ggplot(fruits, aes(cut(Eau, c(0, 84.2, 100)))) + 
+ggplot(fruits, aes(groupe)) + 
   geom_bar(fill = "steelblue")
 ```
 
 ## Avec geom_col
 
-S'utilise **quand on dispose déjà** de comptages.
+S'utilise **quand on connaît déjà** la hauteur des barres.
 
 ```{r geom_col, fig.height = 2}
-dat.count <- fruits %>% 
-  group_by(groupe) %>%
-  summarize(Csup10 = sum(VitamineC >= 10))
+vitamine <- data.frame(
+  groupe = c("compote", "crus", "exotique", "secs"), 
+  VitamineC = c(14.2, 12.2, 32.1, 0.3))
 
-ggplot(data = dat.count, aes(x = groupe, y = Csup10)) +
+ggplot(data = vitamine, aes(x = groupe, y = VitamineC)) +
   geom_col()
 ```
 
 ## A vous !
 
-Comment modifier les deux commandes précédentes pour faire un diagramme en bâtons montrant des pourcentages plutôt que des comptages bruts ?
+Comment modifier le code précédent pour faire un diagramme en bâtons montrant le nombre de fruits ayant une teneur en Eau supérieure à 80 g / 100 g par groupe ?
 
 (PS : il y a plus d'une solution possible)
 
@@ -235,12 +242,12 @@ ggplot(fruits, aes(Sucres)) +
 ```
    
    
-## Exercice qui n'a (presque) rien à voir!
+## C'est quoi ce message ?
 
+Pour faire un histogramme, on a besoin de répartir des valeurs numériques dans des classes.
 
-Dans un document R Markdown, comment faire pour ne pas afficher le message dans votre rapport ?
-
-*... il y a plusieurs solutions possibles...*
+ * La fonction `hist` le fait automatiquement avec l'algorithme de Sturges (ou Scott, ou Friedman-Diaconis si l'utilisateur le souhaite). Si on spécifie `n`, la fonction décidera un nombre de classes "approprié" proche de `n`. Pour forcer les classes, il faut utiliser `breaks`.
+ * La fonction `geom_histogram` crée par défaut 30 classes, charge à l'utilisateur de changer cela.
 
 ## Modification des intervalles
 
@@ -414,7 +421,7 @@ labs(
 Avec la fonction `theme()`, qui a une syntaxe bien particulière : chaque élément doit être spécifié selon sa nature.
 
  * Pour changer la taille, la police, la couleur d'élément de type "texte", on utilise `element_text(size=, colour = "", family = "")`
- * Pour changer la couleur et la taille d'une ligne, on utilise `element_line(colour=“”, size=)`
+ * Pour changer la couleur et la taille d'une ligne, on utilise `element_line(colour="", size=)`
  * Pour personnaliser la couleur du fond, on utilise `element_rect(fill = "")`
 
 ## Ce que l'on peut changer avec `theme()`
@@ -684,6 +691,6 @@ Nous avons vu un package de représentations graphiques très puissant ! `ggplot
  3. Personnaliser un graphe prend du temps, il faut s'armer de patience...
 
 
-# [N'oubliez pas la feuille de triche !](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) {data-background=#ffffff}
+# [N'oubliez pas la feuille de triche !](https://posit.co/wp-content/uploads/2022/10/data-visualization-1.pdf) {data-background=#ffffff}
 
 ![](img/S03ggplot2/cheatsheet.png){width=50%}

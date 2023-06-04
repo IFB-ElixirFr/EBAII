@@ -26,11 +26,10 @@ From there, you can also find a link to download the whole repository with `git`
 | couleurs  | Vincent Guillemot | [[PDF](01R/S04couleurs.pdf)]  |
 | `pheatmap`| Vincent Guillemot | [[PDF](01R/S05pheatmap.pdf)]  |
 | upset     | Vincent Guillemot | [[PDF](01R/S06upset.pdf)]     |
-| `gggenes` | Vincent Guillemot | [[PDF](01R/S07gggenes.pdf)]   |
 
 Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj4ZsQbxgKUJmKTbdbXdmSWeOYkqtVLc/edit?usp=sharing) du cours de R.
 
-Lien vers les [données fruits](01R/fruitsxlsx).
+Lien vers les [données fruits](01R/fruits.xlsx).
 
 ### FAIR
 
