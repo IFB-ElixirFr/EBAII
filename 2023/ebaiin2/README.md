@@ -16,6 +16,8 @@ From there, you can also find a link to download the whole repository with `git`
 ## Accéder au Jupyter Hub IFB :
 
  <https://jupyterhub.cluster.france-bioinformatique.fr/>
+ 
+ - prendre 4 cpu et 15Go
 
 ## Supports de cours
 
