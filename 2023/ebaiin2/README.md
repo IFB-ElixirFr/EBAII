@@ -13,7 +13,7 @@ From there, you can also find a link to download the whole repository with `git`
 
 ****
 
-## Accéder au Jupyter lab IFB :
+## Accéder au Jupyter HUb IFB :
 
  <https://jupyterhub.cluster.france-bioinformatique.fr/>
 
