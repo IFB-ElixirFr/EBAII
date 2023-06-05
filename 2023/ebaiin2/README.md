@@ -13,6 +13,10 @@ From there, you can also find a link to download the whole repository with `git`
 
 ****
 
+## Accéder au Jupyter lab IFB :
+
+ <https://jupyterhub.cluster.france-bioinformatique.fr/>
+
 ## Supports de cours
 
 ### Visualisation en R
