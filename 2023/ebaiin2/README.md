@@ -57,7 +57,7 @@ Lien vers les [données fruits](01R/fruits.xlsx).
 
 | Fichier                  | Intervenant | Lien                                        |
 |--------------------------|-------------|---------------------------------------------|
-| Script Rmarkdown vide    | Hugo Varet  | [Rmd](https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin2/RNASeq/EBAIIn2_RNASeq_apprenants.Rmd) |
+| Script Rmarkdown vide    | Hugo Varet  | [Rmd](RNASeq/EBAIIn2_RNASeq_apprenants.Rmd) |
 | Script Rmarkdown complet | Hugo Varet  | [Rmd](https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin2/RNASeq/EBAIIn2_RNASeq.Rmd)            |
 | Rendu HTML               | Hugo Varet  | [HTML](RNASeq/EBAIIn2_RNASeq.html)          |
 | Données                  | Hugo Varet  | [ZIP](RNASeq/data.zip)                      |
