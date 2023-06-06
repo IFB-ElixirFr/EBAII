@@ -1,4 +1,4 @@
-# 2ere école de bioinformatique AVIESAN - IFB - INSERM Niveau 2 (EBAIIn2 2023)
+# 2eme école de bioinformatique AVIESAN - IFB - INSERM Niveau 2 (EBAIIn2 2023)
 
 ## Initiation au traitement des données de génomique obtenues par séquençage à haut débit
 
@@ -12,6 +12,12 @@
 From there, you can also find a link to download the whole repository with `git`.
 
 ****
+
+## Accéder au Jupyter Hub IFB :
+
+ <https://jupyterhub.cluster.france-bioinformatique.fr/>
+ 
+ - prendre 4 cpu et 15Go
 
 ## Supports de cours
 

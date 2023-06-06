@@ -116,6 +116,10 @@ Pas encore ouvert.
 
 ## Matériel pédagogique
 
+### 2023
+
+- [Analyse et traitement de données NGS, niveau intermédiare](2023/ebaiin2/README.md)
+
 ### 2022
 
 - [Analyse et traitement de données NGS, niveau débutant](2022/ebaiin1/README.md)
