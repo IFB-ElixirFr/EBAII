@@ -54,7 +54,6 @@ De plus : Warning messages:
 
 # Pourquoi ça ne fonctionne pas ?
 
-
 ## Deuxième essai {.columns-2}
 
 ```{r essai2, eval = FALSE}
