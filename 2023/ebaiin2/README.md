@@ -1,4 +1,4 @@
-# 2ere école de bioinformatique AVIESAN - IFB - INSERM Niveau 2 (EBAIIn2 2023)
+# 2eme école de bioinformatique AVIESAN - IFB - INSERM Niveau 2 (EBAIIn2 2023)
 
 ## Initiation au traitement des données de génomique obtenues par séquençage à haut débit
 
