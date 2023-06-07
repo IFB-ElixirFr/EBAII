@@ -75,9 +75,10 @@ Lien vers les [données fruits](01R/fruits.xlsx).
 
 | Thématique| Intervenant·e·s.  | Lien vers la présentation           |
 |----------:|:-----------------:|:------------------------------------|
-| ACP       | VG + CP + RL + LK | [[PDF](02Integration/01_ACP.pdf)]   |
-| CCA       | VG + CP + RL + LK | [[PDF](02Integration/02_CCA.pdf)]   |
-| RGCCA     | VG + CP + RL + LK | [[PDF](02Integration/03_RGCCA.pdf)] |
+| INTRO     | VG + CP + RL + LK | [[PDF](02Integration/INTRO.pdf)]   |
+| ACP       | VG + CP + RL + LK | [[PDF](02Integration/ACP.pdf)]   |
+| CCA       | VG + CP + RL + LK | [[PDF](02Integration/CCA.pdf)]   |
+| RGCCA     | VG + CP + RL + LK | [[PDF](02Integration/RGCCA.pdf)] |
 
 Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj4ZsQbxgKUJmKTbdbXdmSWeOYkqtVLc/edit?usp=sharing) du cours de R.
 
