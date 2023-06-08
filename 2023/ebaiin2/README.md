@@ -84,3 +84,5 @@ Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj
 
 Lien vers les [données](02Integration/ge_cgh_locIGR.rda).
 
+Une proposition d'[analyse des données "Gliome"](02Integration/gliome.html).
+
