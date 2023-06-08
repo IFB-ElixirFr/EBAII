@@ -82,5 +82,5 @@ Lien vers les [données fruits](01R/fruits.xlsx).
 
 Lien vers le [script partagé](https://docs.google.com/document/d/1RaORtpj2dU1rj4ZsQbxgKUJmKTbdbXdmSWeOYkqtVLc/edit?usp=sharing) du cours de R.
 
-Lien vers les [données](02Integration/integration.zip).
+Lien vers les [données](02Integration/ge_cgh_locIGR.rda).
 
