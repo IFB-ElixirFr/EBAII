@@ -1,0 +1,87 @@
+---
+title: "Proposition d'analyse des données de gliome malin pédiatrique"
+author: "Vincent Guillemot & Cathy Philippe"
+date: "2023-06-08"
+output: rmdformats::downcute
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Préambule
+
+On commence par charger la librarie `RGCCA` et les données.
+
+```{r preambule}
+library(RGCCA)
+load("ge_cgh_locIGR.rda")
+```
+
+Puis on prépare les données pour les mettre dans des objets compatibles avec l'utilisation de RGCCA.
+
+```{r data}
+y <- factor(colnames(ge_cgh_locIGR$multiblocks$y)[ge_cgh_locIGR$ylabel])
+A <- list(
+  GE = ge_cgh_locIGR$multiblocks$GE,
+  CGH = ge_cgh_locIGR$multiblocks$CGH,
+  y = y)
+```
+
+
+## Validation croisée
+
+On effectue une validation croisée de type $k$-fold (avec $k = 5$). Pour plus d'information sur la validation croisées, voir la page (succincte) sur [Wikipedia](https://fr.wikipedia.org/wiki/Validation_crois%C3%A9e). 
+
+On effectue la validation croisée sur un grille de paramètres de parcimonie. Le paramètre de parcimonie varie, pour bloc de $p$ variables, entre 1 et $\sqrt{p}$. On crée donc une grille de 100 couples de paramètres de parcimonie qui reprennent cette contrainte. La matrice de connexions reprend bien le design "hiérarchique", et , si possible, on peut lancer la validation croisée sur plusieurs "c\oe urs" (on en prend 4).
+
+```{r cv, cache = TRUE, results = 'hide'}
+C <- matrix(c(0, 0, 1, 
+              0, 0, 1,
+              1, 1, 0),
+            3, 3)
+
+set.seed(5679)
+res.sgcca.cv <- rgcca_cv(
+  blocks = A,
+  response = 3,
+  method = "sgcca",
+  scheme = "factorial", 
+  tau = c(1, 1, 0), 
+  connection = C,
+  ncomp = c(1, 1, 1),
+  par_type = "sparsity", 
+  par_value = as.matrix(expand.grid(
+    (3:10)/sqrt(15702),
+    (3:10)/sqrt(1229),
+    1)),
+  validation = "kfold", 
+  prediction_model = "lda", 
+  metric="Accuracy",
+  n_run = 10,
+  n_cores = 4)
+```
+
+Les résultats de la validation croisée sont présentés ci-après.
+
+```{r res cv}
+plot(res.sgcca.cv)
+```
+
+Une fois la validation croisée terminée, la fonction `rgcca` est capable, à partir des résultats, d'appliquer la méthode SGCCA avec les valeurs optimales des paramètres de parcimonie.
+
+```{r sgcca opt}
+res.sgcca.opt <- rgcca(res.sgcca.cv)
+```
+
+Les plans factoriels des deux premières composantes de chaque bloc sont représentés ci-après.
+
+```{r plot samples}
+plot(res.sgcca.opt, type = "samples")
+```
+
+Le nombre de variable sélectionné est de `r sum(res.sgcca.opt$a$GE != 0)` pour l'expression de gènes et de `r sum(res.sgcca.opt$a$CGH != 0)` pour les segments CGH.
+
+
+Dans cette version du jeu de données, nous n'avons pas beaucoup plus d'information sur les gènes et sur les segments, donc on ne peut pas vraiment aller plus loins. Mais après avoir obtenu ces résultats, il serait tout à fait possible de faire des analyses complémentaires (enrichissement par exemple)
+

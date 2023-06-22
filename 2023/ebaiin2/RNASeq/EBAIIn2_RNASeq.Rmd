@@ -49,7 +49,7 @@ library(ggrepel)            # ajouter des labels sur les plots
 library(ggbeeswarm)         # plots avancés
 library(scales)             # transformation log2 dans ggplot
 library(dplyr)              # manipulation de donnees
-library(ggVennDiagram)      # diagrammes de Venn
+library(ggvenn)             # diagrammes de Venn
 library(UpSetR)             # UpSet plot
 library(FactoMineR)         # ACP
 library(factoextra)         # plot de l'ACP
@@ -157,9 +157,9 @@ et d'afficher un MA-plot :
 resultsNames(dds)
 # interpretation des coefficients
 # ExploreModelMatrix() pour lancer l'application Shiny
-res_4vs0 <- results(dds, contrast=c("time", "T4", "T0"))
-res_8vs0 <- results(dds, contrast=c("time", "T8", "T0"))
-res_8vs4 <- results(dds, contrast=c("time", "T8", "T4"))
+res_4vs0 <- lfcShrink(dds, contrast=c("time", "T4", "T0"), type="ashr", quiet=TRUE)
+res_8vs0 <- lfcShrink(dds, contrast=c("time", "T8", "T0"), type="ashr", quiet=TRUE)
+res_8vs4 <- lfcShrink(dds, contrast=c("time", "T8", "T4"), type="ashr", quiet=TRUE)
 summary(res_4vs0, alpha=0.05)
 summary(res_8vs0, alpha=0.05)
 summary(res_8vs4, alpha=0.05)
@@ -220,7 +220,7 @@ print(head(d), digits=3)
 x <- list("4h vs 0h"=d %>% filter(padj_4vs0 <= 0.05) %>% pull(gene),
           "8h vs 0h"=d %>% filter(padj_8vs0 <= 0.05) %>% pull(gene),
           "8h vs 4h"=d %>% filter(padj_8vs4 <= 0.05) %>% pull(gene))
-ggVennDiagram(x)
+ggvenn(x)
 ```
 
 Le diagramme généré est plutôt lisible car nous avons croisé seulement 3 listes. Pour croiser davantage de données, les UpSet plots ont récemment vu le jour et sont souvent plus adaptés :
@@ -241,7 +241,7 @@ d %>%
   head()
 ```
 
-Par exemple, au seuil de 5%, le gène 5 est différentiellement exprimé à 8h mais pas à 4h. Pourtant, les log2(Fold-Change) à 4h et à 8h sont très proches ($-0,27$ et $-0,29$), tout comme les P-valeurs ajustées ($0,06$ et $0,04$). On constate d'ailleurs que la différence entre 4h et 8h n'est pas significative (P-valeur ajustée = $0,97$). Nous allons donc construire une figure qui permet de visualiser au mieux tous les résultats simultanément :
+Par exemple, au seuil de 5%, le gène 5 est différentiellement exprimé à 8h mais pas à 4h. Pourtant, les log2(Fold-Change) à 4h et à 8h sont très proches ($-0,23$ et $-0,26$), tout comme les P-valeurs ajustées ($0,06$ et $0,04$). On constate d'ailleurs que la différence entre 4h et 8h n'est pas significative (P-valeur ajustée = $0,97$). Nous allons donc construire une figure qui permet de visualiser au mieux tous les résultats simultanément :
 
 ```{r compare_results_pairwise_1factor}
 d <- d %>%
@@ -377,7 +377,8 @@ Le code ci-dessous permet de réaliser l'analyse différentielle et visualiser l
 
 ```{r results_batch}
 dds <- DESeq(dds)
-res <- results(dds)
+resultsNames(dds)
+res <- lfcShrink(dds, coef="condition_T_vs_C", type="ashr", quiet=TRUE)
 summary(res, alpha=0.05)
 ggplot(as.data.frame(res), aes(x=pvalue)) + 
   geom_histogram(color = "white", breaks = seq(0, 1, by = 0.025)) +
@@ -411,7 +412,8 @@ dds <- DESeqDataSetFromMatrix(countData=counts,
                               colData=target,
                               design=~donor+condition)
 dds <- DESeq(dds)
-res <- results(dds)
+resultsNames(dds)
+res <- lfcShrink(dds, coef="condition_T_vs_C", type="ashr", quiet=TRUE)
 summary(res, alpha=0.05)
 ggplot(as.data.frame(res), aes(x=pvalue)) + 
   geom_histogram(color = "white", breaks = seq(0, 1, by = 0.025)) +
@@ -673,6 +675,7 @@ La méthode CAMERA du package R `limma` utilise l'ensemble des résultats plutô
 $$ \text{stat} = \frac{\log_2(\text{Fold-Change})}{\text{standard-error}} $$
 
 ```{r camera}
+res <- res %>% mutate(stat=log2FoldChange/lfcSE)
 statistic <- res %>% pull(stat)
 names(statistic) <- res %>% pull(entrezgene)
 statistic <- statistic[!is.na(statistic)]
@@ -831,9 +834,9 @@ Nous pouvons ensuite utiliser DESeq2 et des contrastes adaptés pour evaluer l'e
 
 ```{r results_2factors}
 # ExploreModelMatrix() pour lancer l'application Shiny
-res_TvsC.WT <- results(dds, contrast=c(0, 0, 0, 0, 1, 0))
-res_TvsC.KO <- results(dds, contrast=c(0, 0, 0, 0, 1, 1))
-res_interaction <- results(dds, contrast=c(0, 0, 0, 0, 0, 1))
+res_TvsC.WT <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 1, 0), type="ashr", quiet=TRUE)
+res_TvsC.KO <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 1, 1), type="ashr", quiet=TRUE)
+res_interaction <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 0, 1), type="ashr", quiet=TRUE)
 summary(res_TvsC.WT, alpha=0.05)
 summary(res_TvsC.KO, alpha=0.05)
 summary(res_interaction, alpha=0.05)

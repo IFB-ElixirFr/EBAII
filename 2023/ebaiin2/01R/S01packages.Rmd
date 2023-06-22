@@ -1,0 +1,73 @@
+---
+title: "Installation de packages"
+author: "Vincent Guillemot"
+output: 
+  ioslides_presentation:
+    css: styles.css
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+
+## 
+
+![](img/S01packages/fripouille.001.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.002.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.003.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.004.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.005.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.006.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.007.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.008.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.009.jpeg){width=100%}
+
+## 
+
+![](img/S01packages/fripouille.010.jpeg){width=100%}
+
+## Comment installer des packages depuis... {.smaller}
+
+
+  * Bioconductor ?
+    1. Installer le package `BiocManager` depuis le CRAN
+    2. Exécuter la commande `BiocManager::install("le_nom_du_package")`
+  * GitHub ?
+    1. Installer `remotes`
+    2. Exécuter la commande `remotes::install_github("username/repository")`.
+  * Du code source ?
+    1. Mettre le `source.tar.gz` dans son dossier de travail...
+    2. ou l'inverse.
+    3. Exécuter la commande `install.package("source.tar.gz", repos = NULL, type = "source")`.
+
+# Exercices
+
