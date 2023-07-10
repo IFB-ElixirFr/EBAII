@@ -4,7 +4,7 @@
 
 ---
 
-*Les demandes d'inscriptions pour la formation de niveau débutant (du 5 au 10 novembre 2023) sont ouvertes sur [le site d'inscription](https://sondages.inrae.fr/index.php/42796?lang=fr).*
+*Les demandes d'inscriptions pour les formations sont maintenant closes.*
 
 ---
 
@@ -60,10 +60,10 @@ Aucune connaissance préalable des environnements Linux ou R n'est requise, mais
 La formation approfondira progressivement l’usage de ces environnements au fil des sessions thématiques.
 
 *Prochaines dates*:
-5 au 10 novembre 2023.
+Non déterminé.
 
 *Site de demande d'inscription*:
-https://sondages.inrae.fr/index.php/42796?lang=fr 
+Clos. 
 
 
 #### Niveau intermédiaire
@@ -78,7 +78,7 @@ L'ensemble de la formation reposera sur l’utilisation de commandes en ligne (t
 Les candidats doivent avoir acquis les compétences enseignées durant l'école de niveau débutant: un niveau de base en ligne de commande, R, et (au choix) RNA-seq, ChIP-seq ou variants DNA-seq.
 
 *Prochaines dates*:
-5 au 9 juin 2023.
+Non déterminé.
 
 *Site de demande d'inscription*:
 Clos.
