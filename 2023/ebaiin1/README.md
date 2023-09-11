@@ -3,7 +3,7 @@
 
 ## Initiation au traitement des données de génomique obtenues par séquençage à haut débit
 
-**Du 05-11-2021 au 10-11-2021 à la Station biologique de Roscoff**
+**Du 05-11-2023 au 10-11-2023 à la Station biologique de Roscoff**
 
 
 ## Web site
