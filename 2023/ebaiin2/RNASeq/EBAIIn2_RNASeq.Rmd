@@ -1,0 +1,950 @@
+---
+title: "EBAII niveau 2 - Atelier RNA-Seq"
+author: "Hugo Varet$^{1,2}$ - hugo.varet@pasteur.fr"
+date: "Juin 2023"
+output:
+    html_document:
+      toc: true
+      toc_float: true
+      number_sections: true
+---
+
+$^1$ Hub de Bioinformatique et Biostatistique, Centre de Ressources et Recherche en Informatique, Institut Pasteur
+
+$^2$ Plate-forme Métabolomique, Centre de Ressources et Recherches Technologiques, Institut Pasteur
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=6, fig.height=5, cache=TRUE,
+                      message=FALSE, out.width="60%", fig.align="center")
+options(width=120)
+```
+
+```{r logo, echo=FALSE, fig.cap="", fig.align="center", out.width = '100%',include=TRUE}
+knitr::include_graphics("logo.png")
+```
+
+Ce fichier Rmarkdown contient tout le matériel de l'atelier RNA-Seq de l'école de Bioinformatique Aviesan/IFB/Inserm niveau 2. Diverses notions seront abordées à travers plusieurs types de designs expérimentaux :
+
+ - design simple avec 3 conditions,
+ - heatmaps,
+ - prise en compte d'un effet "batch",
+ - conversion d'identifiants de gènes,
+ - analyse de *pathways*,
+ - design complexe avec 2 facteurs en interaction,
+
+chacune d'entre-elles pouvant nécessiter plusieurs heures d'approfondissement d'un point de vue statistique/méthodologique. Nous les aborderons donc dans les grandes lignes tout en insistant sur certains concepts et détails clés.
+
+Le code ci-dessous permet de charger les packages R dont nous allons avoir besoin :
+
+```{r, warning=FALSE, message=FALSE}
+library(DESeq2)             # analyse differentielle
+library(limma)              # removeBatchEffect et CAMERA
+library(fgsea)              # gene-set enrichment analysis
+library(biomaRt)            # faire la correspondance ensembl id - gene name
+library(gage)               # recuperer gene-sets KEGG
+library(msigdbr)            # recuperer gene-sets KEGG
+library(ggplot2)            # plots
+library(plotly)             # plots interactifs
+library(ggrepel)            # ajouter des labels sur les plots
+library(ggbeeswarm)         # plots avancés
+library(scales)             # transformation log2 dans ggplot
+library(dplyr)              # manipulation de donnees
+library(ggvenn)             # diagrammes de Venn
+library(UpSetR)             # UpSet plot
+library(FactoMineR)         # ACP
+library(factoextra)         # plot de l'ACP
+library(pheatmap)           # pretty heatmap
+library(RColorBrewer)       # palette pour les heatmaps
+library(ExploreModelMatrix) # application shiny interpretation design
+library(devtools)           # session info
+```
+
+Les données utilisées proviennent de diverses expériences RNA-Seq et sont disponibles dans des fichiers au format `.RData` que nous chargerons avec la fonction `load()`. Chaque fichier `.RData` contient deux objets :
+
+ - `counts` : matrice de comptages avec les gènes en lignes et les échantillons en colonnes (après nettoyage, mapping et comptage des reads sur les gènes),
+ - `target` : `data.frame` décrivant le design expérimental.
+
+On suppose que les données sont de bonne qualité et qu'il n'y a pas eu de problème durant l'extraction des ARN, la préparation des librairies et le séquençage. Aussi, il n'y a pas d'outlier ni d'inversion d'échantillon. En résumé, tous les contrôles ont été faits grâce à des statistiques/figures descriptives simples. Enfin, les échantillons sont nommés et ordonnés de la même manière dans le tableau de design et dans les comptages.
+
+**Remarque** : certaines données ont été anonymisées en modifiant le contexte du design expérimental et en utilisant des identifiants de gènes du type `gene1`, `gene2`, ..., `geneN`.
+
+# Analyse différentielle simple : étude d'un facteur à 3 niveaux
+
+Le jeu de données utilisé ici provient d'une expérience sur un champignon dont l'objectif était de suivre l'évolution transcriptomique au cours du temps. Pour cela, nous avons séquencé l'ARN de 3 échantillons à T=0h, T=4h et à T=8h. On commence par afficher le design de l'expérience ainsi que la matrice de comptages obtenue :
+
+```{r load_data_1factor}
+load("data_3_levels.RData")
+ls()
+print(target)
+print(head(counts))
+```
+
+**Question** : que peut-on faire à partir de ces données et comment pouvons-nous les analyser ?
+
+## Utilisation de DESeq2
+
+Les commandes suivantes permettent de créer un objet `dds` (qui est central et spécifique à l'analyse différentielle avec DESeq2) puis de réaliser les étapes suivantes :
+
+ (1) la normalisation,
+ (2) l'estimation de la dispersion,
+ (3) l'ajustement du modèle linéaire généralisé.
+
+```{r deseq2_1factor}
+dds <- DESeqDataSetFromMatrix(countData=counts,
+                              colData=target,
+                              design=~time)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+```
+
+**Remarque** : nous utilisons ici DESeq2 avec le paramétrage par défaut, mais il existe de nombreuses subtilités mathématiques/statistiques. La [vignette](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) du package est extrêmement bien faite et explique les différentes options possibles.
+
+## Analyse en composantes principales et homoscédasticité
+
+L'analyse en composantes principales (ACP) est une méthode de réduction de la dimension qui permet d'explorer la structure du jeu de données et de le visualiser facilement sur un sous-espace bien choisi. Les figures générées permettent de détecter des échantillons outliers, des inversions, des effets "batch", etc... 
+
+Les deux figures ci-dessous permettent de visualiser le caractère hétéroscédastique des données de comptages, et l'homoscédasticité après transformation `rlog`. Ce sont ces données transformées qui sont utilisées par les méthodes exploratoires telles que l'ACP car le calcul des distances entre les échantillons ne doit pas être *drivé* par seulement quelques gènes fortement exprimés.
+
+```{r homoscedasticity_1factor}
+data.frame(m=apply(counts, 1, mean) + 1, v=apply(counts, 1, var) + 1) %>%
+  ggplot(aes(m, v)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_point(alpha=0.2) +
+  geom_abline(slope=1, intercept=0, linetype="dashed", col="red") +
+  xlab("Mean") +
+  ylab("Variance") +
+  ggtitle("Comptages bruts : un point = un gène") +
+  theme_light()
+rld <- rlog(dds)
+data.frame(m=apply(assay(rld), 1, mean), v=apply(assay(rld), 1, var)) %>%
+  ggplot(aes(m, v)) +
+  geom_point(alpha=0.2) +
+  xlab("Mean") +
+  ylab("Variance") +
+  ggtitle("Comptages transformés : un point = un gène") +
+  theme_light()
+```
+
+On utilise donc les données rendues homoscédastiques grâce à la méthode `rlog()` puis la fonction `plotPCA()` disponible dans DESeq2 :
+
+```{r pca_1factor}
+plotPCA(rld, intgroup="time")
+```
+
+Une alternative est d'utiliser les packages R FactoMineR et factoextra afin d'avoir plus de flexibilité :
+
+```{r pca_1factor_factominer}
+pca <- PCA(t(assay(rld)), scale.unit=FALSE, ncp=3, graph=FALSE)
+fviz_pca_ind(pca, axes=c(1, 2), repel=TRUE, habillage=factor(target$time), mean.point=FALSE)
+fviz_pca_ind(pca, axes=c(1, 3), repel=TRUE, habillage=factor(target$time), mean.point=FALSE)
+```
+
+**Question** : pourquoi y a-t-il une différence entre les deux approches (`plotPCA()` de DESeq2 et `PCA()` de FactoMineR) ?
+
+## Tests des 3 comparaisons
+
+Le code ci-dessous permet d'extraire toutes les comparaisons 2 à 2 :
+
+ - 4h vs 0h,
+ - 8h vs 0h,
+ - 8h vs 4h,
+
+et d'afficher un MA-plot :
+
+```{r results_1factor}
+resultsNames(dds)
+# interpretation des coefficients
+# ExploreModelMatrix() pour lancer l'application Shiny
+res_4vs0 <- lfcShrink(dds, contrast=c("time", "T4", "T0"), type="ashr", quiet=TRUE)
+res_8vs0 <- lfcShrink(dds, contrast=c("time", "T8", "T0"), type="ashr", quiet=TRUE)
+res_8vs4 <- lfcShrink(dds, contrast=c("time", "T8", "T4"), type="ashr", quiet=TRUE)
+summary(res_4vs0, alpha=0.05)
+summary(res_8vs0, alpha=0.05)
+summary(res_8vs4, alpha=0.05)
+# MA-plot de la comparaison 4h vs 0h
+DESeq2::plotMA(res_4vs0, alpha=0.05)
+```
+
+Ce MA-plot est produit grâce à une fonction du package DESeq2. Il est possible de le reproduire manuellement et en ajoutant une couche d'interactivité :
+
+```{r maplot_interactif_1factor, warning=FALSE}
+p <- res_4vs0 %>%
+  as.data.frame() %>%
+  mutate(DE = ifelse(!is.na(padj) & padj <= 0.05, "DE", "Not DE")) %>%
+  mutate(id=rownames(res_4vs0)) %>%
+  ggplot(aes(x=baseMean, y=log2FoldChange, color=DE, label=id)) +
+  geom_point(alpha=0.4) +
+  labs(color="4h vs 0h") +
+  geom_hline(yintercept = 0, linetype="dashed", color="grey") +
+  scale_color_manual(values=c("DE"="red", "Not DE"="black")) +
+  scale_x_log10() +
+  theme_light()
+toWebGL(ggplotly(p, tooltip="label"))
+```
+
+On peut aussi ajouter les noms de certains gènes bien choisis :
+
+```{r maplot_1factor, warning=FALSE}
+res_4vs0 %>%
+  as.data.frame() %>%
+  mutate(DE = ifelse(!is.na(padj) & padj <= 0.05, "DE", "Not DE")) %>%
+  mutate(id=ifelse(log2FoldChange > 3, rownames(res_4vs0), "")) %>%
+  ggplot(aes(x=baseMean, y=log2FoldChange, color=DE, label=id)) +
+  geom_point(alpha=0.4) +
+  labs(color="4h vs 0h") +
+  geom_text_repel(show.legend=FALSE, size=3, point.padding=0.2, max.overlaps=20) +
+  geom_hline(yintercept = 0, linetype="dashed", color="grey") +
+  scale_color_manual(values=c("DE"="red", "Not DE"="black")) +
+  scale_x_log10() +
+  theme_light()
+```
+
+## Croisement des résultats
+
+Etant donné le design expérimental, nous avons obtenus les résultats d'une analyse différentielle pour 3 comparaisons. L'objectif est ici de croiser ces résultats sous la meilleure forme possible, mais nous devons pour cela nous assurer que les gènes sont ordonnés de la même manière dans les 3 objets `res_4vs0`, `res_8vs0` et `res_8vs4` : 
+
+```{r check_ids_1factor}
+all(rownames(res_4vs0) == rownames(res_8vs0)) & all(rownames(res_4vs0) == rownames(res_8vs4))
+```
+
+Une manière assez naturelle est de croiser les listes de gènes différentiellement exprimés, en fixant par exemple un seuil de 5% sur la p-valeur ajustée. Ainsi, nous pouvons détecter des gènes dérégulés spécifiquement à 8h mais qui ne l'étaient pas à 4h. Les diagrammes de Venn sont souvent utilisés pour faire cela :
+
+```{r compare_results_venn_1factor}
+d <- data.frame(gene = rownames(res_4vs0),
+                log2FC_4vs0 = res_4vs0$log2FoldChange, padj_4vs0 = res_4vs0$padj,
+                log2FC_8vs0 = res_8vs0$log2FoldChange, padj_8vs0 = res_8vs0$padj,
+                log2FC_8vs4 = res_8vs4$log2FoldChange, padj_8vs4 = res_8vs4$padj)
+print(head(d), digits=3)
+x <- list("4h vs 0h"=d %>% filter(padj_4vs0 <= 0.05) %>% pull(gene),
+          "8h vs 0h"=d %>% filter(padj_8vs0 <= 0.05) %>% pull(gene),
+          "8h vs 4h"=d %>% filter(padj_8vs4 <= 0.05) %>% pull(gene))
+ggvenn(x)
+```
+
+Le diagramme généré est plutôt lisible car nous avons croisé seulement 3 listes. Pour croiser davantage de données, les UpSet plots ont récemment vu le jour et sont souvent plus adaptés :
+
+```{r compare_results_upset_1factor}
+upset(fromList(x), order.by="freq")
+```
+
+**Question** : comment interpréter les chiffres issus du diagramme de Venn et de l'UpSet plot ?
+
+Les UpSet plots sont souvent plus lisibles que les diagrammes de Venn mais ont toujours l'inconvénient d'avoir des "effets de seuil". L'exemple ci-dessous permet de comprendre ce qu'il peut se passer :
+
+```{r inconvenient_upset_1factor}
+d %>% 
+  filter(abs(log2FC_8vs0 - log2FC_4vs0) < 0.1) %>%
+  filter(padj_4vs0 > 0.05 & padj_8vs0 < 0.05) %>%
+  dplyr::select(contains(c("gene", "log2FC", "padj"))) %>%
+  head()
+```
+
+Par exemple, au seuil de 5%, le gène 5 est différentiellement exprimé à 8h mais pas à 4h. Pourtant, les log2(Fold-Change) à 4h et à 8h sont très proches ($-0,23$ et $-0,26$), tout comme les P-valeurs ajustées ($0,06$ et $0,04$). On constate d'ailleurs que la différence entre 4h et 8h n'est pas significative (P-valeur ajustée = $0,97$). Nous allons donc construire une figure qui permet de visualiser au mieux tous les résultats simultanément :
+
+```{r compare_results_pairwise_1factor}
+d <- d %>%
+  mutate(DE_8vs4=ifelse(!is.na(padj_8vs4) & padj_8vs4 <= 0.05, "DE", "Not DE"),
+         DE_both_times=ifelse(!is.na(padj_4vs0) & padj_4vs0 <= 0.05 & !is.na(padj_8vs0) & padj_8vs0 <= 0.05, "Yes", "No"))
+ggplot(d, aes(x=log2FC_4vs0, y=log2FC_8vs0, color=DE_8vs4, size=DE_both_times)) +
+  geom_point(alpha=0.5) +
+  scale_color_manual(values=c("DE"="red", "Not DE"="black")) +
+  scale_size_manual(values=c("Yes"=1, "No"=0.4)) +
+  geom_hline(yintercept=0, lty=2, color="grey") +
+  geom_vline(xintercept=0, lty=2, color="grey") +
+  geom_abline(slope=1, intercept=0, lty=2, color="grey") +
+  labs(color="8h vs 4h", size="DE at 4h and 8h") +
+  xlab(bquote(log[2](FC)~"4h vs 0h")) +
+  ylab(bquote(log[2](FC)~"8h vs 0h")) +
+  ggtitle("Comparison of the 3 conditions") +
+  theme_light()
+```
+
+Cette figure permet de repérer certains gènes pour lesquels l'effet à 4h est différent de l'effet à 8h, chacun de ces deux effets pouvant être significatifs ou non. On peut alors construire des filtres en fonction de la question biologique, par exemple :
+
+```{r filters_1factor}
+d %>%
+  filter(padj_8vs4 <= 0.05 & abs(log2FC_8vs4) > 2) %>%
+  dplyr::select(contains(c("gene", "log2FC", "padj")))
+```
+
+## Heatmaps
+
+Les heatmaps sont également souvent utilisées pour visualiser les résultats. Pour autant, celles-ci sont plus complexes qu'il n'y parait et il existe de nombreux paramètres à définir :
+
+ - quels gènes inclure ?
+ - afficher leurs identifiants ou noms ?
+ - clusteriser les lignes ? colonnes ? selon quelle méthode ?
+ - centrer/réduire les lignes ? colonnes ?
+ - quelle échelle de couleur choisir ?
+ - prendre en compte un éventuel effet réplicat/batch ?
+
+Le code R ci-dessous permet de sélectionner les gènes différentiellement exprimés dans les 3 comparaisons (avec un seuil de 0.001 sur la P-valeur ajustée) et d'afficher une heatmap (i) sans paramétrage spécifique et (ii) en spécifiant certains paramètres.
+
+```{r heatmap_expression_1factor}
+DE_genes <- d %>%
+  filter(padj_4vs0 <= 0.001 | padj_8vs0 <= 0.001 | padj_8vs4 <= 0.001) %>%
+  pull(gene)
+mat_hm <- assay(rlog(dds))
+pheatmap(mat_hm[DE_genes, ])
+```
+
+**Question** : quel message renvoie cette heatmap ? Pourquoi ?
+
+```{r heatmap_expression_ok_1factor}
+pheatmap(mat_hm[DE_genes, ],
+         scale="row",
+         show_rownames=FALSE,
+         clustering_distance_rows="euclidean",
+         clustering_distance_cols="euclidean",
+         clustering_method="ward.D",
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(200))
+```
+
+**Questions** : 
+
+ - pourquoi cette nouvelle heatmap est-elle si différente de la première ? En quoi est-elle plus adaptée ?
+ - le clustering est-il réalisé à partir des données brutes ou centrées-réduites ?
+
+On peut également visualiser les log2(Fold-Change) plutôt que les données d'expression. Le code R ci-dessous permet de faire cela pour un certain nombre de gènes pré-sélectionnés :
+
+```{r heatmap_log2FC_1factor}
+rownames(d) <- d$gene
+d <- d %>%
+  filter(padj_8vs4 <= 0.05 & (padj_4vs0 <= 0.05 | padj_8vs0 <= 0.05)) %>% 
+  filter(abs(log2FC_8vs0 - log2FC_4vs0) > 1) %>%
+  dplyr::select(log2FC_4vs0, log2FC_8vs0) %>%
+  as.matrix()
+print(head(d))
+pheatmap(d, 
+         scale="none", 
+         cluster_cols=FALSE,
+         clustering_distance_rows="euclidean",
+         angle_col=45,
+         fontsize_row=5,
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(100),
+         breaks=seq(-max(abs(d)), max(abs(d)), length=101))
+```
+
+La heatmap produite est influencée par quelques gènes ayant des log2(Fold-Change) très élevés ou très faibles. Dans ce cas, on peut borner l'échelle de couleur de manière à faire ressortir les autres gènes plus facilement. Toutefois, il faut faire attention à ne pas déformer la figure :
+
+```{r heatmap_log2FC_1factor_forced}
+pheatmap(d, 
+         scale="none", 
+         cluster_cols=FALSE,
+         clustering_distance_rows="euclidean",
+         angle_col=45,
+         fontsize_row=5,
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(100),
+         breaks=seq(-3, 3, length=101))
+```
+
+# Prise en compte d'un effet batch
+
+Nous utilisons ici un jeu de données RNA-Seq humain : un traitement expérimental T et un traitement contrôle C ont été appliqués sur des cultures cellulaires provenant de 3 donneurs indépendants, l'objectif étant de détecter les gènes dérégulés par l'effet du traitement.
+
+```{r load_data_batch}
+rm(list=ls())
+load("data_batch_effect.RData")
+ls()
+print(target)
+print(head(counts))
+```
+
+## Analyse en composantes principales
+
+Commençons par créer l'objet `dds` à partir des comptages et du tableau de design :
+
+```{r deseq2_batch}
+dds <- DESeqDataSetFromMatrix(countData=counts,
+                              colData=target,
+                              design=~condition)
+```
+
+**Question** : que révèle l'analyse en composante principale ?
+
+```{r pca_batch}
+rld <- rlog(dds)
+pca <- PCA(t(assay(rld)), scale.unit=FALSE, ncp=3, graph=FALSE)
+fviz_pca_ind(pca, axes=c(1, 2), repel=TRUE, habillage=factor(target$condition), mean.point=FALSE)
+fviz_pca_ind(pca, axes=c(1, 3), repel=TRUE, habillage=factor(target$condition), mean.point=FALSE)
+```
+
+## Importance du design dans DESeq2
+
+Le code ci-dessous permet de réaliser l'analyse différentielle et visualiser la distribution des p-valeurs brutes :
+
+```{r results_batch}
+dds <- DESeq(dds)
+resultsNames(dds)
+res <- lfcShrink(dds, coef="condition_T_vs_C", type="ashr", quiet=TRUE)
+summary(res, alpha=0.05)
+ggplot(as.data.frame(res), aes(x=pvalue)) + 
+  geom_histogram(color = "white", breaks = seq(0, 1, by = 0.025)) +
+  xlab("Raw p-value") +
+  ylab("Frequency") + 
+  theme_light()
+```
+
+La distribution n'est pas celle attendue car la variabilité (information) générée par l'effet "donneur" n'est pas prise en compte dans le modèle. Nous pouvons visualiser ci-dessous cette variabilité pour un seul gène (bien choisi) :
+
+```{r illustration_batch}
+ncounts <- counts(dds, norm=TRUE)
+d <- data.frame(target, ncounts=ncounts["ENSG00000066279",])
+print(d)
+ggplot(d, aes(x=condition, y=ncounts, color=donor, shape=donor)) +
+  geom_point(size=4) +
+  scale_y_continuous(trans = log2_trans(),
+    breaks = trans_breaks("log2", function(x) 2^x),
+    labels = trans_format("log2", math_format(2^.x))) +
+  xlab("Condition") +
+  ylab("Normalized counts (log2 scale)") +
+  labs(shape="Donor", color="Donor") +
+  ggtitle("Illustration of the donor effect for gene ENSG00000066279") +
+  theme_light()
+```
+
+Il est nécessaire de spécifier dans le design du modèle cet effet "donneur" :
+
+```{r results_ok_batch}
+dds <- DESeqDataSetFromMatrix(countData=counts,
+                              colData=target,
+                              design=~donor+condition)
+dds <- DESeq(dds)
+resultsNames(dds)
+res <- lfcShrink(dds, coef="condition_T_vs_C", type="ashr", quiet=TRUE)
+summary(res, alpha=0.05)
+ggplot(as.data.frame(res), aes(x=pvalue)) + 
+  geom_histogram(color = "white", breaks = seq(0, 1, by = 0.025)) +
+  xlab("Raw p-value") +
+  ylab("Frequency") + 
+  theme_light()
+```
+
+**Question** : quelles sont les améliorations apportées par la prise en compte de cet effet "donneur" ?
+
+## Elimination de l'effet batch pour la visualisation
+
+Maintenant que l'analyse différentielle est correctement réalisée, nous pouvons visualiser les résultats sous la forme d'une heatmap, en sélectionnant les gènes différentiellement exprimés au seuil de 5% :
+
+```{r heatmap_batch}
+DE_genes <- res %>%
+  as.data.frame() %>%
+  filter(padj <= 0.05) %>%
+  rownames()
+mat_hm <- assay(rlog(dds))
+pheatmap(mat_hm[DE_genes,],
+         scale="row",
+         show_rownames=FALSE,
+         clustering_distance_rows="euclidean",
+         clustering_distance_cols="euclidean",
+         clustering_method="ward.D",
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(200))
+```
+
+Dans cette heatmap, les échantillons clusterisent par donneur et pas par traitement alors que nous avons pourtant sélectionné les gènes selon ce critère. Une solution est d'*ajuster* la matrice avant de produire la figure grâce à la fonction `removeBatchEffect()` :
+
+```{r heatmap_ok_batch}
+mat_hm_adj <- removeBatchEffect(mat_hm, batch=target$donor)
+pheatmap(mat_hm_adj[DE_genes,], 
+         scale="row",
+         show_rownames=FALSE,
+         clustering_distance_rows="euclidean",
+         clustering_distance_cols="euclidean",
+         clustering_method="ward.D",
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(200),
+         main="Heatmap based on the *adjusted* variance-stabilized counts")
+```
+
+**Remarques** :
+
+ - Il ne faut pas confondre l'**ajustement** dans le **design du modèle** linéaire généralisé de DESeq2 (les données restent inchangées) et l'ajustement directement sur la **matrice d'expression** (les valeurs sont alors modifiées) dans une optique de **visualisation**.
+ - Si la heatmap contient trop de cellules (en lignes et/ou colonnes) alors il se peut que l'affichage et le rendu soient contraints par le nombre de pixels de l'écran. Ces deux articles décrivent ce "problème" : [ici](https://bioinfo-fr.net/creer-des-heatmaps-a-partir-de-grosses-matrices-en-r) et [là](https://jokergoo.github.io/2020/06/30/rasterization-in-complexheatmap/).
+ - Les heatmaps sont de formidables outils de visualisation et on peut imaginer une personnalisation à l'infini, notamment avec le package [ComplexHeatmap](https://jokergoo.github.io/ComplexHeatmap-reference/book/).
+
+## Identifiants des gènes
+
+Les identifiants utilisés pour l'analyse différentielle sont issus d'*ensembl* (et du fichier d'annotation au format GFF ou GTF) et ne sont pas toujours pratiques pour l'interprétation. Le code ci-dessous est une manière parmi tant d'autres de récupérer les noms des gènes correspondants :
+
+```{r ensembl_bm}
+ensembl <- useEnsembl(biomart="ensembl", dataset="hsapiens_gene_ensembl", version=92)
+# attr <- listAttributes(ensembl)$name
+# attr[grepl("ensembl_gene_id", attr)]
+# attr[grepl("entrezgene", attr)]
+# attr[grepl("external_gene_name", attr)]
+bm <- getBM(attributes=c("ensembl_gene_id", "external_gene_name"), mart=ensembl)
+head(bm)
+```
+
+Le tableau `bm` permet de faire le lien entre les identifiants *ensembl* sous la forme `ENSG000...` et les noms humainement interprétables. Ici, il est nécessaire d'explorer ce tableau afin de vérifier la présence de doublons dans chacune des colonnes. Commençons par les *gene names* :
+
+```{r ensembl_bm_dup_names}
+bm %>%
+  filter(!is.na(external_gene_name)) %>%
+  pull(external_gene_name) %>%
+  duplicated() %>%
+  any()
+dup_gene_names <- bm %>%
+  filter(!is.na(external_gene_name)) %>%
+  filter(duplicated(external_gene_name)) %>%
+  pull(external_gene_name)
+bm %>%
+  filter(external_gene_name %in% dup_gene_names) %>%
+  arrange(external_gene_name) %>%
+  head(n=10)
+```
+
+Plusieurs identifiants *ensembl* correspondent à un même *gene name* ! Regardons ensuite les identifiants *ensembl* :
+
+```{r ensembl_bm_dup_ens_ids}
+bm %>%
+  filter(!is.na(ensembl_gene_id)) %>%
+  pull(ensembl_gene_id) %>%
+  duplicated() %>%
+  any()
+```
+
+Les identifiants *ensembl* sont uniques et nous avons un seul *gene name* par identifiant *ensembl*. Nous allons donc pouvoir les remplacer facilement :
+
+```{r heatmap_names}
+DE_genes <- res %>%
+  as.data.frame() %>%
+  filter(padj <= 0.0001 & (log2FoldChange > 2.5 | log2FoldChange < -3.5)) %>%
+  rownames() %>%
+  sort()
+DE_gene_names <- bm %>%
+  arrange(ensembl_gene_id) %>%
+  filter(ensembl_gene_id %in% DE_genes) %>%
+  pull(external_gene_name)
+print(cbind(DE_genes, DE_gene_names))
+pheatmap(mat_hm_adj[DE_genes,], 
+         scale="row",
+         labels_row=DE_gene_names,
+         clustering_distance_rows="euclidean",
+         clustering_distance_cols="euclidean",
+         clustering_method="ward.D",
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(200),
+         main="Heatmap based on the *adjusted* variance-stabilized counts")
+```
+
+**Remarque** : nous avons utilisé le package R biomaRt pour associer les identifiants *ensembl* aux *gene names*, mais les packages AnnotationHub et AnnotationDbi (entre autres) peuvent être intéressants. Ce [document](https://www.bioconductor.org/help/course-materials/2019/CSAMA/materials/lectures/lecture-08a-annotation.html#1) recense différents outils disponibles et leurs fonctionnements.
+
+# Du gène au *gene-set*
+
+L'analyse conduite ci-dessus nous a permis de détecter un certain nombre de gènes dérégulés par l'effet du traitement. Nous pouvons alors nous demander si ces gènes appartiennent préférentiellement à des *pathways*/voies/catégories (i.e. ensembles de gènes cohérents biologiquement) connus dans la littérature. Autrement dit, nous allons rechercher des *gene-sets* enrichis en gènes différentiellement exprimés, i.e. des *gene-sets* perturbés par l'effet du traitement.
+
+De nombreuses méthodes et plusieurs packages R et applications web existent pour réaliser cette analyse fonctionnelle de manière automatisée. Ici, nous allons la construire pas-à-pas en utilisant trois méthodes différentes et en illustrant les points importants.
+
+La première étape est d'importer dans R les *gene-sets* que l'on souhaite tester : par exemple les *pathways* KEGG, les *GO terms* de la catégorie *Molecular Function*, etc... Ici, nous importons uniquement les *pathways* KEGG en utilisant le package R gage :
+
+```{r import_KEGG}
+kegg <- kegg.gsets(species="human", id.type="kegg")$kg.sets
+print(head(kegg, 3))
+length(kegg)
+```
+
+Les *pathways* KEGG sont importés sous la forme d'une liste : chaque élément est un vecteur (ensemble) de gènes représentant un *pathway*. Aussi, les gènes sont caractérisés par des numéros qui correspondent à leur identifiant *Entrez* (NCBI). On peut vérifier que chaque *gene-set* contient des identifiants uniques (i.e. pas de doublons) et qu'aucun *gene-set* n'est présent deux fois :
+
+```{r check_KEGG}
+any(sapply(kegg, function(x) any(duplicated(x))))
+any(duplicated(lapply(kegg, function(x) sort(x))))
+```
+
+L'étape suivante consiste à transformer les identifiants *ensembl* utilisés pour l'analyse différentielle en identifiants de type *Entrez*. Pour cela, nous pouvons utiliser la même méthode que précédemment et vérifier la présence de doublons :
+
+```{r ensembl2entrez}
+bm <- getBM(attributes=c("ensembl_gene_id", "entrezgene"), mart=ensembl)
+head(bm)
+bm %>%
+  filter(!is.na(ensembl_gene_id)) %>%
+  pull(ensembl_gene_id) %>%
+  duplicated() %>%
+  any()
+dup_ensembl <- bm %>%
+  filter(!is.na(ensembl_gene_id)) %>%
+  filter(duplicated(ensembl_gene_id)) %>%
+  pull(ensembl_gene_id)
+bm %>%
+  filter(ensembl_gene_id %in% dup_ensembl) %>%
+  arrange(ensembl_gene_id) %>%
+  head(n=10)
+```
+
+On remarque qu'il est possible d'avoir différents identifiants *Entrez* qui pointent vers un même identifiant *ensembl*...
+
+```{r ensembl2entrez_dupentrez}
+bm %>%
+  filter(!is.na(entrezgene)) %>%
+  pull(entrezgene) %>%
+  duplicated() %>%
+  any()
+dup_entrez <- bm %>%
+  filter(!is.na(entrezgene)) %>%
+  filter(duplicated(entrezgene)) %>%
+  pull(entrezgene)
+bm %>%
+  filter(entrezgene %in% dup_entrez) %>%
+  arrange(entrezgene) %>%
+  head(n=10)
+```
+
+On remarque que plusieurs identifiants *ensembl* (et donc plusieurs log2(Fold-Change), P-valeurs...) correspondent à un même identifiant *Entrez*. Les *pathways* étant définis par des identifiants *Entrez*, nous devons choisir quel identifiant *ensembl* associer à chaque *Entrez*. Ici, nous choisons l'identifiant *ensembl* ayant l'expression la plus forte, mais nous pourrions choisir tout autre critère :
+
+```{r merge_res_entrez}
+res <- res %>%
+  as.data.frame() %>%
+  mutate(ensembl_gene_id=rownames(res)) %>%
+  inner_join(bm, by="ensembl_gene_id", multiple="all") %>%
+  arrange(desc(baseMean)) %>%
+  filter(!duplicated(entrezgene))
+print(head(res))
+```
+
+## *ORA* : *Over-Representation Analysis*
+
+Nous pouvons maintenant tester si le *gene-set* `hsa05418 Fluid shear stress and atherosclerosis` (par exemple) est enrichi en gènes différentiellement exprimés. Nous utilisons la méthode *ORA* (*Over-Representation Analysis*) avec un test de Fisher :
+
+```{r enrichment}
+res <- res %>%
+  mutate(geneset = ifelse(entrezgene %in% kegg$`hsa05418 Fluid shear stress and atherosclerosis`, "in", "out")) %>%
+  mutate(DE = ifelse(padj <= 0.05 & !is.na(padj), "DE", "notDE"))
+print(head(res), digits=3)
+tab <- table(res$geneset, res$DE)
+print(tab)
+print(fisher.test(tab), alternative="greater")
+```
+
+Le *gene-set* `hsa05418 Fluid shear stress and atherosclerosis` est enrichi en gènes dérégulés car son *Odds-Ratio* défini comme :
+
+$$ \text{OR} = \frac{\text{Odd in gene-set}}{\text{Odd out gene-set}} = \frac{25/113}{1152/18047} = 3.46 $$
+est significativement supérieur à 1 (P-valeur = $8.25 \times 10^{-7}$). On peut également calculer le *Fold-Enrichment* :
+
+$$ \text{FE} = \frac{\text{Pct gene DE in gene-set}}{\text{Pct gene DE out gene-set }} = \frac{25/(25+113)}{1152/(1152+18047)} = \frac{0,181}{0,6} = 3,02$$
+On peut maintenant répéter l'opération grâce à une boucle sur tous les *pathways* KEGG :
+
+```{r enrichment_loop}
+res_kegg <- data.frame(kegg=names(kegg), ngenes=sapply(kegg, length), OR=NA, pvalue=NA)
+for (name in names(kegg)){
+  res <- res %>%
+    mutate(geneset = ifelse(entrezgene %in% kegg[[name]], "in", "out")) %>%
+    mutate(DE = ifelse(padj <= 0.05 & !is.na(padj), "DE", "notDE"))
+  tab <- table(res$geneset, res$DE)
+  if (nrow(tab) < 2 | ncol(tab) < 2) stop("tab is not a 2x2 table, can't perform the statistical test")
+  f <- fisher.test(table(res$geneset, res$DE), alternative="greater")
+  res_kegg[which(res_kegg$kegg == name), c("OR", "pvalue")] <- c(f$estimate, f$p.value)
+}
+print(head(res_kegg))
+```
+
+Etant donné le nombre important de *pathways* testés, il est probable que certaines p-valeurs soient significatives seulement par chance : on doit les ajuster de manière à prendre en compte la multiplicité des tests et ainsi contrôler le taux de faux positifs.
+
+```{r enrichment_fdr}
+res_kegg <- res_kegg %>%
+  mutate(FDR = p.adjust(pvalue)) %>%
+  arrange(FDR)
+print(head(res_kegg))
+sum(res_kegg$FDR <= 0.05)
+```
+
+Au seuil de 5%, on détecte 42 *pathways* KEGG enrichis en gènes dérégulés. On peut les représenter de cette manière :
+
+```{r plot_enrichment, fig.width=8, fig.height=6}
+res_kegg %>%
+  filter(FDR <= 0.05) %>%
+  mutate(kegg = gsub("_", " ", kegg)) %>%
+  ggplot(aes(x=OR, y=reorder(kegg, OR), color=FDR, size=ngenes)) +
+  geom_point() +
+  labs(size="# genes", color="FDR") +
+  xlab("Odds-ratio") +
+  ylab("Gene-set") +
+  ggtitle("Pathways KEGG enrichis") +
+  theme_light()
+```
+
+**Remarque** : on aurait pu visualiser les *Fold-Enrichment* à la place des *Odds-Ratios*.
+
+Cette analyse d'enrichissement utilise la méthode *ORA* (*Over-Representation Analysis*) mais il existe beaucoup d'autres méthodes dont les objectifs et hypothèses sont légèrement différents. 
+
+## CAMERA : *Competitive Gene Set Test Accounting for Inter-gene Correlation*
+
+La méthode CAMERA du package R `limma` utilise l'ensemble des résultats plutôt que de filtrer en utilisant un seuil sur la P-valeur ajustée (par exemple). Le code R ci-dessous permet de réaliser une telle analyse, en utilisant en entrée l'ensemble des statistiques de tests.
+
+**Remarque** : la statistique de test d'un gène est défini comme :
+
+$$ \text{stat} = \frac{\log_2(\text{Fold-Change})}{\text{standard-error}} $$
+
+```{r camera}
+res <- res %>% mutate(stat=log2FoldChange/lfcSE)
+statistic <- res %>% pull(stat)
+names(statistic) <- res %>% pull(entrezgene)
+statistic <- statistic[!is.na(statistic)]
+print(head(statistic))
+res.cam <- cameraPR(statistic=statistic, index=kegg)
+print(head(res.cam))
+```
+
+Le *gene-set* `hsa04060 Cytokine-cytokine receptor interaction` est détecté comme étant plutôt down-régulé, et on peut visualiser les statistiques de test des gènes qui le composent :
+
+```{r camera_illustration}
+res %>%
+  filter(entrezgene %in% kegg[["hsa04060 Cytokine-cytokine receptor interaction"]]) %>%
+  ggplot(aes(x=stat)) +
+  geom_histogram(bins=50, color="white", fill="grey") +
+  geom_vline(xintercept=0, linetype="dashed") +
+  xlab("Statistique de test (par gène)") +
+  ylab("Frequency") +
+  ggtitle("Pathway hsa04060") +
+  theme_light()
+```
+
+## GSEA : *Gene Set Enrichment Analysis*
+
+La méthode GSEA est également souvent utilisée et permet, comme CAMERA, de détecter si un *gene-set* est plutôt up-régulé ou down-régulé. Nous utilisons ici le package `fgsea` pour l'illustrer, avec en entrée l'ensemble des statistiques de tests :
+
+```{r fgsea}
+res.gsea <- fgseaMultilevel(pathways=kegg, stats=statistic, eps=0) %>%
+  arrange(padj)
+print(head(res.gsea))
+```
+
+On peut à nouveau illustrer l'enrichissement du *pathway* `hsa04060 Cytokine-cytokine receptor interaction` :
+
+```{r fgsea_illustration}
+plotEnrichment(kegg[["hsa04060 Cytokine-cytokine receptor interaction"]], statistic) + 
+  labs(title="hsa04060 Cytokine-cytokine receptor interaction")
+```
+
+Enfin, la figure ci-dessous permet de visualiser les résultats pour les 10 *pathways* les plus up- et down-régulés :
+
+```{r fgsea_illustration2, fig.height=10, fig.width=14, dpi=300, out.width="100%"}
+topPathwaysUp <- res.gsea[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- res.gsea[ES < 0][head(order(pval), n=10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+plotGseaTable(kegg[topPathways], statistic, res.gsea, gseaParam=0.5)
+```
+
+**Questions/remarques** :
+
+ - Quel *background* utiliser : tous les gènes ? uniquement ceux présents dans au moins un *gene-set* ?
+ - Quels *gene-sets* tester (KEGG, GO, Reactome, WikiPathways...) ? Impact sur l'ajustement des p-valeurs ?
+ - Quelle base de données choisir pour importer les *gene-sets* : packages R (EnrichmentBrowser, msigdbr, gage, ...) ? sites web ? fichiers GMT ?
+ - Quel est l'impact de la version de l'annotation ?
+ - Quelle méthode choisir : ORA, CAMERA, GSEA ?
+ - Avec la méthode ORA : tester l'enrichissement en gènes dérégulés ? up-régulés ? down-régulés ?
+ - Comment faire lorsqu'on doit tester l'enrichissement pour plusieurs comparaisons (e.g. 0h - 4h - 8h) ?
+ - Que faire avec les organismes plus ou moins bien annotés ?
+
+Pour aller plus loin :
+
+ - Di Wu, Gordon K. Smyth, *Camera: a competitive gene set test accounting for inter-gene correlation*, Nucleic Acids Research, Volume 40, Issue 17, 1 September 2012, Page e133 [[Lien](https://academic.oup.com/nar/article/40/17/e133/2411151)]
+ - Aravind Subramanian, Pablo Tamayo, Vamsi K. Mootha et al. *Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles*. Proceedings of the National Academy of Sciences Oct 2005, 102 (43) 15545-15550 [[Lien](https://www.pnas.org/content/102/43/15545)]
+ - Nguyen, TM., Shafi, A., Nguyen, T. et al. *Identifying significantly impacted pathways: a comprehensive review and assessment*. Genome Biol 20, 203 (2019) [[Lien](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1790-4)]
+ - Ludwig Geistlinger, Gergely Csaba, Mara Santarelli et al, *Toward a gold standard for benchmarking gene set enrichment analysis*, Briefings in Bioinformatics, Volume 22, Issue 1, January 2021, Pages 545–556 [[Lien](https://academic.oup.com/bib/article/22/1/545/5722384)]
+
+## Bonus : import des *pathways* KEGG avec msigdbr
+
+Dans les sections précédentes, nous avons utilisé des *pathways* KEGG importés à partir du package R gage. Il est également possible de les importer en utilisant le package msigdbr, lui même basé sur ces [données](https://www.gsea-msigdb.org/gsea/msigdb/index.jsp) :
+
+```{r kegg_msigdr}
+kegg.msigdb <- msigdbr(species="Homo sapiens",
+                       category="C2",
+                       subcategory="KEGG")
+print(head(as.data.frame(kegg.msigdb)))
+length(unique(kegg.msigdb$gs_name))
+```
+
+On constate que 186 *pathways* KEGG sont répertoriés dans le tableau alors que gage a permis d'en importer 347.
+
+**Question** : comment faire pour comparer le contenu des *pathways* importés grâce à msigdbr et gage ?
+
+# Analyse statistique d'un design complexe
+
+Dans les sections ci-dessus, nous avons analysé des données provenant de designs expérimentaux **simples**. Or, pour répondre à certaines questions biologiques, il est nécessaire de créer des designs dits **complexes**, i.e. incluants plusieurs facteurs.
+
+Nous allons étudier ici des données RNA-Seq provenant d'un tel design : l'objectif est d'évaluer l'effet d'un traitement (T vs C) sur deux souches d'une bactérie (WT et KO). Les deux facteurs/variables étudié(e)s sont donc le traitement et la souche, chacun prenant deux niveaux/modalités.
+
+**Question** : que peut-on faire à partir de ces données et comment pouvons-nous les analyser ?
+
+## Ecriture de l'interaction dans le modèle
+
+```{r load_data_2factors}
+rm(list=ls())
+load("data_interaction.RData")
+ls()
+print(target)
+print(head(counts))
+# mettre WT en reference de strain et C en reference de treatment
+target$strain <- factor(target$strain, levels=c("WT", "KO"))
+target$treatment <- factor(target$treatment, levels=c("C", "T"))
+```
+
+Le code R ci-dessous permet de créer l'objet `dds` avec le design adéquat et de réaliser les 3 étapes de l'analyse différentielle (normalisation, estimation de la dispersion et modèle linéaire généralisé) :
+
+```{r analysis_2factors}
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=target, 
+                              design=~replicate + strain + treatment + strain:treatment)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+dds <- nbinomWaldTest(dds)
+resultsNames(dds)
+```
+
+## Visualisation de l'interaction
+
+L'analyse en composante principale permet de visualiser la structure des données :
+
+```{r acp_2factors}
+rld <- rlog(dds)
+pca <- PCA(t(assay(rld)), scale.unit=FALSE, ncp=3, graph=FALSE)
+fviz_pca_ind(pca, axes=c(1, 2), repel=TRUE, mean.point=FALSE, 
+             habillage=factor(paste(target$strain, target$treatment, sep="-")))
+fviz_pca_ind(pca, axes=c(1, 3), repel=TRUE, mean.point=FALSE, 
+             habillage=factor(paste(target$strain, target$treatment, sep="-")))
+```
+
+Sur le premier plan factoriel formé par les axes 1 et 2 nous visualisons l'effet du traitement (axe 1) et l'effet de la souche (axe 2). Ensuite, l'axe 3 permet de visualiser l'interaction souche-traitement : l'effet du traitement sur les WT (haut vers le bas) est opposé à l'effet du traitement sur KO (bas vers le haut).
+
+On peut également visualiser l'interaction pour un gène spécifique (bien choisi) :
+
+```{r interaction_1gene}
+ncounts <- counts(dds, norm=TRUE)
+d <- data.frame(target, ncounts=ncounts["gene914",])
+print(d)
+ggplot(d, aes(x=strain, y=ncounts, color=treatment, shape=replicate)) +
+  geom_beeswarm(dodge.width=0.3, size=4) +
+  scale_y_continuous(trans = log2_trans(),
+    breaks = trans_breaks("log2", function(x) 2^x),
+    labels = trans_format("log2", math_format(2^.x))) +
+  xlab("Condition") +
+  ylab("Normalized counts (log2 scale)") +
+  labs(shape="Replicate", color="Treatment") +
+  ggtitle("Illustration of the donor effect for gene gene914") +
+  theme_light()
+```
+
+## Ecriture des contrastes
+
+Nous pouvons ensuite utiliser DESeq2 et des contrastes adaptés pour evaluer l'effet du traitement sur chaque souche et ensuite comparer ces deux effets :
+
+ (1) T vs C pour les WT
+ (2) T vs C pour les KO
+ (3) différence entre (2) et (1)
+
+```{r results_2factors}
+# ExploreModelMatrix() pour lancer l'application Shiny
+res_TvsC.WT <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 1, 0), type="ashr", quiet=TRUE)
+res_TvsC.KO <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 1, 1), type="ashr", quiet=TRUE)
+res_interaction <- lfcShrink(dds, contrast=c(0, 0, 0, 0, 0, 1), type="ashr", quiet=TRUE)
+summary(res_TvsC.WT, alpha=0.05)
+summary(res_TvsC.KO, alpha=0.05)
+summary(res_interaction, alpha=0.05)
+```
+
+Afin de comparer les effets du traitement chez les WT et chez les KO, nous assemblons les résultats au sein d'un même tableau et nous créons de nouvelles variables indiquant d'une part si un gène est en interaction (`DE_int`) et d'autre part si les deux effets sont significatifs (`DE_both_strains`). Ensuite nous pouvons tracer la figure :
+
+```{r results_2factors2}
+d <- data.frame(gene=rownames(res_TvsC.WT),
+                log2FC_TvsC.WT=res_TvsC.WT$log2FoldChange,
+                padj_TvsC.WT=res_TvsC.WT$padj,
+                log2FC_TvsC.KO=res_TvsC.KO$log2FoldChange,
+                padj_TvsC.KO=res_TvsC.KO$padj,
+                log2FC_int=res_interaction$log2FoldChange,
+                padj_int=res_interaction$padj)
+d <- d %>%
+  mutate(DE_int=ifelse(!is.na(padj_int) & padj_int <= 0.05, "Yes", "No"),
+         DE_both_strains=ifelse(!is.na(padj_TvsC.WT) & padj_TvsC.WT <= 0.05 & !is.na(padj_TvsC.KO) & padj_TvsC.KO <= 0.05, "Yes", "No"))
+print(head(d))
+ggplot(d, aes(x=log2FC_TvsC.WT, y=log2FC_TvsC.KO, color=DE_int, size=DE_both_strains)) +
+  geom_point(alpha=0.5) +
+  scale_color_manual(values=c("Yes"="red", "No"="black")) +
+  scale_size_manual(values=c("Yes"=1, "No"=0.4)) +
+  geom_hline(yintercept=0, lty=2, color="grey") +
+  geom_vline(xintercept=0, lty=2, color="grey") +
+  geom_abline(slope=1, intercept=0, lty=2, color="grey") +
+  labs(color="Strain-condition\ninteraction", size="DE for both\nWT and KO") +
+  xlab(bquote(log[2](FC)~"T vs C for WT")) +
+  ylab(bquote(log[2](FC)~"T vs C for KO")) +
+  ggtitle("Illustration of the interaction") +
+  theme_light()
+```
+
+Sur cette figure, les points éloignés de la diagonale (droite $Y = X$) correspondent aux gènes en interaction, i.e. pour lesquels l'effet du traitement diffère selon la souche. Autrement dit, le log2(Fold-Change) chez les WT est très différent du log2(Fold-Change) chez les KO. Cette différence d'effets est significative lorsque le point est rouge (au seuil de 5%), et les effets individuels (chez les WT et KO) sont significatifs simultanément si le point est agrandi.
+
+## Heatmap
+
+On peut sélectionner ces gènes et les visualiser sous la forme d'une heatmap (en ajustant sur l'effet du réplicat) :
+
+```{r heatmap_2factors}
+int_genes <- d %>%
+  filter(padj_int <= 0.05) %>%
+  pull(gene)
+mat_hm <- assay(rlog(dds))
+mat_hm_adj <- removeBatchEffect(mat_hm, batch=target$replicate)
+pheatmap(mat_hm_adj[int_genes,],
+         scale="row",
+         show_rownames=FALSE,
+         clustering_distance_rows="euclidean",
+         clustering_distance_cols="euclidean",
+         clustering_method="ward.D",
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(200))
+```
+
+On voit sur cette heatmap que pour chaque ligne l'effet du traitement est opposé entre les deux souches (e.g. rouge vs bleu pour les WT contre bleu vs rouge pour les KO).
+
+Le code ci-dessous permet de visualiser les log2(Fold-Change) :
+
+```{r heatmap_log2FC_2factors}
+rownames(d) <- d$gene
+d <- d %>%
+  filter(padj_int < 0.005 & sign(log2FC_TvsC.WT) != sign(log2FC_TvsC.KO)) %>%
+  dplyr::select(log2FC_TvsC.WT, log2FC_TvsC.KO) %>%
+  as.matrix()
+pheatmap(d, 
+         scale="none", 
+         show_rownames=FALSE,
+         cluster_cols=FALSE,
+         clustering_distance_rows="euclidean",
+         angle_col=45,
+         fontsize_row=5,
+         color=colorRampPalette(rev(brewer.pal(9, "RdBu")))(100),
+         breaks=seq(-4, 4, length=101))
+```
+
+**Question** : comment analyser un design expérimental comportant plus de 3 facteurs d'intérêt ?
+
+# Liens et références intéressants{.unlisted .unnumbered}
+
+### RNA-Seq{.unlisted .unnumbered}
+
+ - Chaine YouTube [StatQuest](https://www.youtube.com/c/joshstarmer/videos)
+ - Site [DoItYourself Transcriptomics](https://diytranscriptomics.com/)
+ - Site [RNA-Seqlopedia](https://rnaseq.uoregon.edu/)
+ - Article sur la normalisation : Ciaran Evans, Johanna Hardin, Daniel M Stoebel, *Selecting between-sample RNA-Seq normalization methods from the perspective of their assumptions*, Briefings in Bioinformatics, Volume 19, Issue 5, September 2018, Pages 776–792 [[Lien](https://academic.oup.com/bib/article/19/5/776/3056951)]
+
+### R{.unlisted .unnumbered}
+
+ - Livre [*R for Data Science*](https://r4ds.had.co.nz/)
+ - Livre [*R Cookbook*](https://rc2e.com/)
+ - Livre [*Modern Data Science with R*](https://mdsr-book.github.io/mdsr2e/)
+ - Livre [*Computational Genomics with R*](https://compgenomr.github.io/book/)
+
+ - Livre [*ggplot2: elegant graphics for data analysis*](https://ggplot2-book.org/index.html)
+ - Site de [référence ggplot2](https://ggplot2.tidyverse.org/reference/)
+ - Site [extensions ggplot2](https://exts.ggplot2.tidyverse.org/gallery/)
+ - Site [*A ggplot2 Tutorial for Beautiful Plotting in R*](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/)
+ - Package R [patchwork](https://github.com/thomasp85/patchwork)
+ - Livre [*Circular Visualization in R*](https://jokergoo.github.io/circlize_book/book/)
+ - Livre [ComplexHeatmap](https://jokergoo.github.io/ComplexHeatmap-reference/book/)
+ - Palettes de [couleurs](https://github.com/EmilHvitfeldt/r-color-palettes)
+
+# Informations sur la session R{.unlisted .unnumbered}
+
+Dans un souci de reproductibilité, la commande ci-dessous permet d'afficher l'ensemble des packages utilisés ainsi que leurs versions :
+
+```{r}
+devtools::session_info()
+```
+
+**Remarque** : la sortie est plus lisible qu'avec le traditionnel `sessionInfo()`.

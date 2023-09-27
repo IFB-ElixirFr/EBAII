@@ -2,12 +2,18 @@
 
 **Ecole de Bioinformatique Aviesan - IFB - Inserm (EBAII)**
 
+---
+
+*Les demandes d'inscriptions pour les formations sont maintenant closes.*
+
+---
+
 
 ## Description
 
 ![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
 
-EBAII propose plusieurs écoles différentes.
+EBAII propose plusieurs formations différentes.
 
 Elles sont basées sur une alternance de courtes sessions théoriques et d'ateliers pratiques.
 
@@ -17,6 +23,9 @@ Les participants bénéficieront d’un tutorat personnalisé pour élaborer leu
 
 *Langue*:
 Les cours seront prodigués uniquement en Français.
+
+*Lieux*:
+Les cours sont données à Roscoff (Hôtel de France).
 
 *Public visé*: 
 Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheurs, enseignants-chercheurs, praticiens…) confrontés à l’analyse de données NGS, et qui ne disposent pas des compétences bioinformatiques suffisantes, ou cherchent à les consolider (en fonction du niveau de la formation).
@@ -51,10 +60,10 @@ Aucune connaissance préalable des environnements Linux ou R n'est requise, mais
 La formation approfondira progressivement l’usage de ces environnements au fil des sessions thématiques.
 
 *Prochaines dates*:
-5 au 10 novembre 2023.
+Non déterminé.
 
 *Site de demande d'inscription*:
-Pas encore ouvert.
+Clos. 
 
 
 #### Niveau intermédiaire
@@ -69,11 +78,10 @@ L'ensemble de la formation reposera sur l’utilisation de commandes en ligne (t
 Les candidats doivent avoir acquis les compétences enseignées durant l'école de niveau débutant: un niveau de base en ligne de commande, R, et (au choix) RNA-seq, ChIP-seq ou variants DNA-seq.
 
 *Prochaines dates*:
-4 au 9 juin 2023.
+Non déterminé.
 
 *Site de demande d'inscription*:
-Pas encore ouvert.
-
+Clos.
 
 ### Formation "assemblage et annotation de génomes procaryotes et eucaryotes"
 
@@ -102,12 +110,15 @@ Pas encore ouvert.
 
 ## Contacts
 
-[Renseignements](mailto:ecole-bioinfo@aviesan.fr)
-
-[Compte twitter](https://twitter.com/EBAI_Roscoff)
+ - [Renseignements](mailto:ecole-bioinfo@aviesan.fr)
+ - [Compte twitter](https://twitter.com/EBAI_Roscoff)
 
 
 ## Matériel pédagogique
+
+### 2023
+
+- [Analyse et traitement de données NGS, niveau intermédiare](2023/ebaiin2/README.md)
 
 ### 2022
 
