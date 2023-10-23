@@ -9,6 +9,11 @@
 *.rdb
 *.rdx
 *.tsv
+*.log
+2023/ebaiin1/Example/Session_example_ipynb/ipython-notebook/
+2023/ebaiin1/Example/Session_example_html/ipython-notebook/
+2023/ebaiin1/Example/Session_example_rmd/rmarkdown/
+2023/ebaiin1/Example/jupyter-book/
 README.html
 *~
 .DS_Store
@@ -16,6 +21,7 @@ README.html
 2021/ebaiin2/RNASeq/EBAIIn2_RNASeq_files/
 2021/ebaiin2/RNASeq/EBAIIn2_RNASeq_apprenants_cache/
 2022/ebaiin1/IGV/IGV_cache/
+2022/ebaiin1/IGV/IGV_practical_cache/
 2022/ebaiin1/IGV/IGV_practical_cache/
 2023/ebaiin2/RNASeq/EBAIIn2_RNASeq_cache/
 2023/ebaiin2/RNASeq/EBAIIn2_RNASeq_files/
