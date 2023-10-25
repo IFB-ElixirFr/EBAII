@@ -26,4 +26,4 @@ ebaii:
 
 .PHONY:
 clean:
-	rm -rf ./ebaii *.html
+	rm -rf ./ebaii *.RDS
