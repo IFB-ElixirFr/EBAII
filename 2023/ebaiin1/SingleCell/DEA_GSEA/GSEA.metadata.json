@@ -1,0 +1,43 @@
+{
+    "name": "SingleCell_GSEA.Rmd",
+    "abstract": "Learn how to perform GSEA (Gene Set Enrichment Analysis) based on a scaled, normalized, and filtered Seurat object",
+    "author": [
+        {
+            "@type": "Person",
+            "name": "Thibault Dayris",
+            "email": "thibault.dayris@gustaveroussy.fr"
+        }
+    ],
+    "contributor": [
+        {
+            "@type": "Person",
+            "name": "Emilie Drouineau",
+            "email": "emilie.drouineau@cea.fr"
+        }
+    ],
+    "description": "This tutorial let you see all function IO and contains the full verbatim of the EBAII 2023 session",
+    "audiance": {
+        "@type": "Audiance",
+        "audienceType": "beginner command line biologist"
+    },
+    "educationalLevel": "Beginner",
+    "inLanguage": [
+        "en-GB"
+    ],
+    "teaches": [
+        "The student will be able to load Seurat object",
+        "The student will be able to select a GSEA method",
+        "The student will be able to select a Seurat count slot",
+        "The student will be able to compose the command line themselves",
+        "The student will be albe to draw basic graphs",
+        "The student will be able to save results as CSV"
+    ],
+    "keywords": "Seurat, R, Gene Set Enrichment Analysis",
+    "learningResourceType": [
+        "handout"
+    ],
+    "license": [
+        "https://mit-license.org/"
+    ],
+    "dateModified": "2023-10-25T13:43:27,142911245+02:00"
+}
