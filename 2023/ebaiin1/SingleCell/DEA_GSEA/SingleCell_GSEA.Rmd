@@ -320,7 +320,7 @@ Save the results in a  variable, for example `sobj_enrich`.
 It is not possible to specify what group we are considering. GSEA/Enrichment 
 analysis do not perform any differential analysis.
 
-```{r escape_enrich, eval=FALSE, echo=TRUE}
+```{r escape_enrich, eval=TRUE, echo=TRUE}
 # Save in a variable called `sobj_enrich`
 # the result of the function `enrichIt` from package `escape`
 sobj_enrich <- escape::enrichIt(
@@ -334,11 +334,6 @@ making it faster !
 
 </details>
 <br />
-
-
-```{r escape_enrich_save, eval=TRUE, echo=FALSE}
-sobj_enrich <- base::readRDS(file="sobj_enrich.RDS")
-```
 
 What happened ? Let's print results with the function [`head`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/head)
 from [`utils`](https://www.rdocumentation.org/packages/utils/versions/3.6.2)
