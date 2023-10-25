@@ -299,22 +299,15 @@ variable, since it is our only Seurat object. In addition, we are going to
 select the feature `Jund`, and split the graph according to the cell phases
 we annotated earlier.
 
-```{r seurat_vlnplot_jund_demo, eval=FALSE, echo=TRUE}
+```{r seurat_vlnplot_jund_demo, eval=TRUE, echo=TRUE}
 Seurat::VlnPlot(
   # The Seurat object
   object = sobj,
   # The name of the gene of interest (feature = gene)
   features = "Jund",
   # The name of the Seurat cell-cycle annotation
-  split.by = "cc_seurat.Phase"
-)
-```
-
-```{r seurat_vlnplot_jund_exec, eval=TRUE, echo=FALSE}
-Seurat::VlnPlot(
-  object = sobj,
-  features = "Jund",
   split.by = "cc_seurat.Phase",
+  # Change color for presentation
   cols = c("darkslategray3", "olivedrab", "orangered3")
 )
 ```
@@ -348,22 +341,15 @@ Using your _'intuition'_, is this gene differentially expressed between G1 and S
 
 <summary>Answer</summary>
 
-```{r vlnplot_seurat_group_phase_code, echo=TRUE, eval=FALSE}
+```{r vlnplot_seurat_group_phase_code, echo=TRUE, eval=TRUE}
 Seurat::VlnPlot(
   # The Seurat object
   object = sobj,
   # The name of the gene of interest (feature = gene)
   features = "Jund",
   # The name of the Seurat cell-cycle annotation
-  group.by = "cc_seurat.Phase"
-)
-```
-
-```{r vlnplot_seurat_group_phase_display, echo=FALSE, eval=TRUE}
-Seurat::VlnPlot(
-  object = sobj,
-  features = "Jund",
   group.by = "cc_seurat.Phase",
+  # Change color for presentation
   cols = c("darkslategray3", "olivedrab", "orangered3")
 )
 ```
@@ -517,22 +503,15 @@ Let's have a look at the gene named ['Atad2'](https://www.genecards.org/cgi-bin/
 an ATPase protein associated with diverse cellular activities.
 
 
-```{r seurat_vlnplot_atad2_demo, eval=FALSE, echo=TRUE}
+```{r seurat_vlnplot_atad2_demo, eval=TRUE, echo=TRUE}
 Seurat::VlnPlot(
   # The Seurat object
   object = sobj,
   # The name of the gene of interest (feature = gene)
   features = "Atad2",
   # The name of the Seurat cell-cycle annotation
-  split.by = "cc_seurat.Phase"
-)
-```
-
-```{r seurat_vlnplot_atad2_exec, eval=TRUE, echo=FALSE}
-Seurat::VlnPlot(
-  object = sobj,
-  features = "Atad2",
   split.by = "cc_seurat.Phase",
+  # Change color for presentation
   cols = c("darkslategray3", "olivedrab", "orangered3")
 )
 ```
@@ -661,7 +640,7 @@ object, and the right arguments.
 
 Here are the code for each team:
 
-```{r findmarkers_all_de, echo=TRUE, eval=FALSE}
+```{r findmarkers_all_de, echo=TRUE, eval=TRUE}
 sobj_wilcox <- Seurat::FindMarkers(
   # The variable that contains Seurat Object
   object = sobj,
@@ -703,11 +682,7 @@ sobj_roc <- Seurat::FindMarkers(
 ```
 
 ```{r load_dea, eval=TRUE, echo=FALSE}
-
-sobj_deseq2 <- readRDS("sobj_deseq2.RDS")
-sobj_t <- readRDS("sobj_t.RDS")
-sobj_wilcox <- readRDS("sobj_wilcox.RDS")
-sobj_roc <- readRDS("sobj_roc.RDS")
+base::saveRDS(file="sobj_wilcox.RDS", object=sobj_wilcox)
 ```
 
 </details>
@@ -778,7 +753,7 @@ In order to do surch modification to the data, we use the function
 from package `Seurat`. It takes a new count matrix in input, se we 
 have to build it first.
 
-```{r build_count_p1_matrix, eval=FALSE, echo=TRUE}
+```{r build_count_p1_matrix, eval=TRUE, echo=TRUE}
 count_matrix_plus_one <- base::as.matrix(
   # Take the count matrix and add one,
   # This results in a data.frame, which
@@ -821,12 +796,12 @@ while Wilcoxon and T-test returned adjusted pvalues far below 0.05.
 
 
 
-```{r save_de_results, eval=FALSE, echo=FALSE}
-# saveRDS(sobj_wilcox, "sobj_wilcox.RDS")
-# saveRDS(sobj_t, "sobj_t.RDS")
-# saveRDS(sobj_roc, "sobj_roc.RDS")
-# saveRDS(sobj_deseq2, "sobj_deseq2.RDS")
-# saveRDS(sobjp1, "sobjp1.RDS")
+```{r save_de_results, eval=TRUE, echo=FALSE}
+base::saveRDS(sobj_wilcox, "sobj_wilcox.RDS")
+base::saveRDS(sobj_t, "sobj_t.RDS")
+base::saveRDS(sobj_roc, "sobj_roc.RDS")
+base::saveRDS(sobj_deseq2, "sobj_deseq2.RDS")
+base::saveRDS(sobjp1, "sobjp1.RDS")
 ```
 
 # Explore results
