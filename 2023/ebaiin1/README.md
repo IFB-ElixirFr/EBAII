@@ -12,4 +12,8 @@
 
 From there, you can also find a link to download the whole repository with `git`.
 
+## Programme synthétique 
+
+Programme <https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin1/programme_synthetique_EBAII_2023%20-%202023.pdf>
+
 ****
