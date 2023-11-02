@@ -27,7 +27,7 @@ Les cours seront prodigués uniquement en Français.
 *Lieux*:
 Les cours sont données à Roscoff (Hôtel de France).
 
-*Public visé*: 
+*Public visé*:
 Cette formation est destinée aux biologistes (ingénieurs, doctorants, chercheurs, enseignants-chercheurs, praticiens…) confrontés à l’analyse de données NGS, et qui ne disposent pas des compétences bioinformatiques suffisantes, ou cherchent à les consolider (en fonction du niveau de la formation).
 
 *Frais d’inscription*:
@@ -63,7 +63,7 @@ La formation approfondira progressivement l’usage de ces environnements au fil
 Non déterminé.
 
 *Site de demande d'inscription*:
-Clos. 
+Clos.
 
 
 #### Niveau intermédiaire
@@ -118,7 +118,8 @@ Pas encore ouvert.
 
 ### 2023
 
-- [Analyse et traitement de données NGS, niveau intermédiare](2023/ebaiin2/README.md)
+- [Analyse et traitement de données NGS, niveau débutant](2023/ebaiin1/README.md)
+- [Analyse et traitement de données NGS, niveau intermédiaire](2023/ebaiin2/README.md)
 
 ### 2022
 
@@ -128,7 +129,7 @@ Pas encore ouvert.
 ### 2021
 
 - [Analyse et traitement de données NGS, niveau débutant](2021/ebaiin1/README.md)
-- [Analyse et traitement de données NGS, niveau intermédiare](2021/ebaiin2/README.md)
+- [Analyse et traitement de données NGS, niveau intermédiaire](2021/ebaiin2/README.md)
 
 ### 2020
 
