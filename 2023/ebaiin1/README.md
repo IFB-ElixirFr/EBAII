@@ -20,6 +20,20 @@ Programme <https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin1/progra
 
 ## Supports de cours
 
+### Exposés d'ouverture
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Long reads | Claude Thermes |  |
+
+### Visualisation
+
+| Cours | Intervenants | Supports |
+|----------------------------------|--------------|----------|
+| Visualization of NGS Data using IGV (v2.4+) -- Documentation | Rachel Legendre, Jean-Pascal Meneboo | [Intro](IGV/IGV.html) [Practical](IGV/IGV_practical.html) [data](IGV/data_igv.zip) |
+
+
+
 ### ChIP-seq
 
 | Support | Lien |
