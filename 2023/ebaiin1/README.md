@@ -12,8 +12,29 @@
 
 From there, you can also find a link to download the whole repository with `git`.
 
-## Programme synthétique 
+## Programme synthétique
 
 Programme <https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin1/programme_synthetique_EBAII_2023%20-%202023.pdf>
 
 ****
+
+## Supports de cours
+
+### ChIP-seq
+
+| Support | Lien |
+|----------------------------------|------------------|
+| Partie théorique | [gslides](https://docs.google.com/presentation/d/1LkZ41PQNwEF5MoTKcYn_yD0dQwFs-g7ZxxHyOc5yFNM/edit?usp=sharing) |
+| Partie pratique | [html](chip-seq/hands-on/hands-on.html) |
+| Workflow et conclusion | [gslides](https://docs.google.com/presentation/d/1vCLgD7zTNXSY94SE13Uo3uvjC2IK4KHGg2LMFyUK_1U/edit?usp=sharing) |
+
+| Cours | Intervenants |
+|----------------------------------|------------------|
+| Programme de l'atelier ChIP-seq | [Program](chip-seq/) |
+| Design expérimental, Contrôle qualité | Stéphanie Le Gras |
+| Alignement | Stéphanie Le Gras |
+| Contrôle qualité des alignements, visualisation | Tao Ye |
+| Peak-calling | Tao Ye |
+| Analyse des motifs | Morgane Thomas-Chollier |
+| Annotation des pics | Elodie Darbo |
+| Workflow et conclusion | Denis Puthier |
