@@ -52,3 +52,9 @@ Programme <https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin1/progra
 | Analyse des motifs | Morgane Thomas-Chollier |
 | Annotation des pics | Elodie Darbo |
 | Workflow et conclusion | Denis Puthier |
+
+### Croisement et intégration des données
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Croisement de données | Claire Toffano-Nioche, Pauline François | [gslides](https://docs.google.com/presentation/d/1eOrpmtwX29lrAo393rNOkKLEEjzxYSbzO62v0JI2VHs/edit?usp=sharing) |
