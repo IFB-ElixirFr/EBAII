@@ -53,6 +53,19 @@ Programme <https://github.com/IFB-ElixirFr/EBAII/blob/master/2023/ebaiin1/progra
 | Annotation des pics | Elodie Darbo |
 | Workflow et conclusion | Denis Puthier |
 
+
+### Variants
+
+| Cours | Intervenants | Supports |
+|----------------------------------|------------------|----------|
+| Introduction & Processing Post-Alignement | Nadia Bessoltane & Gabriele Adam |[pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/1-Intro_Processing-Post-Alignement.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1Z9HlepuI017lGUkFlpwLxdvx4QARG1RQ/) |
+| Variant calling & Annotation | Nadia Bessoltane | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/2-Variant-calling_Annotation.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1JJffLPchxxhy1SFIi-0UedWvn5-n9VgK/) |
+| Variants structuraux | Gabriele Adam | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/3-Variants-Structuraux.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1tJn2-RMWkn7nLrcOubJPvMKx9A8WT2KP/) |
+| manipulation et visualisation de données avec R | Nadia Bessoltane | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/4-Manipuler_table_sourR.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1oOiJfcdnbIaY3G3F_CI-1nt-Op0W0aR8/) |
+| Analyse de variants avec R | Nadia Bessoltane | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/5-Manipuler_VCF_sourR.pptx.pdf) [gslides](https://docs.google.com/presentation/d/10W-EipRAc6146UZwVIRQCvS3Riau3QO4/) [html](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/RMD/2022_ebaiin1_variant_analysis.html) [data](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/RMD/data)|
+| Workflow et conclusion | Nadia Bessoltane & Gabriele Adam | [pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/ebaiin1/DNAseq/6-Workflow_Conclusion.pptx.pdf) [gslides](https://docs.google.com/presentation/d/1-nON-453OfocMrXJ95fMc-JaU9KRcNnB/) |
+
+
 ### Croisement et intégration des données
 
 | Cours | Intervenants | Supports |
