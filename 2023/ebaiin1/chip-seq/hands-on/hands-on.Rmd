@@ -24,8 +24,6 @@ bibliography: references.bib
 knitr::opts_chunk$set(echo = TRUE, root.dir="~/Documents/Formations/2023/EBAIIn1/EBAII/2023/ebaiin1/chip-seq/hands-on")
 ```
 
-$^1$ GenomEast platform, IGBMC
-
 # - Introduction
 ## - Goal
 
@@ -83,8 +81,7 @@ SRA stores sequences in a FASTQ format.
 # - Connect to the server and set up your environment
 ## - Sign in to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr) and open a Terminal
 1. Go to [Jupyterhub](https://jupyterhub.cluster.france-bioinformatique.fr)
-2. select reservation: **2325_ebaii_0**, CPUS: **4** and Memory (in GB): **10**
-![alt text][jupebai]
+2. select CPUS: **4** and Memory (in GB): **10**
 3. Click on "Start"
 4. In the launcher, click on "Terminal" in "Other" section. You should be in your home directory by default. Check it:
 ```{bash eval=FALSE}
@@ -242,7 +239,9 @@ bowtie-build
 5. Build the index for bowtie
 ```{bash eval=FALSE}
 ## Creating genome index : provide the path to the genome file and the name to give to the index (Escherichia_coli_K12)
-bowtie-build ../../data/Escherichia_coli_K12.fasta Escherichia_coli_K12
+bowtie-build \
+  ../../data/Escherichia_coli_K12.fasta \
+  Escherichia_coli_K12
 ```
 6. Go back to upper directory i.e 02-Mapping
 ```{bash eval=FALSE}
@@ -336,7 +335,6 @@ cd /shared/projects/<your_project>/EBAII2023_chipseq/02-Mapping/bam
   * INPUT: input file name to mark for duplicate reads
   * OUTPUT: output file name
   * METRICS: file with duplicates marking statistics
-  * VALIDATION_STRINGENCY: Validation stringency for all SAM files read by picard.
 
 ```{bash eval=FALSE}
 ## Load picard
@@ -344,18 +342,16 @@ module load picard/2.23.5
 
 ## Run picard
 picard MarkDuplicates \
-CREATE_INDEX=true \
-INPUT=SRR576933.bam \
-OUTPUT=Marked_SRR576933.bam \
-METRICS_FILE=metrics_SRR576933.txt \
-VALIDATION_STRINGENCY=STRICT
+  -CREATE_INDEX true \
+  -INPUT SRR576933.bam \
+  -OUTPUT Marked_SRR576933.bam \
+  -METRICS_FILE metrics_SRR576933.txt
 
 picard MarkDuplicates \
-CREATE_INDEX=true \
-INPUT=SRR576938.bam \
-OUTPUT=Marked_SRR576938.bam \
-METRICS_FILE=metrics_SRR576938.txt \
-VALIDATION_STRINGENCY=STRICT
+  -CREATE_INDEX true \
+  -INPUT SRR576938.bam \
+  -OUTPUT Marked_SRR576938.bam \
+  -METRICS_FILE metrics_SRR576938.txt
 ```
 
 To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
@@ -396,7 +392,12 @@ cd 03-ChIPQualityControls
 ## Load deeptools in your environment
 module load deeptools/3.5.0
 ## Run deeptools fingerprint
-plotFingerprint --numberOfSamples 10000 -b ../02-Mapping/bam/SRR576933.bam ../02-Mapping/bam/SRR576934.bam ../02-Mapping/bam/SRR576938.bam -plot fingerprint_10000.png
+plotFingerprint \
+  --numberOfSamples 10000 \
+  -b ../02-Mapping/bam/SRR576933.bam \
+    ../02-Mapping/bam/SRR576934.bam \
+    ../02-Mapping/bam/SRR576938.bam \
+  -plot fingerprint_10000.png
 ```
 4. If plotFingerprint takes ages to run. Take the file that has already been prepared for the training.
 ```{bash eval=FALSE}
@@ -496,8 +497,13 @@ Your directory structure should be like this:
   * --ignoreDuplicates: reads that have the same orientation and start position will be considered only once
 ```{bash eval=FALSE}
 bamCoverage --bam ../02-Mapping/bam/Marked_SRR576933.bam \
---outFileName SRR576933_nodup.bw --outFileFormat bigwig --effectiveGenomeSize 4639675 \
---normalizeUsing RPGC --skipNonCoveredRegions --extendReads 200 --ignoreDuplicates
+  --outFileName SRR576933_nodup.bw \
+  --outFileFormat bigwig \
+  --effectiveGenomeSize 4639675 \
+  --normalizeUsing RPGC \
+  --skipNonCoveredRegions \
+  --extendReads 200 \
+  --ignoreDuplicates
 ```
 
 5. Do it for the replicate and the control.
@@ -562,10 +568,16 @@ This prints the help of the program.
   <!-- * --diag is optional and increases the running time. It tests the saturation of the dataset, and gives an idea of how many peaks are found with subsets of the initial dataset. -->
   * &> MACS.out will output the verbosity (=information) in the file MACS.out
 ```{bash eval=FALSE}
-macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam \
--c ../../02-Mapping/bam/SRR576938.bam --format BAM \
---gsize 4639675 --name 'FNR_Anaerobic_A' --bw 400 \
---fix-bimodal -p 1e-2 &> repA_MACS.out
+macs2 callpeak \
+  -t ../../02-Mapping/bam/SRR576933.bam \
+  -c ../../02-Mapping/bam/SRR576938.bam \
+  --format BAM \
+  --gsize 4639675 \
+  --name 'FNR_Anaerobic_A' \
+  --bw 400 \
+  --fix-bimodal \
+  -p 1e-2 \
+  &> repA_MACS.out
 ```
 3. Run macs2 for replicate A, then go to repB directory and run macs2 for replicate B by changing the treatment file (-t), the output file name (-n) and the log file (&>), this should take a few minutes each.
 
@@ -579,10 +591,17 @@ mkdir pool
 cd pool
 
 # Run macs2 for pooled replicates
-macs2 callpeak -t ../../02-Mapping/bam/SRR576933.bam ../../02-Mapping/bam/SRR576934.bam \
--c ../../02-Mapping/bam/SRR576938.bam --format BAM \
---gsize 4639675 --name 'FNR_Anaerobic_pool' --bw 400 \
---fix-bimodal -p 1e-2 &> pool_MACS.out
+macs2 callpeak \
+  -t ../../02-Mapping/bam/SRR576933.bam \
+     ../../02-Mapping/bam/SRR576934.bam \
+  -c ../../02-Mapping/bam/SRR576938.bam \
+  --format BAM \
+  --gsize 4639675 \
+  --name 'FNR_Anaerobic_pool' \
+  --bw 400 \
+  --fix-bimodal \
+  -p 1e-2 \
+  &> pool_MACS.out
 ```
 
 ## - Analyzing MACS results
@@ -639,10 +658,13 @@ idr --help
 
 3. Run idr
 ```{bash eval=FALSE}
-idr --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak ../replicates/FNR_Anaerobic_B_peaks.narrowPeak \
---peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
---input-file-type narrowPeak --output-file FNR_anaerobic_idr_peaks.bed \
---plot
+idr \
+  --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak \
+    ../replicates/FNR_Anaerobic_B_peaks.narrowPeak \
+  --peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
+  --input-file-type narrowPeak \
+  --output-file FNR_anaerobic_idr_peaks.bed \
+  --plot
 ```
 
 4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2023_chipseq)
@@ -712,8 +734,10 @@ samtools faidx ../data/Escherichia_coli_K12.fasta
 ## First load bedtools
 module load bedtools/2.30.0
 ## Extract fasta sequence from genomic coordinate of peaks
-bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
--bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed -fo FNR_anaerobic_idr_peaks.fa
+bedtools getfasta \
+  -fi ../data/Escherichia_coli_K12.fasta \
+  -bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed \
+  -fo FNR_anaerobic_idr_peaks.fa
 ```
 4. Download the file FNR_anaerobic_idr_peaks.fa on your computer
 
@@ -737,12 +761,18 @@ bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
 ## - OPTIONAL : Motif discovery with RSAT (short peaks)
 1. Restrict the dataset to the summit of the peaks +/- 100bp using bedtools slop. Using bedtools slop to extend genomic coordinates allow not to go beyond chromosome boundaries as the user give the size of chromosomes as input (see fai file).
 ```{bash eval=FALSE}
-bedtools slop -b 100 -i ../05-PeakCalling/replicates/FNR_Anaerobic_A_summits.bed -g ../data/Escherichia_coli_K12.fasta.fai > FNR_Anaerobic_A_summits+-100.bed
+bedtools slop \
+  -b 100 \
+  -i ../05-PeakCalling/replicates/FNR_Anaerobic_A_summits.bed \
+  -g ../data/Escherichia_coli_K12.fasta.fai \
+  > FNR_Anaerobic_A_summits+-100.bed
 ```
 2. Extract the sequences for this BED file
 ```{bash eval=FALSE}
 ## Extract fasta sequence from genomic coordinate of peaks
-bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta -bed FNR_Anaerobic_A_summits+-100.bed -fo FNR_Anaerobic_A_summits+-100.fa
+bedtools getfasta \
+  -fi ../data/Escherichia_coli_K12.fasta -bed FNR_Anaerobic_A_summits+-100.bed \
+  -fo FNR_Anaerobic_A_summits+-100.fa
 
 ## Compress the genome file as we won't need it anymore
 gzip ../data/Escherichia_coli_K12.fasta
