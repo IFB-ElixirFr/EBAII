@@ -2,9 +2,6 @@
 
 **Ecole de Bioinformatique Aviesan - IFB - Inserm (EBAII)**
 
----
-
-*Les demandes d'inscriptions pour les formations sont maintenant closes.*
 
 ---
 
