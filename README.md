@@ -106,7 +106,7 @@ Pas encore ouvert.
 
 ## Contacts
 
- - [Renseignements](mailto:ecole-bioinfo@aviesan.fr)
+ - [Renseignements](mailto:ecole-bioinfo@groupes.renater.fr)
  - [Compte twitter](https://twitter.com/EBAI_Roscoff)
 
 
