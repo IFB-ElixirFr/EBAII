@@ -11,7 +11,6 @@
 
 ## Description
 
-![Formations](Figures/Copy_of_Maquettes_des_cours.jpg)
 
 EBAII propose plusieurs formations différentes.
 
