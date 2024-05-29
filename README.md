@@ -114,7 +114,7 @@ Pas encore ouvert.
 
 ### 2024
 
-- [Assemblage et annotation](2024/Assemblage/README.md)
+- [Assemblage et annotation](2024/Assembly/README.md)
 
 
 ### 2023
