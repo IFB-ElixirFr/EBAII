@@ -112,6 +112,11 @@ Pas encore ouvert.
 
 ## Matériel pédagogique
 
+### 2024
+
+- [Assemblage et annotation](2024/Assemblage/README.md)
+
+
 ### 2023
 
 - [Analyse et traitement de données NGS, niveau débutant](2023/ebaiin1/README.md)
