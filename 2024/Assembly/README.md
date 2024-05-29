@@ -8,7 +8,7 @@
 
 ## Web site
 
-- Web pages: <https://ifb-elixirfr.github.io/EBAII/2024/Assemblage>
+- Web pages: <https://ifb-elixirfr.github.io/EBAII/2024/Assembly>
 
 From there, you can also find a link to download the whole repository with `git`.
 
