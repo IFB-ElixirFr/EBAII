@@ -40,7 +40,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours         | Intervenants                     | Supports                                                                                                      |
 |---------------|----------------------------------|---------------------------------------------------------------------------------------------------------------|
-| Assemblage    | C. Klopp                         | [Cours](Genome_assembly.pdf) <br> [TP](Genome_assembly_tp.pdf)                                                |
+| Assemblage    | C. Klopp                         | [Cours](Genome_assembly.pdf) <br> [TP]([Genome_assembly_tp.pdf](https://github.com/IFB-ElixirFr/EBAII/blob/master/2022/Assembly/Genome_assembly_tp.pdf))                                                |
 | Polishing     | J.-M. Aury                       | [Cours](https://docs.google.com/presentation/d/1RAScBkXvWkRCuD2WAbgNLJZ8zJNXz9skkHJ-MGp4VBk/edit?usp=sharing) |
 | Scaffolding   | J. Kreplak; C. Klopp; A. Cormier | [Cours](https://drive.google.com/file/d/1SRBBqRPUUTePJ7K1wsqbmaFGqAuvVIt6/view?usp=sharing)                   |
 
