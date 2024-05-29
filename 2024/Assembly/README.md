@@ -31,7 +31,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 |-----------------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | Introduction                      | A. Cormier; E. Corre | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/get-started-genome-assembly/slides.html)                  |
 | Outils de séquençage              | J. Kreplak           | [Cours](https://docs.google.com/presentation/d/1rtTCyVF4dz0Trmny5e8r1brzfNab8ZUN/edit?usp=sharing&ouid=109813995176155673766&rtpof=true&sd=true) |
-| QC des lectures                   | C. Klopp; O. Rué     | [Cours](https://hackmd.io/EsjYvtqdQAmW9RmvKr-aaQ?view)                                                                                           |
+| QC des lectures                   | C. Klopp             | [Cours](https://hackmd.io/EsjYvtqdQAmW9RmvKr-aaQ?view)                                                                                           |
 | Validation d'assemblage (Théorie) | E. Corre; A. Cormier | [Cours](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/slides.html)                     |
 | Validation d'assemblage (TP)      | A. Cormier; E. Corre | [TP](https://training.galaxyproject.org/training-material/topics/assembly/tutorials/assembly-quality-control/tutorial.html)                      |
 
@@ -40,7 +40,7 @@ Pour bénéficier des ressources de calcul réservées pour cette formation, cha
 
 | Cours         | Intervenants                     | Supports                                                                                                      |
 |---------------|----------------------------------|---------------------------------------------------------------------------------------------------------------|
-| Assemblage    | C. Klopp; D. Naquin;             | [Cours](Genome_assembly.pdf) <br> [TP](Genome_assembly_tp.pdf)                                                |
+| Assemblage    | C. Klopp                         | [Cours](Genome_assembly.pdf) <br> [TP](Genome_assembly_tp.pdf)                                                |
 | Polishing     | J.-M. Aury                       | [Cours](https://docs.google.com/presentation/d/1RAScBkXvWkRCuD2WAbgNLJZ8zJNXz9skkHJ-MGp4VBk/edit?usp=sharing) |
 | Scaffolding   | J. Kreplak; C. Klopp; A. Cormier | [Cours](https://drive.google.com/file/d/1SRBBqRPUUTePJ7K1wsqbmaFGqAuvVIt6/view?usp=sharing)                   |
 
