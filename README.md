@@ -114,6 +114,7 @@ Pas encore ouvert.
 
 ### 2024
 
+- [Analyse et traitement de données NGS, niveau débutant](2024/ebaiin1/README.md)
 - [Assemblage et annotation](2024/Assembly/README.md)
 
 
