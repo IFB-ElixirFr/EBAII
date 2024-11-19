@@ -630,9 +630,9 @@ DT::datatable(choose_counts, caption = "How to select your counts")
 With the function [`FindMarkers`](https://satijalab.org/seurat/reference/findmarkers) 
 from package `Seurat`, we want to make three groups: 
 
-1. One using `wilcoxon` to perform DEA between "G1" and "S" phases.
-1. One using `t`-test to perform DEA between "G1" and "S" phases.
-1. One using `ROC` to perform DEA between "G1" and "S" phases.
+1. One using `wilcoxon` to perform DEA between clusters "8" and "10".
+1. One using `t`-test to perform DEA between clusters "8" and "10".
+1. One using `ROC` to perform DEA between "8" and "10".
 
 We will observe the results and compare our gene lists.
 
@@ -711,7 +711,7 @@ Remember, here the threshold on Fold Change is Logged. A `log2(1) = ``r log2(1)`
 
 1. If one selects a fold change threshold above 1.7, then their study concludes that smoking is not related to lung cancer.
 1. If one selects a fold change threshold above 1, then their study concludes that a fast-food based diet does not lead to weight gain.
-1. If one selects a fold change threshold above 1/25 000 000, then their study concludes: it is a complete hazard that mice have featal malformation when in presence of Bisphanol.
+1. If one selects a fold change threshold above 1/25 000 000, then their study concludes: it is a complete hazard that mice have fetal malformation when in presence of Bisphanol.
 
 In conclusion, there one, and only one reason to filter on fold change: in my experience, a fold change below 0.7 will be hard to see/verify on wet-lab (qRT).
 
@@ -801,9 +801,9 @@ DT::datatable(
 We have the following columns:
 
 1. `p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
-1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expessed between samples in each condition.
-1. `pct.1`: Percent of cells with gene expression in condition one, here in "G1" phase.
-1. `pct.2`: Percent of cells with gene expression in condition two, here in "S" phase.
+1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expressed between samples in each condition.
+1. `pct.1`: Percent of cells with gene expression in condition one, here in cluster 8.
+1. `pct.2`: Percent of cells with gene expression in condition two, here in cluster 10.
 1. `p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error.
 
 
@@ -817,9 +817,9 @@ DT::datatable(
 We have the following columns:
 
 1. `p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
-1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expessed between samples in each condition.
-1. `pct.1`: Percent of cells with gene expression in condition one, here in "G1" phase.
-1. `pct.2`: Percent of cells with gene expression in condition two, here in "S" phase.
+1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expressed between samples in each condition.
+1. `pct.1`: Percent of cells with gene expression in condition one, here in cluster 8.
+1. `pct.2`: Percent of cells with gene expression in condition two, here in cluster 10.
 1. `p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error.
 
 ```{r sobj_roc_res_display, eval=TRUE, echo=FALSE}
@@ -833,9 +833,9 @@ We have the following columns:
 
 1. `myAUC`: The area under the curve
 1. `avg_diff`: Average difference in AUC
-1. `power`: `abs(AUC-0.5) * 2`, usefull to sort genes based on AUC
-1. `pct.1`: Percent of cells with gene expression in condition one, here in "G1" phase.
-1. `pct.2`: Percent of cells with gene expression in condition two, here in "S" phase.
+1. `power`: `abs(AUC-0.5) * 2`, useful to sort genes based on AUC
+1. `pct.1`: Percent of cells with gene expression in condition one, here in cluster 8.
+1. `pct.2`: Percent of cells with gene expression in condition two, here in cluster 10.
 
 
 ```{r sobj_deseq_res_display, eval=TRUE, echo=FALSE}
@@ -849,8 +849,8 @@ We have the following columns:
 
 1. `p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
 1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expessed between samples in each condition.
-1. `pct.1`: Percent of cells with gene expression in condition one, here in "G1" phase.
-1. `pct.2`: Percent of cells with gene expression in condition two, here in "S" phase.
+1. `pct.1`: Percent of cells with gene expression in condition one, here in cluster 8.
+1. `pct.2`: Percent of cells with gene expression in condition two, here in cluster 10.
 1. `p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error.
 
 
@@ -899,7 +899,7 @@ base::saveRDS(sobj, "DEA_Scaled_Normalized_Filtered.RDS")
 
 ## Common results
 
-Now we can plot intersections in an up-set graph. It is like a venn diagramm:
+Now we can plot intersections in an up-set graph. It is like a Venn diagram:
 
 ```{r upset_seurat_de_methods, eval=TRUE, echo=TRUE}
 UpSetR::upset(
