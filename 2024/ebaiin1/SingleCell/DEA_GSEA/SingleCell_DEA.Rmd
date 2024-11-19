@@ -219,8 +219,6 @@ The command above, uses the function [`readRDS`](https://www.rdocumentation.org/
 from `base` R package. and git it the path to the [RDS](https://riptutorial.com/r/example/3650/rds-and-rdata--rda--files) 
 file we built in previous session.
 
-## 
-
 ## Insight
 
 We are wondering what's in our dataset. Let's have a look, 
