@@ -206,7 +206,7 @@ At the end of this session you will know:
 
 # Select a database
 
-## Gene: Jund
+## Gene: Plac8
 
 Let's search information about this gene on the web. For mice, one of the
 best web-site for human is: [MGI](https://www.informatics.jax.org/).
