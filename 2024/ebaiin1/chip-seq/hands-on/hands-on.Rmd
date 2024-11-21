@@ -152,7 +152,7 @@ Your directory structure should be like this
 ```
 3. Get FastQC available in your environment
 ```{bash eval=FALSE}
-module load fastqc/0.12.1
+module load fastqc/0.11.9
 ```
 4. Check the help page of the program to see its usage and parameters.
 
@@ -274,7 +274,6 @@ Your directory structure should be like this:
 ```{bash eval=FALSE}  
 ## Run alignment
 ## Tip: first type bowtie command line then add quotes around and prefix it with "sbatch --cpus 10 --wrap="
-module load formation/2421
 
 sbatch -p fast -o FNR_IP_ChIP-seq_Anaerobic_A.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Escherichia_coli_K12 -U ../../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -S FNR_IP_ChIP-seq_Anaerobic_A.sam"
 ```  
