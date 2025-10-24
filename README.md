@@ -114,7 +114,7 @@ Pas encore ouvert.
 
 ### 2024
 
-- [Analyse et traitement de données NGS, niveau débutant]((https://moodle.france-bioinformatique.fr/course/view.php?id=28)
+- [Analyse et traitement de données NGS, niveau débutant](https://moodle.france-bioinformatique.fr/course/view.php?id=28)
 - [Assemblage et annotation](https://moodle.france-bioinformatique.fr/course/view.php?id=24)
 
 ### 2023
