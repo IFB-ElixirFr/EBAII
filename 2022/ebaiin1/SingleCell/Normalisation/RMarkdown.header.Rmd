@@ -1,0 +1,29 @@
+---
+title: "A very good title"
+date: "`r Sys.Date()`"
+author:
+  - name: "Our best student"
+output:
+  html_document:
+    fig_caption: false
+    self_contained: yes
+---
+
+# A big title
+
+## A smaller title
+
+### Even smaller one
+
+Some text, a list:
+
+1. nb 1
+1. nb 2
+1. nb 3
+1. and so on
+
+Some text is *important*, some must be **read**, and you're ready to go with some `code` formatting.
+
+```{r a_chunk_name}
+print("Saluton al la mondo!")
+```

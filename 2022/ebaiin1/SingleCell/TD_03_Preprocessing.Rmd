@@ -1,0 +1,469 @@
+---
+title: "EBAII n1 2022 : Single Cell Analysis Training\nPREPROCESSING - QC, Filtering and normalization"
+author: "Bastien JOB<BR>bastien.job@gustaveroussy.fr"
+date: "2022-11-14.18"
+output:
+  html_document: 
+    background: black
+    fig_height: 10
+    fig_width: 15
+    highlight: tango  ## Theme for the code chunks
+    number_sections: yes  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    toc: yes  ## Adds a table of content
+    toc_float:  ## TOC options
+      collapsed: yes  ## By default, the TOC is folded
+      smooth_scroll: yes ## Smooth scroll of the HTML page
+    self_contained: yes ## Includes all plots/images within the HTML
+    code_download: yes ## Adds a button to download the Rmd
+  # rmdformatsbigr::readthebigrdoc:  # if you'd like to have a nice theme
+  #   code_folding: hide
+  #   thumbnails: false
+  #   lightbox: true
+  #   highlight: true
+  #   fig_caption: false
+always_allow_html: yes ## Allow plain HTML code in the Rmd
+---
+
+<!-- Allows to hide the TOC by default, display it with a button, move it to the right or left of the page -->
+`r Hmisc::hidingTOC(buttonLabel = 'Show TOC', hidden = TRUE, tocSide = 'left', buttonSide='left', posCollapse = 'margin', levels = 3)`
+
+```{r setup, include=FALSE}
+# options(width = 60);
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = FALSE,       # Do not run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE
+  # width = 100       # Number of characters per line
+)
+```
+
+<center>![](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/banner.png)</center>
+<br><br>
+
+This file describes the different steps to perform the training course for the EBAII n1 2022 Single Cell analysis, covering the preprocessing steps :
+* Raw matrix loading
+* Empty droplets filtering
+* Ambient RNA contamination estimation
+* QC metrics (%mito, %ribo, %stress, cell cycle status)
+* Barcodes filtering
+* Normalization
+
+# CHEAT SHEET
+
+Here is a list of different guidelines you should refer to, as they correspond to actions you would perform frequently.
+
+<a name="JHconnect"></a>
+
+## [JupyterHub](https://jupyterhub.cluster.france-bioinformatique.fr)
+
+### Connecting, and opening a session
+
+<center>![](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/jupsign.png)</center>
+
+* Connect to the IFB JupyterHub using your credentials : 
+* Select the reservation dedicated to our training session : **form_2022_32**
+* Reservation :
+  * For a **Rstudio** session, request **2 CPUs** and **15 GB of memory** (let the other options to their default value)
+  * For a **shell** session, request the default minimum (1 CPU, 1 GB)
+
+<center>![](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/jup_server_create.png)</center>
+
+### Inside a session
+
+* To open an app, click on its icon.
+* To get multiple apps open simultaneously
+  * Click on **[File > New Launcher]**
+  * *or* just click on the big blue **[ + ]** button
+
+<center>![](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/jupmenu.png)</center>
+
+### <a name="JHclose"></a> Closing a session
+
+* Close your browser/tab, **won't close your session**. It will still be running in background despite being invisible : this is a normal behavior, so that you can get back later to your current active session.
+* To actually close and finish your session, you have to :
+  * Select from the JupyterHub menu **[File > Hub Control Panel]**
+  * Click on the red button **[Stop my server]**
+  * This will release the resources used by your server
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/jupstop.png)</center>
+
+## [singleCellTK](https://www.bioconductor.org/packages/release/bioc/html/singleCellTK.html)
+
+### <a name="scTKstart"></a> Starting scTK
+
+* In the Rstudio console : 
+``` {r}
+scTKcomp::scTK_launch()
+```
+  * *Let the interface start, it should take a few dozen of seconds*
+  * singleCellTK opens a new tab in your favorite internet browser, opened by default on the dataset loading page.
+
+### <a name="scTKimport"></a> Loading a dataset (count matrix)
+
+* **[Data > Import Single Cell data]**
+  * For this course, the data source will always be a **SingleCellExperiment as RDS file**
+  * For each dataset you want to load
+    * **[Browse]** to select the **'\*.rds'** file containing the SingleCellExperiment you want to load
+    * **Wait for loading bar to be fullfilled** (should be immediate for early steps ; may take a few dozen seconds for later steps, when the SCE object contains multiple matrices)
+    * Then, **[Add to sample list]**
+  * *If you are importing a new dataset but another one is already loaded, please remember to **Overwrite existing SCE object** (radio button) before importing !*
+  * Once you added all the datasets you need, **[Import]**
+  * Let the features for display as **Rownames** (which, for our course, are symbols) and **[Set]**
+  * You may switch to the next analysis steps
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/sctk_import.png)</center>
+
+### <a name="scTKexport"></a> Exporting a dataset
+
+For this course, we will systematically export objects from singleCellTK in the SCE (SingleCellExperiment) format, saved as a RDS archive (a compressed format which contained a single, unnamed R object)
+
+* **[Data > Export Single Cell data]**
+  * Select the output directory (your R working directory should already be well positioned)
+  * Let the export type as **RDS**
+  * You can use whatever file name, but it is heavily recommended to follow this course's suggestions.
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/sctk_export.png)</center>
+
+### <a name="scTKdelete"></a> Deleting cell annotations
+
+Sometimes, it will be recommended to remove some entries in the working SCE object, mainly to :
+  * Avoid being confused among multiple matrices in the object, discarding those that won't be required anymore at further steps
+  * Slim down the object for faster import / export.
+
+* **[Data > Delete Single Cell data]**
+  * Just check the data to remove.
+  * Confirm with **[Delete]**
+  * Please remember that **any suppression is definitive** for the currently loaded object.
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/sctk_delete.png)</center>
+
+### <a name="scTKstop"></a> Stopping singleCellTK
+
+* Close your scTK browser tab
+* In Rstudio :
+  * Clic in the console and press **[Esc]**.
+  * ***or*** clic on the red **[Stop]** button.
+
+## [scTKcomp](https://github.com/aoumess/scTKcomp)
+
+This package hosts a collection of functions built around singleCellTK to :
+
+* Fill some gaps existing in its course
+  * Create a SingleCellExperiment object from multiple sources of data (Cell Ranger, UMI-tools, BUStools, Alevin) *(scTK_load)*
+  * Filter empty droplets *(scTK_edf)*
+  * Evaluate cell cycle phase status / scores, using [Seurat](https://satijalab.org/seurat/) *(scTK_cc_seurat)*
+  * Regress of cell covariates on any type of matrix, using Seurat too *(scTK_regress_covariate)*
+* Bypass some bugs
+  * Perform a UMAP reduction (still with Seurat) on a reduced dimension object which is not a PCA/ICA, without creating a SCE object that can't be properly imported anymore *(scTK_SeuratUMAP)*
+* Add new functionalities
+  * Quickly describe the content of a SingleCellExperiment object *(scTK_descriptor)*
+  * Perform a quick and dirty UMAP for early stage matrices (for early visualization) *(scTK_QnDuMAP)*
+  * Use of "sensitive genes" instead of "highly variable genes" for the feature-based dimension reduction, thanks to [scSensitiveGeneDefine](https://github.com/Zechuan-Chen/scSensitiveGeneDefine) *(scTK_scSG)*
+  * Assess the weight of cell covariates on a matrix, with a heatmap visualization *(scTK_assess_covar)*
+  * Perform trajectory analysis with [TinGa](https://www.researchgate.net/publication/342924432_TinGa_fast_and_flexible_trajectory_inference_with_Growing_Neural_Gas) *(scTK_TinGa)*
+* Misc
+  * Recompress a RDS with a better compression ratio than default (ie, from *gzip* to *bzip2* compression) *(scTK_recompress)*
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/sctkcomp.png)</center>
+
+
+***We are now done with the blah blah, let's practice for real !***
+
+# WARMUP
+
+## Preamble
+
+### The analysis framework/interface : singleCellTK
+
+**singleCellTK** :
+* Allows to use some of the R tools we bioinformaticians use
+* Adds a graphical interface
+* Allows visualization of some of the results
+* Obviously there are some limits in what can be done, compared to the command line
+* Relies on a format to store and transform the data :
+
+### The SingleCellExperiment object
+
+We will now see together the scructure of the R data object you will manipulate for the next fewdays : the *SingleCellExperiment* object.
+
+
+## Getting the source data
+
+* Create an IFB [JupyterHub](#JHconnect) session for Rstudio
+* Open a **terminal**
+* Create a new **"TD"** directory in your project folder
+``` {sh}
+MYPROJECTNAME=my_project_name
+mkdir -p /shared/projects/${MYPROJECTNAME}/TD/DATA
+```
+* Copy the source data
+``` {sh}
+cp -r /shared/projects/form_2022_32/SingleCellRNASeq/TD/DATA/START_OBJECTS/* /shared/projects/${MYPROJECTNAME}/TD/DATA/
+```
+* Copy the required resource files
+``` {sh}
+cp -r /shared/projects/form_2022_32/SingleCellRNASeq/TD/RESOURCES /shared/projects/${MYPROJECTNAME}/TD/
+```
+* Exit your terminal
+``` {sh}
+exit
+```
+
+## <a name="startRstudio"></a> Starting Rstudio
+
+* Just click on the Rstudio logo
+* *Optionally : load the **scTKcomp** package*
+``` {r}
+library(scTKcomp)
+```
+# FROM COUNTS TO CELLS
+
+## Purpose
+
+Our typical input data (once the reads mapping has been done, and the count matrix generated) is a features (row) by barcodes (columns) matrix.
+
+Our aim here is to go from these experimental barcodes to actual cells *(or, at least, **most probable cells**)*
+
+We will now :
+* Filter barcodes that should correspond to empty droplets
+* Perform QC, evaluating :
+  * The amount of UMIs and number of expressed features per barcode
+  * Which barcodes correspond to cell multiplets (mainly doublets)
+  * The level of expression per barcode of :
+    * Mitochondrial genes (proxy for over-lysis / cell mortality)
+    * Ribosomal protein genes (proxy for metabolic level status of cells)
+    * Dissociation / mechanical stress response genes (from [Macchiado PhD report](https://hal.archives-ouvertes.fr/hal-03420696/document))
+* We will then filter out barcodes according to these generated QC metrics, using a series of criteria.
+
+## Generating an SCE object from raw data
+
+For this very first step, we will use a rather small public dataset provided by 10X Genomics, which consists into an assay containing ~1000 human PBMCs (Peripheral Blood Mononucleus Cells).
+The source data for this sample consists in a raw count matrix in the 10X Cell Ranger format, and are located in the **[TD/DATA/PBMC1K]** folder
+
+We will first generate a SingleCellExperiment object from the raw Cell Ranger matrix :
+
+* Position your R working directory t o where the data are :
+``` {r}
+setwd('/shared/projects/<yourprojectname>/TD/DATA/PBMC1K')
+```
+* Call the help for the ***scTK_load()*** function
+``` {r}
+?scTKcomp::scTK_load
+```
+* Run it on the 10X PBMC 1K dataset
+``` {r}
+sname <- 'PBMC1K'
+scTKcomp::scTK_load(
+  data_path = '.',
+  sample_name = sname,
+  exp_name = sname
+)
+```
+* This should have created the **[PBMC1K_00a_Raw.rds]** file that contains a SingleCellExperiment
+* Read the console outputs while they pop
+  * ***Q:** Is the observed sparsity level alarming ?*
+
+## Filtering empty droplets
+
+We will now filter out all these empty barcodes/droplets from this huge matrix :
+
+* Call the help for the ***scTK_edf()*** function
+``` {r}
+?scTKcomp::scTK_edf
+```
+* Run it on the freshly created **[PBMC1K_00a_Raw.rds]** SCE object
+``` {r}
+scTKcomp::scTK_edf(in_rds = './PBMC1K_00a_Raw.rds')
+```
+
+* Read the console outputs while they pop
+  * ***Q1 :** How many droplets were retained ?*
+  * ***Q2 :** Compare this value from **emtyDrops** with the one obtained with **Cell Ranger** (in the HTML report). Are they concordant ?*
+* Observe the generated plots (kneeplot, saturation plot)
+  * ***Q3 :** What could you say from the kneeplot ?*
+* We will now take a look inside the guts of the generated SCE object :
+  * Call the help for the function ***scTK_descriptor()***
+  * * `?scTKcomp::scTK_descriptor`
+  * Use this function on the newly created object **[PBMC1K_01a_EDf.rds]**
+* Observe the console output *(and note the sparsity level)*
+
+<center>[](/home/job/WORKSPACE/ENCADREMENT/2022/EBAII_n1_2022/ATELIER_SC/TD/MD/resources/PBMC1K10X_kneeplot.png)</center>
+
+## Estimating contamination
+
+We will now work with the **'TDCT'** sample from [Paiva et al](https://pubmed.ncbi.nlm.nih.gov/30187694/). It consists in a cell dissociation of a grafted murine thymus from a juvenile mouse to another juvenile mouse, that serves as a control in their study.
+
+* [Start Rstudio](#startRstudio) *(if not already started)*
+* Get to the data directory corresponding to the **TDCT** sample
+``` {r}
+setwd('/shared/projects/<myprojectname>/TD/DATA/TDCT')
+```
+* [Start scTK](#scTKstart)
+
+### Importing data 
+
+* [Import](#scTKimport) the **[TDCT_01a_EDf.rds]** SCE object
+* Get to **[QC & Filtering > QC]** 
+* Run **SoupX** with its default parameters
+* Observe the generated uMAPs (and example soup markers)
+* [Save](#scTKexport) the SCE as **[TDCT_01X_SoupX.rds]**
+* [Stop scTK](#scTKstop)
+* Use scTK_descriptor on **[TDCT_01X_SoupX.rds]**
+``` {r}
+scTKcomp::scTK_descriptor('TDCT_01X_SoupX.rds')
+```
+* Observe the console output
+  * ***Q1 :** What did SoupX actually do ?*
+* *(You may now delete [TDCT_01X_SoupX.rds], we won't use it anymore)*
+
+**Just for the show** : Run scTK_descriptor on a post-SoupX RDS on an other sample : N705, from [Bacon et al, 2018](https://pubmed.ncbi.nlm.nih.gov/30443254/)) :
+``` {r}
+scTKcomp::scTK_descriptor('/shared/projects/form_2022_32/SingleCellRNASeq/TD/DATA/ALL_STEPS_OBJECTS/N705/N705_01X_SoupX.rds')
+```
+
+## QC Metrics : Genesets expression & doublets
+
+We will now generate some QC metrics for our cells
+
+* [Start scTK](#scTKstart)
+* Set your working directory on the sample data folder
+``` {r}
+setwd('/shared/projects/<yourprojectname>/TD/DATA/TDCT')
+```
+* [Import](#scTKimport) **[TDCT_01a_EDf.rds]** object again
+* Import the gene lists required for some QCs :
+  * *(Mus musculus mitochondrial genes are bundled with singleCellTK)*
+  * Ribosomal proteins geneset :
+    * **[Data > Import Gene Sets]**
+      * Let the list selection to **'Upload a GMT file'**
+      * **[Browse]** to select the **'../../RESOURCES/GENELISTS/mus_musculus_ribo_symbols_20221105.gmt'**
+      * Set **'Ribo'** as Collection Name
+      * **[Upload]**.
+  * Dissociation / mechanical stress geneset :   
+    * **[Data > Import Gene Sets]**
+      * In the same way, let the list selection to **'Upload a GMT file'**
+      * **[Browse]** to select the **'../../RESOURCES/GENELISTS/mus_musculus_stress_symbols_20221107.gmt '**
+      * Set **'Stress'** as Collection Name
+      * **[Upload]**.
+* Perform doublets identification with method :
+  * Team A : **scDblFinder**
+  * Team B : **scds (cxds bcds hybrid)**
+  * Team C : **both**
+  * Team D : **DoubletFinder**
+* Observe generated uMAP
+* Perform QC (and observe QC plots each time) with
+  * Mito
+  * Ribo
+  * Stress
+* Get to the **[Cell Viewer]** to observe QC metrics on the **[QC_UMAP]**
+* [Delete](#scTKdelete) all metadata **but** the first 5 annotations, \*_percent, percent.top.\* and \*_call
+* [Save](#scTKexport) the SCE object as **[TDCT_01b_QC.rds]**
+* [Stop scTK](#scTKstop)
+
+## Estimate the cell cycle phase
+
+We will now estimate the cell cyle phase status of our cells thanks to Seurat
+
+* Call the help for the ***scTK_cc_seurat()*** function
+``` {r}
+?scTKcomp::scTK_cc_seurat
+```
+* This function will also need another RDS object (available in the **[/shared/projects/<yourprojectname>/TD/RESOURCES/GENELISTS]** direcory) that contains 2 genesets :
+  * S phase signature
+  * G2M phase signature
+
+* Run it on the freshly created **[TDCT_01b_QC.rds]** SCE object. 
+``` {r}
+scTKcomp::scTK_cc_seurat(
+  in_rds = 'TDCT_01b_QC.rds',
+  assay = 'counts',
+  cc_seurat_file = '/shared/projects/<yourprojectname>/TD/RESOURCES/GENELISTS/mus_musculus_Seurat_cc.genes_20191031.rds')
+```
+* Read the contingency table for estimated phases in the console output
+* [Start scTK](#scTKstart)
+* Set your working directory on the sample data folder
+``` {r}
+setwd('/shared/projects/<yourprojectname>/TD/DATA/TDCT')
+```
+* [Import](#scTKimport) the freshly created **[TDCT_02a_counts_CC.seurat.rds]** SCE object
+* in the **[Cell Viewer]**, on the **QC_UMAP**, observe cell annotations :
+  * CC phase
+  * SmG2M score, with a split by CC Phase
+
+## Filter cells and features
+
+* **At the barcode level** : Apply these filtering criteria (step by step, to measure their impact):
+  * nFeature **> 199**
+  * nFeature **< 2999**
+  * nCount **>999**
+  * Mito_percent **< 5** (%)
+  * doublets_call : **Singlet**
+* **At the feature level** : keep features with :
+  * **1 count** in at least **5 cells**
+* *[Delete](#scTKdelete) unneeded **QC_UMAP** reduction*
+* [Save](#scTKexport) object as **[TDCT_02b_QCf.rds]**
+
+# NORMALIZATION
+
+## *Merge datasets*
+
+The study from which came the **TDCT** sample had another sample : **TD3A**. This second sample consists into another graft of a juvenile mouse thymus to another juvenile one, except that in this case the host is mutated so that it cannot produce the expected T cell progenitors from its spine bone marrow.
+
+In normal circumstances, when there is a short period during which the spine bone marrow is unable to produce such progenitors, it is already known that a mechanism (called **autonomy**) activates, such that some unknown immature cell type from the thymus behaves as a progenitor. The aim of this study was to identify which cell type in the T cell maturation stages has this ability.
+
+It is also important to note that such mechanism, when lasting to long, is very prone to start leukemia...
+
+We will know merge the two samples to analyze them, in a comparison purpose.
+
+* [Stop scTK](#scTKstop)
+* Set your working directory on the sample data folder
+``` {r}
+setwd('/shared/projects/<yourprojectname>/TD/DATA/INTEGRATED')
+```
+* [Start scTK](#scTKstart)
+* [Import](#scTKimport) **[../TDCT/TDCT_02b_QCf.rds]** and **[../TD3A/TD3A_02b_QCf.rds]**.
+  * ***WARNING :** This time you import the 2 objects at the same time. Be careful to add them both to the sample list **before** importing.*
+* [Delete](#scTKdelete) "rownames" (bypasses a bug for QC plots)
+  * ***WARNING :** Do not skip this step or you'll be in trouble soon !*
+* Perform basic QCs and observe boxplots
+  * *If you are lost in an infinite waiting loop, you did not read the last warning :D*
+  * ***Q1 :** How similar are these two samples when considering :*
+    * *Their globally measured expression level ?*
+    * *The expression level of their top 50 expressed genes ?*
+* *[Delete](scTKdelete) unneeded barcode annotations : **sum, detected, total***
+* [Save](#scTKexport) the SCE object as **[TDCT.TD31_02b_QCf.rds]**
+* [Stop scTK](#scTKstop)
+* Run ***scTK_descriptor*** (only describing assays) on these 3 SCE objects :
+  * **[TDCT_02b_QCf.RDS]** (Control)
+  * **[TD3A_02b_QCf.RDS]** (Autonomy)
+  * **[TDCT.TD31_02b_QCf.RDS]** (Merged)
+    * ***Q2 :** Do things add up (features / cells) ?*
+
+## Normalization
+
+* [Start scTK](#scTKstart)
+* Set your working directory on the sample data folder
+``` {r}
+setwd('/shared/projects/<yourprojectname>/TD/DATA/INTEGRATED')
+```
+* [Import](#scTKimport) again the **[TDCT.TD3A_02b_QCf.rds]** SCE object
+* Get to **[Normalization & Batch Correction > Normalization]**
+* Use :
+  * Method : **Seurat - LogNormalize**
+  * Input assay : **counts**
+  * Output assay name = **'SLNst'**
+  * Use scaling
+  * Use trimming, let default limits
+* [Save](#scTKexport) the SCE object as **[TDCT.TD3A_02c_SLNst.rds]**
+  * *This should take more time than you are used to from earlier steps. This is due to the fact that while the **raw 'counts'** matrix consists in a very sparse, thus very compressed matrix, the **normalized 'SLNst'** matrix contains numeric values, which compress with a mediocre ratio*
+* [Stop scTK](#scTKstop)
+* Describe the freshly saved **[TDCT.TD3A_02c_SLNst.rds]**
+``` {r}
+scTKcomp::scTK_descriptor('TDCT.TD3A_02c_SLNst.rds')
+```
+  * ***Q1 :** What could you say for our new assay ?*

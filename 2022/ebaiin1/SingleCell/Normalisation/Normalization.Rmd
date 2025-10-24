@@ -1,0 +1,168 @@
+---
+title: "Normalize Single Cell RNA-Seq data"
+date: "`r Sys.Date()`"
+author:
+  - name: "SingleCell RNA-Seq Team - EBAII n1 2022"
+output:
+  html_document:  # Default view
+    fig_caption: false
+    self_contained: yes
+  #rmdformatsbigr::readthebigrdoc:  # if you'd like to have a nice theme
+  #  code_folding: hide
+  #  thumbnails: false
+  #  lightbox: true
+  #  highlight: true
+  #  fig_caption: false
+    
+    
+# install.packages("remotes")
+# install.packages("git2r")
+# remotes::install_git("https://gitlab.com/bioinfo_gustaveroussy/bigr/rmdformatsbigr.git",
+#                      credentials=git2r::cred_user_pass("your_login", "your_password"))
+---
+
+![banner](banner.png)
+
+```{r setup, include=FALSE}
+# options(width = 60);
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Do run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE#,   # Display warnings
+  # width = 100       # Number of characters per line
+  
+);
+
+```
+
+<style type="text/css">
+details:hover { cursor: pointer }
+</style>
+
+<style>
+.column-left{
+  float: left;
+  width: 47%;
+  text-align: left;
+}
+.column-right{
+  float: right;
+  width: 47%;
+  text-align: left;
+}
+</style>
+
+# Forewords
+
+Today, we switch to the [Seurat tool suite](https://satijalab.org/seurat/). This is today's R gold standard to process SingleCell RNA-Seq data ([python's ScanPy](https://scanpy.readthedocs.io/en/stable/) is an alternative).
+
+# RDS file loading
+
+These files contain all information available after yesterday's QC and Filtering steps.
+
+```{r load_files}
+# Loading TDCT object
+tdct_sce <- base::readRDS(
+  file = "/shared/projects/form_2022_32/SingleCellRNASeq/TD/ALL_STEPS/TDCT/TDCT_02b_QCf.rds"
+)
+# Loading TD3A object
+td3a_sce <- base::readRDS(
+  file = "/shared/projects/form_2022_32/SingleCellRNASeq/TD/ALL_STEPS/TD3A/TD3A_02b_QCf.rds"
+)
+
+```
+
+They've been created with SingleCellTK, as SingleCellExperiment objects, that Seurat cannot understand. They've got to be converted to Seurat's own format : Seurat Objects.
+
+```{r seuratize_sce_objects}
+# SCE to Seurat for TDCT
+## Creating a novel SeuratObject from the raw counts matrix, with a project name
+## The project name in a SeuratObject is equivalent to the main experiment name in a SingleCellExperiment object.
+tdct_seur <- Seurat::CreateSeuratObject(
+  counts = SummarizedExperiment::assay(tdct_sce), 
+  project = "TDCT"
+)
+
+## Our SCE object also had barcodes annotations we don't want to lose. So we are adding them to the SeuratObject. As you may see, these annotations are called "colData" in SCE, and "meta.data" in SO.
+tdct_seur@meta.data <- cbind(
+  tdct_seur@meta.data, 
+  SummarizedExperiment::colData(tdct_sce)
+)
+## When a SeuratObject is created, the UMI and Feature counts are automatically computed, so we can remove our old versions from the SCE object.
+## WARNING : This is for the better as our counts / features were computed BEFORE filtering !
+tdct_seur@meta.data[,c("nCount", "nFeature", "log_nCount", "log_nFeature")] <- NULL
+
+
+# SCE to Seurat for TD3A
+td3a_seur <- Seurat::CreateSeuratObject(
+  counts = SummarizedExperiment::assay(td3a_sce), 
+  project = "TD3A"
+)
+
+td3a_seur@meta.data <- cbind(
+  td3a_seur@meta.data, 
+  SummarizedExperiment::colData(td3a_sce)
+)
+td3a_seur@meta.data[,c("nCount", "nFeature", "log_nCount", "log_nFeature")] <- NULL
+```
+
+Both analyses have been made separately. We want to merge their counts and metadata in order to view, compare, and integrate them. This can be done with the base R `merge()` function :
+
+```{r merge_seurat_objects}
+merged_seur <- merge(
+  x = td3a_seur, 
+  y = tdct_seur
+)
+```
+
+Remember yesterday's session about normalization: we cannot compare raw counts. Let's normalize them with Seurat.
+
+```{r normalize_seurat_obj}
+# Normalization by LogNorm
+sobj <- Seurat::NormalizeData(
+  object = merged_seur, 
+  method = "LogNormalize"
+)
+```
+
+Select HVG (Highly Variable Genes). Some genes expression do not bring up much information, while still driving analysis toward a low variance and low expression profile. This is absolutely not what we are looking for; we aim for expressed genes with variable expression across all cells, so that we can easily distinguish their different types.
+
+```{r find_features}
+## Our actual number features in the SeuratObject
+nrow(sobj)
+## We want to select the 2000 top HVGs
+nfeatures <- 2000
+
+sobj <- Seurat::FindVariableFeatures(
+  object = sobj,
+  nfeatures = nfeatures
+)
+```
+
+Outliers in the log-normalized expression distribution may still impact our analysis at this point. Seurat's **log-normalization** divides the feature counts for each cell by the total counts of these cells, then multiplies by a scaling factor, which is by default 10 000, finally logs them all.
+
+Now,  the **centering** step shifts the expression of all genes back to a mean of 0, and **scaling** divides each by their own variance, so that their resulting variance is 1, for all.
+
+```{r scale_data}
+sobj <- Seurat::ScaleData(object = sobj)
+```
+
+We've been running commands, and we thank you for your trust. Let's check what we just did with violin plots:
+
+```{r observe_with_violin}
+# Violin plot of raw-counts
+Seurat::VlnPlot(object = sobj, features = c("Mrpl15"), assay = "RNA", slot = "counts")
+
+# Violin plot of nomalized data
+Seurat::VlnPlot(object = sobj, features = c("Mrpl15"), assay = "RNA", slot = "data")
+```
+
+We are now done with the normalization step. We hope you enjoyed your flight.
+We VERY VERY STRONGLY recommend you save your results before your exit the ship.
+
+```{r save_results}
+base::saveRDS(object = sobj, file = "Scaled_Normalized_Seurat_Object.RDS")
+```
