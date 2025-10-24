@@ -1,6 +1,6 @@
 # Initiation au traitement des données de génomique obtenues par séquençage à haut débit
 
-**Ecole de Bioinformatique Aviesan - IFB - Inserm (EBAII)**
+**Ecole de Bioinformatique Inserm - IFB - INRAE (EB3I)**
 
 
 ---
@@ -9,7 +9,7 @@
 ## Description
 
 
-EBAII propose plusieurs formations différentes.
+EB3I propose plusieurs formations différentes.
 
 Elles sont basées sur une alternance de courtes sessions théoriques et d'ateliers pratiques.
 
@@ -107,35 +107,34 @@ Pas encore ouvert.
 ## Contacts
 
  - [Renseignements](mailto:ecole-bioinfo@groupes.renater.fr)
- - [Compte twitter](https://twitter.com/EBAI_Roscoff)
+ - [LinkedIn](https://www.linkedin.com/company/ebaii/)
 
 
 ## Matériel pédagogique
 
 ### 2024
 
-- [Analyse et traitement de données NGS, niveau débutant](2024/ebaiin1/README.md)
-- [Assemblage et annotation](2024/Assembly/README.md)
-
+- [Analyse et traitement de données NGS, niveau débutant]((https://moodle.france-bioinformatique.fr/course/view.php?id=28)
+- [Assemblage et annotation](https://moodle.france-bioinformatique.fr/course/view.php?id=24)
 
 ### 2023
 
-- [Analyse et traitement de données NGS, niveau débutant](2023/ebaiin1/README.md)
-- [Analyse et traitement de données NGS, niveau intermédiaire](2023/ebaiin2/README.md)
+- [Analyse et traitement de données NGS, niveau débutant](https://moodle.france-bioinformatique.fr/course/view.php?id=22)
+- [Analyse et traitement de données NGS, niveau intermédiaire](https://github.com/IFB-ElixirFr/EB3I_N2/releases/tag/v2023)
 
 ### 2022
 
-- [Analyse et traitement de données NGS, niveau débutant](2022/ebaiin1/README.md)
-- [Assemblage et annotation](2022/Assemblage/README.md)
+- [Analyse et traitement de données NGS, niveau débutant](https://github.com/IFB-ElixirFr/EBAII/releases/tag/v2022_N1)
+- [Assemblage et annotation](https://github.com/IFB-ElixirFr/EB3I_AA/releases/tag/v2022_AA)
 
 ### 2021
 
-- [Analyse et traitement de données NGS, niveau débutant](2021/ebaiin1/README.md)
-- [Analyse et traitement de données NGS, niveau intermédiaire](2021/ebaiin2/README.md)
+- [Analyse et traitement de données NGS, niveau débutant](https://github.com/IFB-ElixirFr/EBAII/releases/tag/v2021_N1)
+- [Analyse et traitement de données NGS, niveau intermédiaire](https://github.com/IFB-ElixirFr/EB3I_N2/releases/tag/v2021)
 
 ### 2020
 
-- [Analyse et traitement de données NGS, niveau débutant](2020/README.md)
+- [Analyse et traitement de données NGS, niveau débutant](https://github.com/IFB-ElixirFr/EBAII/releases/tag/v2020_N1)
 
 ### Sessions précédentes
 
@@ -144,5 +143,7 @@ Pas encore ouvert.
 
 ## Liens
 
-- Github repo: <https://github.com/IFB-ElixirFr/EBAII/>
+- Github repo école du niveau débutant: <https://github.com/IFB-ElixirFr/EBAII/>
+- Github repo école du niveau intermédiaire: <https://github.com/IFB-ElixirFr/EB3I_N2/>
+- Github repo école Assemblage et Annotation: <https://github.com/IFB-ElixirFr/EB3I_AA>
 - Web pages: <https://ifb-elixirfr.github.io/EBAII/>
