@@ -1,7 +1,0 @@
-label	files	condition
-WT1	WT1_feature.out	WT
-WT2	WT2_feature.out	WT
-WT3	WT3_feature.out	WT
-KO1	KO1_feature.out	KO
-KO2	KO2_feature.out	KO
-KO3	KO3_feature.out	KO

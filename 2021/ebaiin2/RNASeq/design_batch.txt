@@ -1,7 +1,0 @@
-label	condition	donor
-C-d03	C	d03
-C-d08	C	d08
-C-d12	C	d12
-T-d03	T	d03
-T-d08	T	d08
-T-d12	T	d12
