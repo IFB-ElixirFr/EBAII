@@ -1,0 +1,654 @@
+---
+title: "Gene Set Analysis (GSA)"
+author: "RNA-Seq group, IFB-AVIESAN 2021"
+institution: "Institut Gustave Roussy, Institut Pasteur"
+date: '`r Sys.Date()`'
+output:
+  beamer_presentation:
+    theme: "Singapore"
+    slide_level: 2
+    colortheme: "seahorse"
+    latex_engine: xelatex
+    fig_caption: false
+    includes:
+      in_header: header.tex
+    fonttheme: "structurebold"
+---
+
+
+```{r setup, include=FALSE}
+options(width = 60)
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = TRUE#,    # Display warnings
+  # width = 100       # Number of characters per line
+)
+```
+
+
+# Intro
+
+## For this session, we use the following packages:
+
+```{r, message=FALSE, warning=FALSE}
+library("clusterProfiler")  # Make enrichment analysis
+library("limma")    # A lots of math-related operations
+library("DOSE")     # Disease Ontology
+library("enrichplot") # Awesome graphs
+library("pathview")   # Nice pathway plot
+library("org.At.tair.db")  # A. Thaliana annotation
+```
+
+## So far ...
+
+From monday we have :
+
+1.  Cleaned FastQ files (FastQC + Trimmomatic)
+1.  Mapped FastQ reads to the genome (STAR)
+1.  Estimated mapped-reads counts over the genome (FeatureCounts)
+1.  Analyzed differnetially expressed genes over the genome (SARTools)
+
+## We have a large table with many columns
+
+```{r read_table, eval=TRUE}
+deseq_genes <- read.table(
+  file="tables/KOvsWT.complete.txt",
+  sep="\t",
+  header=TRUE
+)
+print(names(deseq_genes))
+```
+
+## We have a large table with many lines
+
+```{r print_genes, eval=FALSE}
+print(head(deseq_genes$Id))
+```
+
+```{r print_genes_nicely, eval=TRUE, echo=FALSE}
+print(head(deseq_genes[,"Id", drop=FALSE]))
+```
+
+# Gene Identifiers
+
+## Let's search: "gene:AT1G61580"
+
+```{r arp2_values, eval=TRUE}
+print(deseq_genes[deseq_genes$Id == "gene:AT1G61580", ])
+```
+
+## Details about this gene
+
+Its name is `gene:AT1G61580`, it has a mean expression in the KO equal to `128`, a mean expression in the WT equal to `218`, a fold change of `0.588`.
+
+This means that this gene is less expressed in the KO, in comparison to the WT.
+
+The adjusted p-value almost equals to `7.5e-06`, which means that it is very likely that the difference of expression is related to the KO/WT status.
+
+## What is that gene name, not in computer gibberish ?
+
+![AT1G61580](images/ath_search.png)
+
+## AT1G61580 vs ARP2
+
+To whom does ARP2 refer? Both genes down here does not belong to the same genomic location: Chr1:3A22720431-22723281 or Chr3:3A9952305-9956158
+
+![ARP2](images/ARP2.png)
+
+## AT1G61580 vs ARP2
+
+ARP2 is not only related to A. Thaliana!
+
+![ARP2](images/ARP2_love.png)
+
+## AT1G61580 vs ARP2
+
+AT = Arabidopsis Thaliana
+
+1 = Chromosome number
+
+G = Protein coding gene
+
+61580 = Unique gene identifier, given from top/north to bottom/south of chromosome.
+
+## Gene name vs Gene identifier
+
+A _Gene name_ is human understandable. If is not unique, neither to an organism, nor to a genomic location. A gene name is also called _Symbol_.
+
+A _Gene identifier_ is not designed for human. It is unique to both organism and genomic location.
+
+_You must use gene identifiers as much as possible._ Keep gene names for meetings, and nice-looking graphs. You're right, gene identifiers are horrible on a daily use !
+
+## Fix gene identifiers (1/2)
+
+In our table, the genes identifiers begin with "gene:". This going to break further analysis!
+
+```{r, eval=TRUE}
+head(deseq_genes$Id)
+```
+
+For a computer: "`gene:AT1G01010`" is not "`AT1G01010`"
+
+## Fix gene identifiers (2/2)
+
+We need a raw gene identifier:
+
+```{r}
+# Replace the names in the ID column
+deseq_genes$Id <- sub("gene:", "", deseq_genes$Id)
+```
+
+And we can check our genes identifiers with the function `"head"`:
+
+```{r, eval=TRUE}
+head(deseq_genes$Id)
+```
+
+## Translate Gene Identifiers with bitr
+
+```{r, message=FALSE, warning=FALSE}
+annotation <- bitr(
+  geneID   = deseq_genes$Id,            # Our gene list
+  fromType = "TAIR",               # We have TAIR ID
+  toType   = c("ENTREZID", "SYMBOL"),# Other ID list
+  OrgDb    = org.At.tair.db        # Our annotation
+)
+print(head(annotation))
+```
+
+## Merge the translation and the original table
+
+```{r merge_annot, eval=TRUE}
+deseq_genes <- merge(
+  x = deseq_genes,  y = annotation,
+  by.x = "Id",      by.y = "TAIR"
+)
+print(head(deseq_genes, 1))
+```
+
+## Conclusion
+
+1.  We know to read differential gene expression results
+1.  We know how to read gene identifiers and how to translate them
+1.  We know that human-readable gene names are source of mistakes/confusions
+1.  We agree that computer-readable gene identifiers are horrible on Monday morning meetings.
+
+# Gene sets
+
+## Which genes are expressed in the roots
+
+Go to planteome.org, search for roots ... 19065 genes !
+
+![planteome](images/root_gene_planteome.png)
+
+## Definition of gene sets
+
+A gene set is nothing more than a group of genes belonging to the same ...
+
+![networks](images/gene_sets_functions.png)
+
+
+## Genes annotations: database expectations (1/2)
+
+-   **Gene Ontology (GO)**: which hosts a controlled vocabulary (fixed terms) for annotating genes
+    -   *Molecular Functions*: Molecular-level activities performed by gene products
+    -   *Cellular Components*: Locations relative to cell compartments and structures
+    -   *Biological Process*: Larger processes accomplished by multiple molecular activities
+
+
+> `http://geneontology.org/`    
+
+## Genes annotations: database expectations (2/2)
+
+-   **KEGG**: Kyoto Encyclopedia of Genes and Genomes
+    -   *Pathways*: Larger processes accomplished by multiple molecular activities
+    -   ...
+
+
+> `https://www.genome.jp/`
+
+-   **MSigDB**: Molecular Signatures Database
+    -   Multiple collections of genes sets (human centered)
+
+
+> `http://software.broadinstitute.org/gsea/msigdb/index.jsp`
+
+
+## Within R: OrgDb
+
+-   **OrgDB**: From bioconductor, you may find a lot of organism annotations
+
+![orgdb](images/OrgDb.png)
+
+## Within R: Many others
+
+![organisms_annotation](images/R_organisms.png)
+
+## Protein - Protein Interactions (PPIs)
+
+PPIs are useful for understanding functional relationships between proteins and the biology of the cell
+
+![ppis](images/ppis.png)
+
+## Pathways vs Network
+
+![path_net](images/pathway_network.png)
+
+## Conclusion
+
+1.  A gene set is a group of genes that have a function, location, treatment response, or anything else in common.
+1.  There are a lot of gene set databases, one must choose them wisely.
+1.  You can relate genes, proteins, other kind of molecules together in a (gene) set.
+
+# ORA
+
+## Over Representation Analysis
+
+ORA stands for _Over Representation Analysis_. It is almost what we did 5 minutes earlier!
+
+Given a list of differentially expressed genes, search the gene sets containing these genes, and run an enrichment test on each of them.
+
+## Select differentially expressed genes
+
+```{r select_de, eval=TRUE}
+de_genes <- deseq_genes[deseq_genes[, "padj"] <= 0.001, ]
+de_genes <- de_genes[!is.na(de_genes[, "log2FoldChange"]), ]
+dim(deseq_genes)
+dim(de_genes)
+```
+
+## Cluster Profiler Enrichment on GO: Cellular Components
+
+We would like to perform Gene Set Enrichment analysis against the Gene Ontology's Cellular Components:
+
+```{r enrichgo_cmd}
+ego <- enrichGO(
+  gene    = de_genes$ENTREZID,  # Ranked gene list
+  universe= deseq_genes$ENTREZID,#All genes
+  OrgDb   = org.At.tair.db,     # Annotation
+  keyType = "ENTREZID",         # The genes ID
+  ont     = "CC",               # Cellular Components
+  pvalueCutoff  = 1,            # Significance Threshold
+  pAdjustMethod = "BH",         # Adjustment method
+  readable = TRUE               # For human beings
+)
+```
+
+## Cluster Profiler: Plots (1/3)
+
+We want to visualize these results. To do so, let's use the function `"barplot"` and the function `"dotplot"` from the `"enrichplot"` package:
+
+```{r clusterprofiler_plot_cmds, eval=FALSE}
+barplot(ego, showCategory=15)
+dotplot(object = ego, showCategory=15)
+```
+
+## Cluster Profiler: Plots (2/3)
+
+```{r baprplot_general, echo=FALSE, out.width="90%"}
+barplot(ego, showCategory=15)
+```
+
+## Cluster Profiler: Plots (3/3)
+
+```{r dotplot_general, echo=FALSE, out.width="95%"}
+dotplot(object = ego, showCategory=15)
+```
+
+## What about roots ? (1/4)
+
+```{r get_results}
+res_ego <- ego@result
+print(head(res_ego, 3))
+```
+
+## What about roots ? (2/4)
+
+Nothing about roots ? Really ?
+
+```{r get_roots_empty}
+roots <- res_ego[with(res_ego, grepl("root", Description)), ]
+print(head(roots))
+```
+
+## What about roots ? (3/4)
+
+```{r enrichgo_ego_at}
+ego <- enrichGO(
+  gene    = de_genes$ENTREZID,  # Ranked gene list
+  universe= deseq_genes$ENTREZID,#All genes
+  OrgDb   = org.At.tair.db,     # Annotation
+  keyType = "ENTREZID",         # The genes ID
+  ont     = "BP",               # Biological Process
+  pvalueCutoff  = 1,            # Significance Threshold
+  pAdjustMethod = "BH",         # Adjustment method
+  readable = TRUE               # For human beings
+)
+```
+
+## Cluster Profiler: Roots (1/2)
+
+```{r barplot_display, echo=FALSE, out.width="90%"}
+barplot(ego, showCategory=15)
+```
+
+## Cluster Profiler: Roots (2/2)
+
+```{r dotplot_display, echo=FALSE, out.width="95%"}
+dotplot(object = ego, showCategory=15)
+```
+
+## What about roots ? (4/4)
+
+```{r ego_results_display}
+res_ego <- ego@result
+roots <- res_ego[with(res_ego, grepl("root", Description)), ]
+print(head(roots))
+```
+
+# GSEA
+
+## Enrichment VS Gense Set Enrichment Analysis (1/2)
+
+Note that, up to now, we used genes identifiers, and only genes identifiers. We have guessed which pathways had more differentially expressed genes than the others.
+
+However:
+
+1.  we do not have any idea whether these pathways are up/donw regulated.
+1.  we do not know whether these pathway have up/down-regulated genes.
+
+## Enrichment VS Gense Set Enrichment Analysis (2/2)
+
+Most of the time, we do not need to know that.
+
+We saw our roots and plant organs being smaller, having morphology issues. Look at the plant!
+
+However, we like numbers and statistics. Let's have fun!
+
+## Back to the data
+
+To perform a Gene Set Enrichment Analysis (GSEA), we need to give "a list of weighted ranked genes in order to compute a running enrichment score."
+
+```{r display_colnales2}
+print(colnames(deseq_genes))
+```
+
+## Using TAIR, ENTREZID or SYMBOL
+
+We need a list of genes. What kind of name/identifier should we use ?
+
+1.  TAIR identifiers   (<- Good)
+1.  ENTREZ identifiers (<- Good)
+1.  Gene Symbols       (<- not this one)
+
+## Using WT/KO as weights
+
+We have to weight each genes. We could use the columns `WT` and `KO`, running twice the GSEA, and comparing the enrichment scores.
+
+It works, it is used in current publications. Highly expressed genes have a very very very high impact on the enrichment score.
+
+By doing so, we could conclude something like: _"Root morphogenesis has a higher/lower enrichment score in WT rather than in KO"_
+
+## Using FoldChange as weights
+
+We have to weight each genes. We could use the column `FoldChange`, and look at the enrichment score.
+
+It works, it is used in current publications. Highly differentially expressed genes have a very very very high impact on the enrichment score.
+
+By doing so, we could conclude something like: _"Root morphogenesis has up-/down regulated genes with an enrichment score of XXX"_ or _"Genes in Root morphogenesis are usually up/down regulated in KO plants"_
+
+## Using log2FoldChange as weights
+
+The very same conclusions are being done with log2FoldChange or FoldChange, however there will be no bias related to the initial gene expression.
+
+This is, imho, the most published way to do. I almost always see this in current publications.
+
+## Using pvalue as weights
+
+NO ! NO ! USE ADJUSTED P-VALUES !
+
+## Using padj as weights
+
+We have to weight each genes. We could use the column `padj`, and look at the enrichment score.
+
+It works, but almose never published since it answers the very same questions as ORA: _"Does Root morphogenesis contains differentially expressed genes in an unusual quantity"_
+
+## Using stat as weights
+
+To make short, `stat` is FoldChange weighted by adjusted pvalue.
+
+It answers the very same question as log2FoldChange/FoldChange weights, but includes the confidence we have in the differential expression between KO and WT in addition to the change of expression between conditions.
+
+This is almost never done, but fellow bio-statisticians tell me it is better than FoldChange.
+
+We are going to use `stat` today, because we trust bio-statisticians.
+
+## Prepare data
+
+```{r genelist}
+# Get the weights
+geneList <- as.numeric(de_genes$stat)
+
+# Get genes identifiers
+names(geneList) <- de_genes$ENTREZID
+
+# Sort the list
+geneList <- sort(geneList, decreasing=TRUE)
+```
+
+We now have a sorted list of weighted genes.
+
+
+## Run analysis
+
+Dear statisticians, please look aside for a minute.
+
+```{r gsego, warning=FALSE}
+gsea <- gseGO(
+  geneList = geneList,       # Ranked gene list
+  ont      = "BP",           # Biological Process
+  OrgDb    = org.At.tair.db, # Annotation
+  keyType  = "ENTREZID",     # Identifiers
+  pAdjustMethod = "BH",      # Pvalue Adjustment
+  pvalueCutoff = 1           # Significance Threshold
+)
+```
+
+
+## GSEA plot (1/6)
+
+Let's see the top 8 of the over-represented genes sets:
+
+```{r gsea_result_cmd, eval = FALSE}
+columns_of_interest <- c(
+  "Description",
+  "enrichmentScore",
+  "p.adjust"
+)
+head(
+  x = gsea[, columns_of_interest], # Pathway ID
+  8                                # lines to display
+)
+```
+
+## GSEA plot (2/6)
+
+Let's see the top 8 of the over-represented genes sets:
+
+```{r gsea_results_display, echo = FALSE}
+columns_of_interest <- c(
+  "Description",
+  "enrichmentScore",
+  "p.adjust"
+)
+knitr::kable(head(
+  x = gsea[, columns_of_interest], # Name of the pathways
+  8                                # the # of lines
+), row.names = FALSE)
+```
+
+
+## GSEA plot (3/6)
+
+Finally, building the GSEA plot is being done with the function `"gseaplot2"` from `"clusterProfiler"`:
+
+```{r gsea2_organ_cmd, eval = FALSE}
+# We need the number of the line
+# Containing our pathway of interest
+gsea_line <- match(
+  "plant organ morphogenesis",
+  gsea$Description
+)
+gseaplot2(
+  x         = gsea,               # Our analysis
+  geneSetID = gsea$ID[gsea_line],  # Pathway ID
+  title     = "plant organ morphogenesis" # Its name
+)
+```
+
+## GSEA plot (4/6)
+
+```{r gsea2_organ_plot, echo=FALSE}
+gseaplot2(
+  # Out analysis
+  x         = gsea,            
+  # The # of the pathway
+  geneSetID = gsea$ID[match("plant organ morphogenesis", gsea$Description)],
+  # Its name
+  title     = "plant organ morphogenesis"
+)
+```
+
+## GSEA plot (5/6)
+
+Finally, building the GSEA plot is being done with the function `"gseaplot2"` from `"clusterProfiler"`:
+
+```{r gsea2root_cmd, eval = FALSE}
+# We need the number of the line
+# Containing our pathway of interest
+gsea_line <- match(
+  "root morphogenesis",
+  gsea$Description
+)
+gseaplot2(
+  x         = gsea,               # Our analysis
+  geneSetID = gsea$ID[gsea_line],  # Pathway ID
+  title     = "root morphogenesis" # Its name
+)
+```
+
+## GSEA plot (6/6)
+
+```{r gsea2_root, echo=FALSE}
+gseaplot2(
+  # Out analysis
+  x         = gsea,            
+  # The # of the pathway
+  geneSetID = gsea$ID[match("root morphogenesis", gsea$Description)],
+  # Its name
+  title     = "root morphogenesis"
+)
+```
+
+## Multiple GSEA on the same graph (1/2)
+
+... because we can!
+
+```{r gsea2_cmd, eval = FALSE}
+gseaplot2(
+  x = gsea,
+  geneSetID = 1:3,
+  title = "Most enriched terms"
+)
+```
+
+## Multiple GSEA on the same graph (2/2)
+
+```{r gsea2_plot, echo = FALSE}
+gseaplot2(
+  x = gsea,
+  geneSetID = 1:3,
+  title = "Most enriched terms"
+)
+```
+
+## Conclusion on GSEA
+
+> With GSEA, you dot not test if a pathway is up or down regulated.
+
+A pathway contains both enhancers and suppressors genes. An up-regulation of enhancer genes and a down-regulation of suppressor genes will lead to a "bad" enrichment score. However, this will lead to a strong change in your pathway activity!
+
+If your favorite pathway does not have a _"good enrichment score"_, it does not mean that pathway is not affected.
+
+
+# Sets
+
+## Heatmap (1/2)
+
+Very common in publications
+
+```{r heatplot_ego_cmd, eval=FALSE}
+heatplot(
+  x =  ego,                   # Our enrichment
+  showCategory = 15,          # Nb of terms to display
+  foldChange = geneList[1:10] # Our fold changes
+)
+```
+
+## Heatmap (2/2)
+
+```{r heatplot_ego, echo=FALSE}
+heatplot(x =  ego, showCategory = 14, foldChange = geneList[1:10])
+```
+
+## UpSet plot
+
+```{r upset_plot_ego}
+upsetplot(x = ego) # From our enrichment analysis
+```
+
+# Networks
+
+## Enrichment map
+
+```{r emaplot_ego}
+emapplot(ego) # From our enrichment analysis
+```
+
+## GO plot
+
+Relate enriched terms with each others:
+
+```{r goplot_ego}
+goplot(ego) # From our enrichment analysis
+```
+
+## Kegg (1/2)
+
+The Kegg analysis is done with the `"pathview"` package and this eponymous function:
+
+```{r pathview_plot, eval=FALSE}
+names(geneList) <- de_genes$TAIR  # Use TAIR id
+
+pv.out <- pathview(
+  gene.data = geneList,     # Our gene list
+  pathway.id = "ath00630",  # Our pathway
+  species = "ath",          # Our organism
+  # The color limits
+  limit = list(gene=max(abs(geneList))),
+  gene.idtype = "TAIR"      # The genes identifiers
+)
+```
+
+## KEGG (2/2)
+
+There is the representation of our pathway, with differentially expressed genes colored!
+
+![gsa_type](images/ath00630.png)
+
+## Thanks
+
+Thanks to the rest of the team for their reviews and advises.
