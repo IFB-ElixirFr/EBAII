@@ -203,7 +203,7 @@ Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/w
 Une boucle permet de réaliser des tâches itératives. 
 
 ```{bash, eval=FALSE}
-for PRENOM in Rachel Stephanie Tao Elodie Delphine
+for PRENOM in Pauline Stephanie Emilie Pierre Mathieu
   do
     echo ${PRENOM}
   done
