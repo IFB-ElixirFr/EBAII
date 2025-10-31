@@ -47,7 +47,7 @@ Lancer le même outil (fastqc) sur 3 échantillons différents
 
 
 
-# Les variables
+# Variables et scripts
 
 **Définition:** ce sont des éléments qui associent un nom (l'identifiant) à une valeur, qui sera sauvegardée dans la mémoire du système programmé. 
 
@@ -58,6 +58,7 @@ Lancer le même outil (fastqc) sur 3 échantillons différents
 echo $USER
 echo $PWD
 echo $SHELL
+
 env | head # Liste les variables système
 ```
 
@@ -70,6 +71,7 @@ env | head # Liste les variables système
 PROJECT=project_rlegendre # Attention, pas d’espace autour de l’opérateur "="
 echo ${PROJECT} # ou echo $PROJECT 
 echo /shared/projects/${PROJECT}
+
 WORKDIR=/shared/projects/${PROJECT}
 echo ${WORKDIR}
 ```
@@ -78,13 +80,19 @@ echo ${WORKDIR}
 
 ```{bash, eval=FALSE}
 mkdir -p ${WORKDIR}/tp_workflow/
+
 cd ${WORKDIR}/tp_workflow/
+
 mkdir data
+
 cd data
+
 wget https://zenodo.org/records/10081865/files/FILE1.fastq.gz
 wget https://zenodo.org/records/10081865/files/FILE2.fastq.gz
 wget https://zenodo.org/records/10081865/files/FILE3.fastq.gz
+
 cd .. 
+
 touch script_01.sh 
 ```
 
@@ -197,8 +205,8 @@ bash script_03.sh
 
 Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_03.sh
 
-
-# Utilisation des boucles For
+`
+# Utilisation des boucles `for`
 
 Une boucle permet de réaliser des tâches itératives. 
 
@@ -207,11 +215,13 @@ for PRENOM in Pauline Stephanie Emilie Pierre Mathieu
   do
     echo ${PRENOM}
   done
+  
 #On peut itérer sur une liste de fichiers
 for FILE in data/*
   do
     echo ${FILE}
   done
+  
 #On peut itérer sur le résultat d’une commande
 for READ in $(ls data/* | grep -v FILE1)
   do
@@ -278,7 +288,7 @@ bash script_05.sh
 
 Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_05.sh
 
-##  Ajouter des options pour SLURM
+## Ajouter des options pour SLURM
 
 
 On commence à décrire un peu plus précisément les ressources nécessaires à notre étape
@@ -338,6 +348,7 @@ Vérifier que le job tourne
 ```{bash, eval=FALSE}
 squeue
 squeue -u $USER
+
 sacct -u $USER
 sacct -u $USER | tail -n 1
 ```
@@ -378,7 +389,6 @@ Lancez votre workflow dans le terminal
 ```{bash, eval=FALSE}
 sbatch script_07.sh
 sacct -u $USER | grep RUNNING | grep FILE
-
 ```
 
 Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_07.sh
@@ -426,16 +436,78 @@ sacct -u $USER | grep RUNNING | grep FILE
 Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_08.sh
 
 
-# Rappel du workflow
-
-## ChIP-seq
+# 🔬 Workflow ChIP-seq
 
 
 <img src="images/chip_pipeline.png" style="width: 100% !important; max-width: 100% !important; display: block; margin: auto;">
 
 
 
-## RNA-seq
+# 🧬 Workflow RNA-seq
 
-## Variants
+<img src="images/rnaseq_pipeline.png" style="width: 100% !important; max-width: 100% !important; display: block; margin: auto;">
+
+<img src="images/rnaseq_pipeline2.png" style="width: 100% !important; max-width: 100% !important; display: block; margin: auto;">
+
+### Mise en pratique: Alignement avec STAR
+
+On vous propose maintenant de mettre en pratique ce que vous venez de voir et d’écrire
+un script SLURM pour aligner tous les échantillons sur le génome de référence avec STAR
+
+```{bash, eval=FALSE}
+$ module load star/2.7.9a
+$ STAR --help
+```
+
+Si besoin de plus d'aide : [manuel STAR](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf)
+
+Index STAR: ```/shared/bank/arabidopsis_thaliana/TAIR10.1/star-2.7.9a/```
+
+Annotation (GTF):
+`/shared/bank/arabidopsis_thaliana/TAIR10.1/gtf/GCF_000001735.4_TAIR10.1_genomic.gtf`
+
+### Script d'alignement avec STAR
+
+On voudra lancer le script avec la commande sbatch :
+
+```{bash, eval=FALSE}
+sbatch star_align.sh
+```
+
+<details>
+<summary>Cliquez <span style="color: green;">**ici**</span> pour voir la solution ! </summary>
+
+```{bash, eval=FALSE}
+#!/bin/bash
+
+#SBATCH --account=2422_ebaii_n1
+#SBATCH --job-name=star_align
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=20GB
+#SBATCH --array=1-6
+
+module load star/2.7.11a
+
+OUT_DIR="/path/to/my/project/TP_rnaseq/workflow/star_res"
+mkdir -p $OUT_DIR
+
+DATA_DIR="/shared/projects/2422_ebaii_n1/atelier_rnaseq/04-Workflow/data/"
+STAR_INDEX="/shared/bank/arabidopsis_thaliana/TAIR10.1/star-2.7.9a/"
+GTF="/shared/bank/arabidopsis_thaliana/TAIR10.1/gtf/GCF_000001735.4_TAIR10.1_genomic.gtf"
+
+R1IN=$(ls $DATA_DIR/*_R1.fastq.gz | awk "NR==${SLURM_ARRAY_TASK_ID}")
+R2IN=${R1IN/_R1/_R2}
+BASENAME=${R1IN/_R1.fastq.gz/.STAR_TAIR10.1_}
+
+srun STAR --runThreadN ${SLURM_CPUS_PER_TASK} --genomeDir ${STAR_INDEX} \
+  --sjdbGTFfile ${GTF} --readFilesCommand zcat --readFilesIn ${R1IN} ${R2IN} \
+  --outFileNamePrefix ${OUT_DIR}/${BASENAME} --outSAMtype BAM SortedByCoordinate \
+  --outSAMunmapped Within KeepPairs
+```
+
+</details>
+
+
+
+# 🌿 Workflow Variants
 
