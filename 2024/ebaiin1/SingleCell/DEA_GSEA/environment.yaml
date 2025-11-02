@@ -1,6 +1,6 @@
 channels:
-  - conda-forge
-  - bioconda
+  - https://prefix.dev/conda-forge
+  - https://prefix.dev/bioconda
   - nodefaults
 dependencies:
   - r-seurat =5.3.1
