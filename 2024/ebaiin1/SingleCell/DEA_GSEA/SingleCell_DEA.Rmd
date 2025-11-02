@@ -156,7 +156,8 @@ First, we load Seurat object:
 ```{r load_rds, eval=FALSE, echo=TRUE}
 sobj <- base::readRDS(
   # Path to the RDS file
-  file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
+  # file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
+  file = "12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
 )
 ```
 
@@ -211,7 +212,8 @@ You already have a dataset loaded ? Good. Keep on going with it ! You don't have
 # The function `readRDS` from package `base`.
 sobj <- base::readRDS(
   # Path to the RDS file
-  file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
+  # file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
+  file = "12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
 )
 ```
 

@@ -10,19 +10,17 @@ MAKEFLAGS += --no-builtin-rules
 all: SingleCell_GSEA.html SingleCell_DEA.html
 
 SingleCell_GSEA.html: ebaii SingleCell_DEA.html
-	mamba activate ./ebaii && \
+	conda activate ./ebaii && \
 	R -e 'rmarkdown::render("SingleCell_GSEA.Rmd")'
 
 
-SingleCell_DEA.html: ebaii Scaled_Normalized_Seurat_Object.RDS
-	mamba activate ./ebaii && \
+SingleCell_DEA.html: ebaii 
+	conda activate ./ebaii && \
 	R -e 'rmarkdown::render("SingleCell_DEA.Rmd")'
 
-Scaled_Normalized_Seurat_Object.RDS:
-	wget https://nextcloud.gustaveroussy.fr/s/p8Ab8Be43xFogYN/download/Scaled_Normalized_Seurat_Object.RDS
 
 ebaii:
-	mamba env create -p ./ebaii -f environment.yaml
+	conda create -p ./ebaii --file environment.linux-64.pin.txt
 
 .PHONY:
 clean:

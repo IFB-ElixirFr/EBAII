@@ -156,7 +156,7 @@ sobj <- base::readRDS(
 
 Then we launch enrichment exploration on all counts:
 
-```{r escape_enrichment_tldr, eval=FALSE, echo=TRUE}
+```{r escape_enrichment_tldr, eval=TRUE, echo=TRUE}
 # Acquire gene sets
 mh_hallmark <- escape::getGeneSets(
   species = "Mus musculus",
