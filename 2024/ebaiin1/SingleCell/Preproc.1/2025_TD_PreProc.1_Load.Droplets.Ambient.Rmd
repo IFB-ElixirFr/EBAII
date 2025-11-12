@@ -1,0 +1,1647 @@
+---
+title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR><B>PRE-PROCESSING (I)</B><BR>-<BR>Load a count matrix, empty droplets & ambient RNA filtering</CENTER>"
+date: "2025-16-21.22"
+author:
+  - name: "EBAII n1 scRNAseq Team"
+  - name: "Bastien JOB"
+    email: "bastien.job@gustaveroussy.fr"
+output:
+  rmdformats::readthedown:
+    fig_width: 8
+    fig_height: 6
+    highlight: tango  ## Theme for the code chunks
+    embed_fonts: TRUE
+    number_sections: true  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    collapsed: true  ## By default, the TOC is folded
+    toc_depth: 3
+    smooth_scroll: true ## Smooth scroll of the HTML page
+    self_contained: true ## Includes all plots/images within the HTML
+    code_download: true ## Adds a button to download the Rmd
+    code_folding: show
+    thumbnails: false
+    lightbox: true
+    fig_caption: false
+    gallery: true
+    use_bookdown: true
+always_allow_html: true ## Allow plain HTML code in the Rmd
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- knit setup -->
+
+```{r knit_setup, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE,
+  fig.align="center", 
+  # results = 'hide',
+  width = 100       # Number of characters per line
+)
+```
+
+<!-- CSS to color chunks and outputs -->
+
+```{css, echo=FALSE}
+.notrun {
+  background-color: lightgrey !important;
+  border: 3px solid black !important;
+}
+.notruno {
+  background-color: lightgrey !important;
+  color : black !important;
+}
+.question {
+  background-color: aquamarine !important;
+  color : black !important;
+  border: 3px solid limegreen !important;
+}
+.questiono {
+  background-color: aquamarine !important;
+  color : black !important;
+}
+.answer {
+  background-color: navajowhite !important;
+  border: 3px solid brown !important;
+}
+.answero {
+  background-color: navajowhite !important;
+  color : black !important;
+}
+.beyond {
+  background-color: violet !important;
+  border: 3px solid purple !important;
+}
+.beyondo {
+  background-color: violet !important;
+  color : black !important;
+}
+```
+
+<!-- Hook to handle code blocks output folding -->
+
+```{r knit_hook, echo = FALSE}
+hooks = knitr::knit_hooks$get()
+hook_foldable = function(type) {
+  force(type)
+  function(x, options) {
+    res = hooks[[type]](x, options)
+    
+    if (isFALSE(options[[paste0("fold.", type)]])) return(res)
+    
+    paste0(
+      "<details><summary>Show ", type, "</summary>\n\n",
+      res,
+      "\n\n</details>"
+    )
+  }
+}
+knitr::knit_hooks$set(
+  output = hook_foldable("output"),
+  plot = hook_foldable("plot")
+)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<center>![](eb3i_banner.png)</center>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+This file describes the different steps to perform the **first part** of
+the **single cell RNAseq** data analysis training course for the **EBAII
+n1 2025**, covering these steps :
+
+-   **Load** a single cell raw counts **matrix**
+
+-   **Remove** barcodes from **empty droplets**
+
+-   **Estimate** and remove **ambient RNA** contamination *("soup")*
+
+## An important notice
+
+<center>![](gyro.png)</center>
+
+-   These early (but mandatory) steps of the analysis are not covered by
+    the renowned, higher-level analysis frameworks like **Seurat** nor
+    **scran/scater**.
+
+-   Thus, we will write/use a certain amount of **lines of code**, some
+    of which of a higher complexity for R beginners.
+
+-   **Newcomer, do not fear** !
+
+    -   While you are **welcome to try** writing some by yourself,
+        depending on your R knowledge and self-confidence in it ...
+
+    -   ... you do not have to know [**how**]{.underline} these code
+        work ...
+
+    -   ... thus you **should not feel ashamed** copy-pasting the
+        pre-written code hereafter ...
+
+    -   ... but in both cases, please try **your best understanding**
+        [**what**]{.underline} these code do, and even more,
+        [**why**]{.underline} !
+
+    -   In this purpose, you may use whatever **help** you can **by**
+        **searching**.
+
+## What to run ?
+
+-   This training presentation, written in Rmarkdown, contains **many**
+    chunks ( = code blocks)
+
+-   You **do not have to** run them all !
+
+-   Chunks follow a **color code** :
+
+### Chunks you **ARE** expected to run :
+
+```{r chunk_run}
+# chunk_run
+
+## Example of chunk to run
+getwd()
+
+```
+
+<br>
+
+### Chunks you **ARE NOT** expected to run
+
+Hopefully, we will demo them. You may run them by yourself, young
+padawan, but if you get late or worst, break something, *you*'ll be the
+one to blame !
+
+```{r chunk_demo, class.source="notrun", class.output="notruno"}
+# chunk_demo
+
+## Example of chunk to NOT run
+utils::sessionInfo()
+
+```
+
+<br>
+
+### Questions
+
+Some questions we would like you to answer during the training course.
+Please be fair and do not take a look at the answer before we tell you
+so :)
+
+```{r chunk_question, class.source="question", eval = FALSE}
+# chunk_question
+
+## What's the Answer to Life ? The Universe ? Everything ??
+
+```
+
+<br>
+
+### Answers
+
+They usually follow questions...
+
+```{r chunk_answer, class.source = c("fold-hide", "answer"), class.output="answero"}
+# chunk_answer
+
+cat("The Answer to the Great Question... is ... 
+Forty-two. Six by nine : forty-two. That's it. 
+That's all there is. (I always thought something was 
+fundamentally wrong with the universe.)")
+
+```
+
+<br>
+
+### Additional exercises / questions
+
+These are beyond the scope of the training course, but you may play it
+*if you feel bored*
+
+```{r chunk_beyond, class.source="beyond", class.output="beyondo"}
+# chunk_beyond
+
+## Example of chunk to play with but beyond the scope
+getwd()
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"},
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"}
+    and **create a Rstudio session** with the right resource
+    requirements.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Warm-up
+
+-   We now set **common parameters** as new variables, once and for all
+    for this session :
+
+```{r setparam}
+# setparam
+
+## Set your project name
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+## Seed for the RNG
+my_seed <- 1337L
+
+## Empty droplets max p-value
+max_p <- 1E-03
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Prepare the data structure
+
+-   During the current and remaining training sessions, we will work on
+    different **data** **objects**, some retrieved from **external**
+    resources, some we will **create**.
+
+-   In order to reuse these for further steps, or other sessions, we
+    need to **store** them, thus create a **directory structure** on the
+    cluster.
+
+-   We will create this structure in **your project** folder (the one
+    you registered at the IFB Core, in which you stored your own data
+    for the tutoring).
+
+-   To ensure that *you* will always use the same structure for *your*
+    work, the code hereafter has been writen so that you just have to
+    define a single **variable** that corresponds to your project name.
+
+    -   In *MY* case, as a SC training teacher, it is
+        **`ebaii_sc_teachers`**.
+
+## Main directory
+
+-   Create the training course directory
+
+```{r maindir, fold.output = FALSE}
+# maindir
+
+## Prepare the path in a "TD_dir" variable
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Create the root directory
+dir.create(path = TD_dir, recursive = TRUE)
+
+## Print the root directory on-screen
+print(TD_dir)
+
+```
+
+## Current session
+
+```{r sessiondir, fold.output = FALSE}
+# sessiondir
+
+## Create the session (Preproc.1) directory
+session_dir <- paste0(TD_dir, "/01_Preproc.1")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+```
+
+## Input data directory
+
+```{r indir, fold.output=FALSE}
+# indir
+
+## Create the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+```
+
+## Output results directory
+
+```{r outdir, fold.output=FALSE}
+# outdir
+
+## Create the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+```
+
+<br><br>
+
+[**Note :**]{.underline} *Actually, for this session we won't export any
+result, so creating this **`RESULTS`** folder was just for practice
+purpose.*
+
+<br>
+
+Now, the we have everything needed to :
+
+-   **load** data (`input_dir`)
+
+-   **save** the results we will generate (`output_dir`).
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Additional resources
+
+**However**, some upcoming steps require a bit complicated methods that
+are not fun to write, nor copy-paste multiple times. So, we will now
+prepare code **functions** that will ease these steps. After executing
+these functions code, we may call (invoke) them when needed.
+
+## Functions
+
+### SoupX helper function
+
+This function was written to ease the use of SoupX on a Seurat object
+
+It was tested on `SoupX`=1.6.2 with `igraph`=1.5.1, `Seurat`=4.4.0,5.1.0
+
+Parameters :
+
+-   `scmat_filt` : (sparse)matrix corresponding to an empty droplets -filtered count matrix
+
+-   `scmat_raw` : (sparse)matrix corresponding to an NON- empty droplets -filtered count matrix
+
+-   `soupQuantile`, `contaminationRange` : see `?SoupX::autoEstCont`
+
+-   `contaminationRange` : range of the *expected* soup proportion
+
+-   `soupRange` : estimate soup fraction from features with total reads
+comprised in this range of counts (only used when `scmat_raw != NULL`)
+
+-   `return_object` : if `TRUE`, return the "unsouped" `Seurat` object ; if
+`FALSE`, only perform soup estimation and return the estimated
+proportion value (rho)
+
+-   `doPlot` : Perform the SoupX estimation plot (rho distribution)
+
+```{r soupx_func, eval = TRUE}
+# soupx_func
+
+SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
+                       contaminationRange = c(.01, .8), soupRange = c(0,100),
+                       return_object = FALSE, doPlot = FALSE) {
+  
+  ## Checks
+  if(is.null(scmat_filt)) stop('A filtered count matrix is required !')
+  
+  if(is.null(scmat_raw)) message('No unfiltered raw counts matrix provided. Estimation will be based on filtered matrix only.')
+  
+  ## If no raw matrix
+  if (is.null(scmat_raw)) {
+    spChanRaw <- SoupX::SoupChannel(
+      tod = scmat_filt, 
+      toc = scmat_filt, 
+      calcSoupProfile = FALSE)
+    sc_rowsum <- sparseMatrixStats::rowSums2(scmat_filt)
+    spProf <- data.frame(
+      row.names = rownames(scmat_filt), 
+      est = sc_rowsum/sum(scmat_filt), 
+      counts = sc_rowsum)
+    spChan <- SoupX::setSoupProfile(spChanRaw, spProf)
+  } else {
+    spChan <- SoupX::SoupChannel(
+      tod = scmat_raw, 
+      toc = scmat_filt, 
+      calcSoupProfile = FALSE)
+    if (min(spChan$nDropUMIs) > max(soupRange)) stop(
+      'Minimum found counts per barcode is : ', 
+      min(spChan$nDropUMIs), 
+      ', which is smaller than the upper bound of soupRange ! Please increase soupRange max !')
+    spChan <- SoupX::estimateSoup(sc = spChan, soupRange = soupRange)
+  }
+  ## Display Top 20 contributing genes
+  if (!return_object) {
+    cat('\nSoup-contributing features (Top 20) :\n')
+    print(knitr::kable(head(
+      spChan$soupProfile[order(spChan$soupProfile$est, decreasing = TRUE), ], 
+      n = 20)))
+  }
+  ## Quick clustering needed
+  spClust <- scran::quickCluster(scmat_filt, method = "igraph")
+  ## Adding clusters to the SoupChannel object
+  spChan <- SoupX::setClusters(sc = spChan, clusters = spClust)
+  ## Estimating soup
+  sX <- SoupX::autoEstCont(sc = spChan, doPlot = doPlot, tfidfMin = 1, 
+                           soupQuantile = soupQuantile, maxMarkers = 100, 
+                           contaminationRange = contaminationRange, 
+                           rhoMaxFDR = .2, priorRho = .05, priorRhoStdDev = .1, 
+                           forceAccept = FALSE)
+  
+  ## Removing soup (adjusting counts)
+  if(return_object) {
+    cat('Counts BEFORE SoupX : ', sum(scmat_filt), '\n')
+    scmat_soupx <- SoupX::adjustCounts(
+      sX, method = 'subtraction', roundToInt = TRUE, 
+      tol = .001, pCut = .01)
+    cat('Counts AFTER SoupX : ', sum(scmat_soupx), '\n')
+    rm(scmat_filt)
+    return(scmat_soupx)
+  } else return(sX$fit$rhoEst)
+}
+
+```
+
+### Seurat Object descriptor
+
+This function displays in the console an exhaustive description of the
+content of a `Seurat` object, additionally computing some useful metrics
+
+It was tested on `Seurat`=4.4.0,5.1.0, `sparseMatrixStats`=1.13.4 ,
+`knitr`=1.44
+
+Parameters :
+
+-   `sobj` : a Seurat object
+
+-   `max_levels` : maximum number [int >0] of unique values to consider a
+    barcode annotation as a factor, rather than a continuous numeric
+    vector
+
+-   `sparse_level` : if `TRUE`, compute matrix sparsity
+
+-   `describe` : type of entries in the Seurat object to describe. Can be one
+of (`'all'`, `'assays'`, `'dimred'`, `'coldata'`)
+
+```{r sobjdesc_func, eval = TRUE}
+# sobjdesc_func
+
+SeuratObject_descriptor <- function(sobj = NULL, describe = 'all', sparse_level = TRUE, max_levels = 100) {
+  
+  ## Checks
+  if (is.null(sobj)) stop('A Seurat object is required !')
+  if(!is(sobj, 'Seurat')) stop('Provided sobj is not a proper Seurat object !')
+  
+  describe <- tolower(describe)
+  desc.valids <- c('all', 'assay', 'dimred', 'coldata')
+  if(!all(describe %in% desc.valids)) stop(
+    'At least one requested item type to describe is not valid. Expecting any combination of ["', 
+    paste(c(desc.valids), collapse = '", "'), 
+    '] ("all" supersedes any other).')
+  if('all' %in% describe) describe <- desc.valids[-1]
+  
+  ## Additional checks on sobj
+  if(!is(sobj, 'Seurat')) stop('Provided object is not a proper Seurat object !')
+  
+  retlist <- list()
+  
+  ## Seurat slots
+  slots <- c('counts', 'data', 'scale.data')
+  
+  ### OBJECT VERSION
+  cat(paste0('OBJECT VERSION :\t', sobj@version), '\n')
+  
+  ### PROJECT NAME
+  proj_name <- Seurat::Project(sobj)
+  cat(paste0('PROJECT :\t[', proj_name, ']'), '\n')
+  
+  ### ASSAYS
+  if('assay' %in% describe) {
+    cat('\n[ASSAYS]\n')
+    expassays <- Seurat::Assays(object = sobj)
+    for (ea in seq_along(expassays)) {
+      assay_name <- expassays[ea]
+      # cur_assay <- Seurat::Assays(object = sobj, slot = assay_name)
+      cur_assay <- suppressWarnings(SeuratObject::LayerData(
+        object = sobj, layer = assay_name))
+      cat(paste0(
+        '   ASSAY ', ea, ' :\t[', assay_name, ']', 
+        if(Seurat::DefaultAssay(sobj) == assay_name) ' [ACTIVE]')
+        , '\n')
+      
+      ## SLOTS/LAYERS
+      for (sl in seq_along(slots)) {
+        slot_name <- slots[sl]
+        cur_slot <- suppressWarnings(SeuratObject::GetAssayData(
+          object = sobj, assay = assay_name, layer = slot_name))
+        slot_dimprod <- prod(dim(cur_slot))
+        cat(paste0(
+          '      SLOT/LAYER ', sl, ' :\t[', slot_name, ']\tDims:[',
+          nrow(cur_slot), ' x ', ncol(cur_slot), 
+          if(slot_dimprod > 0) paste0(
+            ']  Range:[', paste(
+              sprintf('%.2f', range(cur_slot, na.rm = TRUE)), 
+              collapse = '-')) else NULL, ']'), '\n')
+        
+        ## Total counts if slot/layer is "counts"
+        if(slot_name == 'counts') cat(paste0(
+          '         Counts :\t', round(sum(cur_slot))), '\n')
+        ## Adding sparsity info when needed :
+        if (sparse_level & is(cur_slot, 'dgCMatrix')) {
+          splev <- sum(sparseMatrixStats::colCounts(
+            x = cur_slot, value = 0)) / slot_dimprod
+          cat(paste0(
+            '         Sparsity :\t', 
+            sprintf('%.5f', splev * 100)
+            , '%')
+            , '\n')
+        }
+      }
+    }
+  }
+  
+  ### DIMRED
+  if ('dimred' %in% describe) {
+    cat('\n[DIMREDS]\n')
+    dimreds <- Seurat::Reductions(object = sobj)
+    for (dr in seq_along(dimreds)) {
+      dr_name <- dimreds[dr]
+      cur_dr <- Seurat::Reductions(object = sobj, slot = dr_name)
+      cat(paste0(
+        '   DIMRED ', dr, ' : [', dimreds[dr], 
+        ']  Dims:[', nrow(cur_dr), ' x ', 
+        ncol(cur_dr), ']'), '\n')
+    }
+  }
+  
+  ### GRAPHS
+  if(length(sobj@graphs) > 0) {
+    cat('\n[GRAPHS]\n')
+    for (gn in names(sobj@graphs)) {
+      cat(paste0('  ', gn), '\n')
+    }
+  }
+  
+  ### BARCODE META
+  if('coldata' %in% describe) {
+    bc.df <- as.data.frame(sobj@meta.data)
+    cat('\n[BARCODES METADATA]\n')
+    for (b in seq_len(ncol(bc.df))) {
+      b.fac <- as.factor(bc.df[,b])
+      if (nlevels(b.fac) < max_levels) {
+        # message('\n', colnames(bc.df)[b])
+        b.tbl <- as.data.frame(table(b.fac, useNA = 'always'))
+        colnames(b.tbl)[1] <- colnames(bc.df)[b]
+        cat(knitr::kable(
+          b.tbl, format = 'simple', escape = FALSE), 
+          sep = '\n')
+      } else {
+        cat('\n',colnames(bc.df)[b], '\n')
+        print(summary(bc.df[,b]))
+      }
+    }
+  }
+}
+
+```
+
+Now, on top of being able to read and write data, we can **work**
+on it too !
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Load a 10X Cell Ranger raw count matrix
+
+## The dataset
+
+-   The data we will work on is hosted on
+    [Zenodo](https://zenodo.org){target="_blank"}. To ease its
+    retrieval, we can define its ID as a variable
+
+    ```{r zid}
+    # zid
+    
+    ## This is actually to help me updating this training without hassle
+    zen_id <- '14034221'
+    
+    ```
+
+-   Here will we train ourselves to load into R a single cell RNAseq
+    data produced by 10X Genomics' software **`Cell Ranger`**.
+
+-   We will work with a public dataset provided by the manufacturer,
+    that consists in \~ **10,000 PBMC** (peripheral bone marrow cells)
+    from a human donor (downsampled to 1/10th, for smaller computation time).
+
+-   The experiment was performed with the **3' capture kit v3**.
+
+-   The analysis was performed with **`Cell Ranger v3`**, mapping on the
+    **`GRCh38-2020-A`** manufacturer reference.
+
+-   The data consists into the typical 10x 3-files structure, hosted in
+    a Zenodo respository (Id :
+    [`r zen_id`](https://zenodo.org/records/%60r%20zen_id%60 "Zenodo Preproc.1"){target="_blank"})
+
+    -   `barcodes.tsv.gz` : the list of putative droplet **barcodes**
+    -   `features.tsv.gz` : the list of **features** (genes)
+    -   `matrix.mtx.gz` : the **feature** x **barcode** expression count
+        **matrix**
+
+## Download data
+
+-   The relatively complex code chunk hereafter has been written to :
+
+    -   let you download the data files from :
+
+        -   Zenodo by default
+
+        -   if `backup = TRUE`, a local backup instead (in case we loose the
+            internet connection)
+
+    -   if the requested data are already available locally :
+
+        -   load this from the local source
+
+        -   if `force = TRUE` a new download is forced
+
+```{r dlzen10x, message = TRUE, echo = TRUE}
+# dlzen10x
+
+### Named files (will be used later on !)
+mtx_file <- "matrix.mtx.gz"
+features_file <- "features.tsv.gz"
+barcodes_file <- "barcodes.tsv.gz"
+summary_file <- "pbmc_10k_v3_summary.html"
+
+## Filename(s) to retrieve
+toget_files <- c(mtx_file,
+                 features_file,
+                 barcodes_file,
+                 summary_file)
+
+## Folder to store retrieved files
+local_folder <- input_dir
+
+## Use local backup ?
+backup <- FALSE
+if(backup) message("Using local backup !")
+
+## Force download ?
+force <- FALSE
+if(force) message("Forcing (re)download !")
+
+### Define remote folder
+remote_folder <- if (backup) "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/10X/" else paste0("https://zenodo.org/records/", zen_id, "/files/")
+
+### Reconstruct the input paths
+remote_path <- paste0(remote_folder, "/", toget_files)
+
+### Reconstruct the output paths
+local_path <- paste0(local_folder, "/", toget_files)
+
+## Retrieve files (if they don't exist), in loop
+for (tg in seq_along(toget_files)) {
+  ## If the file does not locally exist
+  if (!file.exists(local_path[tg]) | force) {
+    ## Retrieve data
+    if(backup) {
+      file.copy(from = remote_path[tg],
+                to = local_path[tg])
+    } else {
+      download.file(url = remote_path[tg], 
+                    destfile = local_path[tg])
+    }
+    ## Check if downloaded files exist locally
+    if(file.exists(local_path[tg])) message("\tOK")
+  } else message(paste0(toget_files[tg], " already downloaded !"))
+}
+
+```
+
+## Load into R
+
+-   **Load** the **10X** **data** files into R :
+
+    ```{r q_r10X, eval = FALSE, class.source="question", eval = FALSE}
+    # q_r10X
+    
+    How ?
+    
+    ```
+
+    -   A good starter
+
+    ```{r a_r10X1, class.source = c("fold-hide", "answer"), echo = FALSE}
+    # a_r10X1
+    
+    cat('https://lmddgtfy.net/?q=load%2010x%20data%20in%20R')
+    
+    ```
+
+    -   Back to your local help ressource
+
+    ```{r a_r10X2, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_r10X2
+    
+    ## Reading the function help page
+    ?Seurat::Read10X
+    
+    ```
+
+    <br><br>
+    
+    We can now apply it to our data : 
+    
+    ```{r load10x, class = "fold-hide"}
+    # load10x
+    
+    ## Loading unfiltered 10X matrix
+    scmat <- Seurat::Read10X(data.dir = input_dir)
+    
+    ```
+
+    <br>
+
+-   However, we don't know what the loaded object actually looks like in
+    R...
+
+-   **Questions** :
+
+    -   Do you know a way to ...
+
+    ```{r q_whatis, class.source="question", eval = FALSE}
+    # q_whatis
+    
+    ... know what IS the type of object that was created ?
+    
+    ```
+
+    <br>
+
+    ```{r a_whatis, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_whatis
+    
+    ## To know the type of an R object : methods::is()
+    ?methods::is
+    
+    ```
+
+    ```{r gois, class.source = "fold-hide"}
+    # gois
+    
+    ## Get the type
+    methods::is(scmat)
+    
+    ```
+
+    <br><br>
+
+    ```{r q_struc, class.source="question", eval = FALSE}
+    # q_struc
+    
+    ... observe the STRucture of the resulting object ?
+    
+    ```
+
+    <br>
+
+    ```{r a_struc, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_struc
+    
+    ## To get a basic structure description : utils::str()
+    ?utils::str
+    
+    ```
+
+    ```{r go_str, class.source = "fold-hide"}
+    # go_str
+    
+    ## Get the basic structure
+    utils::str(scmat)
+    
+    ```
+
+<br>
+
+## Features cleanup
+
+`Seurat` does not like at all **underscores** (`_`) in feature names ...
+
+We will have to :
+
+-   **control** if our dataset contains some ? Here, we will use the `base::grep()` function that looks in character strings `x` if they contain a provided set of characters as a `pattern`, and returns their position (when `value = FALSE`, default) or value itself (`value = TRUE`)
+
+    ```{r us_check1}
+    # us_check1
+    
+    ## Check feature names with underscore(s)
+    base::grep(pattern = '_', 
+         x = rownames(scmat), 
+         value = TRUE)
+    
+    ```
+
+    <br>
+
+-   if so, **clean** it ! Here we will use the `base::gsub()` function that looks for a `pattern` in a character string `x` and substitutes it with a `replacement`  character string.
+
+    ```{r us_clean}
+    # us_clean
+    
+    ## Clean features : replacing underscores by dashes
+    base::rownames(scmat) <- base::gsub(
+      pattern = "_", 
+      replacement = "-", 
+      x = rownames(scmat))
+    
+    ```
+
+-   then, control the efficiency of our cleaning (with a new use of `base::grep`)
+
+    ```{r us_check2, class.source="notrun", class.output="notruno"}
+    # us_check2
+    
+    ## Post-cleanup control
+    base::grep(pattern = "_", 
+               x = rownames(scmat), 
+               value = TRUE)
+    
+    ```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Empty droplets
+
+-   While a large part of our barcodes contain **no count** at all,
+    barcodes with at least one total count **may not** mandatorily
+    correspond to **true cells**, due to ambient RNA.
+
+-   Here we want to **identify** empty droplets, then **remove** them
+    from the matrix.
+
+## Detection
+
+-   To detect the margins of "true" cells versus empty droplets, we will
+    rely on the so-called **"double kneeplot"** : a plot of **UMI counts per 
+    barcode**, in function of their increasingly **ordered rank**.
+
+-   To draw such plot, we need to **rank the barcodes** thanks to their 
+    total counts.
+
+### Ranking barcodes
+
+-   We will use the
+    [**DropletUtils**](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html){target="_blank"}
+    package
+
+    ```{r h_barcodeRanks, eval = FALSE}
+    # h_barcodeRanks
+    
+    ## Read the function help page
+    ?DropletUtils::barcodeRanks()
+    
+    ```
+
+    ```{r bcranks}
+    # bcranks
+    
+    ## Generate the rank statistics
+    bc_rank <- DropletUtils::barcodeRanks(scmat)
+    
+    ```
+
+-   Check the ranking of barcodes, according to their counts
+
+    ```{r bcrank_top, class.source="notrun", class.output="notruno", fold.output = FALSE}
+    # bcrank_top
+    
+    ## Show a summary of the ranks (ordered for display convenience)
+    print(bc_rank[order(bc_rank$rank),])
+    
+    ```
+
+<br>
+
+### Kneeplot
+
+Now, we can **draw** our kneeplot :
+
+```{r kneeplot1, class.source="notrun", class.output="notruno", fold.plot = FALSE}
+# kneeplot1
+
+## Plot
+graphics::plot(x = bc_rank$rank, 
+               y = bc_rank$total + 1, 
+               log = "xy", 
+               xlab = "Barcode rank", 
+               ylab = "Total UMIs", 
+               col = "black", 
+               pch = ".", 
+               cex = 5, 
+               main = "Kneeplot")
+
+```
+
+<br>
+
+-   **Question** :
+
+    ```{r q_knee, class.source="question", eval = FALSE}
+    # q_knee
+    
+    Looking at the kneeplot, can you roughly predict how many barcodes will be 
+    kept as cells (ie, as non-empty droplets) ?
+    
+    ```
+
+    <br>
+
+    ```{r a_knee, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_knee
+    
+    ## . The "cliff" in the kneeplot is at a 
+    ##  rank value a bit below ~ 1,000.
+    
+    ```
+
+Then, we can use these ranks to **identify "true" cells** :
+
+```{r h_emptyDrops, class.source="notrun", class.output="notruno", eval = FALSE}
+# h_emptyDrops
+
+## Read the function help page
+?DropletUtils::emptyDrops
+
+```
+
+The function we will use relies on random number generation, so we will fix the RNG seed, for reproducibility
+
+```{r emptydrops1}
+# emptydrops1
+
+## Set the RNG seed
+set.seed(my_seed)
+
+## Identify empty droplets
+bc_rank2 <- DropletUtils::emptyDrops(scmat)
+
+## Whats is the structure of the returned output ?
+str(bc_rank2)
+```
+
+We can show a summary of the ordered barcodes :
+
+```{r emptysmry, class.source="notrun", class.output="notruno"}
+# emptysmry
+
+## Show a summary of the qualified ranks (ordered for display convenience)
+print(bc_rank2[order(bc_rank2$Total, decreasing = TRUE),])
+
+```
+
+<br>
+
+### Selection
+
+Barcodes considered as empty droplets have **no p-value** (`FDR` = NA)
+
+```{r bcr2_na}
+# bcr2_na
+
+## Creating a validation column (empty droplets have NA as p-value)
+bc_rank2$VALID <- !is.na(bc_rank2$FDR) 
+
+## Quantify "real cells"
+table(bc_rank2$VALID)
+
+```
+
+<br>
+
+We can **control the stringency** by setting a FDR-adjusted p-value
+**threshold**
+
+```{r valid_fdr}
+# valid_fdr
+
+## Recall the max p-value we set as a variable early on
+max_p
+
+## We've set the max p-value to 1E-03
+bc_rank2$VALID[bc_rank2$FDR >= max_p] <- FALSE
+
+## Control
+table(bc_rank2$VALID)
+
+```
+
+<br>
+
+Now, we can **display** our **true cells** on the kneeplot :
+
+```{r kneeplot2, fig.align="center"}
+# kneeplot2
+
+## Plot with highlight of the selected barcodes (red)
+graphics::plot(x = bc_rank$rank, 
+               y = bc_rank$total+1, 
+               log = "xy", 
+               xlab = "Barcode rank", 
+               ylab = "Total UMIs", 
+               col = ifelse(bc_rank2$VALID, "red", "black"), 
+               pch = ".", 
+               cex = ifelse(bc_rank2$VALID, 7, 3), 
+               main = paste0("Kneeplot (", 
+                             length(which(bc_rank2$VALID)), 
+                             " barcodes kept)"))
+
+```
+
+<br>
+
+-   **Question** :
+
+    ```{r q_kneered, class.source="question", eval = FALSE}
+    # q_kneered
+    
+    Is there something unexpected for the retained "TRUE" cells (red) in this kneeplot ?
+
+    ```
+
+    <br>
+
+    ```{r a_kneered, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_kneered
+    
+    ## . You may observe that the selection of "true" cells (red)
+    ##   does not strictly correspond to a "cut" in the kneeplot
+    ##   descending curve.
+    ##
+    ## . This is because emptyDrops does not only "follow" the curve
+    ##   to determine a threshold corresponding to a "minimal count" 
+    ##   value to consider a barcode as a cell, but also performs a 
+    ##   statistical analysis for each barcode, considering how much 
+    ##   its expression profile ressembles the one of other cells, 
+    ##   even with a very different (lower) global level of expression.
+    
+    ```
+
+<br><br>
+
+## Removal
+
+We just need to restrict our count matrix to "true" cells.
+
+-   How many barcodes do we have at the moment ?
+
+    ```{r scdim3, class.source="notrun", class.output="notruno"}
+    # scdim3
+    
+    dim(scmat)
+    
+    ```
+
+    <br>
+
+-   Filter empty droplets out :
+
+    ```{r edfilter}
+    # edfilter
+    
+    ## Restrict to valid barcodes
+    scmat_cells <- scmat[, bc_rank2$VALID]
+    
+    ## Control
+    dim(scmat_cells)
+    
+    ```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Ambient RNA
+
+-   The counts measured in this matrix of (now considered "true") single
+    cells do **not** reflect the measurement of these cells
+    expression **only**
+
+-   Due to other **over-lysed / dying cells** in the emulsion, we also
+    measured fraction of **ambient RNA** that adds up to the "real"
+    expression
+
+-   We may **estimate** it by observing counts existing at a **minimal
+    level** across cells that greatly differ in their expression profile
+
+## Estimate the "soup"
+
+[**SoupX**](https://cran.r-project.org/web/packages/SoupX/readme/README.html){target="_blank"}
+can estimate the rate and composition of ambient RNA, in several ways :
+
+-   **Manual mode** : providing a list of features expected to reflect
+    the soup (genes expressed at high levels in a majority of the
+    expected cell types)
+
+-   **Automatic modes**, using the empty droplets-**filtered** raw count
+    matrix ...
+
+    -   ... along **with the unfiltered** matrix (ie, containing all
+        quantified droplets). This is the most efficient mode.
+
+    -   ... **solely** : this is less efficient, but useful when the
+        unfiltered matrix is not available.
+
+```{r h_SoupX_auto, eval = FALSE, class.source="notrun", class.output="notruno"}
+# h_SoupX_auto
+
+## Reading the SoupX package main help page
+?SoupX::SoupX
+
+```
+
+Let's run SoupX, just asking for an estimation of the "soup" proportion
+:
+
+```{r soupxrhoE}
+# soupxrhoE
+
+## TIP : In case of error :
+# install.packages("irlba", type="source", force=TRUE)
+
+## SoupX
+soup_frac <- SoupX_auto(
+  scmat_filt = scmat_cells, 
+  scmat_raw = scmat)
+
+```
+
+<br>
+
+***NOTE*** : We can observe
+[**MALAT1**](https://www.biorxiv.org/content/10.1101/2024.07.14.603469v2){target="_blank"} as the top first gene (as well as multiple riboprotein-coding genes).
+
+<br>
+
+What's the estimated fraction of soup in our counts ?
+
+```{r soupxfrac}
+# soupxfrac
+
+cat("Soup fraction : ", soup_frac)
+
+```
+
+<br>
+
+-   **Question** :
+
+    ```{r q_souprate, class.source="question", eval = FALSE}
+    # q_souprate
+    
+    Should we try to remove such an amount of ambient RNA ?
+    
+    ```
+
+    <br>
+
+    ```{r a_souprate, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_souprate
+    
+    The best way to know is to try it out =D
+    
+    ```
+
+<br>
+
+## Remove the "soup"
+
+SoupX can **remove** the soup (subtract counts for identified soup genes
+to all barcodes/cells) using different methods :
+
+-   **Automatically** (safer)
+
+-   Specifying a **fraction of counts** to remove.
+
+    -   *Pros* :
+
+        -   By removing X % of reads :
+
+            -   if soup was effectively present (at a rate \<= X), this
+                will **mostly affect soup** genes first.
+
+            -   If not, it will **decrease counts** globally, thus have
+                negligible effect in differences between cells / cell
+                types.
+
+    -   *Cons* :
+
+        -   **Counts are** already **rare** in droplet-based single cell
+            technologies... Removing them "by default" makes them **even
+            more rare**...
+
+        -   If actual soup **rate is higher** than the defined rate X to
+            remove, this mode will remain **uneffective**...
+
+```{r soupxrm}
+# soupxrm
+
+## Run SoupX in "removal" mode
+scmat_unsoup <- SoupX_auto(
+  scmat_filt = scmat_cells, 
+  scmat_raw = scmat, 
+  return_object = TRUE)
+
+## We can remove the raw count matrix to free some RAM
+## We still keep the pre-SoupX matrix for comparison purpose
+rm(scmat)
+
+```
+
+<br>
+
+## Visualize the "soup" removal [DISCARD SEURAT OBJECT]
+
+-   Now, we want to **characterize the effect** of the removal of the
+    ambient RNA, by comparing the pre- and post- soupX matrices.
+
+-   In this purpose, we will construct a **Seurat object** from each of
+    these two matrices, that we will **describe**, then **visualize**
+    through a graphical representation
+
+-   But how to **create a Seurat object** from a count matrix ?
+
+```{r h_CreateSeuratObject, class.source = "fold-hide", eval = FALSE}
+# h_CreateSeuratObject
+
+## Reading the function help page
+?Seurat::CreateSeuratObject()
+
+```
+
+<br><br><br>
+
+### Create and describe the objects {.tabset .tabset-fade .tabset-pills}
+
+#### Before SoupX
+
+-   Create the Seurat object
+
+    ```{r createseuratNS}
+    # createseuratNS
+    
+    ## Create the Seurat object for unsouped cells
+    sobj <- Seurat::CreateSeuratObject(
+      counts = scmat_cells, 
+      project = "PBMC10K_BeforeSoupX")
+    
+    ```
+
+-   Describe this newly created Seurat object
+
+    -   We can use the `View()` function of Rstudio
+
+    ```{r descseuratNS_view, eval = FALSE}
+    # descseuratNS_view
+    
+    ## Describe the obtained Seurat object
+    View(sobj)
+    
+    ```
+
+    -   We can use the "helper" function for additional metrics, like
+        the data **sparsity**.
+
+    ```{r descseuratNS_sparsity}
+    # descseuratNS_sparsity
+    
+    ## Invoke SeuratObject_descriptor()
+    SeuratObject_descriptor(sobj = sobj)
+
+    ```
+
+<br>
+
+#### After SoupX
+
+-   Create the "Unsouped" Seurat object
+
+```{r createseuratS}
+# createseuratS
+
+## Create the Seurat object for "unsouped" cells
+sobj_unsoup <- Seurat::CreateSeuratObject(
+  counts = scmat_unsoup, 
+  project = "PBMC10K_AfterSoupX")
+
+```
+
+-   Describe
+
+```{r descseuratS_view, class.source="notrun", class.output="notruno", eval = FALSE}
+# descseuratS_view
+
+## Describe the new object content with View()
+View(x = sobj_unsoup)
+
+```
+
+```{r descseuratS_desc, class.source="notrun", class.output="notruno"}
+# descseuratS_desc
+
+## Describe the new object content with SeuratObject_descriptor()
+SeuratObject_descriptor(sobj = sobj_unsoup)
+
+```
+
+##  {.unnumbered}
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+-   **Questions** :
+
+    ```{r q_descdiff, class.source="question", eval = FALSE}
+    # q_descdiff
+    
+    Can you describe the difference (especially for counts and sparsity) ?
+      
+    Was it expected ?
+    
+    ```
+
+    <br>
+
+    ```{r a_descdiff, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_descdiff
+    
+    ## . Total counts, max value, counts per cell and number of
+    ##   expressed features per cell, all have decreased.
+    ##
+    ## . The sparsity level has slightly increased (removing the soup
+    ##   obliterated all counts for some features in some cells).
+    ##
+    ## . All of this is absolutely expected.
+    
+    ```
+
+<br>
+
+What are the features most affected by the soup removal ?
+
+```{r soupfeatures, class.source="notrun", class.output="notruno"}
+# soupfeatures
+
+## Compute the fraction matrix (PRE / POST)
+##  NOTE : we have 0 counts in the divider, 
+##  so we increment both matrix by +1 !
+cont_frac <- (scmat_cells + 1) / (scmat_unsoup + 1)
+
+## Fraction of counts decreased by soup removal, per feature (ordered)
+feat_frac <- sort(sparseMatrixStats::rowMeans2(cont_frac), decreasing = TRUE)
+
+### Display Top 5 features
+utils::head(feat_frac, decreasing = TRUE)
+
+## Removing objects to free some RAM
+rm(cont_frac, feat_frac)
+
+```
+
+<br>
+
+```{r cleansoup}
+# cleansoup
+
+## Remove unused objects to free some RAM
+rm(scmat_cells, scmat_unsoup)
+
+```
+
+<br>
+
+### Plot the "top 1" feature {.tabset .tabset-fade .tabset-pills}
+
+We want to visualize the expression of the "top" soup gene, LYZ, in our dataset.
+
+To do so, we will generate a projection of the data into a reduced (2-D) mathematical space. This is done by using a series of R function from the Seurat package, that we won't describe here and now : understanding these commands below is not the scope of our current session, but it will be during the next few days.
+
+Actually, these commands perform all the steps we'll see in the next few days, in a row, but with _default values_ (thus, almost certainly inadequate to our current data).
+
+In consequence, please just consider the output as a way to quickly and dirtily visualize the data : the depicted topology should be considered as very rough and mostly imperfect.
+
+#### Before SoupX
+
+```{r bsoupx, fig.height = 6, fig.width = 6}
+# bsoupx
+
+## Roll process, using a temporary "sobj_viz" Seurat object
+sobj_viz <- sobj
+sobj_viz <- Seurat::NormalizeData(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::ScaleData(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::FindVariableFeatures(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::RunPCA(object = sobj_viz, npcs = 21, verbose = FALSE)
+sobj_viz <- Seurat::RunUMAP(object = sobj_viz, dims = c(1:20), verbose = FALSE)
+
+## Top1 feature plot
+fp_pre <- Seurat::FeaturePlot(object = sobj_viz, features = 'LYZ') + Seurat::DarkTheme()
+print(fp_pre)
+
+## Clean
+rm(sobj_viz)
+
+```
+
+<br>
+
+#### After SoupX
+
+```{r asoupx, fig.height = 6, fig.width = 6, class.source="beyond", class.output="beyondo"}
+# asoupx
+
+## Roll process, using a temporary "sobj_viz" Seurat object
+sobj_viz <- sobj_unsoup
+sobj_viz <- Seurat::NormalizeData(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::ScaleData(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::FindVariableFeatures(object = sobj_viz, verbose = FALSE)
+sobj_viz <- Seurat::RunPCA(object = sobj_viz, npcs = 21, verbose = FALSE)
+sobj_viz <- Seurat::RunUMAP(object = sobj_viz, dims = c(1:20), verbose = FALSE)
+
+## Top1 feature plot
+fp_post <- Seurat::FeaturePlot(object = sobj_viz, features = 'LYZ') + Seurat::DarkTheme()
+print(fp_post)
+
+## Clean
+rm(sobj_viz)
+
+```
+
+<br>
+
+##  {.unnumbered}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+Merging plots for ease of use :
+
+```{r soupx_umaps, fig.width = 12, fig.height = 6, class.source="beyond", class.output="beyondo"}
+# soupx_umaps
+
+## Using the patchwork package to merge plots (and ggplot2 to add titles)
+patchwork::wrap_plots(
+  list(
+    fp_pre & ggplot2::ggtitle(label = "LYZ before SoupX"), 
+    fp_post & ggplot2::ggtitle(label = "LYZ after SoupX")), 
+  nrow = 1)
+
+```
+
+<br>
+
+-   **Question**
+
+    ```{r q_umapsoupx, class.source="question", eval = FALSE}
+    # q_umapsoupx
+    
+    Can you compare the two plots :
+      - for the LYZ expression globally ?
+      - for the LYZ expression across the 2-D space ?
+      - about the space topologies ?
+      
+    ```
+
+    <br>
+
+    ```{r a_umapsoupx, class.source = c("fold-hide", "answer"), eval = FALSE}
+    # a_umapsoupx
+    
+    ## . The level of expression measured in cells with smaller expression
+    ##   before SoupX has gone to almost none after : the ambient expression
+    ##   of this gene has efficiently been removed.
+    ##
+    ## . Hopefully, the cluster(s) with higher expression remain(s) high.
+    ##
+    ## . The expression scale upper bound after SoupX is higher than before ?! 
+    ##   But we REMOVED some counts ?! While being counter-intuitive, this is
+    ##   a positive consequence of the ambient removal on the scaling of
+    ##   barcodes expression (see later). 
+    ##
+    ## . The range of both X and Y axes have increased, depicting a better
+    ##   separation of / distance between some of the clusters.
+    ##
+    ## . The global topology of clusters remains close (but not identical).
+    ## 
+    ## . Clusters compacity has increased.
+    
+    ```
+
+<br>
+
+**Conclusion**
+
+-   Removing ambient RNA has a positive effect :
+
+    -   on the quality of the expression level measurements
+    
+    -   on the observed topology
+    
+    -   ... despite an estimation of only ~5% !
+
+-   Actually, ambient RNA level and composition is (one of) the major source(s) of the batch effect bias that may alter the integration of different samples.
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br><br><br>
+
+**Beyond** :
+
+1.  Save the `sobj` R object on disk.
+
+```{r b_save_answer1, class.source = c("fold-hide", "beyond"), eval = FALSE}
+# b_save_answer1
+
+## A single object : use RDS format with saveRDS()
+saveRDS(object = sobj, file = paste0(output_dir, "/sobj.RDS"))
+
+```
+
+2.  Save both the `sobj` and `sobj_unsoup` objects in a single archive
+    on disk.
+
+```{r b_save_answer2, class.source = c("fold-hide", "beyond"), eval = FALSE}
+# b_save_answer2
+
+## Multiple objects : use Rdata format with save()
+save(list = c(sobj, sobj_unsoup), file = paste0(output_dir, "/sobjects.RDA"))
+
+```
+
+3.  Same as 1. but use the "bzip2" compression algorithm
+
+```{r b_save_answer3, class.source = c("fold-hide", "beyond"), eval = FALSE}
+# b_save_answer3
+
+## Compress with bzip2
+saveRDS(object = sobj, file = paste0(output_dir, "/sobj.RDS"), compress = "bzip2")
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br><br><br>
+
+# Rsession
+
+For reproducibility and context, it is recommended to include in your RMarkdown the list of loaded packages and their version.
+
+```{r rsession, class.source="notrun", class.output="notruno"}
+# rsession
+
+utils::sessionInfo()
+
+```

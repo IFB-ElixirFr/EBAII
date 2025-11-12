@@ -1,0 +1,603 @@
+---
+title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR> <B>LESSON BLOCK (I)</B><BR>-<BR>A nice subtitle</CENTER>"
+date: "2025-16-21.22"
+author:
+  - name: "EBAII n1 scRNAseq Team"
+  - name: "First AUTHOR"
+    email: "first.author@scrnaseq.com"
+  - name: "Second AUTHOR"
+    email: "second.author@scrnaseq.com"
+output:
+  rmdformats::readthedown:
+    fig_width: 8
+    fig_height: 6
+    highlight: tango  ## Theme for the code chunks
+    embed_fonts: TRUE
+    number_sections: true  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    collapsed: true  ## By default, the TOC is folded
+    toc_depth: 3
+    smooth_scroll: true ## Smooth scroll of the HTML page
+    self_contained: true ## Includes all plots/images within the HTML
+    code_download: true ## Adds a button to download the Rmd
+    code_folding: show
+    thumbnails: false
+    lightbox: true
+    fig_caption: false
+    gallery: true
+    use_bookdown: true
+always_allow_html: true ## Allow plain HTML code in the Rmd
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- knit setup -->
+
+```{r knit_setup, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE,
+  fig.align="center", 
+  # results = 'hide',
+  width = 100       # Number of characters per line
+)
+```
+
+
+<!-- CSS to color chunks and outputs -->
+
+```{css, echo=FALSE}
+.notrun {
+  background-color: lightgrey !important;
+  border: 3px solid black !important;
+}
+.notruno {
+  background-color: lightgrey !important;
+  color : black !important;
+}
+.question {
+  background-color: aquamarine !important;
+  color : black !important;
+  border: 3px solid limegreen !important;
+}
+.questiono {
+  background-color: aquamarine !important;
+  color : black !important;
+}
+.answer {
+  background-color: navajowhite !important;
+  border: 3px solid brown !important;
+}
+.answero {
+  background-color: navajowhite !important;
+  color : black !important;
+}
+.beyond {
+  background-color: violet !important;
+  border: 3px solid purple !important;
+}
+.beyondo {
+  background-color: violet !important;
+  color : black !important;
+}
+```
+
+
+<!-- Hook to handle code blocks output folding -->
+
+```{r knit_hook, echo = FALSE}
+hooks = knitr::knit_hooks$get()
+hook_foldable = function(type) {
+  force(type)
+  function(x, options) {
+    res = hooks[[type]](x, options)
+    
+    if (isFALSE(options[[paste0("fold.", type)]])) return(res)
+    
+    paste0(
+      "<details><summary>Show ", type, "</summary>\n\n",
+      res,
+      "\n\n</details>"
+    )
+  }
+}
+knitr::knit_hooks$set(
+  output = hook_foldable("output"),
+  plot = hook_foldable("plot")
+)
+```
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<center>![](eb3i_banner.png)</center>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+This file describes the different steps to perform the **first part** of
+the **single cell RNAseq** data analysis training course for the **EBAII
+n1 2025**, covering these steps :
+
+-   **Load** a single cell raw counts **matrix**
+
+-   **Remove** barcodes from **empty droplets**
+
+-   **Estimate** and remove **ambient RNA** contamination *("soup")*
+
+## An important notice
+
+-   These early (but mandatory) steps of the analysis are not covered by
+    the renowned, higher-level analysis frameworks like **Seurat** nor
+    **scran/scater**.
+    
+-   Thus, we will write/use a certain amount of **lines of code**, some
+    of which of a higher complexity for R beginners.
+    
+-   **Newcomer, do not fear** !
+
+    -   While you are **welcome to try** writing some by yourself,
+        depending on your R knowledge and self-confidence in it ...
+        
+    -   ... you do not have to know [**how**]{.underline} these code
+        work ...
+        
+    -   ... thus you **should not feel ashamed** copy-pasting the
+        pre-written code hereafter ...
+        
+    -   ... but in both cases, please try **your best understanding**
+        [**what**]{.underline} these code do, and even more,
+        [**why**]{.underline} !
+        
+    -   In this purpose, you may use whatever **help** you can **by**
+        **searching**.
+
+## What to run ?
+
+-   This training presentation, written in Rmarkdown, contains **many** chunks ( = code blocks)
+
+-   You **do not have to** run them all !
+
+-   Chunks follow a **color code** :
+
+### Chunks you **ARE** expected to run :
+
+```{r chunk_run}
+# chunk_run
+
+## Example of a chunk to run
+getwd()
+
+```
+
+<br>
+
+### Chunks you **ARE NOT** expected to run
+
+Hopefully, we will demo them. You may run them by yourself, young padawan, but if you get late or worst, break something, _you_'ll be the one to blame !
+
+```{r chunk_demo, class.source="notrun", class.output="notruno"}
+# chunk_demo
+
+## Example of a chunk to NOT run
+utils::sessionInfo()
+
+```
+
+<br>
+
+### Questions
+
+Some questions we would like you to answer during the training course.
+Please be fair and do not take a look at the answer before we tell you so :)
+
+```{r chunk_question, class.source="question", eval = FALSE}
+# chunk_question
+
+## What's the Answer to Life ? The Universe ? Everything ??
+
+```
+
+<br>
+
+### Answers
+
+They usually follow questions...
+
+```{r chunk_answer, class.source = c("fold-hide", "answer"), class.output="answero"}
+# chunk_answer
+
+cat("The Answer to the Great Question... is ... 
+Forty-two. Six by nine : forty-two. That's it. 
+That's all there is. (I always thought something was 
+fundamentally wrong with the universe.)")
+
+```
+
+<br>
+
+### Additional exercises / questions
+
+These are beyond the scope of the training course, but you may play it _if you feel bored_
+
+```{r chunk_beyond, class.source="beyond", class.output="beyondo"}
+# chunk_beyond
+
+## Example of a chunk to play with but beyond the scope
+getwd()
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Additional resources
+
+**However**, some upcoming steps require a bit complicated methods that
+are not fun to write, nor copy-paste multiple times. So, we will now
+prepare code **functions** that will ease these steps. After executing
+these functions code, we may call (invoke) them when needed.
+
+## Functions
+
+### SoupX helper function
+
+This function was written to ease the use of SoupX on a Seurat object
+
+It was tested on `SoupX`=1.6.2 with `igraph`=1.5.1, `Seurat`=4.4.0,5.1.0
+
+Parameters :
+
+-   `scmat_filt` : (sparse)matrix corresponding to an empty droplets -filtered count matrix
+
+-   `scmat_raw` : (sparse)matrix corresponding to an NON- empty droplets -filtered count matrix
+
+-   `soupQuantile`, `contaminationRange` : see `?SoupX::autoEstCont`
+
+-   `contaminationRange` : range of the *expected* soup proportion
+
+-   `soupRange` : estimate soup fraction from features with total reads
+comprised in this range of counts (only used when `scmat_raw != NULL`)
+
+-   `return_object` : if `TRUE`, return the "unsouped" `Seurat` object ; if
+`FALSE`, only perform soup estimation and return the estimated
+proportion value (rho)
+
+-   `doPlot` : Perform the SoupX estimation plot (rho distribution)
+
+```{r soupx_func, eval = TRUE}
+# soupx_func
+
+SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
+                       contaminationRange = c(.01, .8), soupRange = c(0,100),
+                       return_object = FALSE, doPlot = FALSE) {
+  
+  ## Checks
+  if(is.null(scmat_filt)) stop('A filtered count matrix is required !')
+  
+  if(is.null(scmat_raw)) message('No unfiltered raw counts matrix provided. Estimation will be based on filtered matrix only.')
+  
+  ## If no raw matrix
+  if (is.null(scmat_raw)) {
+    spChanRaw <- SoupX::SoupChannel(
+      tod = scmat_filt, 
+      toc = scmat_filt, 
+      calcSoupProfile = FALSE)
+    sc_rowsum <- sparseMatrixStats::rowSums2(scmat_filt)
+    spProf <- data.frame(
+      row.names = rownames(scmat_filt), 
+      est = sc_rowsum/sum(scmat_filt), 
+      counts = sc_rowsum)
+    spChan <- SoupX::setSoupProfile(spChanRaw, spProf)
+  } else {
+    spChan <- SoupX::SoupChannel(
+      tod = scmat_raw, 
+      toc = scmat_filt, 
+      calcSoupProfile = FALSE)
+    if (min(spChan$nDropUMIs) > max(soupRange)) stop(
+      'Minimum found counts per barcode is : ', 
+      min(spChan$nDropUMIs), 
+      ', which is smaller than the upper bound of soupRange ! Please increase soupRange max !')
+    spChan <- SoupX::estimateSoup(sc = spChan, soupRange = soupRange)
+  }
+  ## Display Top 20 contributing genes
+  if (!return_object) {
+    cat('\nSoup-contributing features (Top 20) :\n')
+    print(knitr::kable(head(
+      spChan$soupProfile[order(spChan$soupProfile$est, decreasing = TRUE), ], 
+      n = 20)))
+  }
+  ## Quick clustering needed
+  spClust <- scran::quickCluster(scmat_filt, method = "igraph")
+  ## Adding clusters to the SoupChannel object
+  spChan <- SoupX::setClusters(sc = spChan, clusters = spClust)
+  ## Estimating soup
+  sX <- SoupX::autoEstCont(sc = spChan, doPlot = doPlot, tfidfMin = 1, 
+                           soupQuantile = soupQuantile, maxMarkers = 100, 
+                           contaminationRange = contaminationRange, 
+                           rhoMaxFDR = .2, priorRho = .05, priorRhoStdDev = .1, 
+                           forceAccept = FALSE)
+  
+  ## Removing soup (adjusting counts)
+  if(return_object) {
+    cat('Counts BEFORE SoupX : ', sum(scmat_filt), '\n')
+    scmat_soupx <- SoupX::adjustCounts(
+      sX, method = 'subtraction', roundToInt = TRUE, 
+      tol = .001, pCut = .01)
+    cat('Counts AFTER SoupX : ', sum(scmat_soupx), '\n')
+    rm(scmat_filt)
+    return(scmat_soupx)
+  } else return(sX$fit$rhoEst)
+}
+
+```
+
+### Seurat Object descriptor
+
+This function displays in the console an exhaustive description of the
+content of a `Seurat` object, additionally computing some useful metrics
+
+It was tested on `Seurat`=4.4.0,5.1.0, `sparseMatrixStats`=1.13.4 ,
+`knitr`=1.44
+
+Parameters :
+
+-   `sobj` : a Seurat object
+
+-   `max_levels` : maximum number [int >0] of unique values to consider a
+    barcode annotation as a factor, rather than a continuous numeric
+    vector
+
+-   `sparse_level` : if `TRUE`, compute matrix sparsity
+
+-   `describe` : type of entries in the Seurat object to describe. Can be one
+of (`'all'`, `'assays'`, `'dimred'`, `'coldata'`)
+
+```{r sobjdesc_func, eval = TRUE}
+# sobjdesc_func
+
+SeuratObject_descriptor <- function(sobj = NULL, describe = 'all', sparse_level = TRUE, max_levels = 100) {
+  
+  ## Checks
+  if (is.null(sobj)) stop('A Seurat object is required !')
+  if(!is(sobj, 'Seurat')) stop('Provided sobj is not a proper Seurat object !')
+  
+  describe <- tolower(describe)
+  desc.valids <- c('all', 'assay', 'dimred', 'coldata')
+  if(!all(describe %in% desc.valids)) stop(
+    'At least one requested item type to describe is not valid. Expecting any combination of ["', 
+    paste(c(desc.valids), collapse = '", "'), 
+    '] ("all" supersedes any other).')
+  if('all' %in% describe) describe <- desc.valids[-1]
+  
+  ## Additional checks on sobj
+  if(!is(sobj, 'Seurat')) stop('Provided object is not a proper Seurat object !')
+  
+  retlist <- list()
+  
+  ## Seurat slots
+  slots <- c('counts', 'data', 'scale.data')
+  
+  ### OBJECT VERSION
+  cat(paste0('OBJECT VERSION :\t', sobj@version), '\n')
+  
+  ### PROJECT NAME
+  proj_name <- Seurat::Project(sobj)
+  cat(paste0('PROJECT :\t[', proj_name, ']'), '\n')
+  
+  ### ASSAYS
+  if('assay' %in% describe) {
+    cat('\n[ASSAYS]\n')
+    expassays <- Seurat::Assays(object = sobj)
+    for (ea in seq_along(expassays)) {
+      assay_name <- expassays[ea]
+      # cur_assay <- Seurat::Assays(object = sobj, slot = assay_name)
+      cur_assay <- suppressWarnings(SeuratObject::LayerData(
+        object = sobj, layer = assay_name))
+      cat(paste0(
+        '   ASSAY ', ea, ' :\t[', assay_name, ']', 
+        if(Seurat::DefaultAssay(sobj) == assay_name) ' [ACTIVE]')
+        , '\n')
+      
+      ## SLOTS/LAYERS
+      for (sl in seq_along(slots)) {
+        slot_name <- slots[sl]
+        cur_slot <- suppressWarnings(SeuratObject::GetAssayData(
+          object = sobj, assay = assay_name, layer = slot_name))
+        slot_dimprod <- prod(dim(cur_slot))
+        cat(paste0(
+          '      SLOT/LAYER ', sl, ' :\t[', slot_name, ']\tDims:[',
+          nrow(cur_slot), ' x ', ncol(cur_slot), 
+          if(slot_dimprod > 0) paste0(
+            ']  Range:[', paste(
+              sprintf('%.2f', range(cur_slot, na.rm = TRUE)), 
+              collapse = '-')) else NULL, ']'), '\n')
+        
+        ## Total counts if slot/layer is "counts"
+        if(slot_name == 'counts') cat(paste0(
+          '         Counts :\t', round(sum(cur_slot))), '\n')
+        ## Adding sparsity info when needed :
+        if (sparse_level & is(cur_slot, 'dgCMatrix')) {
+          splev <- sum(sparseMatrixStats::colCounts(
+            x = cur_slot, value = 0)) / slot_dimprod
+          cat(paste0(
+            '         Sparsity :\t', 
+            sprintf('%.5f', splev * 100)
+            , '%')
+            , '\n')
+        }
+      }
+    }
+  }
+  
+  ### DIMRED
+  if ('dimred' %in% describe) {
+    cat('\n[DIMREDS]\n')
+    dimreds <- Seurat::Reductions(object = sobj)
+    for (dr in seq_along(dimreds)) {
+      dr_name <- dimreds[dr]
+      cur_dr <- Seurat::Reductions(object = sobj, slot = dr_name)
+      cat(paste0(
+        '   DIMRED ', dr, ' : [', dimreds[dr], 
+        ']  Dims:[', nrow(cur_dr), ' x ', 
+        ncol(cur_dr), ']'), '\n')
+    }
+  }
+  
+  ### GRAPHS
+  if(length(sobj@graphs) > 0) {
+    cat('\n[GRAPHS]\n')
+    for (gn in names(sobj@graphs)) {
+      cat(paste0('  ', gn), '\n')
+    }
+  }
+  
+  ### BARCODE META
+  if('coldata' %in% describe) {
+    bc.df <- as.data.frame(sobj@meta.data)
+    cat('\n[BARCODES METADATA]\n')
+    for (b in seq_len(ncol(bc.df))) {
+      b.fac <- as.factor(bc.df[,b])
+      if (nlevels(b.fac) < max_levels) {
+        # message('\n', colnames(bc.df)[b])
+        b.tbl <- as.data.frame(table(b.fac, useNA = 'always'))
+        colnames(b.tbl)[1] <- colnames(bc.df)[b]
+        cat(knitr::kable(
+          b.tbl, format = 'simple', escape = FALSE), 
+          sep = '\n')
+      } else {
+        cat('\n',colnames(bc.df)[b], '\n')
+        print(summary(bc.df[,b]))
+      }
+    }
+  }
+}
+
+```
+
+Now, on top of being able to read and write data, we can **work**
+on it too !
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"} **[LINK_TO_UPDATE]**,
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and
+    **create a Rstudio session** with the right resource requirements, thanks to the cheat sheet.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Warm-up
+
+-   We now set **common parameters** as new variables, once and for all for this
+session :
+
+```{r setparam}
+# setparam
+
+## Set your project name
+project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project ! Put YOURS !!
+
+## Seed for the RNG
+my_seed <- 1337L
+
+## Empty droplets max p-value
+max_p <- 1E-03
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Prepare the data structure
+
+-   During the current and remaining training sessions, we will work on
+    different **data** **objects**, some retrieved from **external**
+    resources, some we will **create**.
+    
+-   In order to reuse these for further steps, or other sessions, we
+    need to **store** them, thus create a **directory structure** on the
+    cluster.
+    
+-   We will create this structure in **your project** folder (the one
+    you registered at the IFB Core, in which you stored your own data
+    for the tutoring).
+    
+-   To ensure that *you* will always use the same structure for *your*
+    work, the code hereafter has been writen so that you just have to
+    define a single **variable** that corresponds to your project name.
+    
+    -   In *my* case, as a teacher for the SC training, it is
+        **`ebaii_sc_teachers`**.
+    -   **DO NOT USE IT YOURSELF !! USE YOUR OWN PROJECT NAME !!!**
+
+
+### Example of a set of tabs {.tabset .tabset-fade .tabset-pills}
+
+#### Tab One
+
+-   Contains some text
+
+    ```{r tab1chunk}
+    # tab1chunk
+    
+    getwd()
+    
+    ```
+
+#### Tab Two
+
+-   Contains some text too
+
+    ```{r tab2chunk}
+    # tab2chunk
+    
+    getwd()
+    
+    ```
+
+##  {.unnumbered}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br><br><br>
+
+# Rsession
+
+For reproducibility and context, it is recommended to include in your RMarkdown the list of loaded packages and their version.
+
+```{r rsession, class.source="notrun", class.output="notruno"}
+# rsession
+
+utils::sessionInfo()
+
+```
