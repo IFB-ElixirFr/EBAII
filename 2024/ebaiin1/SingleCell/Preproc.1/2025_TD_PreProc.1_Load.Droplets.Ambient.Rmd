@@ -5,6 +5,8 @@ author:
   - name: "EBAII n1 scRNAseq Team"
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
+  - name: "William JARASSIER"
+    email: "william.jarassier@univ-lyon1.fr" 
 output:
   rmdformats::readthedown:
     fig_width: 8
@@ -393,11 +395,10 @@ these functions code, we may call (invoke) them when needed.
 
 ### SoupX helper function
 
-This function was written to ease the use of SoupX on a Seurat object
-
+This function was written to ease the use of SoupX on a count matrix
 It was tested on `SoupX`=1.6.2 with `igraph`=1.5.1, `Seurat`=4.4.0,5.1.0
 
-Parameters :
+**Parameters** :
 
 -   `scmat_filt` : (sparse)matrix corresponding to an empty droplets -filtered count matrix
 
@@ -410,7 +411,7 @@ Parameters :
 -   `soupRange` : estimate soup fraction from features with total reads
 comprised in this range of counts (only used when `scmat_raw != NULL`)
 
--   `return_object` : if `TRUE`, return the "unsouped" `Seurat` object ; if
+-   `return_object` : if `TRUE`, return the "unsouped" count matrix ; if
 `FALSE`, only perform soup estimation and return the estimated
 proportion value (rho)
 
@@ -482,152 +483,6 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
 }
 
 ```
-
-### Seurat Object descriptor
-
-This function displays in the console an exhaustive description of the
-content of a `Seurat` object, additionally computing some useful metrics
-
-It was tested on `Seurat`=4.4.0,5.1.0, `sparseMatrixStats`=1.13.4 ,
-`knitr`=1.44
-
-Parameters :
-
--   `sobj` : a Seurat object
-
--   `max_levels` : maximum number [int >0] of unique values to consider a
-    barcode annotation as a factor, rather than a continuous numeric
-    vector
-
--   `sparse_level` : if `TRUE`, compute matrix sparsity
-
--   `describe` : type of entries in the Seurat object to describe. Can be one
-of (`'all'`, `'assays'`, `'dimred'`, `'coldata'`)
-
-```{r sobjdesc_func, eval = TRUE}
-# sobjdesc_func
-
-SeuratObject_descriptor <- function(sobj = NULL, describe = 'all', sparse_level = TRUE, max_levels = 100) {
-  
-  ## Checks
-  if (is.null(sobj)) stop('A Seurat object is required !')
-  if(!is(sobj, 'Seurat')) stop('Provided sobj is not a proper Seurat object !')
-  
-  describe <- tolower(describe)
-  desc.valids <- c('all', 'assay', 'dimred', 'coldata')
-  if(!all(describe %in% desc.valids)) stop(
-    'At least one requested item type to describe is not valid. Expecting any combination of ["', 
-    paste(c(desc.valids), collapse = '", "'), 
-    '] ("all" supersedes any other).')
-  if('all' %in% describe) describe <- desc.valids[-1]
-  
-  ## Additional checks on sobj
-  if(!is(sobj, 'Seurat')) stop('Provided object is not a proper Seurat object !')
-  
-  retlist <- list()
-  
-  ## Seurat slots
-  slots <- c('counts', 'data', 'scale.data')
-  
-  ### OBJECT VERSION
-  cat(paste0('OBJECT VERSION :\t', sobj@version), '\n')
-  
-  ### PROJECT NAME
-  proj_name <- Seurat::Project(sobj)
-  cat(paste0('PROJECT :\t[', proj_name, ']'), '\n')
-  
-  ### ASSAYS
-  if('assay' %in% describe) {
-    cat('\n[ASSAYS]\n')
-    expassays <- Seurat::Assays(object = sobj)
-    for (ea in seq_along(expassays)) {
-      assay_name <- expassays[ea]
-      # cur_assay <- Seurat::Assays(object = sobj, slot = assay_name)
-      cur_assay <- suppressWarnings(SeuratObject::LayerData(
-        object = sobj, layer = assay_name))
-      cat(paste0(
-        '   ASSAY ', ea, ' :\t[', assay_name, ']', 
-        if(Seurat::DefaultAssay(sobj) == assay_name) ' [ACTIVE]')
-        , '\n')
-      
-      ## SLOTS/LAYERS
-      for (sl in seq_along(slots)) {
-        slot_name <- slots[sl]
-        cur_slot <- suppressWarnings(SeuratObject::GetAssayData(
-          object = sobj, assay = assay_name, layer = slot_name))
-        slot_dimprod <- prod(dim(cur_slot))
-        cat(paste0(
-          '      SLOT/LAYER ', sl, ' :\t[', slot_name, ']\tDims:[',
-          nrow(cur_slot), ' x ', ncol(cur_slot), 
-          if(slot_dimprod > 0) paste0(
-            ']  Range:[', paste(
-              sprintf('%.2f', range(cur_slot, na.rm = TRUE)), 
-              collapse = '-')) else NULL, ']'), '\n')
-        
-        ## Total counts if slot/layer is "counts"
-        if(slot_name == 'counts') cat(paste0(
-          '         Counts :\t', round(sum(cur_slot))), '\n')
-        ## Adding sparsity info when needed :
-        if (sparse_level & is(cur_slot, 'dgCMatrix')) {
-          splev <- sum(sparseMatrixStats::colCounts(
-            x = cur_slot, value = 0)) / slot_dimprod
-          cat(paste0(
-            '         Sparsity :\t', 
-            sprintf('%.5f', splev * 100)
-            , '%')
-            , '\n')
-        }
-      }
-    }
-  }
-  
-  ### DIMRED
-  if ('dimred' %in% describe) {
-    cat('\n[DIMREDS]\n')
-    dimreds <- Seurat::Reductions(object = sobj)
-    for (dr in seq_along(dimreds)) {
-      dr_name <- dimreds[dr]
-      cur_dr <- Seurat::Reductions(object = sobj, slot = dr_name)
-      cat(paste0(
-        '   DIMRED ', dr, ' : [', dimreds[dr], 
-        ']  Dims:[', nrow(cur_dr), ' x ', 
-        ncol(cur_dr), ']'), '\n')
-    }
-  }
-  
-  ### GRAPHS
-  if(length(sobj@graphs) > 0) {
-    cat('\n[GRAPHS]\n')
-    for (gn in names(sobj@graphs)) {
-      cat(paste0('  ', gn), '\n')
-    }
-  }
-  
-  ### BARCODE META
-  if('coldata' %in% describe) {
-    bc.df <- as.data.frame(sobj@meta.data)
-    cat('\n[BARCODES METADATA]\n')
-    for (b in seq_len(ncol(bc.df))) {
-      b.fac <- as.factor(bc.df[,b])
-      if (nlevels(b.fac) < max_levels) {
-        # message('\n', colnames(bc.df)[b])
-        b.tbl <- as.data.frame(table(b.fac, useNA = 'always'))
-        colnames(b.tbl)[1] <- colnames(bc.df)[b]
-        cat(knitr::kable(
-          b.tbl, format = 'simple', escape = FALSE), 
-          sep = '\n')
-      } else {
-        cat('\n',colnames(bc.df)[b], '\n')
-        print(summary(bc.df[,b]))
-      }
-    }
-  }
-}
-
-```
-
-Now, on top of being able to read and write data, we can **work**
-on it too !
 
 <br>
 
@@ -845,8 +700,21 @@ for (tg in seq_along(toget_files)) {
     utils::str(scmat)
     
     ```
-
-<br>
+    
+    <br>
+    
+    Not that meaningful, though... At least we now we have a matrix, so one can
+    get its dimensions !
+    
+    ```{r scmat_dim}
+    # scmat_dim
+    
+    ## Dimensions of a >1D object
+    dim(scmat)
+    
+    ```
+    
+    <br>
 
 ## Features cleanup
 
@@ -874,14 +742,14 @@ We will have to :
     # us_clean
     
     ## Clean features : replacing underscores by dashes
-    base::rownames(scmat) <- base::gsub(
+    rownames(scmat) <- base::gsub(
       pattern = "_", 
       replacement = "-", 
       x = rownames(scmat))
     
     ```
 
--   then, control the efficiency of our cleaning (with a new use of `base::grep`)
+-   then, **control** the efficiency of our cleaning (with a new use of `base::grep`)
 
     ```{r us_check2, class.source="notrun", class.output="notruno"}
     # us_check2
@@ -1163,6 +1031,12 @@ We just need to restrict our count matrix to "true" cells.
 
 -   We may **estimate** it by observing counts existing at a **minimal
     level** across cells that greatly differ in their expression profile
+    
+-   Just in case, due to the fun tool name we will use, `SoupX`, I'll
+    write down "soup" as an alias for "ambient RNA", but both terms have
+    the same meaning.
+
+<br>
 
 ## Estimate the "soup"
 
@@ -1199,7 +1073,7 @@ Let's run SoupX, just asking for an estimation of the "soup" proportion
 ## TIP : In case of error :
 # install.packages("irlba", type="source", force=TRUE)
 
-## SoupX
+## SoupX for ambient fraction estimation
 soup_frac <- SoupX_auto(
   scmat_filt = scmat_cells, 
   scmat_raw = scmat)
@@ -1282,105 +1156,124 @@ scmat_unsoup <- SoupX_auto(
   scmat_raw = scmat, 
   return_object = TRUE)
 
-## We can remove the raw count matrix to free some RAM
-## We still keep the pre-SoupX matrix for comparison purpose
-rm(scmat)
-
 ```
 
 <br>
 
-## Visualize the "soup" removal [DISCARD SEURAT OBJECT]
+## Effect of the "soup" removal
 
 -   Now, we want to **characterize the effect** of the removal of the
     ambient RNA, by comparing the pre- and post- soupX matrices.
+    
+-   An easy way is to **describe**, then **visualize** such effect.
 
--   In this purpose, we will construct a **Seurat object** from each of
-    these two matrices, that we will **describe**, then **visualize**
-    through a graphical representation
+-   In this purpose, we will use a whole series of `Seurat` functions, chained. 
 
--   But how to **create a Seurat object** from a count matrix ?
+-   You do not have to understand the meaning of such functions, just focus on
+our purpose.
 
-```{r h_CreateSeuratObject, class.source = "fold-hide", eval = FALSE}
-# h_CreateSeuratObject
+-   <I>The signification and usage of such functions will be the matter of the
+practical sessions of the next few days</I>
 
-## Reading the function help page
-?Seurat::CreateSeuratObject()
+<br><br>
 
-```
-
-<br><br><br>
-
-### Create and describe the objects {.tabset .tabset-fade .tabset-pills}
+### Describe and visualize {.tabset .tabset-fade .tabset-pills}
 
 #### Before SoupX
 
--   Create the Seurat object
+We can describe our count matrix thanks to some useful metrics :
 
-    ```{r createseuratNS}
-    # createseuratNS
-    
-    ## Create the Seurat object for unsouped cells
-    sobj <- Seurat::CreateSeuratObject(
-      counts = scmat_cells, 
-      project = "PBMC10K_BeforeSoupX")
-    
-    ```
+-   Total counts
 
--   Describe this newly created Seurat object
+```{r descBS_totcount, class.source="notrun", class.output="notruno"}
+# descBS_totcount
 
-    -   We can use the `View()` function of Rstudio
+## All counts
+base::sum(scmat_cells)
 
-    ```{r descseuratNS_view, eval = FALSE}
-    # descseuratNS_view
-    
-    ## Describe the obtained Seurat object
-    View(sobj)
-    
-    ```
+```
 
-    -   We can use the "helper" function for additional metrics, like
-        the data **sparsity**.
+-   Sparsity (fraction of `0`s)
 
-    ```{r descseuratNS_sparsity}
-    # descseuratNS_sparsity
-    
-    ## Invoke SeuratObject_descriptor()
-    SeuratObject_descriptor(sobj = sobj)
+```{r descBS_sparsity, class.source="notrun", class.output="notruno"}
+# descBS_sparsity
 
-    ```
+## Compute sparsity (number of matrix values at 0 / cross-product of matrix dim)
+base::sum(sparseMatrixStats::colCounts(
+  x = scmat_cells, value = 0)
+  ) / base::prod(dim(scmat_cells))
 
-<br>
+```
+
+-   Distribution of counts in cells
+
+```{r descBS_nCount, class.source="notrun", class.output="notruno"}
+# descBS_nCount
+
+## Sums up counts for each cell
+base::summary(sparseMatrixStats::colSums2(x = scmat_cells, na.rm = TRUE))
+
+```
+
+-   Distribution of expressed genes in cells
+
+```{r descBS_nFeature, class.source="notrun", class.output="notruno"}
+# descBS_nFeature
+
+## All genes minus 0-count genes
+base::summary(nrow(scmat_cells) - sparseMatrixStats::colCounts(
+  x = scmat_cells, 
+  value = 0, 
+  na.rm = TRUE))
+
+```
 
 #### After SoupX
 
--   Create the "Unsouped" Seurat object
+We can describe our count matrix thanks to some useful metrics :
 
-```{r createseuratS}
-# createseuratS
+-   Total counts
 
-## Create the Seurat object for "unsouped" cells
-sobj_unsoup <- Seurat::CreateSeuratObject(
-  counts = scmat_unsoup, 
-  project = "PBMC10K_AfterSoupX")
+```{r descAS_totcount}
+# descAS_totcount
 
-```
-
--   Describe
-
-```{r descseuratS_view, class.source="notrun", class.output="notruno", eval = FALSE}
-# descseuratS_view
-
-## Describe the new object content with View()
-View(x = sobj_unsoup)
+## All counts
+base::sum(scmat_unsoup)
 
 ```
 
-```{r descseuratS_desc, class.source="notrun", class.output="notruno"}
-# descseuratS_desc
+-   Sparsity (fraction of `0`s)
 
-## Describe the new object content with SeuratObject_descriptor()
-SeuratObject_descriptor(sobj = sobj_unsoup)
+```{r descAS_sparsity}
+# descAS_sparsity
+
+## Compute sparsity (number of matrix values at 0 / cross-product of matrix dim)
+base::sum(sparseMatrixStats::colCounts(
+  x = scmat_unsoup, value = 0)
+  ) / base::prod(dim(scmat_unsoup))
+
+```
+
+-   Distribution of counts in cells
+
+```{r descAS_nCount}
+# descAS_nCount
+
+## Sums up counts for each cell
+base::summary(sparseMatrixStats::colSums2(x = scmat_unsoup, na.rm = TRUE))
+
+```
+
+-   Distribution of expressed genes in cells
+
+```{r descAS_nFeature}
+# descAS_nFeature
+
+## Compute sparsity (number of matrix values at 0 / cross-product of matrix dim)
+base::summary(nrow(scmat_cells) - sparseMatrixStats::colCounts(
+  x = scmat_unsoup, 
+  value = 0, 
+  na.rm = TRUE))
 
 ```
 
@@ -1428,7 +1321,7 @@ What are the features most affected by the soup removal ?
 # soupfeatures
 
 ## Compute the fraction matrix (PRE / POST)
-##  NOTE : we have 0 counts in the divider, 
+##  NOTE : we may have 0 counts in the divider, 
 ##  so we increment both matrix by +1 !
 cont_frac <- (scmat_cells + 1) / (scmat_unsoup + 1)
 
@@ -1443,13 +1336,31 @@ rm(cont_frac, feat_frac)
 
 ```
 
-<br>
+```{r qsoupfeat, class.source="question", eval = FALSE}
+# qsoupfeat
 
-```{r cleansoup}
-# cleansoup
+Does something about these genes strike you ?
 
-## Remove unused objects to free some RAM
-rm(scmat_cells, scmat_unsoup)
+```
+
+Hint : **fraction** or **difference** ?
+
+```{r soupfeaturesdiff, class.source=c("fold-hide", "answer"), class.output="answero"}
+# soupfeaturesdiff
+
+## Compute the DIFFERENCE matrix (PRE / POST)
+##  NOTE : we may have 0 counts in the divider, 
+##  so we increment both matrix by +1 !
+cont_dif <- scmat_cells - scmat_unsoup
+
+## Fraction of counts decreased by soup removal, per feature (ordered)
+feat_dif <- sort(sparseMatrixStats::rowMeans2(cont_dif), decreasing = TRUE)
+
+### Display Top 5 features
+utils::head(feat_dif, decreasing = TRUE)
+
+## Removing objects to free some RAM
+rm(cont_dif, feat_dif)
 
 ```
 
@@ -1467,23 +1378,20 @@ In consequence, please just consider the output as a way to quickly and dirtily 
 
 #### Before SoupX
 
-```{r bsoupx, fig.height = 6, fig.width = 6}
+```{r bsoupx, fig.height = 6, fig.width = 6, class.source="notrun", class.output="notruno"}
 # bsoupx
 
-## Roll process, using a temporary "sobj_viz" Seurat object
-sobj_viz <- sobj
-sobj_viz <- Seurat::NormalizeData(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::ScaleData(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::FindVariableFeatures(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::RunPCA(object = sobj_viz, npcs = 21, verbose = FALSE)
-sobj_viz <- Seurat::RunUMAP(object = sobj_viz, dims = c(1:20), verbose = FALSE)
+## Roll process, using a temporary "sobj_presoupx" Seurat object
+sobj_presoupx <- Seurat::CreateSeuratObject(counts = scmat_cells, project = "PBMC10K_BeforeSoupX")
+sobj_presoupx <- Seurat::NormalizeData(object = sobj_presoupx, verbose = FALSE)
+sobj_presoupx <- Seurat::ScaleData(object = sobj_presoupx, verbose = FALSE)
+sobj_presoupx <- Seurat::FindVariableFeatures(object = sobj_presoupx, verbose = FALSE)
+sobj_presoupx <- Seurat::RunPCA(object = sobj_presoupx, npcs = 21, verbose = FALSE)
+sobj_presoupx <- Seurat::RunUMAP(object = sobj_presoupx, dims = c(1:20), verbose = FALSE)
 
 ## Top1 feature plot
-fp_pre <- Seurat::FeaturePlot(object = sobj_viz, features = 'LYZ') + Seurat::DarkTheme()
+fp_pre <- Seurat::FeaturePlot(object = sobj_presoupx, features = 'LYZ') + Seurat::DarkTheme()
 print(fp_pre)
-
-## Clean
-rm(sobj_viz)
 
 ```
 
@@ -1491,23 +1399,20 @@ rm(sobj_viz)
 
 #### After SoupX
 
-```{r asoupx, fig.height = 6, fig.width = 6, class.source="beyond", class.output="beyondo"}
+```{r asoupx, fig.height = 6, fig.width = 6}
 # asoupx
 
-## Roll process, using a temporary "sobj_viz" Seurat object
-sobj_viz <- sobj_unsoup
-sobj_viz <- Seurat::NormalizeData(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::ScaleData(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::FindVariableFeatures(object = sobj_viz, verbose = FALSE)
-sobj_viz <- Seurat::RunPCA(object = sobj_viz, npcs = 21, verbose = FALSE)
-sobj_viz <- Seurat::RunUMAP(object = sobj_viz, dims = c(1:20), verbose = FALSE)
+## Roll process, using a temporary "sobj_postsoupx" Seurat object
+sobj_postsoupx <- Seurat::CreateSeuratObject(counts = scmat_unsoup, project = "PBMC10K_AfterSoupX")
+sobj_postsoupx <- Seurat::NormalizeData(object = sobj_postsoupx, verbose = FALSE)
+sobj_postsoupx <- Seurat::ScaleData(object = sobj_postsoupx, verbose = FALSE)
+sobj_postsoupx <- Seurat::FindVariableFeatures(object = sobj_postsoupx, verbose = FALSE)
+sobj_postsoupx <- Seurat::RunPCA(object = sobj_postsoupx, npcs = 21, verbose = FALSE)
+sobj_postsoupx <- Seurat::RunUMAP(object = sobj_postsoupx, dims = c(1:20), verbose = FALSE)
 
 ## Top1 feature plot
-fp_post <- Seurat::FeaturePlot(object = sobj_viz, features = 'LYZ') + Seurat::DarkTheme()
+fp_post <- Seurat::FeaturePlot(object = sobj_postsoupx, features = 'LYZ') + Seurat::DarkTheme()
 print(fp_post)
-
-## Clean
-rm(sobj_viz)
 
 ```
 
@@ -1574,17 +1479,17 @@ patchwork::wrap_plots(
 
 <br>
 
-**Conclusion**
+## Conclusion
 
--   Removing ambient RNA has a positive effect :
+-   Removing ambient RNA has a **positive effect** :
 
-    -   on the quality of the expression level measurements
+    -   on the **quality of the expression** level measurements
     
-    -   on the observed topology
+    -   on the observed **topology**
     
     -   ... despite an estimation of only ~5% !
 
--   Actually, ambient RNA level and composition is (one of) the major source(s) of the batch effect bias that may alter the integration of different samples.
+-   Actually, ambient RNA level and composition is (one of) the major source(s) of the **batch effect bias** that may alter the integration of different samples.
 
 <br>
 
@@ -1596,36 +1501,54 @@ patchwork::wrap_plots(
 
 **Beyond** :
 
-1.  Save the `sobj` R object on disk.
+1.  One can check if the "unsouped" (ie, post-SoupX) matrix retain some soup ?. How would you do it ?
 
-```{r b_save_answer1, class.source = c("fold-hide", "beyond"), eval = FALSE}
-# b_save_answer1
+    ```{r b_soupx2, class.source = c("fold-hide", "beyond"), eval = FALSE}
+    # b_soupx2
+    
+    ## SoupX for ambient fraction estimation
+    soup2_frac <- SoupX_auto(
+      scmat_filt = scmat_unsoup, 
+      scmat_raw = scmat)
+    
+    ## Run SoupX in "removal" mode
+    scmat_unsoup2 <- SoupX_auto(
+      scmat_filt = scmat_unsoup, 
+      scmat_raw = scmat, 
+      return_object = TRUE)
+    
+    ```
 
-## A single object : use RDS format with saveRDS()
-saveRDS(object = sobj, file = paste0(output_dir, "/sobj.RDS"))
+2.  Save the `sobj_presoupx` R object on disk.
 
-```
+    ```{r b_save_answer1, class.source = c("fold-hide", "beyond"), eval = FALSE}
+    # b_save_answer1
+    
+    ## A single object : use RDS format with saveRDS()
+    saveRDS(object = sobj_presoupx, file = paste0(output_dir, "/sobj_presoupx.RDS"))
+    
+    ```
 
-2.  Save both the `sobj` and `sobj_unsoup` objects in a single archive
+3.  Save both the `sobj_presoupx` and `sobj_postsoupx` objects in a single archive
     on disk.
 
-```{r b_save_answer2, class.source = c("fold-hide", "beyond"), eval = FALSE}
-# b_save_answer2
+    ```{r b_save_answer2, class.source = c("fold-hide", "beyond"), eval = FALSE}
+    # b_save_answer2
+    
+    ## Multiple objects : use Rdata format with save()
+    save(list = c(sobj_presoupx, sobj_postsoupx), file = paste0(output_dir, "/sobjects.RDA"))
+    
+    ```
 
-## Multiple objects : use Rdata format with save()
-save(list = c(sobj, sobj_unsoup), file = paste0(output_dir, "/sobjects.RDA"))
+4.  Same as 1. but use the `bzip2` compression algorithm
 
-```
-
-3.  Same as 1. but use the "bzip2" compression algorithm
-
-```{r b_save_answer3, class.source = c("fold-hide", "beyond"), eval = FALSE}
-# b_save_answer3
-
-## Compress with bzip2
-saveRDS(object = sobj, file = paste0(output_dir, "/sobj.RDS"), compress = "bzip2")
-
-```
+    ```{r b_save_answer3, class.source = c("fold-hide", "beyond"), eval = FALSE}
+    # b_save_answer3
+    
+    ## Compress with bzip2
+    saveRDS(object = sobj, file = paste0(output_dir, "/sobj.RDS"), compress = "bzip2")
+    
+    ```
 
 <br>
 
