@@ -83,10 +83,8 @@ This file describes the different steps to perform fifth part of the data proces
 # setparam
 
 
-
 ## SET YOUR PROJECT NAME
 project_name <- ""
-
 
 
 ## Seed for the RNG
@@ -108,7 +106,7 @@ We will do the same as for former steps, just changing the session name
 
 ## Main directory
 
-```{r maindir, fold.output = FALSE}
+```{r maindir}
 #maindir
 
 ## Preparing the path
@@ -124,7 +122,7 @@ print(TD_dir)
 
 ## Current session
 
-```{r sessiondir, fold.output = FALSE}
+```{r sessiondir}
 # sessiondir
 
 ## Creating the session (Preproc.2) directory
@@ -138,7 +136,7 @@ print(session_dir)
 
 ## Input directory
 
-```{r indir, fold.output = FALSE}
+```{r indir}
 #indir
 
 ## Creating the INPUT data directory
@@ -152,7 +150,7 @@ print(input_dir)
 
 ## Output directory
 
-```{r outdir, fold.output = FALSE}
+```{r outdir}
 #outdir
 
 ## Creating the OUTPUT data directory
@@ -255,7 +253,7 @@ sobj <- Seurat::RunPCA(
 
 Description :
 
-```{r PCAdesc, class.source="notrun", class.output="notruno", eval = FALSE}
+```{r PCAdesc, eval = FALSE}
 # PCAdesc
 
 ## Please, focus on the "reductions" slot
@@ -462,7 +460,7 @@ Question : (q_umap3D) **Isn't there something striking ?**
 
 We will save our Seurat object that now contains PCA and UMAP reductions  :
 
-```{r saverds1, fold.output = FALSE}
+```{r saverds1}
 # saverds1
 
 ## Save our Seurat object (rich naming)
@@ -595,7 +593,7 @@ Questions (q_compres) :
 
 -   Something that might help (a bit) : `splitting` the clustering results :
 
-    ```{r clust_dimplot_split, fig.width=18, fig.height = 4 }
+    ```{r clust_dimplot_split, fig.width=18, fig.height=4 }
     # clust_dimplot_split
     
     ## Looping on resolutions
@@ -645,7 +643,7 @@ Seurat has a handy function to :
 
 -   Draw a clusterized, annotated heatmap of these genes
 
-```{r h_fam, class.source="notrun", class.output="notruno", eval = FALSE}
+```{r h_fam, eval = FALSE}
 # h_fam
 
 ?Seurat::FindAllMarkers
@@ -754,7 +752,7 @@ Seurat::DimPlot(
 
 We will save our Seurat object that now contains our clustering results  :
 
-```{r saverds2, fold.output = FALSE}
+```{r saverds2}
 # saverds2
 
 ## Save our Seurat object (rich naming)
@@ -787,7 +785,7 @@ saveRDS(object = sobj,
 
 # Rsession
 
-```{r rsession, class.source="notrun", class.output="notruno"}
+```{r rsession}
 # rsession
 
 utils::sessionInfo()

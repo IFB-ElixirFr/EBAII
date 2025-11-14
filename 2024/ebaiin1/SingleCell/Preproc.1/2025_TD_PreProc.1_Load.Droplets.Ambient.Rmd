@@ -417,7 +417,7 @@ proportion value (rho)
 
 -   `doPlot` : Perform the SoupX estimation plot (rho distribution)
 
-```{r soupx_func, eval = TRUE}
+```{r soupx_func}
 # soupx_func
 
 SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
@@ -703,7 +703,7 @@ for (tg in seq_along(toget_files)) {
     
     <br>
     
-    Not that meaningful, though... At least we now we have a matrix, so one can
+    Not that meaningful, though... At least we know we have a matrix, so one can
     get its dimensions !
     
     ```{r scmat_dim}
@@ -779,8 +779,12 @@ We will have to :
 ## Detection
 
 -   To detect the margins of "true" cells versus empty droplets, we will
-    rely on the so-called **"double kneeplot"** : a plot of **UMI counts per 
+    rely on the so-called **`double-kneeplot`** : a plot of **UMI counts per 
     barcode**, in function of their increasingly **ordered rank**.
+
+<br>
+<center>![](elbow_knee_KNEE.png)</center>
+<br>
 
 -   To draw such plot, we need to **rank the barcodes** thanks to their 
     total counts.
@@ -788,8 +792,7 @@ We will have to :
 ### Ranking barcodes
 
 -   We will use the
-    [**DropletUtils**](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html){target="_blank"}
-    package
+    [**DropletUtils**](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html){target="_blank"} package
 
     ```{r h_barcodeRanks, eval = FALSE}
     # h_barcodeRanks
@@ -1165,21 +1168,13 @@ scmat_unsoup <- SoupX_auto(
 -   Now, we want to **characterize the effect** of the removal of the
     ambient RNA, by comparing the pre- and post- soupX matrices.
     
--   An easy way is to **describe**, then **visualize** such effect.
-
--   In this purpose, we will use a whole series of `Seurat` functions, chained. 
-
--   You do not have to understand the meaning of such functions, just focus on
-our purpose.
-
--   <I>The signification and usage of such functions will be the matter of the
-practical sessions of the next few days</I>
+-   An easy way is to **describe**, then **visualize** such an effect.
 
 <br><br>
 
 ### Describe and visualize {.tabset .tabset-fade .tabset-pills}
 
-#### Before SoupX
+#### Before SoupX (DEMO)
 
 We can describe our count matrix thanks to some useful metrics :
 
@@ -1345,6 +1340,7 @@ Does something about these genes strike you ?
 
 Hint : **fraction** or **difference** ?
 
+
 ```{r soupfeaturesdiff, class.source=c("fold-hide", "answer"), class.output="answero"}
 # soupfeaturesdiff
 
@@ -1370,11 +1366,19 @@ rm(cont_dif, feat_dif)
 
 We want to visualize the expression of the "top" soup gene, LYZ, in our dataset.
 
-To do so, we will generate a projection of the data into a reduced (2-D) mathematical space. This is done by using a series of R function from the Seurat package, that we won't describe here and now : understanding these commands below is not the scope of our current session, but it will be during the next few days.
+To do so, we will generate a projection of the data into a reduced (2-D) 
+mathematical space. This is done by using a series of R function from the 
+Seurat package, that we won't describe here and now : understanding these 
+commands below is not the scope of our current session, but it will be during 
+the next few days.
 
-Actually, these commands perform all the steps we'll see in the next few days, in a row, but with _default values_ (thus, almost certainly inadequate to our current data).
+Actually, these commands perform all the steps we'll see in the next few days, 
+in a row, but with _default values_ (thus, almost certainly inadequate to our 
+current data).
 
-In consequence, please just consider the output as a way to quickly and dirtily visualize the data : the depicted topology should be considered as very rough and mostly imperfect.
+In consequence, please just consider the output as a way to quickly and dirtily 
+visualize the data : the depicted topology should be considered as very rough 
+and mostly imperfect.
 
 #### Before SoupX
 
@@ -1446,9 +1450,9 @@ patchwork::wrap_plots(
     # q_umapsoupx
     
     Can you compare the two plots :
-      - for the LYZ expression globally ?
       - for the LYZ expression across the 2-D space ?
       - about the space topologies ?
+      - for the LYZ expression globally ?
       
     ```
 
@@ -1489,7 +1493,9 @@ patchwork::wrap_plots(
     
     -   ... despite an estimation of only ~5% !
 
--   Actually, ambient RNA level and composition is (one of) the major source(s) of the **batch effect bias** that may alter the integration of different samples.
+-   Actually, ambient RNA level and composition is (one of) the major source(s) 
+of the **batch effect bias** that may alter the integration of different 
+samples.
 
 <br>
 

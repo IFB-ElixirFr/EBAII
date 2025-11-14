@@ -1,12 +1,9 @@
----
+²---
 title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR><B>PRE-PROCESSING (I)</B><BR>-<BR>Load a count matrix, empty droplets & ambient RNA filtering<BR>-<BR>TRAINEE EDITION</CENTER>"
 date: "2025-16-21.22"
 author:
-  - name: "EBAII n1 scRNAseq Team"
-  - name: "Bastien JOB"
-    email: "bastien.job@gustaveroussy.fr"
-  - name: "William JARASSIER"
-    email: "william.jarassier@univ-lyon1.fr" 
+  - name: "Your NAME"
+    email: "your.name@provider.com"
 output:
   rmdformats::readthedown:
     fig_width: 8
@@ -52,25 +49,19 @@ knitr::opts_chunk$set(
 
 ------------------------------------------------------------------------
 
-<center>![](eb3i_banner.png)</center>
-
-------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
 # PREAMBLE
 
 ## Purpose of this session
 
-This file describes the different steps to perform the **first part** of
-the **single cell RNAseq** data analysis training course for the **EBAII
-n1 2025**, covering these steps :
+This file describes the different steps to perform the first part of
+the single cell RNAseq data analysis training course for the EBAII
+n1 2025, covering these steps :
 
--   **Load** a single cell raw counts **matrix**
+-   Load a single cell raw counts matrix
 
--   **Remove** barcodes from **empty droplets**
+-   Remove barcodes from empty droplets
 
--   **Estimate** and remove **ambient RNA** contamination *("soup")*
+-   Estimate and remove ambient RNA contamination ("soup")
 
 ------------------------------------------------------------------------
 
@@ -82,7 +73,7 @@ n1 2025**, covering these steps :
     sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"},
     connect to the [OpenOnDemand
     portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"}
-    and **create a Rstudio session** with the right resource
+    and create a Rstudio session with the right resource
     requirements.
 
 ------------------------------------------------------------------------
@@ -91,15 +82,16 @@ n1 2025**, covering these steps :
 
 # Warm-up
 
--   We now set **common parameters** as new variables, once and for all
+-   We now set common parameters as new variables, once and for all
     for this session :
 
 ```{r setparam}
 # setparam
 
-## Set your project name
-# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
-project_name <- "ebaii_sc_teachers"
+
+## SET YOUR PROJECT NAME
+project_name <- ""
+
 
 ## Seed for the RNG
 my_seed <- 1337L
@@ -119,7 +111,7 @@ max_p <- 1E-03
 
 -   Create the training course directory
 
-```{r maindir, fold.output = FALSE}
+```{r maindir}
 # maindir
 
 ## Prepare the path in a "TD_dir" variable
@@ -135,7 +127,7 @@ print(TD_dir)
 
 ## Current session
 
-```{r sessiondir, fold.output = FALSE}
+```{r sessiondir}
 # sessiondir
 
 ## Create the session (Preproc.1) directory
@@ -148,7 +140,7 @@ print(session_dir)
 
 ## Input data directory
 
-```{r indir, fold.output=FALSE}
+```{r indir}
 # indir
 
 ## Create the INPUT data directory
@@ -161,7 +153,7 @@ print(input_dir)
 
 ## Output results directory
 
-```{r outdir, fold.output=FALSE}
+```{r outdir}
 # outdir
 
 ## Create the OUTPUT data directory
@@ -172,13 +164,11 @@ dir.create(path = output_dir, recursive = TRUE)
 print(output_dir)
 ```
 
-<br>
-
 Now, the we have everything needed to :
 
--   **load** data (`input_dir`)
+-   load data (`input_dir`)
 
--   **save** the results we will generate (`output_dir`).
+-   save the results we will generate (`output_dir`).
 
 ------------------------------------------------------------------------
 
@@ -193,7 +183,7 @@ Now, the we have everything needed to :
 This function was written to ease the use of SoupX on a count matrix
 It was tested on `SoupX`=1.6.2 with `igraph`=1.5.1, `Seurat`=4.4.0,5.1.0
 
-**Parameters** :
+Parameters :
 
 -   `scmat_filt` : (sparse)matrix corresponding to an empty droplets -filtered count matrix
 
@@ -212,7 +202,7 @@ proportion value (rho)
 
 -   `doPlot` : Perform the SoupX estimation plot (rho distribution)
 
-```{r soupx_func, eval = TRUE}
+```{r soupx_func}
 # soupx_func
 
 SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
@@ -279,7 +269,6 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
 
 ```
 
-<br>
 
 ------------------------------------------------------------------------
 
@@ -302,25 +291,25 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
     ```
 
 -   Here will we train ourselves to load into R a single cell RNAseq
-    data produced by 10X Genomics' software **`Cell Ranger`**.
+    data produced by 10X Genomics' software `Cell Ranger`.
 
 -   We will work with a public dataset provided by the manufacturer,
-    that consists in \~ **10,000 PBMC** (peripheral bone marrow cells)
+    that consists in \~ 10,000 PBMC (peripheral bone marrow cells)
     from a human donor (downsampled to 1/10th, for smaller computation time).
 
--   The experiment was performed with the **3' capture kit v3**.
+-   The experiment was performed with the 3' capture kit v3.
 
--   The analysis was performed with **`Cell Ranger v3`**, mapping on the
-    **`GRCh38-2020-A`** manufacturer reference.
+-   The analysis was performed with `Cell Ranger v3`, mapping on the
+    `GRCh38-2020-A` manufacturer reference.
 
 -   The data consists into the typical 10x 3-files structure, hosted in
     a Zenodo respository (Id :
     [`r zen_id`](https://zenodo.org/records/%60r%20zen_id%60 "Zenodo Preproc.1"){target="_blank"})
 
-    -   `barcodes.tsv.gz` : the list of putative droplet **barcodes**
-    -   `features.tsv.gz` : the list of **features** (genes)
-    -   `matrix.mtx.gz` : the **feature** x **barcode** expression count
-        **matrix**
+    -   `barcodes.tsv.gz` : the list of putative droplet barcodes
+    -   `features.tsv.gz` : the list of features (genes)
+    -   `matrix.mtx.gz` : the feature x barcode expression count
+        matrix
 
 ## Download data
 
@@ -380,7 +369,7 @@ for (tg in seq_along(toget_files)) {
 
 ## Load into R
 
--   **Load** the **10X** **data** files into R :
+-   Load the 10X data files into R :
 
 
 
@@ -398,7 +387,7 @@ for (tg in seq_along(toget_files)) {
 
 
 
-    ```{r a_r10X2, class.source = c("fold-hide", "answer"), eval = FALSE}
+    ```{r a_r10X2, eval = FALSE}
     # a_r10X2
     
     ## Reading the function help page
@@ -408,7 +397,7 @@ for (tg in seq_along(toget_files)) {
 
     We can now apply it to our data : 
     
-    ```{r load10x, class = "fold-hide"}
+    ```{r load10x}
     # load10x
     
     ## Loading unfiltered 10X matrix
@@ -416,41 +405,13 @@ for (tg in seq_along(toget_files)) {
     
     ```
 
-    <br>
-
+    
 -   However, we don't know what the loaded object actually looks like in
     R...
 
--   **Questions** :
+Questions :
 
-    -   Do you know a way to know what IS the type of object that was created ?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ```{r gois, class.source = "fold-hide"}
-    # gois
-    
-    ## Get the type
-    methods::is(scmat)
-    
-    ```
-
-    -   Do you know a way to know what is the STRucture of the object that was created ?
+-   (q_whatis) **Do you know a way to know what IS the type of object that was created ?**
 
 
 
@@ -468,32 +429,59 @@ for (tg in seq_along(toget_files)) {
 
 
 
-    ```{r go_str, class.source = "fold-hide"}
-    # go_str
-    
-    ## Get the basic structure
-    utils::str(scmat)
-    
-    ```
-    
-    Not that meaningful, though... At least we now we have a matrix, so one can
-    get its dimensions !
-    
-    ```{r scmat_dim}
-    # scmat_dim
-    
-    ## Dimensions of a >1D object
-    dim(scmat)
-    
-    ```
-    
-    <br>
+
+```{r gois}
+# gois
+
+## Get the type
+methods::is(scmat)
+
+```
+
+-   (q_struc) **Do you know a way to know what is the STRucture of the object that was created ?**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r go_str}
+# go_str
+
+## Get the basic structure
+utils::str(scmat)
+
+```
+
+
+Not that meaningful, though... At least we now we have a matrix, so one can
+get its dimensions !
+
+```{r scmat_dim}
+# scmat_dim
+
+## Dimensions of a >1D object
+dim(scmat)
+
+```
+
 
 ## Features cleanup
 
-`Seurat` does not like at all **underscores** (`_`) in feature names ...
+`Seurat` does not like at all underscores (`_`) in feature names ...
 
--   **control** :
+-   Control :
 
     ```{r us_check1}
     # us_check1
@@ -505,7 +493,7 @@ for (tg in seq_along(toget_files)) {
     
     ```
 
--   **clean** :
+-   Clean :
 
     ```{r us_clean}
     # us_clean
@@ -518,7 +506,8 @@ for (tg in seq_along(toget_files)) {
     
     ```
 
-<br>
+-   Control (DEMO)
+
 
 ------------------------------------------------------------------------
 
@@ -526,10 +515,27 @@ for (tg in seq_along(toget_files)) {
 
 # Empty droplets
 
+-   While a large part of our barcodes contain no count at all,
+    barcodes with at least one total count may not mandatorily
+    correspond to true cells, due to ambient RNA.
+
+-   Here we want to identify empty droplets, then remove them
+    from the matrix.
+
+
 ## Detection
+
+-   To detect the margins of "true" cells versus empty droplets, we will
+    rely on the so-called `double-kneeplot` : a plot of UMI counts per 
+    barcode, in function of their increasingly ordered rank.
+
+-   To draw such plot, we need to rank the barcodes thanks to their 
+    total counts.
 
 ### Ranking barcodes
 
+-   We will use the **DropletUtils** package
+    
 ```{r h_barcodeRanks, eval = FALSE}
 # h_barcodeRanks
 
@@ -547,21 +553,22 @@ bc_rank <- DropletUtils::barcodeRanks(scmat)
 
 ```
 
-    ```{r bcrank_top, class.source="notrun", class.output="notruno", fold.output = FALSE}
-    # bcrank_top
-    
-    ## Show a summary of the ranks (ordered for display convenience)
-    print(bc_rank[order(bc_rank$rank),])
-    
-    ```
+-   Check the ranking of barcodes, according to their counts
 
-<br>
+```{r bcrank_top}
+# bcrank_top
+
+## Show a summary of the ranks (ordered for display convenience)
+print(bc_rank[order(bc_rank$rank),])
+
+```
+
 
 ### Kneeplot
 
-Now, we can **draw** our kneeplot :
+Now, we can draw our kneeplot :
 
-```{r kneeplot1, class.source="notrun", class.output="notruno", fold.plot = FALSE}
+```{r kneeplot1}
 # kneeplot1
 
 ## Plot
@@ -577,11 +584,13 @@ graphics::plot(x = bc_rank$rank,
 
 ```
 
-<br>
 
-Then, we can use these ranks to **identify "true" cells** :
+Question : (q_knee) **Looking at the kneeplot, can you roughly predict how many barcodes will be kept as cells (ie, as non-empty droplets) ?**
 
-```{r h_emptyDrops, class.source="notrun", class.output="notruno", eval = FALSE}
+
+Then, we can use these ranks to identify "true" cells :
+
+```{r h_emptyDrops, eval = FALSE}
 # h_emptyDrops
 
 ## Read the function help page
@@ -607,11 +616,9 @@ str(bc_rank2)
 We can show a summary of the ordered barcodes (DEMO)
 
 
-<br>
-
 ### Selection
 
-Barcodes considered as empty droplets have **no p-value** (`FDR` = NA)
+Barcodes considered as empty droplets have no p-value (`FDR` = NA)
 
 ```{r bcr2_na}
 # bcr2_na
@@ -624,10 +631,9 @@ table(bc_rank2$VALID)
 
 ```
 
-<br>
 
-We can **control the stringency** by setting a FDR-adjusted p-value
-**threshold**
+We can control the stringency by setting a FDR-adjusted p-value
+threshold
 
 ```{r valid_fdr}
 # valid_fdr
@@ -643,11 +649,10 @@ table(bc_rank2$VALID)
 
 ```
 
-<br>
 
-Now, we can **display** our **true cells** on the kneeplot :
+Now, we can display our true cells on the kneeplot :
 
-```{r kneeplot2, fig.align="center"}
+```{r kneeplot2}
 # kneeplot2
 
 ## Plot with highlight of the selected barcodes (red)
@@ -666,8 +671,7 @@ graphics::plot(x = bc_rank$rank,
 ```
 
 
--   **Question** : Is there something unexpected for the retained "TRUE" cells (red) in this kneeplot ?
-
+Question : (q_kneered) **Is there something unexpected for the retained "TRUE" cells (red) in this kneeplot ?**
 
 
 ## Removal
@@ -676,7 +680,7 @@ We just need to restrict our count matrix to "true" cells.
 
 -   How many barcodes do we have at the moment ?
 
-    ```{r scdim3, class.source="notrun", class.output="notruno"}
+    ```{r scdim3}
     # scdim3
     
     dim(scmat)
@@ -704,9 +708,41 @@ We just need to restrict our count matrix to "true" cells.
 
 # Ambient RNA
 
+
+-   The counts measured in this matrix of (now considered "true") single
+    cells do not reflect the measurement of these cells
+    expression only
+
+-   Due to other over-lysed / dying cells in the emulsion, we also
+    measured fraction of ambient RNA that adds up to the "real"
+    expression
+
+-   We may estimate it by observing counts existing at a minimal
+    level across cells that greatly differ in their expression profile
+    
+-   Just in case, due to the fun tool name we will use, `SoupX`, I'll
+    write down "soup" as an alias for "ambient RNA", but both terms have
+    the same meaning.
+
 ## Estimate the "soup"
 
-```{r h_SoupX_auto, eval = FALSE, class.source="notrun", class.output="notruno"}
+
+SoupX can estimate the rate and composition of ambient RNA, in several ways :
+
+-   Manual mode : providing a list of features expected to reflect
+    the soup (genes expressed at high levels in a majority of the
+    expected cell types)
+
+-   Automatic modes, using the empty droplets-filtered raw count
+    matrix ...
+
+    -   ... along with the unfiltered matrix (ie, containing all
+        quantified droplets). This is the most efficient mode.
+
+    -   ... solely : this is less efficient, but useful when the
+        unfiltered matrix is not available.
+
+```{r h_SoupX_auto, eval = FALSE}
 # h_SoupX_auto
 
 ## Reading the SoupX package main help page
@@ -730,6 +766,9 @@ soup_frac <- SoupX_auto(
 
 ```
 
+**NOTE** : We can observe **MALAT1** as the top first gene 
+(as well as multiple riboprotein-coding genes).
+
 
 What's the estimated fraction of soup in our counts ?
 
@@ -741,10 +780,38 @@ cat("Soup fraction : ", soup_frac)
 ```
 
 
--   **Question** : Should we try to remove such an amount of ambient RNA ?
+Question : (q_souprate) **Should we try to remove such an amount of ambient RNA ?**
+
 
 
 ## Remove the "soup"
+
+SoupX can remove the soup (subtract counts for identified soup genes
+to all barcodes/cells) using different methods :
+
+-   Automatically (safer)
+
+-   Specifying a fraction of counts to remove.
+
+    -   *Pros* :
+
+        -   By removing X % of reads :
+
+            -   if soup was effectively present (at a rate \<= X), this
+                will mostly affect soup genes first.
+
+            -   If not, it will decrease counts globally, thus have
+                negligible effect in differences between cells / cell
+                types.
+
+    -   *Cons* :
+
+        -   Counts are already rare in droplet-based single cell
+            technologies... Removing them "by default" makes them even
+            more rare...
+
+        -   If actual soup rate is higher than the defined rate X to
+            remove, this mode will remain uneffective...
 
 ```{r soupxrm}
 # soupxrm
@@ -759,6 +826,12 @@ scmat_unsoup <- SoupX_auto(
 
 
 ## Effect of the "soup" removal
+
+-   Now, we want to characterize the effect of the removal of the
+    ambient RNA, by comparing the pre- and post- soupX matrices.
+    
+-   An easy way is to describe, then visualize such an effect.
+
 
 ### Describe and visualize
 
@@ -817,21 +890,38 @@ base::summary(nrow(scmat_cells) - sparseMatrixStats::colCounts(
 ```
 
 
--   **Questions** :
+-   Questions : (q_descdiff)
 
-    1.  Can you describe the difference (especially for counts and sparsity) ?
+    1.  **Can you describe the difference (especially for counts and sparsity) ?**
       
-    2.  Was it expected ?
+    2.  **Was it expected ?**
+
     
-    3.  What are the features (genes) most affected by the soup removal (DEMO) ?
-        
-        - Does something about these genes strike you ?
-          Hint : **fraction** or **difference** ?
+What are the features (genes) most affected by the soup removal ? (DEMO)
+
+
+-   Question : (qsoupfeat) **Does something about these genes strike you ?**
+    
+    **Hint** : fraction or difference ?
 
 
 ### Plot the "top 1" feature
 
 We want to visualize the expression of the "top" soup gene, LYZ, in our dataset.
+
+To do so, we will generate a projection of the data into a reduced (2-D) 
+mathematical space. This is done by using a series of R function from the 
+Seurat package, that we won't describe here and now : understanding these 
+commands below is not the scope of our current session, but it will be during 
+the next few days.
+
+Actually, these commands perform all the steps we'll see in the next few days, 
+in a row, but with default values (thus, almost certainly inadequate to our 
+current data).
+
+In consequence, please just consider the output as a way to quickly and dirtily 
+visualize the data : the depicted topology should be considered as very rough 
+and mostly imperfect.
 
 #### Before SoupX
 
@@ -860,7 +950,7 @@ print(fp_post)
 Merging before/after plots for ease of use (DEMO)
 
 
--   **Questions** : Can you compare the two plots :
+-   Questions : (q_umapsoupx) **Can you compare the two plots :**
 
     1.  for the LYZ expression across the 2-D space ?
 
@@ -871,24 +961,26 @@ Merging before/after plots for ease of use (DEMO)
 
 ## Conclusion
 
--   Removing ambient RNA has a **positive effect** :
+-   Removing ambient RNA has a positive effect :
 
-    -   on the **quality of the expression** level measurements
+    -   on the quality of the expression level measurements
     
-    -   on the observed **topology**
+    -   on the observed topology
     
     -   ... despite an estimation of only ~5% !
 
--   Actually, ambient RNA level and composition is (one of) the major source(s) of the **batch effect bias** that may alter the integration of different samples.
+-   Actually, ambient RNA level and composition is (one of) the major source(s) 
+of the batch effect bias that may alter the integration of different samples.
 
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-**Beyond** :
+Beyond :
 
-1.  One can check if the "unsouped" (ie, post-SoupX) matrix retain some soup ?. How would you do it ?
+1.  One can check if the "unsouped" (ie, post-SoupX) matrix retain some soup ?. 
+    How would you do it ?
 
     ```{r b_soupx2}
     # b_soupx2
@@ -904,8 +996,8 @@ Merging before/after plots for ease of use (DEMO)
     
     ```
 
-3.  Save both the `sobj_presoupx` and `sobj_postsoupx` objects in a single archive
-    on disk.
+3.  Save both the `sobj_presoupx` and `sobj_postsoupx` objects in a single 
+    archive on disk.
 
     ```{r b_save_answer2, class.source = c("fold-hide", "beyond"), eval = FALSE}
     # b_save_answer2
@@ -913,7 +1005,7 @@ Merging before/after plots for ease of use (DEMO)
     
     ```
 
-    4.  Same as 1. but use the `bzip2` compression algorithm
+4.  Same as 1. but use the `bzip2` compression algorithm.
     
     ```{r b_save_answer3, class.source = c("fold-hide", "beyond"), eval = FALSE}
     # b_save_answer3
