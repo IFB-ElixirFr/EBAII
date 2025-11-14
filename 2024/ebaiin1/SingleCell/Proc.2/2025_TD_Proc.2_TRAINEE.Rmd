@@ -1,0 +1,795 @@
+---
+title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR><B>PROCESSING (II)</B><BR>-<BR>Dimension reduction & visualization<BR>-<BR>TRAINEE EDITION</CENTER>"
+date: "2025-16-21.22"
+author:
+  - name: "Your NAME"
+    email: "your.name@provider.com"
+output:
+  rmdformats::readthedown:
+    fig_width: 8
+    fig_height: 6
+    highlight: tango  ## Theme for the code chunks
+    embed_fonts: TRUE
+    number_sections: true  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    collapsed: true  ## By default, the TOC is folded
+    toc_depth: 3
+    smooth_scroll: true ## Smooth scroll of the HTML page
+    self_contained: true ## Includes all plots/images within the HTML
+    code_download: true ## Adds a button to download the Rmd
+    code_folding: show
+    thumbnails: false
+    lightbox: true
+    fig_caption: false
+    gallery: true
+    use_bookdown: true
+always_allow_html: true ## Allow plain HTML code in the Rmd
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- knit setup -->
+
+```{r knit_setup, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE,
+  fig.align="center", 
+  width = 100       # Number of characters per line
+)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+This file describes the different steps to perform fifth part of the data processing for the single cell RNAseq data analysis training course for the EBAII n1 2025, covering these steps :
+
+-   Dimension reduction of the expression data
+
+-   Visualization of cells expression in a 2-D space
+
+-   Unsupervised clustering of cells
+
+-   Description of the defined clusters
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html),
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr) and
+    create a Rstudio session with the right resource requirements.
+
+# Warm-up
+
+-   We set common parameters we will use throughout this session :
+
+```{r setparam}
+# setparam
+
+
+
+## SET YOUR PROJECT NAME
+project_name <- ""
+
+
+
+## Seed for the RNG
+my_seed <- 1337L
+
+## Known marker genes for TD3A
+td3a_markers <- c("Apoe", "Birc5", "Plac8", "Itm2a", "Ptcra", "Trbv29", "Isg15", "Cldn10")
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Prepare the data structure
+
+We will do the same as for former steps, just changing the session name
+:
+
+## Main directory
+
+```{r maindir, fold.output = FALSE}
+#maindir
+
+## Preparing the path
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Creating the root directory
+dir.create(path = TD_dir, recursive = TRUE)
+
+## Print the root directory on-screen
+print(TD_dir)
+
+```
+
+## Current session
+
+```{r sessiondir, fold.output = FALSE}
+# sessiondir
+
+## Creating the session (Preproc.2) directory
+session_dir <- paste0(TD_dir, "/05_Proc.2")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+
+```
+
+## Input directory
+
+```{r indir, fold.output = FALSE}
+#indir
+
+## Creating the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+
+```
+
+## Output directory
+
+```{r outdir, fold.output = FALSE}
+#outdir
+
+## Creating the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Reload the Seurat Object
+
+-   We can reload the object we saved at the former step
+
+```{r dataload}
+##  dataload
+
+## The latest Seurat object saved as RDS (name)
+sobj_file <- "08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS"
+
+## The latest Seurat object saved as RDS (full path)
+sobj_path <- paste0(TD_dir, 
+                    "/04_Proc.1/RESULTS/",
+                    sobj_file)
+
+force <- FALSE  ## To force a re-download of a Zenodo-hosted backup
+local <- FALSE  ## To force a loading from a local backup
+
+## In case of error/lost data : force a reload from a Zenodo backup repository
+if(force) {
+  zen_id <- "14035293"
+  zen_backup_file <- paste0("https://zenodo.org/records/",
+                            zen_id,
+                            "/files/",
+                            sobj_file)
+  ## Recreate the expected path if it does not exist
+  dir.create(path = dirname(sobj_path), recursive = TRUE)
+  ## Download the file
+  download.file(url = zen_backup_file,
+                destfile = sobj_path)
+}
+
+## In case of error/lost data : force a reload from a local backup repository
+if(local) {
+  sobj_path <- paste0(
+    "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/",
+    sobj_file)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Dimension reduction
+
+## Principal Component Analysis (PCA)
+
+Here, we will use the grand-mother of all : the PCA (Principal Component Analysis)
+
+```{r h_RunPCA, eval = FALSE}
+# h_runPCA
+
+?Seurat::RunPCA()
+
+```
+
+Questions : ⭍⭍ Lightning quizz ⭍⭍  : 
+
+-   (q_pca1) **How many principal components (PC) will be generated by default ?**
+
+-   (q_pca2) **Which data type (ie, which Seurat object layer) will be used to generate the components ?**
+
+<br>
+
+Perform PCA on our data
+
+```{r pca}
+# pca
+
+## Note : a seed is used here !
+sobj <- Seurat::RunPCA(
+  object = sobj, 
+  assay = 'RNA', 
+  seed.use = my_seed, 
+  verbose = FALSE)
+
+```
+
+<br>
+
+Description :
+
+```{r PCAdesc, class.source="notrun", class.output="notruno", eval = FALSE}
+# PCAdesc
+
+## Please, focus on the "reductions" slot
+View(sobj)
+
+```
+
+<br>
+
+Visualization of the very first two components, with cells coloring according to the estimated cell cycle phase :
+
+```{r PCAplot}
+# PCAplot
+
+## Scatter plot along dimensions
+Seurat::DimPlot(
+  object = sobj, 
+  ## First two components
+  dims = c(1,2), 
+  ## Color dots per cell phase groups
+  group.by = 'CC_Seurat_Phase', 
+  ## Data to use
+  reduction = 'pca')
+
+```
+
+<br>
+
+
+## Questions
+
+-   (q_pca3) **Give us your interpretation / feelings from this plot !**
+
+-   (q_pca4) **Should we limit ourselves to using 2 dimensions to interpret our data ?**
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Visualization
+
+We will use the [UMAP](https://en.wikipedia.org/wiki/UMAP){target="_blank"} method.
+
+## Uniform Manifold Approximation and Projection (UMAP)
+
+How ?
+
+```{r humap, eval = FALSE}
+# humap
+
+?Seurat::RunUMAP()
+
+```
+
+### Select dimensions
+
+We generated 50 PCA components from our ~12 K features
+
+-   These 50 dimensions may not all contain valuable information
+-   We should try do select the most useful ones and discard the remaining noise
+-   But how many should we keep ?
+
+-   Question : (q_ndim1) **Do you have an idea about this number ?**
+
+
+There are several methods to help us choose.
+Several, but none perfect.
+We will use a very simple, graphical method : the observation of the amount of global variance explained by each component, through the `elbow-plot`.
+
+```{r h_elbow, eval = FALSE}
+# h_elbow
+
+?Seurat::ElbowPlot()
+
+```
+
+
+Apply on our data :
+
+```{r elbow}
+# elbow
+
+## Perform the "elbow plot"
+Seurat::ElbowPlot(
+  object = sobj, 
+  reduction = 'pca',
+  ndims = 50)
+
+```
+
+
+Question : (q_ndim2) **Any more precise idea, now ?**
+
+
+
+### Assess dimensions
+
+To demonstrate the effect of the number of PC dimensions used as input to the UMAP generation, we will perform a comparison using `6` different amounts of retained PCs :
+
+
+    **TEAMWORK TIME !**
+
+We will dispatch the assessment of each amount of dimensions to groups 
+of trainees.
+
+
+```{r dim_sel, fig.width = 16, fig.height = 8}
+# dim_sel
+
+## PCA max dimensions to evaluate
+pca_dims <- c(, )
+
+## Define a function to compute the UMAP
+pca_dim_eval <- function(object = NULL, dim.max = 2, my_seed = 1337L) {
+  
+  message('\nRunning UMAP with ', dim.max, ' dimensions ...\n')
+  
+  ## RunUMAP
+  object <- Seurat::RunUMAP(
+    object = object, assay = "RNA", 
+    reduction = "pca", dims = 1:dim.max, 
+    seed.use = my_seed)
+  
+  ## Plot
+  dpN <- Seurat::DimPlot(
+    object = object, 
+    reduction = 'umap',
+    combine = TRUE) + ggplot2::ggtitle(
+      label = paste0("Dim : ", dim.max)) + Seurat::DarkTheme()
+  
+  ## Clean
+  rm(object)
+  
+  ## Return the plot object
+  return(dpN)
+}
+
+## Run the function on multiple dimensions, get a list of ggplots
+pca_eval_res <- lapply(X = pca_dims,
+                       FUN = function(p) {
+                         pca_dim_eval(object = sobj, 
+                                      dim.max = p,
+                                      my_seed = my_seed)
+                       })
+
+## Plot the list alltogether
+patchwork::wrap_plots(pca_eval_res, nrow = 2)
+
+```
+
+<br>
+
+Question : (q_ndim3) **Any more precise idea, now, FOR REAL ?**
+
+
+
+
+### Create the UMAP
+
+We can now perform the final UMAP with the PC dimensions of your choice.
+
+For the next steps of the training, we will use **20** PCA dimensions.
+
+```{r umap20}
+# umap20
+
+## Fixing n_dim
+n_dim <- 20
+
+## Using 20 PCs
+## A seed is needed here !
+sobj <- Seurat::RunUMAP(
+    object = sobj, assay = "RNA", 
+    reduction = "pca", 
+    dims = 1:n_dim, 
+    seed.use = my_seed)
+
+## DimPlot
+umap2d <- Seurat::DimPlot(
+  object = sobj, 
+  reduction = 'umap') + Seurat::DarkTheme()
+print(umap2d)
+
+```
+
+
+## Bonus : 3D UMAP (DEMO)
+
+We can generate a UMAP with 3 components, from the 20 PCs.
+
+We can plot the two first UMAP components from this 3D space.
+
+
+
+Question : (q_umap3D) **Isn't there something striking ?**
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Save the Seurat object
+
+We will save our Seurat object that now contains PCA and UMAP reductions  :
+
+```{r saverds1, fold.output = FALSE}
+# saverds1
+
+## Save our Seurat object (rich naming)
+out_name <- paste0(
+          output_dir, "/", paste(
+            c("09", Seurat::Project(sobj), "S5", 
+              "DimRed.PCA", paste(
+                dim(sobj), 
+                collapse = '.'
+              )
+            ), collapse = "_"),
+            ".RDS")
+
+## Check
+print(out_name)
+
+## Write on disk
+saveRDS(object = sobj, 
+        file = out_name)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Clustering
+
+We can now attempt to determine how cells are organized in an unsupervised manner in this space
+
+We will use the graph-based clustering method [Louvain](https://en.wikipedia.org/wiki/Louvain_method){target="_blank"}
+
+Clustering will be performed on the `PCA` dimension reduction, 
+NOT on the `UMAP` one !
+
+
+
+Question : (q_clust_on_PCA) **Any idea why ?**
+
+
+
+## Find neighbors
+
+Before running the Louvain method, a first pass method is used to generate a "K-Nearest Neighbour" graph (see more details [here](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html){target="_blank"}).
+
+```{r fnn20}
+# fnn20
+
+## Compute a SNN using the first 20 PCs
+sobj <- Seurat::FindNeighbors(
+  object = sobj, 
+  dims = 1:20, 
+  reduction = "pca")
+
+```
+
+## Louvain clustering
+
+-   We will test multiple different resolutions
+-   The Seurat function to perform clustering can be called with 
+    multiple resolutions at once (less to code, lucky us !).
+
+    
+    **TEAMWORK TIME !**
+
+We wil dispatch the different clustering resolution values to groups of trainees.
+
+```{r clustL20}
+# clustL20
+
+## Louvain resolutions to test
+resol <- c(, )
+
+## Clustering
+sobj <- Seurat::FindClusters(
+  object = sobj, 
+  resolution = resol,
+  verbose = FALSE)
+
+```
+
+<br>
+
+
+Question : (q_clustdesc) **Could you tell us what changed in our object ?**
+
+
+```{r a_clustdesc, eval = FALSE}
+# a_clustdesc
+
+## Please, focus on the [meta.data] slot
+View(sobj)
+
+```
+
+
+## Assess resolutions
+
+### On UMAPs
+
+#### Clusters
+
+Plotting UMAPs harboring the clustering results for our tested resolutions
+
+```{r clust_dimplot, fig.width=12, fig.height=6}
+# clust_dimplot
+
+## Metadata name of clustering results (defined by default by Seurat)
+resol_names <- paste0("RNA_snn_res.", resol)
+
+## DimPlot
+Seurat::DimPlot(
+  object = sobj, 
+  reduction = "umap", 
+  group.by = resol_names,
+  label = TRUE, 
+  repel = TRUE)
+
+```
+
+
+Questions (q_compres) :
+
+1.  **Could you briefly compare the different versions ?**
+
+2.  **Would you consider that some results are under/over-clustered ?**
+
+3.  **Are all clusters well-defined ?**
+
+
+-   Something that might help (a bit) : `splitting` the clustering results :
+
+    ```{r clust_dimplot_split, fig.width=18, fig.height = 4 }
+    # clust_dimplot_split
+    
+    ## Looping on resolutions
+    for (my_grp in resol_names) {
+      ## DimPlot
+      p <- Seurat::DimPlot(
+        object = sobj, 
+        reduction = "umap", 
+        group.by = my_grp,
+        split.by = my_grp,
+        label = TRUE, 
+        repel = TRUE)
+      print(p)
+    }
+    ```
+    
+-   Something other : assessing clusters stability across resolutions,
+    thanks to `clustree` (DEMO) :
+
+
+#### Cell-type markers
+
+We can plot the cell markers we already know
+
+```{r u_markers, fig.width=12, fig.height=12}
+# u_markers
+
+## Multiple FeaturePlots with markers
+Seurat::FeaturePlot(object = sobj, 
+                    features = td3a_markers) + 
+  patchwork::plot_layout(nrow = 3, 
+                         ncol = 3)
+
+```
+
+
+Just for "fun" : what would have been seen on a PCA ? (DEMO)
+
+
+### Cluster-specific markers
+
+A practical way to characterize our clustering results is to get back to a level of knowledge you are confident in : marker genes.
+
+Seurat has a handy function to :
+
+-   Identify differential expressed genes specific to each and every provided category of cells (here, clustering results)
+
+-   Draw a clusterized, annotated heatmap of these genes
+
+```{r h_fam, class.source="notrun", class.output="notruno", eval = FALSE}
+# h_fam
+
+?Seurat::FindAllMarkers
+
+```
+
+```{r dhm_prep, fig.width=24, fig.height=8}
+# dhm_prep
+
+## Looping on clustering results
+fam_all <- lapply(resol_names, function(r) {
+  
+  ## Find markers for all clusters
+  ## A seed is needed here !
+  Seurat::Idents(object = sobj) <- sobj[[r]][[1]]
+  fam <- Seurat::FindAllMarkers(
+    object = sobj, 
+    logfc.threshold = .5, 
+    only.pos = TRUE, 
+    min.pct = .5, 
+    verbose = FALSE,
+    random.seed = my_seed)
+  
+  ## Get top gene per cluster
+  famtop <- fam$gene[!duplicated(fam$cluster)]
+  vln_pl <- Seurat::VlnPlot(object = sobj, features = famtop)
+  print(vln_pl)
+  
+  ## Select top10 genes when available
+  fam_rdx <- dplyr::group_by(.data = fam, cluster)
+  fam_rdx <- dplyr::filter(.data = fam_rdx, avg_log2FC > 1)
+  fam_rdx <- dplyr::slice_head(.data = fam_rdx, n = 10)
+  dh <- Seurat::DoHeatmap(
+    object = sobj, features = fam_rdx$gene, size = 3,
+    combine = TRUE) + ggplot2::ggtitle(label = r)
+  return(dh)
+})
+
+
+```
+
+```{r dhm_plot, fig.width=12, fig.height=6}
+# dhm_plot
+
+## Plot all heatmaps at once
+patchwork::wrap_plots(fam_all) + patchwork::plot_layout(nrow = 2)
+
+```
+
+
+Questions, comparing the heatmaps :
+
+-   (q_hm1) **Which resolution would you choose, and why ?**
+
+-   (q_hm2) **Is there a single one and only answer to the former question ?**
+
+
+### Clusters contingencies and proportions
+
+One can observe how many cells are in each cluster, and what proportion of all cells these represent (DEMO)
+
+
+## Selection
+
+For the downstream analyses, we will use the resolution `0.8`.
+
+We will fix the clustering results for this resolution as the default one
+Seurat will use for any further analyses / plots, using the `Seurat::Idents()`
+function.
+
+```{r sel_res, fig.height=6, fig.width=6}
+# sel_res
+
+## Fixing l_res
+l_res <- .8
+
+## Performing Louvain clustering at the selected resolution
+sobj <- Seurat::FindClusters(
+  object = sobj, 
+  resolution = l_res,
+  verbose = FALSE)
+
+## Check on default "Idents"
+identical(
+  x = SeuratObject::FetchData(
+    object = sobj, 
+    vars = paste0("RNA_snn_res.", l_res))[[1]],
+  y = unname(Seurat::Idents(object = sobj))
+)
+
+## DimPlot without specifying the resolution
+Seurat::DimPlot(
+  object = sobj, 
+  reduction = "umap", 
+  label = TRUE, 
+  repel = TRUE)
+
+```
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Save the Seurat object
+
+We will save our Seurat object that now contains our clustering results  :
+
+```{r saverds2, fold.output = FALSE}
+# saverds2
+
+## Save our Seurat object (rich naming)
+out_name <- paste0(
+          output_dir, "/", paste(
+            c("10", Seurat::Project(sobj), "S5", 
+              paste0(
+                "Clustered.",
+                l_res), 
+              paste(
+                dim(sobj), 
+                collapse = '.'
+              )
+            ), collapse = "_"),
+            ".RDS")
+
+## Check
+print(out_name)
+
+## Write on disk
+saveRDS(object = sobj, 
+        file = out_name)
+```
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Rsession
+
+```{r rsession, class.source="notrun", class.output="notruno"}
+# rsession
+
+utils::sessionInfo()
+
+```
