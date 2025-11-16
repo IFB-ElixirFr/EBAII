@@ -28,3 +28,4 @@ README.html
 *.vcf
 *.gff
 *.gff3
+*.ipynb
