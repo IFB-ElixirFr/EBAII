@@ -28,4 +28,4 @@ README.html
 *.vcf
 *.gff
 *.gff3
-*.ipynb
+.ipynb_checkpoints
