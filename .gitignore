@@ -25,3 +25,6 @@ README.html
 2022/ebaiin1/IGV/IGV_practical_cache/
 2023/ebaiin2/RNASeq/EBAIIn2_RNASeq_cache/
 2023/ebaiin2/RNASeq/EBAIIn2_RNASeq_files/
+*.vcf
+*.gff
+*.gff3
