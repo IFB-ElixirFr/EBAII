@@ -117,7 +117,7 @@ We will do the same as for former steps, just changing the session name
 TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
 
 ## Creating the root directory
-dir.create(path = TD_dir, recursive = TRUE)
+# dir.create(path = TD_dir, recursive = TRUE)
 
 ## Print the root directory on-screen
 print(TD_dir)
