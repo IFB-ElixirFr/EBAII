@@ -87,9 +87,8 @@ mkdir data
 
 cd data
 
-wget https://zenodo.org/records/10081865/files/FILE1.fastq.gz
-wget https://zenodo.org/records/10081865/files/FILE2.fastq.gz
-wget https://zenodo.org/records/10081865/files/FILE3.fastq.gz
+cp /shared/projects/2538_eb3i_n1_2025/TP_workflow/data/*.fastq.gz .
+
 
 cd .. 
 
@@ -105,9 +104,8 @@ Dans un script_01.sh :
 mkdir -p fastqc
 module load fastqc/0.11.9
 
-fastqc --outdir fastqc data/FILE1.fastq.gz
-fastqc --outdir fastqc data/FILE2.fastq.gz
-fastqc --outdir fastqc data/FILE3.fastq.gz
+fastqc --outdir fastqc data/FILE1_R1.fastq.gz
+fastqc --outdir fastqc data/FILE1_R2.fastq.gz
 ```
 
 
@@ -133,15 +131,18 @@ module load fastqc/0.11.9
 
 SAMPLE=FILE1
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
 
 SAMPLE=FILE2
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
 
 SAMPLE=FILE3
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
 ```
 
 ### Lancement du workflow
@@ -168,21 +169,24 @@ module load fastqc/0.11.9
 
 SAMPLE=FILE1
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz 2> fastqc/${SAMPLE}.log
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz 2> fastqc/${SAMPLE}_R1.log
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz 2> fastqc/${SAMPLE}_R2.log
 
 SAMPLE=FILE2
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz 2> fastqc/${SAMPLE}.log
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz 2> fastqc/${SAMPLE}_R1.log
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz 2> fastqc/${SAMPLE}_R2.log
 
 SAMPLE=FILE3
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz 2> fastqc/${SAMPLE}.log
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz 2> fastqc/${SAMPLE}_R1.log
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz 2> fastqc/${SAMPLE}_R2.log
 ```
 
 
 ## Question bonus 
 
-Comment rediriger le message  “Analysis complete for FILE1.fastq.gz” ?
+Comment rediriger le message  “Analysis complete for FILE1_R1.fastq.gz” ?
 
 
 <details>
@@ -243,7 +247,8 @@ module load fastqc/0.11.9
 for SAMPLE in FILE1 FILE2 FILE3
 do
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz &> fastqc/${SAMPLE}.log
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz 2> fastqc/${SAMPLE}_R1.log
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz 2> fastqc/${SAMPLE}_R2.log
 done
 ```
 
@@ -273,7 +278,8 @@ module load fastqc/0.11.9
 for SAMPLE in $(ls data/ | sed 's/.fastq.gz//')
 do
 echo ">>> Processing $SAMPLE"
-fastqc --outdir fastqc data/${SAMPLE}.fastq.gz &> fastqc/${SAMPLE}.log
+fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz &> fastqc/${SAMPLE}_R1.log
+fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz &> fastqc/${SAMPLE}_R2.log
 done
 ```
 
@@ -325,7 +331,8 @@ module load fastqc/0.11.9
 for SAMPLE in $(ls data/ | sed 's/.fastq.gz//')
 do
 echo ">>> Processing $SAMPLE"
-srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
+srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
 done
 ```
 
@@ -369,7 +376,7 @@ Dans un script_07.sh :
 #SBATCH --account=2538_eb3i_n1_2025  # Modifier en fonction du projet
 #SBATCH --cpus-per-task=1        # Modifier en fonction des besoins
 #SBATCH --mem=4GB                # Idem
-#SBATCH --array=1-3              # Modifier en fonction du nb de tâches à lancer en parallèle
+#SBATCH --array=1-6              # Modifier en fonction du nb de tâches à lancer en parallèle
 
 mkdir -p fastqc
 module load fastqc/0.11.9
@@ -413,12 +420,13 @@ mkdir -p trimmomatic
 module load trimmomatic/0.39
 
 # le Nième fichier de ma liste
-SAMPLE=$(ls data/ | sed 's/.fastq.gz//' | \
+SAMPLE=$(ls data/ | sed 's/R1.fastq.gz//' | \
 head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1)
 
 srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
-srun --job-name TRIM-$SAMPLE trimmomatic SE -threads 4 -phred33 \
-                            data/${SAMPLE}.fastq.gz  trimmomatic/${SAMPLE}.fastq.gz \
+srun --job-name TRIM-$SAMPLE trimmomatic PE -threads 4 -phred33 \
+                            data/${SAMPLE}.fastq.gz  data/${SAMPLE/R1/R2}.fastq.gz \
+                            trimmomatic/${SAMPLE}.fastq.gz trimmomatic/${SAMPLE/R1/R2}.fastq.gz \
                             SLIDINGWINDOW:4:20 MINLEN:20
 ```
 
@@ -480,11 +488,11 @@ sbatch star_align.sh
 ```{bash, eval=FALSE}
 #!/bin/bash
 
-#SBATCH --account=2422_ebaii_n1
+#SBATCH --account=2538_eb3i_n1_2025
 #SBATCH --job-name=star_align
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=20GB
-#SBATCH --array=1-6
+#SBATCH --array=1-3
 
 module load star/2.7.11a
 
