@@ -1,7 +1,7 @@
 ---
-title: "ChIP-seq workshop - Hands-on Roscoff 2024"
-author: "Elodie Darbo; Stéphanie Le Gras; Delphine Potier; Morgane Thomas-Chollier; Tao Ye;"
-date: "2024 Novembre 19-21"
+title: "ChIP-seq workshop - Hands-on Roscoff 2025"
+author: "Elodie Darbo; Stéphanie Le Gras; Pascal Martin;"
+date: "2025 November 18-20"
 output:
   html_document:
     fig_caption: yes
@@ -69,8 +69,8 @@ We will thus use the **GSE41195** identifier to retrieve the dataset from the **
 ## - Downloading FASTQ file from the SRA database
 SRA stores sequences in a FASTQ format.
 
-1. Click on **SRR576933** in SRA ![alt text][sra1]
-2. There are statistics on the run that generated the data. ![alt text][sra2]
+1. Click on **SRR576933** in SRA 
+2. There are statistics on the run that generated the data. 
 2. Click on FASTA/FASTQ download. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded and is available in the "data" folder (SRR576933.fastq.gz)  
 ![alt text][sra3]
 
@@ -86,7 +86,7 @@ During this training, we will work on the cluster provided by the Institut Fran�
 ![alt text][selectjupyterlab]
 
 3. Fill the form as such: 
-  - account: 2422_ebaii_n1, 
+  - account: 2538_eb3i_n1_2025, 
   - CPUS: 2 
   - Amount of memory: 10G
   - Number of hours: 7
@@ -103,21 +103,21 @@ cd /shared/projects/<your_project>
 ```
 2. Create a directory that will contain all results of the upcoming analyses.
 ```{bash eval=FALSE}
-mkdir EBAII2024_chipseq
+mkdir EBAII2025_chipseq
 ```
 3. Go to the newly created directory
 ```{bash eval=FALSE}
-cd EBAII2024_chipseq
+cd EBAII2025_chipseq
 ```
 4. Copy the directory containing data
 
 ```{bash eval=FALSE}
-cp -r /shared/projects/2422_ebaii_n1/chipseq/EBAII2024_chipseq/data .
+cp -r /shared/projects/2538_eb3i_n1_2025/chipseq/EBAII2025_chipseq/data .
 ```
 
 7. Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 ```
@@ -144,7 +144,7 @@ cd 01-QualityControl
 
 Your directory structure should be like this
 ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 │   
@@ -170,7 +170,7 @@ ls
 ```
 > FNR_IP_ChIP-seq_Anaerobic_A_fastqc.html  FNR_IP_ChIP-seq_Anaerobic_A_fastqc.zip
 
-7. Go to the directory /shared/projects/<your_project>/EBAII2024_chipseq/1-QualityControl in the tree directory on the left of the jupyterhub window and double click on FNR_IP_ChIP-seq_Anaerobic_A_fastqc.html to visualize the file.
+7. Go to the directory /shared/projects/\<your_project\>/EBAII2025_chipseq/1-QualityControl in the tree directory on the left of the jupyterhub window and double click on FNR_IP_ChIP-seq_Anaerobic_A_fastqc.html to visualize the file.
 ![alt text][fastqc]
 
 8. Launch the FASTQC program on the replicate (FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz) and on the control file (Anaerobic_INPUT_DNA.fastq.gz)
@@ -252,7 +252,7 @@ cd bam
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 │   
@@ -322,7 +322,7 @@ How many reads were mapped for samples Anaerobic_INPUT_DNA and FNR_IP_ChIP-seq_A
 
 1. Go to the directory with alignment files
 ```{bash eval=FALSE}
-cd /shared/projects/<your_project>/EBAII2024_chipseq/02-Mapping/bam
+cd /shared/projects/<your_project>/EBAII2025_chipseq/02-Mapping/bam
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -354,7 +354,7 @@ samtools flagstat Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam
 
 **Run picard MarkDuplicates on the 2 other samples. How many duplicates are found in each sample?**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2024_chipseq/)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq/)
 ```{bash eval=FALSE}
 ## Unload picard and samtools
 module unload samtools/1.18 picard/2.23.5
@@ -460,7 +460,7 @@ cd 04-Visualization
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 │   
@@ -511,7 +511,7 @@ bamCoverage \
 **Go back to the genes we looked at earlier: pepT, ycfP (add screenshots to this report). Look at the shape of the signal.**  
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2024_chipseq)
+Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 04-Visualization
 cd ..
@@ -602,7 +602,7 @@ cd idr
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 │   
@@ -647,7 +647,7 @@ idr \
 
 **Add the IDR graph to this report. How many peaks are found with the IDR method?**
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2024_chipseq)
+4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq)
 ```{bash eval=FALSE}
 module unload macs2/2.2.7.1
 module unload idr/2.0.4.2
@@ -664,7 +664,7 @@ cd ../..
 * 05-PeakCalling/pool/FNR_Anaerobic_pool_peaks.narrowPeak
 * 05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed
 
-**Go back again to the genes we looked at earlier: pepT, ycfP. Do you see peaks (add the 2 screenshots to this report)?**
+**Go back again to the genes we looked at earlier: pepT, ycfP. Do you see peaks ?**
 **Navigate throught the genome to find peaks detected in the replicates (peak calling per replicate) and not found/kept with the IDR method** 
 
 **From now on, peak set we keep is the IDR peak set.**
@@ -686,7 +686,7 @@ cd 06-MotifAnalysis
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2024_chipseq
+/shared/projects/<your_project>/EBAII2025_chipseq
 │
 └───data
 │   
@@ -801,7 +801,7 @@ annotatePeaks.pl \
 ```{R eval=FALSE, include=TRUE}
 
 ## set working directory
-setwd("/shared/projects/<your_project>/EBAII2024_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/<your_project>/EBAII2025_chipseq/07-PeakAnnotation")
 ## Or navigate using the "Files" tab and click on "More">"Set as Working Directory"
 
 ## read the file with peaks annotated with homer
@@ -862,7 +862,7 @@ Use Official gene symbols of the file FNR_anaerobic_idr_final_peaks_annotation.t
 1. We will download the already called peak files in bed format from GEO.
 Create a new folder and go in it.
 ```{bash eval=FALSE}
-cd /shared/projects/<your_project>/EBAII2024_chipseq
+cd /shared/projects/<your_project>/EBAII2025_chipseq
 mkdir 07-PeakAnnotation-bonus
 cd 07-PeakAnnotation-bonus
 ```
@@ -910,7 +910,7 @@ col = brewer.pal(9,'Set1')
 
 ```{r eval=FALSE, include=TRUE}
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBAII2024_chipseq/07-PeakAnnotation-bonus")
+setwd("/shared/projects/<your_project>/EBAII2025_chipseq/07-PeakAnnotation-bonus")
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
 peaks.midbrain = readPeakFile('GSM348065_p300_peaks.txt.gz')
