@@ -511,3 +511,4 @@ srun STAR --runThreadN ${SLURM_CPUS_PER_TASK} --genomeDir ${STAR_INDEX} \
 
 # 🌿 Workflow Variants
 
+<img src="images/workflow_variant.png" style="width: 100% !important; max-width: 100% !important; display: block; margin: auto;">
