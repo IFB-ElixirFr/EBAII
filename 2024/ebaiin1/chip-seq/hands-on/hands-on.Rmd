@@ -71,12 +71,15 @@ SRA stores sequences in a FASTQ format.
 
 1. Click on **SRR576933** in SRA 
 2. There are statistics on the run that generated the data. 
-2. Click on FASTA/FASTQ download. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded and is available in the "data" folder (SRR576933.fastq.gz)  
-![alt text][sra3]
+3. Click on FASTA/FASTQ download. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded.
+
 
 **tip**: To download the replicate and control datasets, we should redo the same steps starting from the GEO web page specific to the chip-seq datasets (see step 2.4) and choose **FNR IP ChIP-seq Anaerobic B** and **anaerobic INPUT DNA**. Downloaded FASTQ files are available in the data folder (SRR576934.fastq.gz and SRR576938.fastq.gz respectively)
 
-**At this point, you have three FASTQ files, two IPs, one control (INPUT).**
+**Samples have been renamed to have explicite names**:
+  * FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz (SRR576933)
+  * FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz (SRR576934)
+  * Anaerobic_INPUT_DNA.fastq.gz (SRR576938)
 
 # - Connect to the server and set up your environment
 During this training, we will work on the cluster provided by the Institut Français de Bioinformatique (IFB) using JupyterLab through the ondemand system.
@@ -112,7 +115,7 @@ cd EBAII2025_chipseq
 4. Copy the directory containing data
 
 ```{bash eval=FALSE}
-cp -r /shared/projects/2538_eb3i_n1_2025/chipseq/EBAII2025_chipseq/data .
+cp -r /shared/projects/2538_eb3i_n1_2025/atelier_chipseq/training_data/data .
 ```
 
 7. Your directory structure should be like this
