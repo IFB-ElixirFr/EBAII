@@ -294,7 +294,7 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
   * -o: to specify a output file name
 ```{bash eval=FALSE}
 ## First load samtools
-module load samtools/1.18
+module load samtools/1.21
 ## Then run samtools
 samtools view -@ 2 -q 10 -b FNR_IP_ChIP-seq_Anaerobic_A.sam | samtools sort -@ 2 - -o FNR_IP_ChIP-seq_Anaerobic_A.bam 
 ```
@@ -311,7 +311,7 @@ gzip FNR_IP_ChIP-seq_Anaerobic_A.sam
 
 7. Once it's done, unload the tools you used
 ```{bash eval=FALSE}
-module unload samtools/1.18 bowtie2/2.5.1
+module unload samtools/1.21 bowtie2/2.5.1
 ```
 
 ## - Map the second replicate and the control
@@ -350,23 +350,23 @@ To determine the number of duplicated reads marked by Picard, we can run the `sa
 
 ```{bash eval=FALSE}
 ## Add samtools to your environment
-module load samtools/1.18
+module load samtools/1.21
 ## run samtools
 samtools flagstat Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam
 ```
 
 **Run picard MarkDuplicates on the 2 other samples. How many duplicates are found in each sample?**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq/)
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq/)
 ```{bash eval=FALSE}
 ## Unload picard and samtools
-module unload samtools/1.18 picard/2.23.5
+module unload samtools/1.21 picard/2.23.5
 ## If you are in 02-Mapping/bam
 cd ../..
 ```
 
 # - ChIP quality controls
-**Goal**: This exercise aims at plotting the **Lorenz curve** to assess the quality of the chIP.
+**Goal**: This exercise aims at plotting the **Lorenz curve** to assess the quality of the ChIP.
 
 ## - Plot the Lorenz curve with Deeptools
 1. Create a directory named **03-ChIPQualityControls** in which to put mapping results for IP
@@ -396,13 +396,14 @@ plotFingerprint \
 ```
 4. If plotFingerprint takes to much time to run. Take the file that has already been prepared for the training.
 ```{bash eval=FALSE}
-cp /shared/home/slegras/2421_m22_bims/slegras/03-ChIPQualityControls/fingerprint.png .
+cp /shared/projects/2538_eb3i_n1_2025/atelier_chipseq/EBAII2025_chipseq/03-ChIPQualityControls/fingerprint_10000.png .
 ```
-5. Go find the file using the directory tree on the left of the Jupyterlab panel and click on the fingerprint.png file to display it in Jupyterlab.
+5. Go find the file using the directory tree on the left of the Jupyterlab panel and click on the fingerprint_10000.png file to display it in Jupyterlab.
 
 **Look at the result files fingerprint.png (add the plot to this report). Give an explanation of the curves?**  
 
-Go back to the working home directory (i.e /shared/projects/2421_m22_bims/\<login\>)
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
+
 ```{bash eval=FALSE}
 ## Unload deepTools
 module unload deeptools/3.5.4
@@ -514,7 +515,7 @@ bamCoverage \
 **Go back to the genes we looked at earlier: pepT, ycfP (add screenshots to this report). Look at the shape of the signal.**  
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq)
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 04-Visualization
 cd ..
@@ -650,7 +651,7 @@ idr \
 
 **Add the IDR graph to this report. How many peaks are found with the IDR method?**
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/<your_project>/EBAII2025_chipseq)
+4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
 ```{bash eval=FALSE}
 module unload macs2/2.2.7.1
 module unload idr/2.0.4.2
@@ -711,7 +712,7 @@ Your directory structure should be like this:
 3. Extract peak sequence in fasta format
 ```{bash eval=FALSE}
 ## First load samtools
-module load samtools/1.18
+module load samtools/1.21
 ## Create an index of the genome fasta file
 samtools faidx ../data/Escherichia_coli_K12.fasta
 
@@ -727,7 +728,7 @@ bedtools getfasta \
 
 ## - Motif discovery with RSAT
 1. Open a connection to a Regulatory Sequence Analysis Tools server. You can choose between various website mirrors.
-  * Teaching Server  (recommended for this training) [https://rsat.france-bioinformatique.fr/teaching/](https://rsat.france-bioinformatique.fr/teaching/)
+  * Teaching Server  (recommended for this training) [https://rsat.eead.csic.es/plants/](https://rsat.eead.csic.es/plants/)
 2. In the left menu, click on **NGS ChIP-seq** and then click on **peak-motifs**. A new page opens, with a form
 3. The default peak-motifs web form only displays the essential options. There are only two mandatory parameters.
   * The **title box**, which you will set as **FNR Anaerobic** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **FNR_anaerobic_idr_peaks.fa** from your computer.
@@ -844,7 +845,7 @@ write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T
 
 **What are all the possible gene features? (see in column Annotation - extract information like promoter-TSS, TSS, ...). Create a plot (pie chart, barplot...) showing the proportion of each of them (include both the plot and the code that created it in the report).**
 
-6. Go back to working home directory (i.e /shared/projects/training/\<login\>/M2.2-BIMS-epigenomique)
+6. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 07-PeakAnnotation
 cd ..
@@ -878,8 +879,6 @@ You should now have downloaded 3 files:
 > GSM348066_p300_peaks.txt.gz  (limb)
 
 ```{bash eval=TRUE, include=FALSE}
-mkdir 07-PeakAnnotation-bonus
-cd 07-PeakAnnotation-bonus
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348064/suppl/GSM348064_p300_peaks.txt.gz
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348065/suppl/GSM348065_p300_peaks.txt.gz
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348066/suppl/GSM348066_p300_peaks.txt.gz
