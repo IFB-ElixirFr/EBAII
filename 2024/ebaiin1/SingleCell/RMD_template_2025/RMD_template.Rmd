@@ -349,151 +349,6 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
 
 ```
 
-### Seurat Object descriptor
-
-This function displays in the console an exhaustive description of the
-content of a `Seurat` object, additionally computing some useful metrics
-
-It was tested on `Seurat`=4.4.0,5.1.0, `sparseMatrixStats`=1.13.4 ,
-`knitr`=1.44
-
-Parameters :
-
--   `sobj` : a Seurat object
-
--   `max_levels` : maximum number [int >0] of unique values to consider a
-    barcode annotation as a factor, rather than a continuous numeric
-    vector
-
--   `sparse_level` : if `TRUE`, compute matrix sparsity
-
--   `describe` : type of entries in the Seurat object to describe. Can be one
-of (`'all'`, `'assays'`, `'dimred'`, `'coldata'`)
-
-```{r sobjdesc_func, eval = TRUE}
-# sobjdesc_func
-
-SeuratObject_descriptor <- function(sobj = NULL, describe = 'all', sparse_level = TRUE, max_levels = 100) {
-  
-  ## Checks
-  if (is.null(sobj)) stop('A Seurat object is required !')
-  if(!is(sobj, 'Seurat')) stop('Provided sobj is not a proper Seurat object !')
-  
-  describe <- tolower(describe)
-  desc.valids <- c('all', 'assay', 'dimred', 'coldata')
-  if(!all(describe %in% desc.valids)) stop(
-    'At least one requested item type to describe is not valid. Expecting any combination of ["', 
-    paste(c(desc.valids), collapse = '", "'), 
-    '] ("all" supersedes any other).')
-  if('all' %in% describe) describe <- desc.valids[-1]
-  
-  ## Additional checks on sobj
-  if(!is(sobj, 'Seurat')) stop('Provided object is not a proper Seurat object !')
-  
-  retlist <- list()
-  
-  ## Seurat slots
-  slots <- c('counts', 'data', 'scale.data')
-  
-  ### OBJECT VERSION
-  cat(paste0('OBJECT VERSION :\t', sobj@version), '\n')
-  
-  ### PROJECT NAME
-  proj_name <- Seurat::Project(sobj)
-  cat(paste0('PROJECT :\t[', proj_name, ']'), '\n')
-  
-  ### ASSAYS
-  if('assay' %in% describe) {
-    cat('\n[ASSAYS]\n')
-    expassays <- Seurat::Assays(object = sobj)
-    for (ea in seq_along(expassays)) {
-      assay_name <- expassays[ea]
-      # cur_assay <- Seurat::Assays(object = sobj, slot = assay_name)
-      cur_assay <- suppressWarnings(SeuratObject::LayerData(
-        object = sobj, layer = assay_name))
-      cat(paste0(
-        '   ASSAY ', ea, ' :\t[', assay_name, ']', 
-        if(Seurat::DefaultAssay(sobj) == assay_name) ' [ACTIVE]')
-        , '\n')
-      
-      ## SLOTS/LAYERS
-      for (sl in seq_along(slots)) {
-        slot_name <- slots[sl]
-        cur_slot <- suppressWarnings(SeuratObject::GetAssayData(
-          object = sobj, assay = assay_name, layer = slot_name))
-        slot_dimprod <- prod(dim(cur_slot))
-        cat(paste0(
-          '      SLOT/LAYER ', sl, ' :\t[', slot_name, ']\tDims:[',
-          nrow(cur_slot), ' x ', ncol(cur_slot), 
-          if(slot_dimprod > 0) paste0(
-            ']  Range:[', paste(
-              sprintf('%.2f', range(cur_slot, na.rm = TRUE)), 
-              collapse = '-')) else NULL, ']'), '\n')
-        
-        ## Total counts if slot/layer is "counts"
-        if(slot_name == 'counts') cat(paste0(
-          '         Counts :\t', round(sum(cur_slot))), '\n')
-        ## Adding sparsity info when needed :
-        if (sparse_level & is(cur_slot, 'dgCMatrix')) {
-          splev <- sum(sparseMatrixStats::colCounts(
-            x = cur_slot, value = 0)) / slot_dimprod
-          cat(paste0(
-            '         Sparsity :\t', 
-            sprintf('%.5f', splev * 100)
-            , '%')
-            , '\n')
-        }
-      }
-    }
-  }
-  
-  ### DIMRED
-  if ('dimred' %in% describe) {
-    cat('\n[DIMREDS]\n')
-    dimreds <- Seurat::Reductions(object = sobj)
-    for (dr in seq_along(dimreds)) {
-      dr_name <- dimreds[dr]
-      cur_dr <- Seurat::Reductions(object = sobj, slot = dr_name)
-      cat(paste0(
-        '   DIMRED ', dr, ' : [', dimreds[dr], 
-        ']  Dims:[', nrow(cur_dr), ' x ', 
-        ncol(cur_dr), ']'), '\n')
-    }
-  }
-  
-  ### GRAPHS
-  if(length(sobj@graphs) > 0) {
-    cat('\n[GRAPHS]\n')
-    for (gn in names(sobj@graphs)) {
-      cat(paste0('  ', gn), '\n')
-    }
-  }
-  
-  ### BARCODE META
-  if('coldata' %in% describe) {
-    bc.df <- as.data.frame(sobj@meta.data)
-    cat('\n[BARCODES METADATA]\n')
-    for (b in seq_len(ncol(bc.df))) {
-      b.fac <- as.factor(bc.df[,b])
-      if (nlevels(b.fac) < max_levels) {
-        # message('\n', colnames(bc.df)[b])
-        b.tbl <- as.data.frame(table(b.fac, useNA = 'always'))
-        colnames(b.tbl)[1] <- colnames(bc.df)[b]
-        cat(knitr::kable(
-          b.tbl, format = 'simple', escape = FALSE), 
-          sep = '\n')
-      } else {
-        cat('\n',colnames(bc.df)[b], '\n')
-        print(summary(bc.df[,b]))
-      }
-    }
-  }
-}
-
-```
-
-Now, on top of being able to read and write data, we can **work**
-on it too !
 
 <br>
 
@@ -671,11 +526,10 @@ We can load it into R :
 ```{r mat_load}
 # mat_load
 
-scmat <- as.matrix(
-  utils::read.table(
+## Loading the matrix directly as a sparseMatrix
+scmat <- scuttle::readSparseCounts(
     file = scmat_file, 
-    header = TRUE, 
-    sep = "\t"))
+    sep = "\t")
 
 ## Displaying its size in-memory (this is a basic matrix)
 format(utils::object.size(scmat), units = "auto")
