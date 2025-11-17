@@ -521,8 +521,14 @@ session :
 ```{r setparam}
 # setparam
 
+
 ## Set your project name
-project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project ! Put YOURS !!
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
 
 ## Seed for the RNG
 my_seed <- 1337L
@@ -536,32 +542,250 @@ max_p <- 1E-03
 
 ------------------------------------------------------------------------
 
-# Prepare the data structure
+# Prepare the data structure [PREPROC.2]
 
--   During the current and remaining training sessions, we will work on
-    different **data** **objects**, some retrieved from **external**
-    resources, some we will **create**.
-    
--   In order to reuse these for further steps, or other sessions, we
-    need to **store** them, thus create a **directory structure** on the
-    cluster.
-    
--   We will create this structure in **your project** folder (the one
-    you registered at the IFB Core, in which you stored your own data
-    for the tutoring).
-    
--   To ensure that *you* will always use the same structure for *your*
-    work, the code hereafter has been writen so that you just have to
-    define a single **variable** that corresponds to your project name.
-    
-    -   In *my* case, as a teacher for the SC training, it is
-        **`ebaii_sc_teachers`**.
-    -   **DO NOT USE IT YOURSELF !! USE YOUR OWN PROJECT NAME !!!**
+## Main directory
+
+```{r maindir}
+# maindir
+
+## Preparing the path
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Creating the root directory
+dir.create(path = TD_dir, recursive = TRUE)
+
+## Print the root directory on-screen
+print(TD_dir)
+
+```
+
+## Current session
+
+```{r sessiondir}
+# sessiondir
+
+## Creating the session (Preproc.2) directory
+session_dir <- paste0(TD_dir, "/02_Preproc.2")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+
+```
+
+## Input directory
+
+```{r indir}
+# indir
+
+## Creating the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+
+```
+
+## Genelists directory
+
+This is a directory where we will store additional information from 
+knowledge bases about genes used to estimate the cell cycle phase of cells.
+
+```{r resdir}
+# resdir
+
+res_dir <- paste0(TD_dir, "/Resources")
+glist_dir <- paste0(res_dir, "/Genelists")
+
+## Create the directory
+dir.create(path = glist_dir, recursive = TRUE)
+
+## Print the resources directory on-screen
+print(glist_dir)
+
+```
+
+## Output directory
+
+```{r outdir}
+# outdir
+
+## Creating the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+
+```
 
 
-### Example of a set of tabs {.tabset .tabset-fade .tabset-pills}
+------------------------------------------------------------------------
 
-#### Tab One
+------------------------------------------------------------------------
+
+# Load the raw matrix [PreProc.2]
+
+We retrieve the input data file
+
+```{r mat_dl}
+# mat_dl
+
+local <- FALSE
+
+## The raw count matrix we will start from
+scmat_source <- "GSM4861194_gex_2_raw_gene_expression.tsv.gz"
+
+## Download the file from Zenodo
+if (!local) {
+  
+  ### ZenID
+  zen_id <- "14033941"
+  ### Zen Path
+  zen_backup_file <- paste0("https://zenodo.org/records/",
+                            zen_id,
+                            "/files/",
+                            scmat_source)
+  
+  ## The path to the locally saved input file
+  scmat_file <- paste0(input_dir,
+                       '/',
+                       scmat_source)
+  ## Download the file
+  download.file(url = zen_backup_file,
+                destfile = scmat_file)
+} else {
+  ebaii_session <- '2538_eb3i_n1_2025'
+  scmat_file <- paste0(
+      '/shared/projects/',
+      ebaii_session,
+      '/atelier_scrnaseq/TD/BACKUP/TSV/',
+      scmat_source)
+}
+```
+
+We can load it into R :
+
+```{r mat_load}
+# mat_load
+
+scmat <- as.matrix(
+  utils::read.table(
+    file = scmat_file, 
+    header = TRUE, 
+    sep = "\t"))
+
+## Displaying its size in-memory (this is a basic matrix)
+format(utils::object.size(scmat), units = "auto")
+
+```
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Load the genelists resources [PreProc.2]
+
+We retrieve the genelists
+
+```{r gl_dl}
+# gl_dl
+
+local <- FALSE
+
+## The genelist files
+mito_source <- "mus_musculus_mito_symbols_20191015.rds"
+ribo_source <- "mus_musculus_cribo_symbols_20191015.rds"
+stress_source <- "mus_musculus_stress_symbols_20200224.rds"
+gl_sources <- c(mito_source, ribo_source, stress_source)
+
+## The (future) local files
+mito_file <- paste0(input_dir, '/', mito_source)
+ribo_file <- paste0(input_dir, '/', ribo_source)
+stress_file <- paste0(input_dir, '/', stress_source)
+gl_files <- c(mito_file, ribo_file, stress_file)
+
+## Download the file from Zenodo
+if (!local) {
+  
+  ### ZenID
+  zen_id <- "14037355"
+  ### Looping on files
+  for (glf in seq_along(gl_sources)) {
+    ### Zen Path
+    zen_backup_file <- paste0("https://zenodo.org/records/",
+                              zen_id,
+                              "/files/",
+                              gl_sources[glf])
+    
+    ## Download the file
+    download.file(url = zen_backup_file,
+                  destfile = gl_files[glf])
+  }
+  rm(gl_files)
+} else {  ## Local mode
+  ebaii_session <- '2538_eb3i_n1_2025'
+  localbackup_dir <- paste0('/shared/projects/', ebaii_session, '/atelier_scrnaseq/TD/RESOURCES/GENELISTS/')
+  mito_file <- paste0(localbackup_dir, '/mus_musculus_mito_symbols_20191015.rds')
+  ribo_source <- paste0(input_dir, '/mus_musculus_cribo_symbols_20191015.rds')
+  stress_source <- paste0(input_dir, '/mus_musculus_stress_symbols_20200224.rds')
+}
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Reload the Seurat Object (example from PreProc.3)
+
+-   We can reload the object we saved at the former step
+
+```{r dataload}
+# dataload
+
+## The latest Seurat object saved as RDS (name)
+sobj_file <- "02_TD3A_S5_Metrics.Bio_31053.4587.RDS"
+
+## The latest Seurat object saved as RDS (full path)
+sobj_path <- paste0(TD_dir, 
+                    "/02_Preproc.2/RESULTS/",
+                    sobj_file)
+
+force <- FALSE  ## To force a re-download of a Zenodo-hosted backup
+local <- FALSE  ## To force a loading from a local backup
+
+## In case of error/lost data : force a reload from a Zenodo backup repository
+if(force) {
+  zen_id <- "14035293"
+  zen_backup_file <- paste0("https://zenodo.org/records/",
+                            zen_id,
+                            "/files/",
+                            sobj_file)
+  ## Recreate the expected path if it does not exist
+  dir.create(path = dirname(sobj_path), recursive = TRUE)
+  ## Download the file
+  download.file(url = zen_backup_file,
+                destfile = sobj_path)
+}
+
+## In case of error/lost data : force a reload from a local backup repository
+if(local) {
+  sobj_path <- paste0(
+    "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/",
+    sobj_file)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+
+```
+
+# Example of a set of tabs {.tabset .tabset-fade .tabset-pills}
+
+## Tab One
 
 -   Contains some text
 
@@ -572,7 +796,7 @@ max_p <- 1E-03
     
     ```
 
-#### Tab Two
+## Tab Two
 
 -   Contains some text too
 
@@ -583,11 +807,23 @@ max_p <- 1E-03
     
     ```
 
-##  {.unnumbered}
+#  {.unnumbered}
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+
+# Example of the "TEAMWORK" logo
+
+That's what I use when trainees work in 5 binomes :
+
+<br>
+<CENTER>**TeAmWoRk TiMe !**
+<br>
+![](a2mibleufraise50.jpg)
+</CENTER>
+<br>
+
 
 <br><br><br>
 

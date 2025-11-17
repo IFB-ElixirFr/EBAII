@@ -272,9 +272,14 @@ getwd()
 ```{r setparam}
 # setparam
 
+
 ## Set your project name
 # WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
 project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
 
 ## Seed for the RNG
 my_seed <- 1337L
