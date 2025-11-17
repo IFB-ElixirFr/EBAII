@@ -6,7 +6,7 @@ author:
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
   - name: "Lilia YOUNSI"
-    email: "Liliayounsi@outlook.fr" 
+    email: "lilia.younsi@inserm.fr" 
 output:
   rmdformats::readthedown:
     fig_width: 8
@@ -154,8 +154,14 @@ This file describes the different steps to perform **fifth** part of the data pr
 ```{r setparam}
 # setparam
 
-## Setting the project name
-project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project !!
+
+## Set your project name
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
 
 ## Seed for the RNG
 my_seed <- 1337L
