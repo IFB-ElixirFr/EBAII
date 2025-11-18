@@ -54,7 +54,7 @@ knitr::opts_chunk$set(
 ## Purpose of this session
 
 This file describes the different steps to perform the first part of
-the single cell RNAseq data analysis training course for the EBAII
+the single cell RNAseq data analysis training course for the EB3I
 n1 2025, covering these steps :
 
 -   Load a single cell raw counts matrix

@@ -2,7 +2,7 @@
 title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR><B>PRE-PROCESSING (I)</B><BR>-<BR>Load a count matrix, empty droplets & ambient RNA filtering</CENTER>"
 date: "2025-16-21.22"
 author:
-  - name: "EBAII n1 scRNAseq Team"
+  - name: "EB3I n1 scRNAseq Team"
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
   - name: "William JARASSIER"
@@ -126,7 +126,7 @@ knitr::knit_hooks$set(
 ## Purpose of this session
 
 This file describes the different steps to perform the **first part** of
-the **single cell RNAseq** data analysis training course for the **EBAII
+the **single cell RNAseq** data analysis training course for the **EB3I
 n1 2025**, covering these steps :
 
 -   **Load** a single cell raw counts **matrix**
