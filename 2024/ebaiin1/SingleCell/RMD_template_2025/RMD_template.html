@@ -1704,7 +1704,6 @@ EB3I n1 2025 scRNAseq<BR>-<BR> <B>LESSON BLOCK (I)</B><BR>-<BR>A nice subtitle<b
       <li><a href="#functions" id="toc-functions"><span class="toc-section-number">2.1</span> Functions</a>
       <ul>
       <li><a href="#soupx-helper-function" id="toc-soupx-helper-function"><span class="toc-section-number">2.1.1</span> SoupX helper function</a></li>
-      <li><a href="#seurat-object-descriptor" id="toc-seurat-object-descriptor"><span class="toc-section-number">2.1.2</span> Seurat Object descriptor</a></li>
       </ul></li>
       </ul></li>
       <li><a href="#start-rstudio" id="toc-start-rstudio"><span class="toc-section-number">3</span> Start Rstudio</a></li>
@@ -2030,143 +2029,6 @@ proportion value (rho)</p></li>
 <span id="cb10-61"><a href="#cb10-61" tabindex="-1"></a>    <span class="fu">return</span>(scmat_soupx)</span>
 <span id="cb10-62"><a href="#cb10-62" tabindex="-1"></a>  } <span class="cf">else</span> <span class="fu">return</span>(sX<span class="sc">$</span>fit<span class="sc">$</span>rhoEst)</span>
 <span id="cb10-63"><a href="#cb10-63" tabindex="-1"></a>}</span></code></pre></div>
-</div>
-<div id="seurat-object-descriptor" class="section level3" number="2.1.2">
-<h3><span class="header-section-number">2.1.2</span> Seurat Object descriptor</h3>
-<p>This function displays in the console an exhaustive description of the
-content of a <code>Seurat</code> object, additionally computing some useful metrics</p>
-<p>It was tested on <code>Seurat</code>=4.4.0,5.1.0, <code>sparseMatrixStats</code>=1.13.4 ,
-<code>knitr</code>=1.44</p>
-<p>Parameters :</p>
-<ul>
-<li><p><code>sobj</code> : a Seurat object</p></li>
-<li><p><code>max_levels</code> : maximum number [int &gt;0] of unique values to consider a
-barcode annotation as a factor, rather than a continuous numeric
-vector</p></li>
-<li><p><code>sparse_level</code> : if <code>TRUE</code>, compute matrix sparsity</p></li>
-<li><p><code>describe</code> : type of entries in the Seurat object to describe. Can be one
-of (<code>&#39;all&#39;</code>, <code>&#39;assays&#39;</code>, <code>&#39;dimred&#39;</code>, <code>&#39;coldata&#39;</code>)</p></li>
-</ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># sobjdesc_func</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>SeuratObject_descriptor <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sobj =</span> <span class="cn">NULL</span>, <span class="at">describe =</span> <span class="st">&#39;all&#39;</span>, <span class="at">sparse_level =</span> <span class="cn">TRUE</span>, <span class="at">max_levels =</span> <span class="dv">100</span>) {</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  </span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="do">## Checks</span></span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(sobj)) <span class="fu">stop</span>(<span class="st">&#39;A Seurat object is required !&#39;</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is</span>(sobj, <span class="st">&#39;Seurat&#39;</span>)) <span class="fu">stop</span>(<span class="st">&#39;Provided sobj is not a proper Seurat object !&#39;</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  </span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  describe <span class="ot">&lt;-</span> <span class="fu">tolower</span>(describe)</span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  desc.valids <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;all&#39;</span>, <span class="st">&#39;assay&#39;</span>, <span class="st">&#39;dimred&#39;</span>, <span class="st">&#39;coldata&#39;</span>)</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">all</span>(describe <span class="sc">%in%</span> desc.valids)) <span class="fu">stop</span>(</span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>    <span class="st">&#39;At least one requested item type to describe is not valid. Expecting any combination of [&quot;&#39;</span>, </span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>    <span class="fu">paste</span>(<span class="fu">c</span>(desc.valids), <span class="at">collapse =</span> <span class="st">&#39;&quot;, &quot;&#39;</span>), </span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>    <span class="st">&#39;] (&quot;all&quot; supersedes any other).&#39;</span>)</span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&#39;all&#39;</span> <span class="sc">%in%</span> describe) describe <span class="ot">&lt;-</span> desc.valids[<span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>  </span>
-<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>  <span class="do">## Additional checks on sobj</span></span>
-<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is</span>(sobj, <span class="st">&#39;Seurat&#39;</span>)) <span class="fu">stop</span>(<span class="st">&#39;Provided object is not a proper Seurat object !&#39;</span>)</span>
-<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>  </span>
-<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>  retlist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a>  </span>
-<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>  <span class="do">## Seurat slots</span></span>
-<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>  slots <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;counts&#39;</span>, <span class="st">&#39;data&#39;</span>, <span class="st">&#39;scale.data&#39;</span>)</span>
-<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a>  </span>
-<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>  <span class="do">### OBJECT VERSION</span></span>
-<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&#39;OBJECT VERSION :</span><span class="sc">\t</span><span class="st">&#39;</span>, sobj<span class="sc">@</span>version), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>  </span>
-<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a>  <span class="do">### PROJECT NAME</span></span>
-<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>  proj_name <span class="ot">&lt;-</span> Seurat<span class="sc">::</span><span class="fu">Project</span>(sobj)</span>
-<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&#39;PROJECT :</span><span class="sc">\t</span><span class="st">[&#39;</span>, proj_name, <span class="st">&#39;]&#39;</span>), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>  </span>
-<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>  <span class="do">### ASSAYS</span></span>
-<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&#39;assay&#39;</span> <span class="sc">%in%</span> describe) {</span>
-<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">[ASSAYS]</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a>    expassays <span class="ot">&lt;-</span> Seurat<span class="sc">::</span><span class="fu">Assays</span>(<span class="at">object =</span> sobj)</span>
-<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a>    <span class="cf">for</span> (ea <span class="cf">in</span> <span class="fu">seq_along</span>(expassays)) {</span>
-<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a>      assay_name <span class="ot">&lt;-</span> expassays[ea]</span>
-<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a>      <span class="co"># cur_assay &lt;- Seurat::Assays(object = sobj, slot = assay_name)</span></span>
-<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a>      cur_assay <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(SeuratObject<span class="sc">::</span><span class="fu">LayerData</span>(</span>
-<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a>        <span class="at">object =</span> sobj, <span class="at">layer =</span> assay_name))</span>
-<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="fu">paste0</span>(</span>
-<span id="cb11-42"><a href="#cb11-42" tabindex="-1"></a>        <span class="st">&#39;   ASSAY &#39;</span>, ea, <span class="st">&#39; :</span><span class="sc">\t</span><span class="st">[&#39;</span>, assay_name, <span class="st">&#39;]&#39;</span>, </span>
-<span id="cb11-43"><a href="#cb11-43" tabindex="-1"></a>        <span class="cf">if</span>(Seurat<span class="sc">::</span><span class="fu">DefaultAssay</span>(sobj) <span class="sc">==</span> assay_name) <span class="st">&#39; [ACTIVE]&#39;</span>)</span>
-<span id="cb11-44"><a href="#cb11-44" tabindex="-1"></a>        , <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-45"><a href="#cb11-45" tabindex="-1"></a>      </span>
-<span id="cb11-46"><a href="#cb11-46" tabindex="-1"></a>      <span class="do">## SLOTS/LAYERS</span></span>
-<span id="cb11-47"><a href="#cb11-47" tabindex="-1"></a>      <span class="cf">for</span> (sl <span class="cf">in</span> <span class="fu">seq_along</span>(slots)) {</span>
-<span id="cb11-48"><a href="#cb11-48" tabindex="-1"></a>        slot_name <span class="ot">&lt;-</span> slots[sl]</span>
-<span id="cb11-49"><a href="#cb11-49" tabindex="-1"></a>        cur_slot <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(SeuratObject<span class="sc">::</span><span class="fu">GetAssayData</span>(</span>
-<span id="cb11-50"><a href="#cb11-50" tabindex="-1"></a>          <span class="at">object =</span> sobj, <span class="at">assay =</span> assay_name, <span class="at">layer =</span> slot_name))</span>
-<span id="cb11-51"><a href="#cb11-51" tabindex="-1"></a>        slot_dimprod <span class="ot">&lt;-</span> <span class="fu">prod</span>(<span class="fu">dim</span>(cur_slot))</span>
-<span id="cb11-52"><a href="#cb11-52" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="fu">paste0</span>(</span>
-<span id="cb11-53"><a href="#cb11-53" tabindex="-1"></a>          <span class="st">&#39;      SLOT/LAYER &#39;</span>, sl, <span class="st">&#39; :</span><span class="sc">\t</span><span class="st">[&#39;</span>, slot_name, <span class="st">&#39;]</span><span class="sc">\t</span><span class="st">Dims:[&#39;</span>,</span>
-<span id="cb11-54"><a href="#cb11-54" tabindex="-1"></a>          <span class="fu">nrow</span>(cur_slot), <span class="st">&#39; x &#39;</span>, <span class="fu">ncol</span>(cur_slot), </span>
-<span id="cb11-55"><a href="#cb11-55" tabindex="-1"></a>          <span class="cf">if</span>(slot_dimprod <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">paste0</span>(</span>
-<span id="cb11-56"><a href="#cb11-56" tabindex="-1"></a>            <span class="st">&#39;]  Range:[&#39;</span>, <span class="fu">paste</span>(</span>
-<span id="cb11-57"><a href="#cb11-57" tabindex="-1"></a>              <span class="fu">sprintf</span>(<span class="st">&#39;%.2f&#39;</span>, <span class="fu">range</span>(cur_slot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)), </span>
-<span id="cb11-58"><a href="#cb11-58" tabindex="-1"></a>              <span class="at">collapse =</span> <span class="st">&#39;-&#39;</span>)) <span class="cf">else</span> <span class="cn">NULL</span>, <span class="st">&#39;]&#39;</span>), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-59"><a href="#cb11-59" tabindex="-1"></a>        </span>
-<span id="cb11-60"><a href="#cb11-60" tabindex="-1"></a>        <span class="do">## Total counts if slot/layer is &quot;counts&quot;</span></span>
-<span id="cb11-61"><a href="#cb11-61" tabindex="-1"></a>        <span class="cf">if</span>(slot_name <span class="sc">==</span> <span class="st">&#39;counts&#39;</span>) <span class="fu">cat</span>(<span class="fu">paste0</span>(</span>
-<span id="cb11-62"><a href="#cb11-62" tabindex="-1"></a>          <span class="st">&#39;         Counts :</span><span class="sc">\t</span><span class="st">&#39;</span>, <span class="fu">round</span>(<span class="fu">sum</span>(cur_slot))), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-63"><a href="#cb11-63" tabindex="-1"></a>        <span class="do">## Adding sparsity info when needed :</span></span>
-<span id="cb11-64"><a href="#cb11-64" tabindex="-1"></a>        <span class="cf">if</span> (sparse_level <span class="sc">&amp;</span> <span class="fu">is</span>(cur_slot, <span class="st">&#39;dgCMatrix&#39;</span>)) {</span>
-<span id="cb11-65"><a href="#cb11-65" tabindex="-1"></a>          splev <span class="ot">&lt;-</span> <span class="fu">sum</span>(sparseMatrixStats<span class="sc">::</span><span class="fu">colCounts</span>(</span>
-<span id="cb11-66"><a href="#cb11-66" tabindex="-1"></a>            <span class="at">x =</span> cur_slot, <span class="at">value =</span> <span class="dv">0</span>)) <span class="sc">/</span> slot_dimprod</span>
-<span id="cb11-67"><a href="#cb11-67" tabindex="-1"></a>          <span class="fu">cat</span>(<span class="fu">paste0</span>(</span>
-<span id="cb11-68"><a href="#cb11-68" tabindex="-1"></a>            <span class="st">&#39;         Sparsity :</span><span class="sc">\t</span><span class="st">&#39;</span>, </span>
-<span id="cb11-69"><a href="#cb11-69" tabindex="-1"></a>            <span class="fu">sprintf</span>(<span class="st">&#39;%.5f&#39;</span>, splev <span class="sc">*</span> <span class="dv">100</span>)</span>
-<span id="cb11-70"><a href="#cb11-70" tabindex="-1"></a>            , <span class="st">&#39;%&#39;</span>)</span>
-<span id="cb11-71"><a href="#cb11-71" tabindex="-1"></a>            , <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-72"><a href="#cb11-72" tabindex="-1"></a>        }</span>
-<span id="cb11-73"><a href="#cb11-73" tabindex="-1"></a>      }</span>
-<span id="cb11-74"><a href="#cb11-74" tabindex="-1"></a>    }</span>
-<span id="cb11-75"><a href="#cb11-75" tabindex="-1"></a>  }</span>
-<span id="cb11-76"><a href="#cb11-76" tabindex="-1"></a>  </span>
-<span id="cb11-77"><a href="#cb11-77" tabindex="-1"></a>  <span class="do">### DIMRED</span></span>
-<span id="cb11-78"><a href="#cb11-78" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">&#39;dimred&#39;</span> <span class="sc">%in%</span> describe) {</span>
-<span id="cb11-79"><a href="#cb11-79" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">[DIMREDS]</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-80"><a href="#cb11-80" tabindex="-1"></a>    dimreds <span class="ot">&lt;-</span> Seurat<span class="sc">::</span><span class="fu">Reductions</span>(<span class="at">object =</span> sobj)</span>
-<span id="cb11-81"><a href="#cb11-81" tabindex="-1"></a>    <span class="cf">for</span> (dr <span class="cf">in</span> <span class="fu">seq_along</span>(dimreds)) {</span>
-<span id="cb11-82"><a href="#cb11-82" tabindex="-1"></a>      dr_name <span class="ot">&lt;-</span> dimreds[dr]</span>
-<span id="cb11-83"><a href="#cb11-83" tabindex="-1"></a>      cur_dr <span class="ot">&lt;-</span> Seurat<span class="sc">::</span><span class="fu">Reductions</span>(<span class="at">object =</span> sobj, <span class="at">slot =</span> dr_name)</span>
-<span id="cb11-84"><a href="#cb11-84" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="fu">paste0</span>(</span>
-<span id="cb11-85"><a href="#cb11-85" tabindex="-1"></a>        <span class="st">&#39;   DIMRED &#39;</span>, dr, <span class="st">&#39; : [&#39;</span>, dimreds[dr], </span>
-<span id="cb11-86"><a href="#cb11-86" tabindex="-1"></a>        <span class="st">&#39;]  Dims:[&#39;</span>, <span class="fu">nrow</span>(cur_dr), <span class="st">&#39; x &#39;</span>, </span>
-<span id="cb11-87"><a href="#cb11-87" tabindex="-1"></a>        <span class="fu">ncol</span>(cur_dr), <span class="st">&#39;]&#39;</span>), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-88"><a href="#cb11-88" tabindex="-1"></a>    }</span>
-<span id="cb11-89"><a href="#cb11-89" tabindex="-1"></a>  }</span>
-<span id="cb11-90"><a href="#cb11-90" tabindex="-1"></a>  </span>
-<span id="cb11-91"><a href="#cb11-91" tabindex="-1"></a>  <span class="do">### GRAPHS</span></span>
-<span id="cb11-92"><a href="#cb11-92" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">length</span>(sobj<span class="sc">@</span>graphs) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb11-93"><a href="#cb11-93" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">[GRAPHS]</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-94"><a href="#cb11-94" tabindex="-1"></a>    <span class="cf">for</span> (gn <span class="cf">in</span> <span class="fu">names</span>(sobj<span class="sc">@</span>graphs)) {</span>
-<span id="cb11-95"><a href="#cb11-95" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&#39;  &#39;</span>, gn), <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-96"><a href="#cb11-96" tabindex="-1"></a>    }</span>
-<span id="cb11-97"><a href="#cb11-97" tabindex="-1"></a>  }</span>
-<span id="cb11-98"><a href="#cb11-98" tabindex="-1"></a>  </span>
-<span id="cb11-99"><a href="#cb11-99" tabindex="-1"></a>  <span class="do">### BARCODE META</span></span>
-<span id="cb11-100"><a href="#cb11-100" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&#39;coldata&#39;</span> <span class="sc">%in%</span> describe) {</span>
-<span id="cb11-101"><a href="#cb11-101" tabindex="-1"></a>    bc.df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(sobj<span class="sc">@</span>meta.data)</span>
-<span id="cb11-102"><a href="#cb11-102" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">[BARCODES METADATA]</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-103"><a href="#cb11-103" tabindex="-1"></a>    <span class="cf">for</span> (b <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(bc.df))) {</span>
-<span id="cb11-104"><a href="#cb11-104" tabindex="-1"></a>      b.fac <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bc.df[,b])</span>
-<span id="cb11-105"><a href="#cb11-105" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nlevels</span>(b.fac) <span class="sc">&lt;</span> max_levels) {</span>
-<span id="cb11-106"><a href="#cb11-106" tabindex="-1"></a>        <span class="co"># message(&#39;\n&#39;, colnames(bc.df)[b])</span></span>
-<span id="cb11-107"><a href="#cb11-107" tabindex="-1"></a>        b.tbl <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">table</span>(b.fac, <span class="at">useNA =</span> <span class="st">&#39;always&#39;</span>))</span>
-<span id="cb11-108"><a href="#cb11-108" tabindex="-1"></a>        <span class="fu">colnames</span>(b.tbl)[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">colnames</span>(bc.df)[b]</span>
-<span id="cb11-109"><a href="#cb11-109" tabindex="-1"></a>        <span class="fu">cat</span>(knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb11-110"><a href="#cb11-110" tabindex="-1"></a>          b.tbl, <span class="at">format =</span> <span class="st">&#39;simple&#39;</span>, <span class="at">escape =</span> <span class="cn">FALSE</span>), </span>
-<span id="cb11-111"><a href="#cb11-111" tabindex="-1"></a>          <span class="at">sep =</span> <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-112"><a href="#cb11-112" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb11-113"><a href="#cb11-113" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>,<span class="fu">colnames</span>(bc.df)[b], <span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb11-114"><a href="#cb11-114" tabindex="-1"></a>        <span class="fu">print</span>(<span class="fu">summary</span>(bc.df[,b]))</span>
-<span id="cb11-115"><a href="#cb11-115" tabindex="-1"></a>      }</span>
-<span id="cb11-116"><a href="#cb11-116" tabindex="-1"></a>    }</span>
-<span id="cb11-117"><a href="#cb11-117" tabindex="-1"></a>  }</span>
-<span id="cb11-118"><a href="#cb11-118" tabindex="-1"></a>}</span></code></pre></div>
-<p>Now, on top of being able to read and write data, we can <strong>work</strong>
-on it too !</p>
 <p><br></p>
 <hr />
 <hr />
@@ -2176,7 +2038,7 @@ on it too !</p>
 <div id="start-rstudio" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Start Rstudio</h1>
 <ul>
-<li>Using the <a href="https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html" target="_blank">OpenOnDemand cheat
+<li>Using the <a href="https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html?forcedownload=1" target="_blank">OpenOnDemand/Rstudio cheat
 sheet</a> <strong>[LINK_TO_UPDATE]</strong>,
 connect to the <a href="https://ondemand.cluster.france-bioinformatique.fr" target="_blank">OpenOnDemand
 portal</a> and
@@ -2191,27 +2053,27 @@ portal</a> and
 <li>We now set <strong>common parameters</strong> as new variables, once and for all for this
 session :</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># setparam</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="do">## Set your project name</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co"># </span><span class="al">WARNING</span><span class="co"> : Do not just copy-paste this ! It&#39;s MY project name ! Put YOURS !!</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>project_name <span class="ot">&lt;-</span> <span class="st">&quot;ebaii_sc_teachers&quot;</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="do">## Control if the project_name exists on the cluster</span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;PATH CHECK : &#39;</span>, <span class="fu">dir.exists</span>(<span class="fu">paste0</span>(<span class="st">&#39;/shared/projects/&#39;</span>, project_name)))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># setparam</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="do">## Set your project name</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co"># </span><span class="al">WARNING</span><span class="co"> : Do not just copy-paste this ! It&#39;s MY project name ! Put YOURS !!</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>project_name <span class="ot">&lt;-</span> <span class="st">&quot;ebaii_sc_teachers&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="do">## Control if the project_name exists on the cluster</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;PATH CHECK : &#39;</span>, <span class="fu">dir.exists</span>(<span class="fu">paste0</span>(<span class="st">&#39;/shared/projects/&#39;</span>, project_name)))</span></code></pre></div>
 <details>
 <summary>
 Show output
 </summary>
 <pre><code>PATH CHECK :  TRUE</code></pre>
 </details>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="do">## Seed for the RNG</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>my_seed <span class="ot">&lt;-</span> <span class="dv">1337</span><span class="dt">L</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="do">## Empty droplets max p-value</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>max_p <span class="ot">&lt;-</span> <span class="fl">1E-03</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="do">## Seed for the RNG</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>my_seed <span class="ot">&lt;-</span> <span class="dv">1337</span><span class="dt">L</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="do">## Empty droplets max p-value</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>max_p <span class="ot">&lt;-</span> <span class="fl">1E-03</span></span></code></pre></div>
 <hr />
 <hr />
 </div>
@@ -2219,16 +2081,16 @@ Show output
 <h1><span class="header-section-number">5</span> Prepare the data structure [PREPROC.2]</h1>
 <div id="main-directory" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> Main directory</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># maindir</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="do">## Preparing the path</span></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>TD_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;/shared/projects/&quot;</span>, project_name, <span class="st">&quot;/SC_TD&quot;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="do">## Creating the root directory</span></span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> TD_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## Print the root directory on-screen</span></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">print</span>(TD_dir)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># maindir</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="do">## Preparing the path</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>TD_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;/shared/projects/&quot;</span>, project_name, <span class="st">&quot;/SC_TD&quot;</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="do">## Creating the root directory</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> TD_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="do">## Print the root directory on-screen</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="fu">print</span>(TD_dir)</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2238,14 +2100,14 @@ Show output
 </div>
 <div id="current-session" class="section level2" number="5.2">
 <h2><span class="header-section-number">5.2</span> Current session</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># sessiondir</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="do">## Creating the session (Preproc.2) directory</span></span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>session_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, <span class="st">&quot;/02_Preproc.2&quot;</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> session_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="do">## Print the session directory on-screen</span></span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="fu">print</span>(session_dir)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># sessiondir</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="do">## Creating the session (Preproc.2) directory</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>session_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, <span class="st">&quot;/02_Preproc.2&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> session_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="do">## Print the session directory on-screen</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="fu">print</span>(session_dir)</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2255,14 +2117,14 @@ Show output
 </div>
 <div id="input-directory" class="section level2" number="5.3">
 <h2><span class="header-section-number">5.3</span> Input directory</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># indir</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="do">## Creating the INPUT data directory</span></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>input_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(session_dir, <span class="st">&quot;/DATA&quot;</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> input_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="do">## Print the input directory on-screen</span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="fu">print</span>(input_dir)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># indir</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="do">## Creating the INPUT data directory</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>input_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(session_dir, <span class="st">&quot;/DATA&quot;</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> input_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="do">## Print the input directory on-screen</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="fu">print</span>(input_dir)</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2274,16 +2136,16 @@ Show output
 <h2><span class="header-section-number">5.4</span> Genelists directory</h2>
 <p>This is a directory where we will store additional information from
 knowledge bases about genes used to estimate the cell cycle phase of cells.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># resdir</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>res_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, <span class="st">&quot;/Resources&quot;</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>glist_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(res_dir, <span class="st">&quot;/Genelists&quot;</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="do">## Create the directory</span></span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> glist_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="do">## Print the resources directory on-screen</span></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="fu">print</span>(glist_dir)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># resdir</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>res_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, <span class="st">&quot;/Resources&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>glist_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(res_dir, <span class="st">&quot;/Genelists&quot;</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="do">## Create the directory</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> glist_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="do">## Print the resources directory on-screen</span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="fu">print</span>(glist_dir)</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2293,14 +2155,14 @@ Show output
 </div>
 <div id="output-directory" class="section level2" number="5.5">
 <h2><span class="header-section-number">5.5</span> Output directory</h2>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># outdir</span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="do">## Creating the OUTPUT data directory</span></span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>output_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(session_dir, <span class="st">&quot;/RESULTS&quot;</span>)</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> output_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="do">## Print the output directory on-screen</span></span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="fu">print</span>(output_dir)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># outdir</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="do">## Creating the OUTPUT data directory</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>output_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(session_dir, <span class="st">&quot;/RESULTS&quot;</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="at">path =</span> output_dir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="do">## Print the output directory on-screen</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="fu">print</span>(output_dir)</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2314,55 +2176,54 @@ Show output
 <div id="load-the-raw-matrix-preproc.2" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Load the raw matrix [PreProc.2]</h1>
 <p>We retrieve the input data file</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># mat_dl</span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="do">## The raw count matrix we will start from</span></span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>scmat_source <span class="ot">&lt;-</span> <span class="st">&quot;GSM4861194_gex_2_raw_gene_expression.tsv.gz&quot;</span></span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="do">## Download the file from Zenodo</span></span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>local) {</span>
-<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a>  </span>
-<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>  <span class="do">### ZenID</span></span>
-<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14033941&quot;</span></span>
-<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a>  <span class="do">### Zen Path</span></span>
-<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a>  zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
-<span id="cb25-15"><a href="#cb25-15" tabindex="-1"></a>                            zen_id,</span>
-<span id="cb25-16"><a href="#cb25-16" tabindex="-1"></a>                            <span class="st">&quot;/files/&quot;</span>,</span>
-<span id="cb25-17"><a href="#cb25-17" tabindex="-1"></a>                            scmat_source)</span>
-<span id="cb25-18"><a href="#cb25-18" tabindex="-1"></a>  </span>
-<span id="cb25-19"><a href="#cb25-19" tabindex="-1"></a>  <span class="do">## The path to the locally saved input file</span></span>
-<span id="cb25-20"><a href="#cb25-20" tabindex="-1"></a>  scmat_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir,</span>
-<span id="cb25-21"><a href="#cb25-21" tabindex="-1"></a>                       <span class="st">&#39;/&#39;</span>,</span>
-<span id="cb25-22"><a href="#cb25-22" tabindex="-1"></a>                       scmat_source)</span>
-<span id="cb25-23"><a href="#cb25-23" tabindex="-1"></a>  <span class="do">## Download the file</span></span>
-<span id="cb25-24"><a href="#cb25-24" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
-<span id="cb25-25"><a href="#cb25-25" tabindex="-1"></a>                <span class="at">destfile =</span> scmat_file)</span>
-<span id="cb25-26"><a href="#cb25-26" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb25-27"><a href="#cb25-27" tabindex="-1"></a>  ebaii_session <span class="ot">&lt;-</span> <span class="st">&#39;2538_eb3i_n1_2025&#39;</span></span>
-<span id="cb25-28"><a href="#cb25-28" tabindex="-1"></a>  scmat_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb25-29"><a href="#cb25-29" tabindex="-1"></a>      <span class="st">&#39;/shared/projects/&#39;</span>,</span>
-<span id="cb25-30"><a href="#cb25-30" tabindex="-1"></a>      ebaii_session,</span>
-<span id="cb25-31"><a href="#cb25-31" tabindex="-1"></a>      <span class="st">&#39;/atelier_scrnaseq/TD/BACKUP/TSV/&#39;</span>,</span>
-<span id="cb25-32"><a href="#cb25-32" tabindex="-1"></a>      scmat_source)</span>
-<span id="cb25-33"><a href="#cb25-33" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># mat_dl</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="do">## The raw count matrix we will start from</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>scmat_source <span class="ot">&lt;-</span> <span class="st">&quot;GSM4861194_gex_2_raw_gene_expression.tsv.gz&quot;</span></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a><span class="do">## Download the file from Zenodo</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>local) {</span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>  </span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a>  <span class="do">### ZenID</span></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14033941&quot;</span></span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a>  <span class="do">### Zen Path</span></span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>  zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a>                            zen_id,</span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a>                            <span class="st">&quot;/files/&quot;</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a>                            scmat_source)</span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a>  </span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a>  <span class="do">## The path to the locally saved input file</span></span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a>  scmat_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir,</span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a>                       <span class="st">&#39;/&#39;</span>,</span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a>                       scmat_source)</span>
+<span id="cb24-23"><a href="#cb24-23" tabindex="-1"></a>  <span class="do">## Download the file</span></span>
+<span id="cb24-24"><a href="#cb24-24" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
+<span id="cb24-25"><a href="#cb24-25" tabindex="-1"></a>                <span class="at">destfile =</span> scmat_file)</span>
+<span id="cb24-26"><a href="#cb24-26" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb24-27"><a href="#cb24-27" tabindex="-1"></a>  ebaii_session <span class="ot">&lt;-</span> <span class="st">&#39;2538_eb3i_n1_2025&#39;</span></span>
+<span id="cb24-28"><a href="#cb24-28" tabindex="-1"></a>  scmat_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb24-29"><a href="#cb24-29" tabindex="-1"></a>      <span class="st">&#39;/shared/projects/&#39;</span>,</span>
+<span id="cb24-30"><a href="#cb24-30" tabindex="-1"></a>      ebaii_session,</span>
+<span id="cb24-31"><a href="#cb24-31" tabindex="-1"></a>      <span class="st">&#39;/atelier_scrnaseq/TD/BACKUP/TSV/&#39;</span>,</span>
+<span id="cb24-32"><a href="#cb24-32" tabindex="-1"></a>      scmat_source)</span>
+<span id="cb24-33"><a href="#cb24-33" tabindex="-1"></a>}</span></code></pre></div>
 <p>We can load it into R :</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># mat_load</span></span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>scmat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(</span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>  utils<span class="sc">::</span><span class="fu">read.table</span>(</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>    <span class="at">file =</span> scmat_file, </span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>    <span class="at">header =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>))</span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a></span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="do">## Displaying its size in-memory (this is a basic matrix)</span></span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="fu">format</span>(utils<span class="sc">::</span><span class="fu">object.size</span>(scmat), <span class="at">units =</span> <span class="st">&quot;auto&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># mat_load</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="do">## Loading the matrix directly as a sparseMatrix</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>scmat <span class="ot">&lt;-</span> scuttle<span class="sc">::</span><span class="fu">readSparseCounts</span>(</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>    <span class="at">file =</span> scmat_file, </span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="do">## Displaying its size in-memory (this is a basic matrix)</span></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="fu">format</span>(utils<span class="sc">::</span><span class="fu">object.size</span>(scmat), <span class="at">units =</span> <span class="st">&quot;auto&quot;</span>)</span></code></pre></div>
 <details>
 <summary>
 Show output
 </summary>
-<pre><code>[1] &quot;545.7 Mb&quot;</code></pre>
+<pre><code>[1] &quot;88.3 Mb&quot;</code></pre>
 </details>
 <hr />
 <hr />
@@ -2370,47 +2231,47 @@ Show output
 <div id="load-the-genelists-resources-preproc.2" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Load the genelists resources [PreProc.2]</h1>
 <p>We retrieve the genelists</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># gl_dl</span></span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="do">## The genelist files</span></span>
-<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>mito_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_mito_symbols_20191015.rds&quot;</span></span>
-<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>ribo_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_cribo_symbols_20191015.rds&quot;</span></span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>stress_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_stress_symbols_20200224.rds&quot;</span></span>
-<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>gl_sources <span class="ot">&lt;-</span> <span class="fu">c</span>(mito_source, ribo_source, stress_source)</span>
-<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="do">## The (future) local files</span></span>
-<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a>mito_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, mito_source)</span>
-<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a>ribo_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, ribo_source)</span>
-<span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a>stress_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, stress_source)</span>
-<span id="cb28-15"><a href="#cb28-15" tabindex="-1"></a>gl_files <span class="ot">&lt;-</span> <span class="fu">c</span>(mito_file, ribo_file, stress_file)</span>
-<span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a></span>
-<span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a><span class="do">## Download the file from Zenodo</span></span>
-<span id="cb28-18"><a href="#cb28-18" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>local) {</span>
-<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a>  </span>
-<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a>  <span class="do">### ZenID</span></span>
-<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14037355&quot;</span></span>
-<span id="cb28-22"><a href="#cb28-22" tabindex="-1"></a>  <span class="do">### Looping on files</span></span>
-<span id="cb28-23"><a href="#cb28-23" tabindex="-1"></a>  <span class="cf">for</span> (glf <span class="cf">in</span> <span class="fu">seq_along</span>(gl_sources)) {</span>
-<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a>    <span class="do">### Zen Path</span></span>
-<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a>    zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
-<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a>                              zen_id,</span>
-<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a>                              <span class="st">&quot;/files/&quot;</span>,</span>
-<span id="cb28-28"><a href="#cb28-28" tabindex="-1"></a>                              gl_sources[glf])</span>
-<span id="cb28-29"><a href="#cb28-29" tabindex="-1"></a>    </span>
-<span id="cb28-30"><a href="#cb28-30" tabindex="-1"></a>    <span class="do">## Download the file</span></span>
-<span id="cb28-31"><a href="#cb28-31" tabindex="-1"></a>    <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
-<span id="cb28-32"><a href="#cb28-32" tabindex="-1"></a>                  <span class="at">destfile =</span> gl_files[glf])</span>
-<span id="cb28-33"><a href="#cb28-33" tabindex="-1"></a>  }</span>
-<span id="cb28-34"><a href="#cb28-34" tabindex="-1"></a>  <span class="fu">rm</span>(gl_files)</span>
-<span id="cb28-35"><a href="#cb28-35" tabindex="-1"></a>} <span class="cf">else</span> {  <span class="do">## Local mode</span></span>
-<span id="cb28-36"><a href="#cb28-36" tabindex="-1"></a>  ebaii_session <span class="ot">&lt;-</span> <span class="st">&#39;2538_eb3i_n1_2025&#39;</span></span>
-<span id="cb28-37"><a href="#cb28-37" tabindex="-1"></a>  localbackup_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&#39;/shared/projects/&#39;</span>, ebaii_session, <span class="st">&#39;/atelier_scrnaseq/TD/RESOURCES/GENELISTS/&#39;</span>)</span>
-<span id="cb28-38"><a href="#cb28-38" tabindex="-1"></a>  mito_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(localbackup_dir, <span class="st">&#39;/mus_musculus_mito_symbols_20191015.rds&#39;</span>)</span>
-<span id="cb28-39"><a href="#cb28-39" tabindex="-1"></a>  ribo_source <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/mus_musculus_cribo_symbols_20191015.rds&#39;</span>)</span>
-<span id="cb28-40"><a href="#cb28-40" tabindex="-1"></a>  stress_source <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/mus_musculus_stress_symbols_20200224.rds&#39;</span>)</span>
-<span id="cb28-41"><a href="#cb28-41" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># gl_dl</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="do">## The genelist files</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>mito_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_mito_symbols_20191015.rds&quot;</span></span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>ribo_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_cribo_symbols_20191015.rds&quot;</span></span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a>stress_source <span class="ot">&lt;-</span> <span class="st">&quot;mus_musculus_stress_symbols_20200224.rds&quot;</span></span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a>gl_sources <span class="ot">&lt;-</span> <span class="fu">c</span>(mito_source, ribo_source, stress_source)</span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a><span class="do">## The (future) local files</span></span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a>mito_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, mito_source)</span>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a>ribo_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, ribo_source)</span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a>stress_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/&#39;</span>, stress_source)</span>
+<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a>gl_files <span class="ot">&lt;-</span> <span class="fu">c</span>(mito_file, ribo_file, stress_file)</span>
+<span id="cb27-16"><a href="#cb27-16" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a><span class="do">## Download the file from Zenodo</span></span>
+<span id="cb27-18"><a href="#cb27-18" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>local) {</span>
+<span id="cb27-19"><a href="#cb27-19" tabindex="-1"></a>  </span>
+<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a>  <span class="do">### ZenID</span></span>
+<span id="cb27-21"><a href="#cb27-21" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14037355&quot;</span></span>
+<span id="cb27-22"><a href="#cb27-22" tabindex="-1"></a>  <span class="do">### Looping on files</span></span>
+<span id="cb27-23"><a href="#cb27-23" tabindex="-1"></a>  <span class="cf">for</span> (glf <span class="cf">in</span> <span class="fu">seq_along</span>(gl_sources)) {</span>
+<span id="cb27-24"><a href="#cb27-24" tabindex="-1"></a>    <span class="do">### Zen Path</span></span>
+<span id="cb27-25"><a href="#cb27-25" tabindex="-1"></a>    zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
+<span id="cb27-26"><a href="#cb27-26" tabindex="-1"></a>                              zen_id,</span>
+<span id="cb27-27"><a href="#cb27-27" tabindex="-1"></a>                              <span class="st">&quot;/files/&quot;</span>,</span>
+<span id="cb27-28"><a href="#cb27-28" tabindex="-1"></a>                              gl_sources[glf])</span>
+<span id="cb27-29"><a href="#cb27-29" tabindex="-1"></a>    </span>
+<span id="cb27-30"><a href="#cb27-30" tabindex="-1"></a>    <span class="do">## Download the file</span></span>
+<span id="cb27-31"><a href="#cb27-31" tabindex="-1"></a>    <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
+<span id="cb27-32"><a href="#cb27-32" tabindex="-1"></a>                  <span class="at">destfile =</span> gl_files[glf])</span>
+<span id="cb27-33"><a href="#cb27-33" tabindex="-1"></a>  }</span>
+<span id="cb27-34"><a href="#cb27-34" tabindex="-1"></a>  <span class="fu">rm</span>(gl_files)</span>
+<span id="cb27-35"><a href="#cb27-35" tabindex="-1"></a>} <span class="cf">else</span> {  <span class="do">## Local mode</span></span>
+<span id="cb27-36"><a href="#cb27-36" tabindex="-1"></a>  ebaii_session <span class="ot">&lt;-</span> <span class="st">&#39;2538_eb3i_n1_2025&#39;</span></span>
+<span id="cb27-37"><a href="#cb27-37" tabindex="-1"></a>  localbackup_dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&#39;/shared/projects/&#39;</span>, ebaii_session, <span class="st">&#39;/atelier_scrnaseq/TD/RESOURCES/GENELISTS/&#39;</span>)</span>
+<span id="cb27-38"><a href="#cb27-38" tabindex="-1"></a>  mito_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(localbackup_dir, <span class="st">&#39;/mus_musculus_mito_symbols_20191015.rds&#39;</span>)</span>
+<span id="cb27-39"><a href="#cb27-39" tabindex="-1"></a>  ribo_source <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/mus_musculus_cribo_symbols_20191015.rds&#39;</span>)</span>
+<span id="cb27-40"><a href="#cb27-40" tabindex="-1"></a>  stress_source <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input_dir, <span class="st">&#39;/mus_musculus_stress_symbols_20200224.rds&#39;</span>)</span>
+<span id="cb27-41"><a href="#cb27-41" tabindex="-1"></a>}</span></code></pre></div>
 <hr />
 <hr />
 </div>
@@ -2419,42 +2280,42 @@ Show output
 <ul>
 <li>We can reload the object we saved at the former step</li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># dataload</span></span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="do">## The latest Seurat object saved as RDS (name)</span></span>
-<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>sobj_file <span class="ot">&lt;-</span> <span class="st">&quot;02_TD3A_S5_Metrics.Bio_31053.4587.RDS&quot;</span></span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="do">## The latest Seurat object saved as RDS (full path)</span></span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a>sobj_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, </span>
-<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a>                    <span class="st">&quot;/02_Preproc.2/RESULTS/&quot;</span>,</span>
-<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a>                    sobj_file)</span>
-<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a></span>
-<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a>force <span class="ot">&lt;-</span> <span class="cn">FALSE</span>  <span class="do">## To force a re-download of a Zenodo-hosted backup</span></span>
-<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span>  <span class="do">## To force a loading from a local backup</span></span>
-<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a></span>
-<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="do">## In case of error/lost data : force a reload from a Zenodo backup repository</span></span>
-<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="cf">if</span>(force) {</span>
-<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14035293&quot;</span></span>
-<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a>  zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a>                            zen_id,</span>
-<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a>                            <span class="st">&quot;/files/&quot;</span>,</span>
-<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a>                            sobj_file)</span>
-<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a>  <span class="do">## Recreate the expected path if it does not exist</span></span>
-<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="at">path =</span> <span class="fu">dirname</span>(sobj_path), <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a>  <span class="do">## Download the file</span></span>
-<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
-<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a>                <span class="at">destfile =</span> sobj_path)</span>
-<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a>}</span>
-<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a></span>
-<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="do">## In case of error/lost data : force a reload from a local backup repository</span></span>
-<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="cf">if</span>(local) {</span>
-<span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a>  sobj_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb29-31"><a href="#cb29-31" tabindex="-1"></a>    <span class="st">&quot;/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/&quot;</span>,</span>
-<span id="cb29-32"><a href="#cb29-32" tabindex="-1"></a>    sobj_file)</span>
-<span id="cb29-33"><a href="#cb29-33" tabindex="-1"></a>}</span>
-<span id="cb29-34"><a href="#cb29-34" tabindex="-1"></a></span>
-<span id="cb29-35"><a href="#cb29-35" tabindex="-1"></a><span class="do">## Load the object</span></span>
-<span id="cb29-36"><a href="#cb29-36" tabindex="-1"></a>sobj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> sobj_path)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># dataload</span></span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="do">## The latest Seurat object saved as RDS (name)</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>sobj_file <span class="ot">&lt;-</span> <span class="st">&quot;02_TD3A_S5_Metrics.Bio_31053.4587.RDS&quot;</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="do">## The latest Seurat object saved as RDS (full path)</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>sobj_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(TD_dir, </span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>                    <span class="st">&quot;/02_Preproc.2/RESULTS/&quot;</span>,</span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>                    sobj_file)</span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a>force <span class="ot">&lt;-</span> <span class="cn">FALSE</span>  <span class="do">## To force a re-download of a Zenodo-hosted backup</span></span>
+<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a>local <span class="ot">&lt;-</span> <span class="cn">FALSE</span>  <span class="do">## To force a loading from a local backup</span></span>
+<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a><span class="do">## In case of error/lost data : force a reload from a Zenodo backup repository</span></span>
+<span id="cb28-15"><a href="#cb28-15" tabindex="-1"></a><span class="cf">if</span>(force) {</span>
+<span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a>  zen_id <span class="ot">&lt;-</span> <span class="st">&quot;14035293&quot;</span></span>
+<span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a>  zen_backup_file <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://zenodo.org/records/&quot;</span>,</span>
+<span id="cb28-18"><a href="#cb28-18" tabindex="-1"></a>                            zen_id,</span>
+<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a>                            <span class="st">&quot;/files/&quot;</span>,</span>
+<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a>                            sobj_file)</span>
+<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a>  <span class="do">## Recreate the expected path if it does not exist</span></span>
+<span id="cb28-22"><a href="#cb28-22" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="at">path =</span> <span class="fu">dirname</span>(sobj_path), <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-23"><a href="#cb28-23" tabindex="-1"></a>  <span class="do">## Download the file</span></span>
+<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="at">url =</span> zen_backup_file,</span>
+<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a>                <span class="at">destfile =</span> sobj_path)</span>
+<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a>}</span>
+<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a></span>
+<span id="cb28-28"><a href="#cb28-28" tabindex="-1"></a><span class="do">## In case of error/lost data : force a reload from a local backup repository</span></span>
+<span id="cb28-29"><a href="#cb28-29" tabindex="-1"></a><span class="cf">if</span>(local) {</span>
+<span id="cb28-30"><a href="#cb28-30" tabindex="-1"></a>  sobj_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb28-31"><a href="#cb28-31" tabindex="-1"></a>    <span class="st">&quot;/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/&quot;</span>,</span>
+<span id="cb28-32"><a href="#cb28-32" tabindex="-1"></a>    sobj_file)</span>
+<span id="cb28-33"><a href="#cb28-33" tabindex="-1"></a>}</span>
+<span id="cb28-34"><a href="#cb28-34" tabindex="-1"></a></span>
+<span id="cb28-35"><a href="#cb28-35" tabindex="-1"></a><span class="do">## Load the object</span></span>
+<span id="cb28-36"><a href="#cb28-36" tabindex="-1"></a>sobj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> sobj_path)</span></code></pre></div>
 </div>
 <div id="example-of-a-set-of-tabs" class="section level1 tabset tabset-fade tabset-pills" number="9">
 <h1><span class="header-section-number">9</span> Example of a set of tabs</h1>
@@ -2462,9 +2323,9 @@ Show output
 <h2><span class="header-section-number">9.1</span> Tab One</h2>
 <ul>
 <li><p>Contains some text</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="co"># tab1chunk</span></span>
-<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a></span>
-<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="fu">getwd</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># tab1chunk</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="fu">getwd</span>()</span></code></pre></div>
 <details>
 <summary>
 <p>Show output</p>
@@ -2477,9 +2338,9 @@ Show output
 <h2><span class="header-section-number">9.2</span> Tab Two</h2>
 <ul>
 <li><p>Contains some text too</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># tab2chunk</span></span>
-<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a><span class="fu">getwd</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># tab2chunk</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a><span class="fu">getwd</span>()</span></code></pre></div>
 <details>
 <summary>
 <p>Show output</p>
@@ -2509,9 +2370,9 @@ Show output
 <div id="rsession" class="section level1" number="11">
 <h1><span class="header-section-number">11</span> Rsession</h1>
 <p>For reproducibility and context, it is recommended to include in your RMarkdown the list of loaded packages and their version.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r notrun"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="co"># rsession</span></span>
-<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a></span>
-<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r notrun"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="co"># rsession</span></span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <details>
 <summary>
 Show output
@@ -2538,18 +2399,39 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] digest_0.6.37     R6_2.6.1          bookdown_0.39     fastmap_1.2.0    
- [5] xfun_0.52         cachem_1.1.0      knitr_1.50        htmltools_0.5.8.1
- [9] rmarkdown_2.29    lifecycle_1.0.4   cli_3.6.5         sass_0.4.10      
-[13] jquerylib_0.1.4   compiler_4.4.1    rstudioapi_0.17.1 tools_4.4.1      
-[17] evaluate_1.0.3    bslib_0.9.0       rmdformats_1.0.4  yaml_2.3.10      
-[21] jsonlite_2.0.0    rlang_1.1.6      </code></pre>
+ [1] Matrix_1.7-3                jsonlite_2.0.0             
+ [3] compiler_4.4.1              crayon_1.5.3               
+ [5] SummarizedExperiment_1.34.0 Rcpp_1.0.14                
+ [7] Biobase_2.64.0              scuttle_1.14.0             
+ [9] GenomicRanges_1.56.2        DelayedMatrixStats_1.26.0  
+[11] parallel_4.4.1              jquerylib_0.1.4            
+[13] IRanges_2.38.1              BiocParallel_1.38.0        
+[15] yaml_2.3.10                 fastmap_1.2.0              
+[17] lattice_0.22-6              R6_2.6.1                   
+[19] XVector_0.44.0              S4Arrays_1.4.1             
+[21] GenomeInfoDb_1.40.1         knitr_1.50                 
+[23] BiocGenerics_0.50.0         DelayedArray_0.30.1        
+[25] bookdown_0.39               MatrixGenerics_1.16.0      
+[27] GenomeInfoDbData_1.2.12     bslib_0.9.0                
+[29] rlang_1.1.6                 cachem_1.1.0               
+[31] xfun_0.52                   sass_0.4.10                
+[33] SparseArray_1.4.8           cli_3.6.5                  
+[35] zlibbioc_1.50.0             rmdformats_1.0.4           
+[37] digest_0.6.37               grid_4.4.1                 
+[39] rstudioapi_0.17.1           sparseMatrixStats_1.16.0   
+[41] lifecycle_1.0.4             S4Vectors_0.42.1           
+[43] SingleCellExperiment_1.26.0 evaluate_1.0.3             
+[45] codetools_0.2-20            beachmat_2.20.0            
+[47] abind_1.4-8                 stats4_4.4.1               
+[49] httr_1.4.7                  rmarkdown_2.29             
+[51] matrixStats_1.5.0           tools_4.4.1                
+[53] htmltools_0.5.8.1           UCSC.utils_1.0.0           </code></pre>
 </details>
 </div>
 </div>
 
    
-      <div id="rmd-source-code">LS0tCnRpdGxlOiAiPENFTlRFUj5FQjNJIG4xIDIwMjUgc2NSTkFzZXE8QlI+LTxCUj4gPEI+TEVTU09OIEJMT0NLIChJKTwvQj48QlI+LTxCUj5BIG5pY2Ugc3VidGl0bGU8L0NFTlRFUj4iCmRhdGU6ICIyMDI1LTE2LTIxLjIyIgphdXRob3I6CiAgLSBuYW1lOiAiRUJBSUkgbjEgc2NSTkFzZXEgVGVhbSIKICAtIG5hbWU6ICJGaXJzdCBBVVRIT1IiCiAgICBlbWFpbDogImZpcnN0LmF1dGhvckBzY3JuYXNlcS5jb20iCiAgLSBuYW1lOiAiU2Vjb25kIEFVVEhPUiIKICAgIGVtYWlsOiAic2Vjb25kLmF1dGhvckBzY3JuYXNlcS5jb20iCm91dHB1dDoKICBybWRmb3JtYXRzOjpyZWFkdGhlZG93bjoKICAgIGZpZ193aWR0aDogOAogICAgZmlnX2hlaWdodDogNgogICAgaGlnaGxpZ2h0OiB0YW5nbyAgIyMgVGhlbWUgZm9yIHRoZSBjb2RlIGNodW5rcwogICAgZW1iZWRfZm9udHM6IFRSVUUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZSAgIyMgQWRkcyBudW1iZXIgdG8gaGVhZGVycyAoc2VjdGlvbnMpCiAgICB0aGVtZTogZmxhdGx5ICAjIyBDU1MgdGhlbWUgZm9yIHRoZSBIVE1MIHBhZ2UKICAgIGNvbGxhcHNlZDogdHJ1ZSAgIyMgQnkgZGVmYXVsdCwgdGhlIFRPQyBpcyBmb2xkZWQKICAgIHRvY19kZXB0aDogMwogICAgc21vb3RoX3Njcm9sbDogdHJ1ZSAjIyBTbW9vdGggc2Nyb2xsIG9mIHRoZSBIVE1MIHBhZ2UKICAgIHNlbGZfY29udGFpbmVkOiB0cnVlICMjIEluY2x1ZGVzIGFsbCBwbG90cy9pbWFnZXMgd2l0aGluIHRoZSBIVE1MCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlICMjIEFkZHMgYSBidXR0b24gdG8gZG93bmxvYWQgdGhlIFJtZAogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICB0aHVtYm5haWxzOiBmYWxzZQogICAgbGlnaHRib3g6IHRydWUKICAgIGZpZ19jYXB0aW9uOiBmYWxzZQogICAgZ2FsbGVyeTogdHJ1ZQogICAgdXNlX2Jvb2tkb3duOiB0cnVlCmFsd2F5c19hbGxvd19odG1sOiB0cnVlICMjIEFsbG93IHBsYWluIEhUTUwgY29kZSBpbiB0aGUgUm1kCmVkaXRvcl9vcHRpb25zOiAKICBtYXJrZG93bjogCiAgICB3cmFwOiA3MgotLS0KCjwhLS0ga25pdCBzZXR1cCAtLT4KCmBgYHtyIGtuaXRfc2V0dXAsIGVjaG8gPSBGQUxTRX0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgIyBQcmludCB0aGUgY29kZQogIGV2YWwgPSBUUlVFLCAgICAgICAgIyBSdW4gY29tbWFuZCBsaW5lcwogIG1lc3NhZ2UgPSBGQUxTRSwgICAgIyBQcmludCBtZXNzYWdlcwogIHByb21wdCA9IEZBTFNFLCAgICAgIyBEbyBub3QgZGlzcGxheSBwcm9tcHQKICBjb21tZW50ID0gTkEsICAgICAgICMgTm8gY29tbWVudHMgb24gdGhpcyBzZWN0aW9uCiAgd2FybmluZyA9IEZBTFNFLCAgICAjIERpc3BsYXkgd2FybmluZ3MKICB0aWR5ID0gRkFMU0UsCiAgZmlnLmFsaWduPSJjZW50ZXIiLCAKICAjIHJlc3VsdHMgPSAnaGlkZScsCiAgd2lkdGggPSAxMDAgICAgICAgIyBOdW1iZXIgb2YgY2hhcmFjdGVycyBwZXIgbGluZQopCmBgYAoKCjwhLS0gQ1NTIHRvIGNvbG9yIGNodW5rcyBhbmQgb3V0cHV0cyAtLT4KCmBgYHtjc3MsIGVjaG89RkFMU0V9Ci5ub3RydW4gewogIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0Z3JleSAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIGJsYWNrICFpbXBvcnRhbnQ7Cn0KLm5vdHJ1bm8gewogIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0Z3JleSAhaW1wb3J0YW50OwogIGNvbG9yIDogYmxhY2sgIWltcG9ydGFudDsKfQoucXVlc3Rpb24gewogIGJhY2tncm91bmQtY29sb3I6IGFxdWFtYXJpbmUgIWltcG9ydGFudDsKICBjb2xvciA6IGJsYWNrICFpbXBvcnRhbnQ7CiAgYm9yZGVyOiAzcHggc29saWQgbGltZWdyZWVuICFpbXBvcnRhbnQ7Cn0KLnF1ZXN0aW9ubyB7CiAgYmFja2dyb3VuZC1jb2xvcjogYXF1YW1hcmluZSAhaW1wb3J0YW50OwogIGNvbG9yIDogYmxhY2sgIWltcG9ydGFudDsKfQouYW5zd2VyIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiBuYXZham93aGl0ZSAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIGJyb3duICFpbXBvcnRhbnQ7Cn0KLmFuc3dlcm8gewogIGJhY2tncm91bmQtY29sb3I6IG5hdmFqb3doaXRlICFpbXBvcnRhbnQ7CiAgY29sb3IgOiBibGFjayAhaW1wb3J0YW50Owp9Ci5iZXlvbmQgewogIGJhY2tncm91bmQtY29sb3I6IHZpb2xldCAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIHB1cnBsZSAhaW1wb3J0YW50Owp9Ci5iZXlvbmRvIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiB2aW9sZXQgIWltcG9ydGFudDsKICBjb2xvciA6IGJsYWNrICFpbXBvcnRhbnQ7Cn0KYGBgCgoKPCEtLSBIb29rIHRvIGhhbmRsZSBjb2RlIGJsb2NrcyBvdXRwdXQgZm9sZGluZyAtLT4KCmBgYHtyIGtuaXRfaG9vaywgZWNobyA9IEZBTFNFfQpob29rcyA9IGtuaXRyOjprbml0X2hvb2tzJGdldCgpCmhvb2tfZm9sZGFibGUgPSBmdW5jdGlvbih0eXBlKSB7CiAgZm9yY2UodHlwZSkKICBmdW5jdGlvbih4LCBvcHRpb25zKSB7CiAgICByZXMgPSBob29rc1tbdHlwZV1dKHgsIG9wdGlvbnMpCiAgICAKICAgIGlmIChpc0ZBTFNFKG9wdGlvbnNbW3Bhc3RlMCgiZm9sZC4iLCB0eXBlKV1dKSkgcmV0dXJuKHJlcykKICAgIAogICAgcGFzdGUwKAogICAgICAiPGRldGFpbHM+PHN1bW1hcnk+U2hvdyAiLCB0eXBlLCAiPC9zdW1tYXJ5PlxuXG4iLAogICAgICByZXMsCiAgICAgICJcblxuPC9kZXRhaWxzPiIKICAgICkKICB9Cn0Ka25pdHI6OmtuaXRfaG9va3Mkc2V0KAogIG91dHB1dCA9IGhvb2tfZm9sZGFibGUoIm91dHB1dCIpLAogIHBsb3QgPSBob29rX2ZvbGRhYmxlKCJwbG90IikKKQpgYGAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKPGNlbnRlcj4hW10oZWIzaV9iYW5uZXIucG5nKTwvY2VudGVyPgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgUFJFQU1CTEUKCiMjIFB1cnBvc2Ugb2YgdGhpcyBzZXNzaW9uCgpUaGlzIGZpbGUgZGVzY3JpYmVzIHRoZSBkaWZmZXJlbnQgc3RlcHMgdG8gcGVyZm9ybSB0aGUgKipmaXJzdCBwYXJ0Kiogb2YKdGhlICoqc2luZ2xlIGNlbGwgUk5Bc2VxKiogZGF0YSBhbmFseXNpcyB0cmFpbmluZyBjb3Vyc2UgZm9yIHRoZSAqKkVCQUlJCm4xIDIwMjUqKiwgY292ZXJpbmcgdGhlc2Ugc3RlcHMgOgoKLSAgICoqTG9hZCoqIGEgc2luZ2xlIGNlbGwgcmF3IGNvdW50cyAqKm1hdHJpeCoqCgotICAgKipSZW1vdmUqKiBiYXJjb2RlcyBmcm9tICoqZW1wdHkgZHJvcGxldHMqKgoKLSAgICoqRXN0aW1hdGUqKiBhbmQgcmVtb3ZlICoqYW1iaWVudCBSTkEqKiBjb250YW1pbmF0aW9uICooInNvdXAiKSoKCiMjIEFuIGltcG9ydGFudCBub3RpY2UKCi0gICBUaGVzZSBlYXJseSAoYnV0IG1hbmRhdG9yeSkgc3RlcHMgb2YgdGhlIGFuYWx5c2lzIGFyZSBub3QgY292ZXJlZCBieQogICAgdGhlIHJlbm93bmVkLCBoaWdoZXItbGV2ZWwgYW5hbHlzaXMgZnJhbWV3b3JrcyBsaWtlICoqU2V1cmF0Kiogbm9yCiAgICAqKnNjcmFuL3NjYXRlcioqLgogICAgCi0gICBUaHVzLCB3ZSB3aWxsIHdyaXRlL3VzZSBhIGNlcnRhaW4gYW1vdW50IG9mICoqbGluZXMgb2YgY29kZSoqLCBzb21lCiAgICBvZiB3aGljaCBvZiBhIGhpZ2hlciBjb21wbGV4aXR5IGZvciBSIGJlZ2lubmVycy4KICAgIAotICAgKipOZXdjb21lciwgZG8gbm90IGZlYXIqKiAhCgogICAgLSAgIFdoaWxlIHlvdSBhcmUgKip3ZWxjb21lIHRvIHRyeSoqIHdyaXRpbmcgc29tZSBieSB5b3Vyc2VsZiwKICAgICAgICBkZXBlbmRpbmcgb24geW91ciBSIGtub3dsZWRnZSBhbmQgc2VsZi1jb25maWRlbmNlIGluIGl0IC4uLgogICAgICAgIAogICAgLSAgIC4uLiB5b3UgZG8gbm90IGhhdmUgdG8ga25vdyBbKipob3cqKl17LnVuZGVybGluZX0gdGhlc2UgY29kZQogICAgICAgIHdvcmsgLi4uCiAgICAgICAgCiAgICAtICAgLi4uIHRodXMgeW91ICoqc2hvdWxkIG5vdCBmZWVsIGFzaGFtZWQqKiBjb3B5LXBhc3RpbmcgdGhlCiAgICAgICAgcHJlLXdyaXR0ZW4gY29kZSBoZXJlYWZ0ZXIgLi4uCiAgICAgICAgCiAgICAtICAgLi4uIGJ1dCBpbiBib3RoIGNhc2VzLCBwbGVhc2UgdHJ5ICoqeW91ciBiZXN0IHVuZGVyc3RhbmRpbmcqKgogICAgICAgIFsqKndoYXQqKl17LnVuZGVybGluZX0gdGhlc2UgY29kZSBkbywgYW5kIGV2ZW4gbW9yZSwKICAgICAgICBbKip3aHkqKl17LnVuZGVybGluZX0gIQogICAgICAgIAogICAgLSAgIEluIHRoaXMgcHVycG9zZSwgeW91IG1heSB1c2Ugd2hhdGV2ZXIgKipoZWxwKiogeW91IGNhbiAqKmJ5KioKICAgICAgICAqKnNlYXJjaGluZyoqLgoKIyMgV2hhdCB0byBydW4gPwoKLSAgIFRoaXMgdHJhaW5pbmcgcHJlc2VudGF0aW9uLCB3cml0dGVuIGluIFJtYXJrZG93biwgY29udGFpbnMgKiptYW55KiogY2h1bmtzICggPSBjb2RlIGJsb2NrcykKCi0gICBZb3UgKipkbyBub3QgaGF2ZSB0byoqIHJ1biB0aGVtIGFsbCAhCgotICAgQ2h1bmtzIGZvbGxvdyBhICoqY29sb3IgY29kZSoqIDoKCiMjIyBDaHVua3MgeW91ICoqQVJFKiogZXhwZWN0ZWQgdG8gcnVuIDoKCmBgYHtyIGNodW5rX3J1bn0KIyBjaHVua19ydW4KCiMjIEV4YW1wbGUgb2YgYSBjaHVuayB0byBydW4KZ2V0d2QoKQoKYGBgCgo8YnI+CgojIyMgQ2h1bmtzIHlvdSAqKkFSRSBOT1QqKiBleHBlY3RlZCB0byBydW4KCkhvcGVmdWxseSwgd2Ugd2lsbCBkZW1vIHRoZW0uIFlvdSBtYXkgcnVuIHRoZW0gYnkgeW91cnNlbGYsIHlvdW5nIHBhZGF3YW4sIGJ1dCBpZiB5b3UgZ2V0IGxhdGUgb3Igd29yc3QsIGJyZWFrIHNvbWV0aGluZywgX3lvdV8nbGwgYmUgdGhlIG9uZSB0byBibGFtZSAhCgpgYGB7ciBjaHVua19kZW1vLCBjbGFzcy5zb3VyY2U9Im5vdHJ1biIsIGNsYXNzLm91dHB1dD0ibm90cnVubyJ9CiMgY2h1bmtfZGVtbwoKIyMgRXhhbXBsZSBvZiBhIGNodW5rIHRvIE5PVCBydW4KdXRpbHM6OnNlc3Npb25JbmZvKCkKCmBgYAoKPGJyPgoKIyMjIFF1ZXN0aW9ucwoKU29tZSBxdWVzdGlvbnMgd2Ugd291bGQgbGlrZSB5b3UgdG8gYW5zd2VyIGR1cmluZyB0aGUgdHJhaW5pbmcgY291cnNlLgpQbGVhc2UgYmUgZmFpciBhbmQgZG8gbm90IHRha2UgYSBsb29rIGF0IHRoZSBhbnN3ZXIgYmVmb3JlIHdlIHRlbGwgeW91IHNvIDopCgpgYGB7ciBjaHVua19xdWVzdGlvbiwgY2xhc3Muc291cmNlPSJxdWVzdGlvbiIsIGV2YWwgPSBGQUxTRX0KIyBjaHVua19xdWVzdGlvbgoKIyMgV2hhdCdzIHRoZSBBbnN3ZXIgdG8gTGlmZSA/IFRoZSBVbml2ZXJzZSA/IEV2ZXJ5dGhpbmcgPz8KCmBgYAoKPGJyPgoKIyMjIEFuc3dlcnMKClRoZXkgdXN1YWxseSBmb2xsb3cgcXVlc3Rpb25zLi4uCgpgYGB7ciBjaHVua19hbnN3ZXIsIGNsYXNzLnNvdXJjZSA9IGMoImZvbGQtaGlkZSIsICJhbnN3ZXIiKSwgY2xhc3Mub3V0cHV0PSJhbnN3ZXJvIn0KIyBjaHVua19hbnN3ZXIKCmNhdCgiVGhlIEFuc3dlciB0byB0aGUgR3JlYXQgUXVlc3Rpb24uLi4gaXMgLi4uIApGb3J0eS10d28uIFNpeCBieSBuaW5lIDogZm9ydHktdHdvLiBUaGF0J3MgaXQuIApUaGF0J3MgYWxsIHRoZXJlIGlzLiAoSSBhbHdheXMgdGhvdWdodCBzb21ldGhpbmcgd2FzIApmdW5kYW1lbnRhbGx5IHdyb25nIHdpdGggdGhlIHVuaXZlcnNlLikiKQoKYGBgCgo8YnI+CgojIyMgQWRkaXRpb25hbCBleGVyY2lzZXMgLyBxdWVzdGlvbnMKClRoZXNlIGFyZSBiZXlvbmQgdGhlIHNjb3BlIG9mIHRoZSB0cmFpbmluZyBjb3Vyc2UsIGJ1dCB5b3UgbWF5IHBsYXkgaXQgX2lmIHlvdSBmZWVsIGJvcmVkXwoKYGBge3IgY2h1bmtfYmV5b25kLCBjbGFzcy5zb3VyY2U9ImJleW9uZCIsIGNsYXNzLm91dHB1dD0iYmV5b25kbyJ9CiMgY2h1bmtfYmV5b25kCgojIyBFeGFtcGxlIG9mIGEgY2h1bmsgdG8gcGxheSB3aXRoIGJ1dCBiZXlvbmQgdGhlIHNjb3BlCmdldHdkKCkKCmBgYAoKPGJyPgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCgojIEFkZGl0aW9uYWwgcmVzb3VyY2VzCgoqKkhvd2V2ZXIqKiwgc29tZSB1cGNvbWluZyBzdGVwcyByZXF1aXJlIGEgYml0IGNvbXBsaWNhdGVkIG1ldGhvZHMgdGhhdAphcmUgbm90IGZ1biB0byB3cml0ZSwgbm9yIGNvcHktcGFzdGUgbXVsdGlwbGUgdGltZXMuIFNvLCB3ZSB3aWxsIG5vdwpwcmVwYXJlIGNvZGUgKipmdW5jdGlvbnMqKiB0aGF0IHdpbGwgZWFzZSB0aGVzZSBzdGVwcy4gQWZ0ZXIgZXhlY3V0aW5nCnRoZXNlIGZ1bmN0aW9ucyBjb2RlLCB3ZSBtYXkgY2FsbCAoaW52b2tlKSB0aGVtIHdoZW4gbmVlZGVkLgoKIyMgRnVuY3Rpb25zCgojIyMgU291cFggaGVscGVyIGZ1bmN0aW9uCgpUaGlzIGZ1bmN0aW9uIHdhcyB3cml0dGVuIHRvIGVhc2UgdGhlIHVzZSBvZiBTb3VwWCBvbiBhIFNldXJhdCBvYmplY3QKCkl0IHdhcyB0ZXN0ZWQgb24gYFNvdXBYYD0xLjYuMiB3aXRoIGBpZ3JhcGhgPTEuNS4xLCBgU2V1cmF0YD00LjQuMCw1LjEuMAoKUGFyYW1ldGVycyA6CgotICAgYHNjbWF0X2ZpbHRgIDogKHNwYXJzZSltYXRyaXggY29ycmVzcG9uZGluZyB0byBhbiBlbXB0eSBkcm9wbGV0cyAtZmlsdGVyZWQgY291bnQgbWF0cml4CgotICAgYHNjbWF0X3Jhd2AgOiAoc3BhcnNlKW1hdHJpeCBjb3JyZXNwb25kaW5nIHRvIGFuIE5PTi0gZW1wdHkgZHJvcGxldHMgLWZpbHRlcmVkIGNvdW50IG1hdHJpeAoKLSAgIGBzb3VwUXVhbnRpbGVgLCBgY29udGFtaW5hdGlvblJhbmdlYCA6IHNlZSBgP1NvdXBYOjphdXRvRXN0Q29udGAKCi0gICBgY29udGFtaW5hdGlvblJhbmdlYCA6IHJhbmdlIG9mIHRoZSAqZXhwZWN0ZWQqIHNvdXAgcHJvcG9ydGlvbgoKLSAgIGBzb3VwUmFuZ2VgIDogZXN0aW1hdGUgc291cCBmcmFjdGlvbiBmcm9tIGZlYXR1cmVzIHdpdGggdG90YWwgcmVhZHMKY29tcHJpc2VkIGluIHRoaXMgcmFuZ2Ugb2YgY291bnRzIChvbmx5IHVzZWQgd2hlbiBgc2NtYXRfcmF3ICE9IE5VTExgKQoKLSAgIGByZXR1cm5fb2JqZWN0YCA6IGlmIGBUUlVFYCwgcmV0dXJuIHRoZSAidW5zb3VwZWQiIGBTZXVyYXRgIG9iamVjdCA7IGlmCmBGQUxTRWAsIG9ubHkgcGVyZm9ybSBzb3VwIGVzdGltYXRpb24gYW5kIHJldHVybiB0aGUgZXN0aW1hdGVkCnByb3BvcnRpb24gdmFsdWUgKHJobykKCi0gICBgZG9QbG90YCA6IFBlcmZvcm0gdGhlIFNvdXBYIGVzdGltYXRpb24gcGxvdCAocmhvIGRpc3RyaWJ1dGlvbikKCmBgYHtyIHNvdXB4X2Z1bmMsIGV2YWwgPSBUUlVFfQojIHNvdXB4X2Z1bmMKClNvdXBYX2F1dG8gPC0gZnVuY3Rpb24oc2NtYXRfZmlsdCA9IE5VTEwsIHNjbWF0X3JhdyA9IE5VTEwsIHNvdXBRdWFudGlsZSA9IDAuOSwKICAgICAgICAgICAgICAgICAgICAgICBjb250YW1pbmF0aW9uUmFuZ2UgPSBjKC4wMSwgLjgpLCBzb3VwUmFuZ2UgPSBjKDAsMTAwKSwKICAgICAgICAgICAgICAgICAgICAgICByZXR1cm5fb2JqZWN0ID0gRkFMU0UsIGRvUGxvdCA9IEZBTFNFKSB7CiAgCiAgIyMgQ2hlY2tzCiAgaWYoaXMubnVsbChzY21hdF9maWx0KSkgc3RvcCgnQSBmaWx0ZXJlZCBjb3VudCBtYXRyaXggaXMgcmVxdWlyZWQgIScpCiAgCiAgaWYoaXMubnVsbChzY21hdF9yYXcpKSBtZXNzYWdlKCdObyB1bmZpbHRlcmVkIHJhdyBjb3VudHMgbWF0cml4IHByb3ZpZGVkLiBFc3RpbWF0aW9uIHdpbGwgYmUgYmFzZWQgb24gZmlsdGVyZWQgbWF0cml4IG9ubHkuJykKICAKICAjIyBJZiBubyByYXcgbWF0cml4CiAgaWYgKGlzLm51bGwoc2NtYXRfcmF3KSkgewogICAgc3BDaGFuUmF3IDwtIFNvdXBYOjpTb3VwQ2hhbm5lbCgKICAgICAgdG9kID0gc2NtYXRfZmlsdCwgCiAgICAgIHRvYyA9IHNjbWF0X2ZpbHQsIAogICAgICBjYWxjU291cFByb2ZpbGUgPSBGQUxTRSkKICAgIHNjX3Jvd3N1bSA8LSBzcGFyc2VNYXRyaXhTdGF0czo6cm93U3VtczIoc2NtYXRfZmlsdCkKICAgIHNwUHJvZiA8LSBkYXRhLmZyYW1lKAogICAgICByb3cubmFtZXMgPSByb3duYW1lcyhzY21hdF9maWx0KSwgCiAgICAgIGVzdCA9IHNjX3Jvd3N1bS9zdW0oc2NtYXRfZmlsdCksIAogICAgICBjb3VudHMgPSBzY19yb3dzdW0pCiAgICBzcENoYW4gPC0gU291cFg6OnNldFNvdXBQcm9maWxlKHNwQ2hhblJhdywgc3BQcm9mKQogIH0gZWxzZSB7CiAgICBzcENoYW4gPC0gU291cFg6OlNvdXBDaGFubmVsKAogICAgICB0b2QgPSBzY21hdF9yYXcsIAogICAgICB0b2MgPSBzY21hdF9maWx0LCAKICAgICAgY2FsY1NvdXBQcm9maWxlID0gRkFMU0UpCiAgICBpZiAobWluKHNwQ2hhbiRuRHJvcFVNSXMpID4gbWF4KHNvdXBSYW5nZSkpIHN0b3AoCiAgICAgICdNaW5pbXVtIGZvdW5kIGNvdW50cyBwZXIgYmFyY29kZSBpcyA6ICcsIAogICAgICBtaW4oc3BDaGFuJG5Ecm9wVU1JcyksIAogICAgICAnLCB3aGljaCBpcyBzbWFsbGVyIHRoYW4gdGhlIHVwcGVyIGJvdW5kIG9mIHNvdXBSYW5nZSAhIFBsZWFzZSBpbmNyZWFzZSBzb3VwUmFuZ2UgbWF4ICEnKQogICAgc3BDaGFuIDwtIFNvdXBYOjplc3RpbWF0ZVNvdXAoc2MgPSBzcENoYW4sIHNvdXBSYW5nZSA9IHNvdXBSYW5nZSkKICB9CiAgIyMgRGlzcGxheSBUb3AgMjAgY29udHJpYnV0aW5nIGdlbmVzCiAgaWYgKCFyZXR1cm5fb2JqZWN0KSB7CiAgICBjYXQoJ1xuU291cC1jb250cmlidXRpbmcgZmVhdHVyZXMgKFRvcCAyMCkgOlxuJykKICAgIHByaW50KGtuaXRyOjprYWJsZShoZWFkKAogICAgICBzcENoYW4kc291cFByb2ZpbGVbb3JkZXIoc3BDaGFuJHNvdXBQcm9maWxlJGVzdCwgZGVjcmVhc2luZyA9IFRSVUUpLCBdLCAKICAgICAgbiA9IDIwKSkpCiAgfQogICMjIFF1aWNrIGNsdXN0ZXJpbmcgbmVlZGVkCiAgc3BDbHVzdCA8LSBzY3Jhbjo6cXVpY2tDbHVzdGVyKHNjbWF0X2ZpbHQsIG1ldGhvZCA9ICJpZ3JhcGgiKQogICMjIEFkZGluZyBjbHVzdGVycyB0byB0aGUgU291cENoYW5uZWwgb2JqZWN0CiAgc3BDaGFuIDwtIFNvdXBYOjpzZXRDbHVzdGVycyhzYyA9IHNwQ2hhbiwgY2x1c3RlcnMgPSBzcENsdXN0KQogICMjIEVzdGltYXRpbmcgc291cAogIHNYIDwtIFNvdXBYOjphdXRvRXN0Q29udChzYyA9IHNwQ2hhbiwgZG9QbG90ID0gZG9QbG90LCB0ZmlkZk1pbiA9IDEsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBzb3VwUXVhbnRpbGUgPSBzb3VwUXVhbnRpbGUsIG1heE1hcmtlcnMgPSAxMDAsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBjb250YW1pbmF0aW9uUmFuZ2UgPSBjb250YW1pbmF0aW9uUmFuZ2UsIAogICAgICAgICAgICAgICAgICAgICAgICAgICByaG9NYXhGRFIgPSAuMiwgcHJpb3JSaG8gPSAuMDUsIHByaW9yUmhvU3RkRGV2ID0gLjEsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBmb3JjZUFjY2VwdCA9IEZBTFNFKQogIAogICMjIFJlbW92aW5nIHNvdXAgKGFkanVzdGluZyBjb3VudHMpCiAgaWYocmV0dXJuX29iamVjdCkgewogICAgY2F0KCdDb3VudHMgQkVGT1JFIFNvdXBYIDogJywgc3VtKHNjbWF0X2ZpbHQpLCAnXG4nKQogICAgc2NtYXRfc291cHggPC0gU291cFg6OmFkanVzdENvdW50cygKICAgICAgc1gsIG1ldGhvZCA9ICdzdWJ0cmFjdGlvbicsIHJvdW5kVG9JbnQgPSBUUlVFLCAKICAgICAgdG9sID0gLjAwMSwgcEN1dCA9IC4wMSkKICAgIGNhdCgnQ291bnRzIEFGVEVSIFNvdXBYIDogJywgc3VtKHNjbWF0X3NvdXB4KSwgJ1xuJykKICAgIHJtKHNjbWF0X2ZpbHQpCiAgICByZXR1cm4oc2NtYXRfc291cHgpCiAgfSBlbHNlIHJldHVybihzWCRmaXQkcmhvRXN0KQp9CgpgYGAKCiMjIyBTZXVyYXQgT2JqZWN0IGRlc2NyaXB0b3IKClRoaXMgZnVuY3Rpb24gZGlzcGxheXMgaW4gdGhlIGNvbnNvbGUgYW4gZXhoYXVzdGl2ZSBkZXNjcmlwdGlvbiBvZiB0aGUKY29udGVudCBvZiBhIGBTZXVyYXRgIG9iamVjdCwgYWRkaXRpb25hbGx5IGNvbXB1dGluZyBzb21lIHVzZWZ1bCBtZXRyaWNzCgpJdCB3YXMgdGVzdGVkIG9uIGBTZXVyYXRgPTQuNC4wLDUuMS4wLCBgc3BhcnNlTWF0cml4U3RhdHNgPTEuMTMuNCAsCmBrbml0cmA9MS40NAoKUGFyYW1ldGVycyA6CgotICAgYHNvYmpgIDogYSBTZXVyYXQgb2JqZWN0CgotICAgYG1heF9sZXZlbHNgIDogbWF4aW11bSBudW1iZXIgW2ludCA+MF0gb2YgdW5pcXVlIHZhbHVlcyB0byBjb25zaWRlciBhCiAgICBiYXJjb2RlIGFubm90YXRpb24gYXMgYSBmYWN0b3IsIHJhdGhlciB0aGFuIGEgY29udGludW91cyBudW1lcmljCiAgICB2ZWN0b3IKCi0gICBgc3BhcnNlX2xldmVsYCA6IGlmIGBUUlVFYCwgY29tcHV0ZSBtYXRyaXggc3BhcnNpdHkKCi0gICBgZGVzY3JpYmVgIDogdHlwZSBvZiBlbnRyaWVzIGluIHRoZSBTZXVyYXQgb2JqZWN0IHRvIGRlc2NyaWJlLiBDYW4gYmUgb25lCm9mIChgJ2FsbCdgLCBgJ2Fzc2F5cydgLCBgJ2RpbXJlZCdgLCBgJ2NvbGRhdGEnYCkKCmBgYHtyIHNvYmpkZXNjX2Z1bmMsIGV2YWwgPSBUUlVFfQojIHNvYmpkZXNjX2Z1bmMKClNldXJhdE9iamVjdF9kZXNjcmlwdG9yIDwtIGZ1bmN0aW9uKHNvYmogPSBOVUxMLCBkZXNjcmliZSA9ICdhbGwnLCBzcGFyc2VfbGV2ZWwgPSBUUlVFLCBtYXhfbGV2ZWxzID0gMTAwKSB7CiAgCiAgIyMgQ2hlY2tzCiAgaWYgKGlzLm51bGwoc29iaikpIHN0b3AoJ0EgU2V1cmF0IG9iamVjdCBpcyByZXF1aXJlZCAhJykKICBpZighaXMoc29iaiwgJ1NldXJhdCcpKSBzdG9wKCdQcm92aWRlZCBzb2JqIGlzIG5vdCBhIHByb3BlciBTZXVyYXQgb2JqZWN0ICEnKQogIAogIGRlc2NyaWJlIDwtIHRvbG93ZXIoZGVzY3JpYmUpCiAgZGVzYy52YWxpZHMgPC0gYygnYWxsJywgJ2Fzc2F5JywgJ2RpbXJlZCcsICdjb2xkYXRhJykKICBpZighYWxsKGRlc2NyaWJlICVpbiUgZGVzYy52YWxpZHMpKSBzdG9wKAogICAgJ0F0IGxlYXN0IG9uZSByZXF1ZXN0ZWQgaXRlbSB0eXBlIHRvIGRlc2NyaWJlIGlzIG5vdCB2YWxpZC4gRXhwZWN0aW5nIGFueSBjb21iaW5hdGlvbiBvZiBbIicsIAogICAgcGFzdGUoYyhkZXNjLnZhbGlkcyksIGNvbGxhcHNlID0gJyIsICInKSwgCiAgICAnXSAoImFsbCIgc3VwZXJzZWRlcyBhbnkgb3RoZXIpLicpCiAgaWYoJ2FsbCcgJWluJSBkZXNjcmliZSkgZGVzY3JpYmUgPC0gZGVzYy52YWxpZHNbLTFdCiAgCiAgIyMgQWRkaXRpb25hbCBjaGVja3Mgb24gc29iagogIGlmKCFpcyhzb2JqLCAnU2V1cmF0JykpIHN0b3AoJ1Byb3ZpZGVkIG9iamVjdCBpcyBub3QgYSBwcm9wZXIgU2V1cmF0IG9iamVjdCAhJykKICAKICByZXRsaXN0IDwtIGxpc3QoKQogIAogICMjIFNldXJhdCBzbG90cwogIHNsb3RzIDwtIGMoJ2NvdW50cycsICdkYXRhJywgJ3NjYWxlLmRhdGEnKQogIAogICMjIyBPQkpFQ1QgVkVSU0lPTgogIGNhdChwYXN0ZTAoJ09CSkVDVCBWRVJTSU9OIDpcdCcsIHNvYmpAdmVyc2lvbiksICdcbicpCiAgCiAgIyMjIFBST0pFQ1QgTkFNRQogIHByb2pfbmFtZSA8LSBTZXVyYXQ6OlByb2plY3Qoc29iaikKICBjYXQocGFzdGUwKCdQUk9KRUNUIDpcdFsnLCBwcm9qX25hbWUsICddJyksICdcbicpCiAgCiAgIyMjIEFTU0FZUwogIGlmKCdhc3NheScgJWluJSBkZXNjcmliZSkgewogICAgY2F0KCdcbltBU1NBWVNdXG4nKQogICAgZXhwYXNzYXlzIDwtIFNldXJhdDo6QXNzYXlzKG9iamVjdCA9IHNvYmopCiAgICBmb3IgKGVhIGluIHNlcV9hbG9uZyhleHBhc3NheXMpKSB7CiAgICAgIGFzc2F5X25hbWUgPC0gZXhwYXNzYXlzW2VhXQogICAgICAjIGN1cl9hc3NheSA8LSBTZXVyYXQ6OkFzc2F5cyhvYmplY3QgPSBzb2JqLCBzbG90ID0gYXNzYXlfbmFtZSkKICAgICAgY3VyX2Fzc2F5IDwtIHN1cHByZXNzV2FybmluZ3MoU2V1cmF0T2JqZWN0OjpMYXllckRhdGEoCiAgICAgICAgb2JqZWN0ID0gc29iaiwgbGF5ZXIgPSBhc3NheV9uYW1lKSkKICAgICAgY2F0KHBhc3RlMCgKICAgICAgICAnICAgQVNTQVkgJywgZWEsICcgOlx0WycsIGFzc2F5X25hbWUsICddJywgCiAgICAgICAgaWYoU2V1cmF0OjpEZWZhdWx0QXNzYXkoc29iaikgPT0gYXNzYXlfbmFtZSkgJyBbQUNUSVZFXScpCiAgICAgICAgLCAnXG4nKQogICAgICAKICAgICAgIyMgU0xPVFMvTEFZRVJTCiAgICAgIGZvciAoc2wgaW4gc2VxX2Fsb25nKHNsb3RzKSkgewogICAgICAgIHNsb3RfbmFtZSA8LSBzbG90c1tzbF0KICAgICAgICBjdXJfc2xvdCA8LSBzdXBwcmVzc1dhcm5pbmdzKFNldXJhdE9iamVjdDo6R2V0QXNzYXlEYXRhKAogICAgICAgICAgb2JqZWN0ID0gc29iaiwgYXNzYXkgPSBhc3NheV9uYW1lLCBsYXllciA9IHNsb3RfbmFtZSkpCiAgICAgICAgc2xvdF9kaW1wcm9kIDwtIHByb2QoZGltKGN1cl9zbG90KSkKICAgICAgICBjYXQocGFzdGUwKAogICAgICAgICAgJyAgICAgIFNMT1QvTEFZRVIgJywgc2wsICcgOlx0WycsIHNsb3RfbmFtZSwgJ11cdERpbXM6WycsCiAgICAgICAgICBucm93KGN1cl9zbG90KSwgJyB4ICcsIG5jb2woY3VyX3Nsb3QpLCAKICAgICAgICAgIGlmKHNsb3RfZGltcHJvZCA+IDApIHBhc3RlMCgKICAgICAgICAgICAgJ10gIFJhbmdlOlsnLCBwYXN0ZSgKICAgICAgICAgICAgICBzcHJpbnRmKCclLjJmJywgcmFuZ2UoY3VyX3Nsb3QsIG5hLnJtID0gVFJVRSkpLCAKICAgICAgICAgICAgICBjb2xsYXBzZSA9ICctJykpIGVsc2UgTlVMTCwgJ10nKSwgJ1xuJykKICAgICAgICAKICAgICAgICAjIyBUb3RhbCBjb3VudHMgaWYgc2xvdC9sYXllciBpcyAiY291bnRzIgogICAgICAgIGlmKHNsb3RfbmFtZSA9PSAnY291bnRzJykgY2F0KHBhc3RlMCgKICAgICAgICAgICcgICAgICAgICBDb3VudHMgOlx0Jywgcm91bmQoc3VtKGN1cl9zbG90KSkpLCAnXG4nKQogICAgICAgICMjIEFkZGluZyBzcGFyc2l0eSBpbmZvIHdoZW4gbmVlZGVkIDoKICAgICAgICBpZiAoc3BhcnNlX2xldmVsICYgaXMoY3VyX3Nsb3QsICdkZ0NNYXRyaXgnKSkgewogICAgICAgICAgc3BsZXYgPC0gc3VtKHNwYXJzZU1hdHJpeFN0YXRzOjpjb2xDb3VudHMoCiAgICAgICAgICAgIHggPSBjdXJfc2xvdCwgdmFsdWUgPSAwKSkgLyBzbG90X2RpbXByb2QKICAgICAgICAgIGNhdChwYXN0ZTAoCiAgICAgICAgICAgICcgICAgICAgICBTcGFyc2l0eSA6XHQnLCAKICAgICAgICAgICAgc3ByaW50ZignJS41ZicsIHNwbGV2ICogMTAwKQogICAgICAgICAgICAsICclJykKICAgICAgICAgICAgLCAnXG4nKQogICAgICAgIH0KICAgICAgfQogICAgfQogIH0KICAKICAjIyMgRElNUkVECiAgaWYgKCdkaW1yZWQnICVpbiUgZGVzY3JpYmUpIHsKICAgIGNhdCgnXG5bRElNUkVEU11cbicpCiAgICBkaW1yZWRzIDwtIFNldXJhdDo6UmVkdWN0aW9ucyhvYmplY3QgPSBzb2JqKQogICAgZm9yIChkciBpbiBzZXFfYWxvbmcoZGltcmVkcykpIHsKICAgICAgZHJfbmFtZSA8LSBkaW1yZWRzW2RyXQogICAgICBjdXJfZHIgPC0gU2V1cmF0OjpSZWR1Y3Rpb25zKG9iamVjdCA9IHNvYmosIHNsb3QgPSBkcl9uYW1lKQogICAgICBjYXQocGFzdGUwKAogICAgICAgICcgICBESU1SRUQgJywgZHIsICcgOiBbJywgZGltcmVkc1tkcl0sIAogICAgICAgICddICBEaW1zOlsnLCBucm93KGN1cl9kciksICcgeCAnLCAKICAgICAgICBuY29sKGN1cl9kciksICddJyksICdcbicpCiAgICB9CiAgfQogIAogICMjIyBHUkFQSFMKICBpZihsZW5ndGgoc29iakBncmFwaHMpID4gMCkgewogICAgY2F0KCdcbltHUkFQSFNdXG4nKQogICAgZm9yIChnbiBpbiBuYW1lcyhzb2JqQGdyYXBocykpIHsKICAgICAgY2F0KHBhc3RlMCgnICAnLCBnbiksICdcbicpCiAgICB9CiAgfQogIAogICMjIyBCQVJDT0RFIE1FVEEKICBpZignY29sZGF0YScgJWluJSBkZXNjcmliZSkgewogICAgYmMuZGYgPC0gYXMuZGF0YS5mcmFtZShzb2JqQG1ldGEuZGF0YSkKICAgIGNhdCgnXG5bQkFSQ09ERVMgTUVUQURBVEFdXG4nKQogICAgZm9yIChiIGluIHNlcV9sZW4obmNvbChiYy5kZikpKSB7CiAgICAgIGIuZmFjIDwtIGFzLmZhY3RvcihiYy5kZlssYl0pCiAgICAgIGlmIChubGV2ZWxzKGIuZmFjKSA8IG1heF9sZXZlbHMpIHsKICAgICAgICAjIG1lc3NhZ2UoJ1xuJywgY29sbmFtZXMoYmMuZGYpW2JdKQogICAgICAgIGIudGJsIDwtIGFzLmRhdGEuZnJhbWUodGFibGUoYi5mYWMsIHVzZU5BID0gJ2Fsd2F5cycpKQogICAgICAgIGNvbG5hbWVzKGIudGJsKVsxXSA8LSBjb2xuYW1lcyhiYy5kZilbYl0KICAgICAgICBjYXQoa25pdHI6OmthYmxlKAogICAgICAgICAgYi50YmwsIGZvcm1hdCA9ICdzaW1wbGUnLCBlc2NhcGUgPSBGQUxTRSksIAogICAgICAgICAgc2VwID0gJ1xuJykKICAgICAgfSBlbHNlIHsKICAgICAgICBjYXQoJ1xuJyxjb2xuYW1lcyhiYy5kZilbYl0sICdcbicpCiAgICAgICAgcHJpbnQoc3VtbWFyeShiYy5kZlssYl0pKQogICAgICB9CiAgICB9CiAgfQp9CgpgYGAKCk5vdywgb24gdG9wIG9mIGJlaW5nIGFibGUgdG8gcmVhZCBhbmQgd3JpdGUgZGF0YSwgd2UgY2FuICoqd29yayoqCm9uIGl0IHRvbyAhCgo8YnI+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBTdGFydCBSc3R1ZGlvCgotICAgVXNpbmcgdGhlIFtPcGVuT25EZW1hbmQgY2hlYXQKICAgIHNoZWV0XShodHRwczovL2lmYi1lbGl4aXJmci5naXRodWIuaW8vRUJBSUkvMjAyMy9lYmFpaW4xL1NpbmdsZUNlbGwvMjAyNF9URF9PcGVuT25EZW1hbmQuaHRtbCl7dGFyZ2V0PSJfYmxhbmsifSAqKltMSU5LX1RPX1VQREFURV0qKiwKICAgIGNvbm5lY3QgdG8gdGhlIFtPcGVuT25EZW1hbmQKICAgIHBvcnRhbF0oaHR0cHM6Ly9vbmRlbWFuZC5jbHVzdGVyLmZyYW5jZS1iaW9pbmZvcm1hdGlxdWUuZnIpe3RhcmdldD0iX2JsYW5rIn0gYW5kCiAgICAqKmNyZWF0ZSBhIFJzdHVkaW8gc2Vzc2lvbioqIHdpdGggdGhlIHJpZ2h0IHJlc291cmNlIHJlcXVpcmVtZW50cywgdGhhbmtzIHRvIHRoZSBjaGVhdCBzaGVldC4KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIFdhcm0tdXAKCi0gICBXZSBub3cgc2V0ICoqY29tbW9uIHBhcmFtZXRlcnMqKiBhcyBuZXcgdmFyaWFibGVzLCBvbmNlIGFuZCBmb3IgYWxsIGZvciB0aGlzCnNlc3Npb24gOgoKYGBge3Igc2V0cGFyYW19CiMgc2V0cGFyYW0KCgojIyBTZXQgeW91ciBwcm9qZWN0IG5hbWUKIyBXQVJOSU5HIDogRG8gbm90IGp1c3QgY29weS1wYXN0ZSB0aGlzICEgSXQncyBNWSBwcm9qZWN0IG5hbWUgISBQdXQgWU9VUlMgISEKcHJvamVjdF9uYW1lIDwtICJlYmFpaV9zY190ZWFjaGVycyIKCgojIyBDb250cm9sIGlmIHRoZSBwcm9qZWN0X25hbWUgZXhpc3RzIG9uIHRoZSBjbHVzdGVyCmNhdCgnUEFUSCBDSEVDSyA6ICcsIGRpci5leGlzdHMocGFzdGUwKCcvc2hhcmVkL3Byb2plY3RzLycsIHByb2plY3RfbmFtZSkpKQoKIyMgU2VlZCBmb3IgdGhlIFJORwpteV9zZWVkIDwtIDEzMzdMCgojIyBFbXB0eSBkcm9wbGV0cyBtYXggcC12YWx1ZQptYXhfcCA8LSAxRS0wMwoKYGBgCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBQcmVwYXJlIHRoZSBkYXRhIHN0cnVjdHVyZSBbUFJFUFJPQy4yXQoKIyMgTWFpbiBkaXJlY3RvcnkKCmBgYHtyIG1haW5kaXJ9CiMgbWFpbmRpcgoKIyMgUHJlcGFyaW5nIHRoZSBwYXRoClREX2RpciA8LSBwYXN0ZTAoIi9zaGFyZWQvcHJvamVjdHMvIiwgcHJvamVjdF9uYW1lLCAiL1NDX1REIikKCiMjIENyZWF0aW5nIHRoZSByb290IGRpcmVjdG9yeQpkaXIuY3JlYXRlKHBhdGggPSBURF9kaXIsIHJlY3Vyc2l2ZSA9IFRSVUUpCgojIyBQcmludCB0aGUgcm9vdCBkaXJlY3Rvcnkgb24tc2NyZWVuCnByaW50KFREX2RpcikKCmBgYAoKIyMgQ3VycmVudCBzZXNzaW9uCgpgYGB7ciBzZXNzaW9uZGlyfQojIHNlc3Npb25kaXIKCiMjIENyZWF0aW5nIHRoZSBzZXNzaW9uIChQcmVwcm9jLjIpIGRpcmVjdG9yeQpzZXNzaW9uX2RpciA8LSBwYXN0ZTAoVERfZGlyLCAiLzAyX1ByZXByb2MuMiIpCmRpci5jcmVhdGUocGF0aCA9IHNlc3Npb25fZGlyLCByZWN1cnNpdmUgPSBUUlVFKQoKIyMgUHJpbnQgdGhlIHNlc3Npb24gZGlyZWN0b3J5IG9uLXNjcmVlbgpwcmludChzZXNzaW9uX2RpcikKCmBgYAoKIyMgSW5wdXQgZGlyZWN0b3J5CgpgYGB7ciBpbmRpcn0KIyBpbmRpcgoKIyMgQ3JlYXRpbmcgdGhlIElOUFVUIGRhdGEgZGlyZWN0b3J5CmlucHV0X2RpciA8LSBwYXN0ZTAoc2Vzc2lvbl9kaXIsICIvREFUQSIpCmRpci5jcmVhdGUocGF0aCA9IGlucHV0X2RpciwgcmVjdXJzaXZlID0gVFJVRSkKCiMjIFByaW50IHRoZSBpbnB1dCBkaXJlY3Rvcnkgb24tc2NyZWVuCnByaW50KGlucHV0X2RpcikKCmBgYAoKIyMgR2VuZWxpc3RzIGRpcmVjdG9yeQoKVGhpcyBpcyBhIGRpcmVjdG9yeSB3aGVyZSB3ZSB3aWxsIHN0b3JlIGFkZGl0aW9uYWwgaW5mb3JtYXRpb24gZnJvbSAKa25vd2xlZGdlIGJhc2VzIGFib3V0IGdlbmVzIHVzZWQgdG8gZXN0aW1hdGUgdGhlIGNlbGwgY3ljbGUgcGhhc2Ugb2YgY2VsbHMuCgpgYGB7ciByZXNkaXJ9CiMgcmVzZGlyCgpyZXNfZGlyIDwtIHBhc3RlMChURF9kaXIsICIvUmVzb3VyY2VzIikKZ2xpc3RfZGlyIDwtIHBhc3RlMChyZXNfZGlyLCAiL0dlbmVsaXN0cyIpCgojIyBDcmVhdGUgdGhlIGRpcmVjdG9yeQpkaXIuY3JlYXRlKHBhdGggPSBnbGlzdF9kaXIsIHJlY3Vyc2l2ZSA9IFRSVUUpCgojIyBQcmludCB0aGUgcmVzb3VyY2VzIGRpcmVjdG9yeSBvbi1zY3JlZW4KcHJpbnQoZ2xpc3RfZGlyKQoKYGBgCgojIyBPdXRwdXQgZGlyZWN0b3J5CgpgYGB7ciBvdXRkaXJ9CiMgb3V0ZGlyCgojIyBDcmVhdGluZyB0aGUgT1VUUFVUIGRhdGEgZGlyZWN0b3J5Cm91dHB1dF9kaXIgPC0gcGFzdGUwKHNlc3Npb25fZGlyLCAiL1JFU1VMVFMiKQpkaXIuY3JlYXRlKHBhdGggPSBvdXRwdXRfZGlyLCByZWN1cnNpdmUgPSBUUlVFKQoKIyMgUHJpbnQgdGhlIG91dHB1dCBkaXJlY3Rvcnkgb24tc2NyZWVuCnByaW50KG91dHB1dF9kaXIpCgpgYGAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBMb2FkIHRoZSByYXcgbWF0cml4IFtQcmVQcm9jLjJdCgpXZSByZXRyaWV2ZSB0aGUgaW5wdXQgZGF0YSBmaWxlCgpgYGB7ciBtYXRfZGx9CiMgbWF0X2RsCgpsb2NhbCA8LSBGQUxTRQoKIyMgVGhlIHJhdyBjb3VudCBtYXRyaXggd2Ugd2lsbCBzdGFydCBmcm9tCnNjbWF0X3NvdXJjZSA8LSAiR1NNNDg2MTE5NF9nZXhfMl9yYXdfZ2VuZV9leHByZXNzaW9uLnRzdi5neiIKCiMjIERvd25sb2FkIHRoZSBmaWxlIGZyb20gWmVub2RvCmlmICghbG9jYWwpIHsKICAKICAjIyMgWmVuSUQKICB6ZW5faWQgPC0gIjE0MDMzOTQxIgogICMjIyBaZW4gUGF0aAogIHplbl9iYWNrdXBfZmlsZSA8LSBwYXN0ZTAoImh0dHBzOi8vemVub2RvLm9yZy9yZWNvcmRzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB6ZW5faWQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAiL2ZpbGVzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzY21hdF9zb3VyY2UpCiAgCiAgIyMgVGhlIHBhdGggdG8gdGhlIGxvY2FsbHkgc2F2ZWQgaW5wdXQgZmlsZQogIHNjbWF0X2ZpbGUgPC0gcGFzdGUwKGlucHV0X2RpciwKICAgICAgICAgICAgICAgICAgICAgICAnLycsCiAgICAgICAgICAgICAgICAgICAgICAgc2NtYXRfc291cmNlKQogICMjIERvd25sb2FkIHRoZSBmaWxlCiAgZG93bmxvYWQuZmlsZSh1cmwgPSB6ZW5fYmFja3VwX2ZpbGUsCiAgICAgICAgICAgICAgICBkZXN0ZmlsZSA9IHNjbWF0X2ZpbGUpCn0gZWxzZSB7CiAgZWJhaWlfc2Vzc2lvbiA8LSAnMjUzOF9lYjNpX24xXzIwMjUnCiAgc2NtYXRfZmlsZSA8LSBwYXN0ZTAoCiAgICAgICcvc2hhcmVkL3Byb2plY3RzLycsCiAgICAgIGViYWlpX3Nlc3Npb24sCiAgICAgICcvYXRlbGllcl9zY3JuYXNlcS9URC9CQUNLVVAvVFNWLycsCiAgICAgIHNjbWF0X3NvdXJjZSkKfQpgYGAKCldlIGNhbiBsb2FkIGl0IGludG8gUiA6CgpgYGB7ciBtYXRfbG9hZH0KIyBtYXRfbG9hZAoKc2NtYXQgPC0gYXMubWF0cml4KAogIHV0aWxzOjpyZWFkLnRhYmxlKAogICAgZmlsZSA9IHNjbWF0X2ZpbGUsIAogICAgaGVhZGVyID0gVFJVRSwgCiAgICBzZXAgPSAiXHQiKSkKCiMjIERpc3BsYXlpbmcgaXRzIHNpemUgaW4tbWVtb3J5ICh0aGlzIGlzIGEgYmFzaWMgbWF0cml4KQpmb3JtYXQodXRpbHM6Om9iamVjdC5zaXplKHNjbWF0KSwgdW5pdHMgPSAiYXV0byIpCgpgYGAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBMb2FkIHRoZSBnZW5lbGlzdHMgcmVzb3VyY2VzIFtQcmVQcm9jLjJdCgpXZSByZXRyaWV2ZSB0aGUgZ2VuZWxpc3RzCgpgYGB7ciBnbF9kbH0KIyBnbF9kbAoKbG9jYWwgPC0gRkFMU0UKCiMjIFRoZSBnZW5lbGlzdCBmaWxlcwptaXRvX3NvdXJjZSA8LSAibXVzX211c2N1bHVzX21pdG9fc3ltYm9sc18yMDE5MTAxNS5yZHMiCnJpYm9fc291cmNlIDwtICJtdXNfbXVzY3VsdXNfY3JpYm9fc3ltYm9sc18yMDE5MTAxNS5yZHMiCnN0cmVzc19zb3VyY2UgPC0gIm11c19tdXNjdWx1c19zdHJlc3Nfc3ltYm9sc18yMDIwMDIyNC5yZHMiCmdsX3NvdXJjZXMgPC0gYyhtaXRvX3NvdXJjZSwgcmlib19zb3VyY2UsIHN0cmVzc19zb3VyY2UpCgojIyBUaGUgKGZ1dHVyZSkgbG9jYWwgZmlsZXMKbWl0b19maWxlIDwtIHBhc3RlMChpbnB1dF9kaXIsICcvJywgbWl0b19zb3VyY2UpCnJpYm9fZmlsZSA8LSBwYXN0ZTAoaW5wdXRfZGlyLCAnLycsIHJpYm9fc291cmNlKQpzdHJlc3NfZmlsZSA8LSBwYXN0ZTAoaW5wdXRfZGlyLCAnLycsIHN0cmVzc19zb3VyY2UpCmdsX2ZpbGVzIDwtIGMobWl0b19maWxlLCByaWJvX2ZpbGUsIHN0cmVzc19maWxlKQoKIyMgRG93bmxvYWQgdGhlIGZpbGUgZnJvbSBaZW5vZG8KaWYgKCFsb2NhbCkgewogIAogICMjIyBaZW5JRAogIHplbl9pZCA8LSAiMTQwMzczNTUiCiAgIyMjIExvb3Bpbmcgb24gZmlsZXMKICBmb3IgKGdsZiBpbiBzZXFfYWxvbmcoZ2xfc291cmNlcykpIHsKICAgICMjIyBaZW4gUGF0aAogICAgemVuX2JhY2t1cF9maWxlIDwtIHBhc3RlMCgiaHR0cHM6Ly96ZW5vZG8ub3JnL3JlY29yZHMvIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgemVuX2lkLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiL2ZpbGVzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdsX3NvdXJjZXNbZ2xmXSkKICAgIAogICAgIyMgRG93bmxvYWQgdGhlIGZpbGUKICAgIGRvd25sb2FkLmZpbGUodXJsID0gemVuX2JhY2t1cF9maWxlLAogICAgICAgICAgICAgICAgICBkZXN0ZmlsZSA9IGdsX2ZpbGVzW2dsZl0pCiAgfQogIHJtKGdsX2ZpbGVzKQp9IGVsc2UgeyAgIyMgTG9jYWwgbW9kZQogIGViYWlpX3Nlc3Npb24gPC0gJzI1MzhfZWIzaV9uMV8yMDI1JwogIGxvY2FsYmFja3VwX2RpciA8LSBwYXN0ZTAoJy9zaGFyZWQvcHJvamVjdHMvJywgZWJhaWlfc2Vzc2lvbiwgJy9hdGVsaWVyX3Njcm5hc2VxL1REL1JFU09VUkNFUy9HRU5FTElTVFMvJykKICBtaXRvX2ZpbGUgPC0gcGFzdGUwKGxvY2FsYmFja3VwX2RpciwgJy9tdXNfbXVzY3VsdXNfbWl0b19zeW1ib2xzXzIwMTkxMDE1LnJkcycpCiAgcmlib19zb3VyY2UgPC0gcGFzdGUwKGlucHV0X2RpciwgJy9tdXNfbXVzY3VsdXNfY3JpYm9fc3ltYm9sc18yMDE5MTAxNS5yZHMnKQogIHN0cmVzc19zb3VyY2UgPC0gcGFzdGUwKGlucHV0X2RpciwgJy9tdXNfbXVzY3VsdXNfc3RyZXNzX3N5bWJvbHNfMjAyMDAyMjQucmRzJykKfQpgYGAKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIFJlbG9hZCB0aGUgU2V1cmF0IE9iamVjdCAoZXhhbXBsZSBmcm9tIFByZVByb2MuMykKCi0gICBXZSBjYW4gcmVsb2FkIHRoZSBvYmplY3Qgd2Ugc2F2ZWQgYXQgdGhlIGZvcm1lciBzdGVwCgpgYGB7ciBkYXRhbG9hZH0KIyBkYXRhbG9hZAoKIyMgVGhlIGxhdGVzdCBTZXVyYXQgb2JqZWN0IHNhdmVkIGFzIFJEUyAobmFtZSkKc29ial9maWxlIDwtICIwMl9URDNBX1M1X01ldHJpY3MuQmlvXzMxMDUzLjQ1ODcuUkRTIgoKIyMgVGhlIGxhdGVzdCBTZXVyYXQgb2JqZWN0IHNhdmVkIGFzIFJEUyAoZnVsbCBwYXRoKQpzb2JqX3BhdGggPC0gcGFzdGUwKFREX2RpciwgCiAgICAgICAgICAgICAgICAgICAgIi8wMl9QcmVwcm9jLjIvUkVTVUxUUy8iLAogICAgICAgICAgICAgICAgICAgIHNvYmpfZmlsZSkKCmZvcmNlIDwtIEZBTFNFICAjIyBUbyBmb3JjZSBhIHJlLWRvd25sb2FkIG9mIGEgWmVub2RvLWhvc3RlZCBiYWNrdXAKbG9jYWwgPC0gRkFMU0UgICMjIFRvIGZvcmNlIGEgbG9hZGluZyBmcm9tIGEgbG9jYWwgYmFja3VwCgojIyBJbiBjYXNlIG9mIGVycm9yL2xvc3QgZGF0YSA6IGZvcmNlIGEgcmVsb2FkIGZyb20gYSBaZW5vZG8gYmFja3VwIHJlcG9zaXRvcnkKaWYoZm9yY2UpIHsKICB6ZW5faWQgPC0gIjE0MDM1MjkzIgogIHplbl9iYWNrdXBfZmlsZSA8LSBwYXN0ZTAoImh0dHBzOi8vemVub2RvLm9yZy9yZWNvcmRzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB6ZW5faWQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAiL2ZpbGVzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzb2JqX2ZpbGUpCiAgIyMgUmVjcmVhdGUgdGhlIGV4cGVjdGVkIHBhdGggaWYgaXQgZG9lcyBub3QgZXhpc3QKICBkaXIuY3JlYXRlKHBhdGggPSBkaXJuYW1lKHNvYmpfcGF0aCksIHJlY3Vyc2l2ZSA9IFRSVUUpCiAgIyMgRG93bmxvYWQgdGhlIGZpbGUKICBkb3dubG9hZC5maWxlKHVybCA9IHplbl9iYWNrdXBfZmlsZSwKICAgICAgICAgICAgICAgIGRlc3RmaWxlID0gc29ial9wYXRoKQp9CgojIyBJbiBjYXNlIG9mIGVycm9yL2xvc3QgZGF0YSA6IGZvcmNlIGEgcmVsb2FkIGZyb20gYSBsb2NhbCBiYWNrdXAgcmVwb3NpdG9yeQppZihsb2NhbCkgewogIHNvYmpfcGF0aCA8LSBwYXN0ZTAoCiAgICAiL3NoYXJlZC9wcm9qZWN0cy8yNDIyX2ViYWlpX24xL2F0ZWxpZXJfc2NybmFzZXEvVEQvQkFDS1VQL1JEUy8iLAogICAgc29ial9maWxlKQp9CgojIyBMb2FkIHRoZSBvYmplY3QKc29iaiA8LSByZWFkUkRTKGZpbGUgPSBzb2JqX3BhdGgpCgpgYGAKCiMgRXhhbXBsZSBvZiBhIHNldCBvZiB0YWJzIHsudGFic2V0IC50YWJzZXQtZmFkZSAudGFic2V0LXBpbGxzfQoKIyMgVGFiIE9uZQoKLSAgIENvbnRhaW5zIHNvbWUgdGV4dAoKICAgIGBgYHtyIHRhYjFjaHVua30KICAgICMgdGFiMWNodW5rCiAgICAKICAgIGdldHdkKCkKICAgIAogICAgYGBgCgojIyBUYWIgVHdvCgotICAgQ29udGFpbnMgc29tZSB0ZXh0IHRvbwoKICAgIGBgYHtyIHRhYjJjaHVua30KICAgICMgdGFiMmNodW5rCiAgICAKICAgIGdldHdkKCkKICAgIAogICAgYGBgCgojICB7LnVubnVtYmVyZWR9CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBFeGFtcGxlIG9mIHRoZSAiVEVBTVdPUksiIGxvZ28KClRoYXQncyB3aGF0IEkgdXNlIHdoZW4gdHJhaW5lZXMgd29yayBpbiA1IGJpbm9tZXMgOgoKPGJyPgo8Q0VOVEVSPioqVGVBbVdvUmsgVGlNZSAhKioKPGJyPgohW10oYTJtaWJsZXVmcmFpc2U1MC5qcGcpCjwvQ0VOVEVSPgo8YnI+CgoKPGJyPjxicj48YnI+CgojIFJzZXNzaW9uCgpGb3IgcmVwcm9kdWNpYmlsaXR5IGFuZCBjb250ZXh0LCBpdCBpcyByZWNvbW1lbmRlZCB0byBpbmNsdWRlIGluIHlvdXIgUk1hcmtkb3duIHRoZSBsaXN0IG9mIGxvYWRlZCBwYWNrYWdlcyBhbmQgdGhlaXIgdmVyc2lvbi4KCmBgYHtyIHJzZXNzaW9uLCBjbGFzcy5zb3VyY2U9Im5vdHJ1biIsIGNsYXNzLm91dHB1dD0ibm90cnVubyJ9CiMgcnNlc3Npb24KCnV0aWxzOjpzZXNzaW9uSW5mbygpCgpgYGAK</div>
+      <div id="rmd-source-code">LS0tCnRpdGxlOiAiPENFTlRFUj5FQjNJIG4xIDIwMjUgc2NSTkFzZXE8QlI+LTxCUj4gPEI+TEVTU09OIEJMT0NLIChJKTwvQj48QlI+LTxCUj5BIG5pY2Ugc3VidGl0bGU8L0NFTlRFUj4iCmRhdGU6ICIyMDI1LTE2LTIxLjIyIgphdXRob3I6CiAgLSBuYW1lOiAiRUJBSUkgbjEgc2NSTkFzZXEgVGVhbSIKICAtIG5hbWU6ICJGaXJzdCBBVVRIT1IiCiAgICBlbWFpbDogImZpcnN0LmF1dGhvckBzY3JuYXNlcS5jb20iCiAgLSBuYW1lOiAiU2Vjb25kIEFVVEhPUiIKICAgIGVtYWlsOiAic2Vjb25kLmF1dGhvckBzY3JuYXNlcS5jb20iCm91dHB1dDoKICBybWRmb3JtYXRzOjpyZWFkdGhlZG93bjoKICAgIGZpZ193aWR0aDogOAogICAgZmlnX2hlaWdodDogNgogICAgaGlnaGxpZ2h0OiB0YW5nbyAgIyMgVGhlbWUgZm9yIHRoZSBjb2RlIGNodW5rcwogICAgZW1iZWRfZm9udHM6IFRSVUUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZSAgIyMgQWRkcyBudW1iZXIgdG8gaGVhZGVycyAoc2VjdGlvbnMpCiAgICB0aGVtZTogZmxhdGx5ICAjIyBDU1MgdGhlbWUgZm9yIHRoZSBIVE1MIHBhZ2UKICAgIGNvbGxhcHNlZDogdHJ1ZSAgIyMgQnkgZGVmYXVsdCwgdGhlIFRPQyBpcyBmb2xkZWQKICAgIHRvY19kZXB0aDogMwogICAgc21vb3RoX3Njcm9sbDogdHJ1ZSAjIyBTbW9vdGggc2Nyb2xsIG9mIHRoZSBIVE1MIHBhZ2UKICAgIHNlbGZfY29udGFpbmVkOiB0cnVlICMjIEluY2x1ZGVzIGFsbCBwbG90cy9pbWFnZXMgd2l0aGluIHRoZSBIVE1MCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlICMjIEFkZHMgYSBidXR0b24gdG8gZG93bmxvYWQgdGhlIFJtZAogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICB0aHVtYm5haWxzOiBmYWxzZQogICAgbGlnaHRib3g6IHRydWUKICAgIGZpZ19jYXB0aW9uOiBmYWxzZQogICAgZ2FsbGVyeTogdHJ1ZQogICAgdXNlX2Jvb2tkb3duOiB0cnVlCmFsd2F5c19hbGxvd19odG1sOiB0cnVlICMjIEFsbG93IHBsYWluIEhUTUwgY29kZSBpbiB0aGUgUm1kCmVkaXRvcl9vcHRpb25zOiAKICBtYXJrZG93bjogCiAgICB3cmFwOiA3MgotLS0KCjwhLS0ga25pdCBzZXR1cCAtLT4KCmBgYHtyIGtuaXRfc2V0dXAsIGVjaG8gPSBGQUxTRX0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgIyBQcmludCB0aGUgY29kZQogIGV2YWwgPSBUUlVFLCAgICAgICAgIyBSdW4gY29tbWFuZCBsaW5lcwogIG1lc3NhZ2UgPSBGQUxTRSwgICAgIyBQcmludCBtZXNzYWdlcwogIHByb21wdCA9IEZBTFNFLCAgICAgIyBEbyBub3QgZGlzcGxheSBwcm9tcHQKICBjb21tZW50ID0gTkEsICAgICAgICMgTm8gY29tbWVudHMgb24gdGhpcyBzZWN0aW9uCiAgd2FybmluZyA9IEZBTFNFLCAgICAjIERpc3BsYXkgd2FybmluZ3MKICB0aWR5ID0gRkFMU0UsCiAgZmlnLmFsaWduPSJjZW50ZXIiLCAKICAjIHJlc3VsdHMgPSAnaGlkZScsCiAgd2lkdGggPSAxMDAgICAgICAgIyBOdW1iZXIgb2YgY2hhcmFjdGVycyBwZXIgbGluZQopCmBgYAoKCjwhLS0gQ1NTIHRvIGNvbG9yIGNodW5rcyBhbmQgb3V0cHV0cyAtLT4KCmBgYHtjc3MsIGVjaG89RkFMU0V9Ci5ub3RydW4gewogIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0Z3JleSAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIGJsYWNrICFpbXBvcnRhbnQ7Cn0KLm5vdHJ1bm8gewogIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0Z3JleSAhaW1wb3J0YW50OwogIGNvbG9yIDogYmxhY2sgIWltcG9ydGFudDsKfQoucXVlc3Rpb24gewogIGJhY2tncm91bmQtY29sb3I6IGFxdWFtYXJpbmUgIWltcG9ydGFudDsKICBjb2xvciA6IGJsYWNrICFpbXBvcnRhbnQ7CiAgYm9yZGVyOiAzcHggc29saWQgbGltZWdyZWVuICFpbXBvcnRhbnQ7Cn0KLnF1ZXN0aW9ubyB7CiAgYmFja2dyb3VuZC1jb2xvcjogYXF1YW1hcmluZSAhaW1wb3J0YW50OwogIGNvbG9yIDogYmxhY2sgIWltcG9ydGFudDsKfQouYW5zd2VyIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiBuYXZham93aGl0ZSAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIGJyb3duICFpbXBvcnRhbnQ7Cn0KLmFuc3dlcm8gewogIGJhY2tncm91bmQtY29sb3I6IG5hdmFqb3doaXRlICFpbXBvcnRhbnQ7CiAgY29sb3IgOiBibGFjayAhaW1wb3J0YW50Owp9Ci5iZXlvbmQgewogIGJhY2tncm91bmQtY29sb3I6IHZpb2xldCAhaW1wb3J0YW50OwogIGJvcmRlcjogM3B4IHNvbGlkIHB1cnBsZSAhaW1wb3J0YW50Owp9Ci5iZXlvbmRvIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiB2aW9sZXQgIWltcG9ydGFudDsKICBjb2xvciA6IGJsYWNrICFpbXBvcnRhbnQ7Cn0KYGBgCgoKPCEtLSBIb29rIHRvIGhhbmRsZSBjb2RlIGJsb2NrcyBvdXRwdXQgZm9sZGluZyAtLT4KCmBgYHtyIGtuaXRfaG9vaywgZWNobyA9IEZBTFNFfQpob29rcyA9IGtuaXRyOjprbml0X2hvb2tzJGdldCgpCmhvb2tfZm9sZGFibGUgPSBmdW5jdGlvbih0eXBlKSB7CiAgZm9yY2UodHlwZSkKICBmdW5jdGlvbih4LCBvcHRpb25zKSB7CiAgICByZXMgPSBob29rc1tbdHlwZV1dKHgsIG9wdGlvbnMpCiAgICAKICAgIGlmIChpc0ZBTFNFKG9wdGlvbnNbW3Bhc3RlMCgiZm9sZC4iLCB0eXBlKV1dKSkgcmV0dXJuKHJlcykKICAgIAogICAgcGFzdGUwKAogICAgICAiPGRldGFpbHM+PHN1bW1hcnk+U2hvdyAiLCB0eXBlLCAiPC9zdW1tYXJ5PlxuXG4iLAogICAgICByZXMsCiAgICAgICJcblxuPC9kZXRhaWxzPiIKICAgICkKICB9Cn0Ka25pdHI6OmtuaXRfaG9va3Mkc2V0KAogIG91dHB1dCA9IGhvb2tfZm9sZGFibGUoIm91dHB1dCIpLAogIHBsb3QgPSBob29rX2ZvbGRhYmxlKCJwbG90IikKKQpgYGAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKPGNlbnRlcj4hW10oZWIzaV9iYW5uZXIucG5nKTwvY2VudGVyPgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgUFJFQU1CTEUKCiMjIFB1cnBvc2Ugb2YgdGhpcyBzZXNzaW9uCgpUaGlzIGZpbGUgZGVzY3JpYmVzIHRoZSBkaWZmZXJlbnQgc3RlcHMgdG8gcGVyZm9ybSB0aGUgKipmaXJzdCBwYXJ0Kiogb2YKdGhlICoqc2luZ2xlIGNlbGwgUk5Bc2VxKiogZGF0YSBhbmFseXNpcyB0cmFpbmluZyBjb3Vyc2UgZm9yIHRoZSAqKkVCQUlJCm4xIDIwMjUqKiwgY292ZXJpbmcgdGhlc2Ugc3RlcHMgOgoKLSAgICoqTG9hZCoqIGEgc2luZ2xlIGNlbGwgcmF3IGNvdW50cyAqKm1hdHJpeCoqCgotICAgKipSZW1vdmUqKiBiYXJjb2RlcyBmcm9tICoqZW1wdHkgZHJvcGxldHMqKgoKLSAgICoqRXN0aW1hdGUqKiBhbmQgcmVtb3ZlICoqYW1iaWVudCBSTkEqKiBjb250YW1pbmF0aW9uICooInNvdXAiKSoKCiMjIEFuIGltcG9ydGFudCBub3RpY2UKCi0gICBUaGVzZSBlYXJseSAoYnV0IG1hbmRhdG9yeSkgc3RlcHMgb2YgdGhlIGFuYWx5c2lzIGFyZSBub3QgY292ZXJlZCBieQogICAgdGhlIHJlbm93bmVkLCBoaWdoZXItbGV2ZWwgYW5hbHlzaXMgZnJhbWV3b3JrcyBsaWtlICoqU2V1cmF0Kiogbm9yCiAgICAqKnNjcmFuL3NjYXRlcioqLgogICAgCi0gICBUaHVzLCB3ZSB3aWxsIHdyaXRlL3VzZSBhIGNlcnRhaW4gYW1vdW50IG9mICoqbGluZXMgb2YgY29kZSoqLCBzb21lCiAgICBvZiB3aGljaCBvZiBhIGhpZ2hlciBjb21wbGV4aXR5IGZvciBSIGJlZ2lubmVycy4KICAgIAotICAgKipOZXdjb21lciwgZG8gbm90IGZlYXIqKiAhCgogICAgLSAgIFdoaWxlIHlvdSBhcmUgKip3ZWxjb21lIHRvIHRyeSoqIHdyaXRpbmcgc29tZSBieSB5b3Vyc2VsZiwKICAgICAgICBkZXBlbmRpbmcgb24geW91ciBSIGtub3dsZWRnZSBhbmQgc2VsZi1jb25maWRlbmNlIGluIGl0IC4uLgogICAgICAgIAogICAgLSAgIC4uLiB5b3UgZG8gbm90IGhhdmUgdG8ga25vdyBbKipob3cqKl17LnVuZGVybGluZX0gdGhlc2UgY29kZQogICAgICAgIHdvcmsgLi4uCiAgICAgICAgCiAgICAtICAgLi4uIHRodXMgeW91ICoqc2hvdWxkIG5vdCBmZWVsIGFzaGFtZWQqKiBjb3B5LXBhc3RpbmcgdGhlCiAgICAgICAgcHJlLXdyaXR0ZW4gY29kZSBoZXJlYWZ0ZXIgLi4uCiAgICAgICAgCiAgICAtICAgLi4uIGJ1dCBpbiBib3RoIGNhc2VzLCBwbGVhc2UgdHJ5ICoqeW91ciBiZXN0IHVuZGVyc3RhbmRpbmcqKgogICAgICAgIFsqKndoYXQqKl17LnVuZGVybGluZX0gdGhlc2UgY29kZSBkbywgYW5kIGV2ZW4gbW9yZSwKICAgICAgICBbKip3aHkqKl17LnVuZGVybGluZX0gIQogICAgICAgIAogICAgLSAgIEluIHRoaXMgcHVycG9zZSwgeW91IG1heSB1c2Ugd2hhdGV2ZXIgKipoZWxwKiogeW91IGNhbiAqKmJ5KioKICAgICAgICAqKnNlYXJjaGluZyoqLgoKIyMgV2hhdCB0byBydW4gPwoKLSAgIFRoaXMgdHJhaW5pbmcgcHJlc2VudGF0aW9uLCB3cml0dGVuIGluIFJtYXJrZG93biwgY29udGFpbnMgKiptYW55KiogY2h1bmtzICggPSBjb2RlIGJsb2NrcykKCi0gICBZb3UgKipkbyBub3QgaGF2ZSB0byoqIHJ1biB0aGVtIGFsbCAhCgotICAgQ2h1bmtzIGZvbGxvdyBhICoqY29sb3IgY29kZSoqIDoKCiMjIyBDaHVua3MgeW91ICoqQVJFKiogZXhwZWN0ZWQgdG8gcnVuIDoKCmBgYHtyIGNodW5rX3J1bn0KIyBjaHVua19ydW4KCiMjIEV4YW1wbGUgb2YgYSBjaHVuayB0byBydW4KZ2V0d2QoKQoKYGBgCgo8YnI+CgojIyMgQ2h1bmtzIHlvdSAqKkFSRSBOT1QqKiBleHBlY3RlZCB0byBydW4KCkhvcGVmdWxseSwgd2Ugd2lsbCBkZW1vIHRoZW0uIFlvdSBtYXkgcnVuIHRoZW0gYnkgeW91cnNlbGYsIHlvdW5nIHBhZGF3YW4sIGJ1dCBpZiB5b3UgZ2V0IGxhdGUgb3Igd29yc3QsIGJyZWFrIHNvbWV0aGluZywgX3lvdV8nbGwgYmUgdGhlIG9uZSB0byBibGFtZSAhCgpgYGB7ciBjaHVua19kZW1vLCBjbGFzcy5zb3VyY2U9Im5vdHJ1biIsIGNsYXNzLm91dHB1dD0ibm90cnVubyJ9CiMgY2h1bmtfZGVtbwoKIyMgRXhhbXBsZSBvZiBhIGNodW5rIHRvIE5PVCBydW4KdXRpbHM6OnNlc3Npb25JbmZvKCkKCmBgYAoKPGJyPgoKIyMjIFF1ZXN0aW9ucwoKU29tZSBxdWVzdGlvbnMgd2Ugd291bGQgbGlrZSB5b3UgdG8gYW5zd2VyIGR1cmluZyB0aGUgdHJhaW5pbmcgY291cnNlLgpQbGVhc2UgYmUgZmFpciBhbmQgZG8gbm90IHRha2UgYSBsb29rIGF0IHRoZSBhbnN3ZXIgYmVmb3JlIHdlIHRlbGwgeW91IHNvIDopCgpgYGB7ciBjaHVua19xdWVzdGlvbiwgY2xhc3Muc291cmNlPSJxdWVzdGlvbiIsIGV2YWwgPSBGQUxTRX0KIyBjaHVua19xdWVzdGlvbgoKIyMgV2hhdCdzIHRoZSBBbnN3ZXIgdG8gTGlmZSA/IFRoZSBVbml2ZXJzZSA/IEV2ZXJ5dGhpbmcgPz8KCmBgYAoKPGJyPgoKIyMjIEFuc3dlcnMKClRoZXkgdXN1YWxseSBmb2xsb3cgcXVlc3Rpb25zLi4uCgpgYGB7ciBjaHVua19hbnN3ZXIsIGNsYXNzLnNvdXJjZSA9IGMoImZvbGQtaGlkZSIsICJhbnN3ZXIiKSwgY2xhc3Mub3V0cHV0PSJhbnN3ZXJvIn0KIyBjaHVua19hbnN3ZXIKCmNhdCgiVGhlIEFuc3dlciB0byB0aGUgR3JlYXQgUXVlc3Rpb24uLi4gaXMgLi4uIApGb3J0eS10d28uIFNpeCBieSBuaW5lIDogZm9ydHktdHdvLiBUaGF0J3MgaXQuIApUaGF0J3MgYWxsIHRoZXJlIGlzLiAoSSBhbHdheXMgdGhvdWdodCBzb21ldGhpbmcgd2FzIApmdW5kYW1lbnRhbGx5IHdyb25nIHdpdGggdGhlIHVuaXZlcnNlLikiKQoKYGBgCgo8YnI+CgojIyMgQWRkaXRpb25hbCBleGVyY2lzZXMgLyBxdWVzdGlvbnMKClRoZXNlIGFyZSBiZXlvbmQgdGhlIHNjb3BlIG9mIHRoZSB0cmFpbmluZyBjb3Vyc2UsIGJ1dCB5b3UgbWF5IHBsYXkgaXQgX2lmIHlvdSBmZWVsIGJvcmVkXwoKYGBge3IgY2h1bmtfYmV5b25kLCBjbGFzcy5zb3VyY2U9ImJleW9uZCIsIGNsYXNzLm91dHB1dD0iYmV5b25kbyJ9CiMgY2h1bmtfYmV5b25kCgojIyBFeGFtcGxlIG9mIGEgY2h1bmsgdG8gcGxheSB3aXRoIGJ1dCBiZXlvbmQgdGhlIHNjb3BlCmdldHdkKCkKCmBgYAoKPGJyPgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCgojIEFkZGl0aW9uYWwgcmVzb3VyY2VzCgoqKkhvd2V2ZXIqKiwgc29tZSB1cGNvbWluZyBzdGVwcyByZXF1aXJlIGEgYml0IGNvbXBsaWNhdGVkIG1ldGhvZHMgdGhhdAphcmUgbm90IGZ1biB0byB3cml0ZSwgbm9yIGNvcHktcGFzdGUgbXVsdGlwbGUgdGltZXMuIFNvLCB3ZSB3aWxsIG5vdwpwcmVwYXJlIGNvZGUgKipmdW5jdGlvbnMqKiB0aGF0IHdpbGwgZWFzZSB0aGVzZSBzdGVwcy4gQWZ0ZXIgZXhlY3V0aW5nCnRoZXNlIGZ1bmN0aW9ucyBjb2RlLCB3ZSBtYXkgY2FsbCAoaW52b2tlKSB0aGVtIHdoZW4gbmVlZGVkLgoKIyMgRnVuY3Rpb25zCgojIyMgU291cFggaGVscGVyIGZ1bmN0aW9uCgpUaGlzIGZ1bmN0aW9uIHdhcyB3cml0dGVuIHRvIGVhc2UgdGhlIHVzZSBvZiBTb3VwWCBvbiBhIFNldXJhdCBvYmplY3QKCkl0IHdhcyB0ZXN0ZWQgb24gYFNvdXBYYD0xLjYuMiB3aXRoIGBpZ3JhcGhgPTEuNS4xLCBgU2V1cmF0YD00LjQuMCw1LjEuMAoKUGFyYW1ldGVycyA6CgotICAgYHNjbWF0X2ZpbHRgIDogKHNwYXJzZSltYXRyaXggY29ycmVzcG9uZGluZyB0byBhbiBlbXB0eSBkcm9wbGV0cyAtZmlsdGVyZWQgY291bnQgbWF0cml4CgotICAgYHNjbWF0X3Jhd2AgOiAoc3BhcnNlKW1hdHJpeCBjb3JyZXNwb25kaW5nIHRvIGFuIE5PTi0gZW1wdHkgZHJvcGxldHMgLWZpbHRlcmVkIGNvdW50IG1hdHJpeAoKLSAgIGBzb3VwUXVhbnRpbGVgLCBgY29udGFtaW5hdGlvblJhbmdlYCA6IHNlZSBgP1NvdXBYOjphdXRvRXN0Q29udGAKCi0gICBgY29udGFtaW5hdGlvblJhbmdlYCA6IHJhbmdlIG9mIHRoZSAqZXhwZWN0ZWQqIHNvdXAgcHJvcG9ydGlvbgoKLSAgIGBzb3VwUmFuZ2VgIDogZXN0aW1hdGUgc291cCBmcmFjdGlvbiBmcm9tIGZlYXR1cmVzIHdpdGggdG90YWwgcmVhZHMKY29tcHJpc2VkIGluIHRoaXMgcmFuZ2Ugb2YgY291bnRzIChvbmx5IHVzZWQgd2hlbiBgc2NtYXRfcmF3ICE9IE5VTExgKQoKLSAgIGByZXR1cm5fb2JqZWN0YCA6IGlmIGBUUlVFYCwgcmV0dXJuIHRoZSAidW5zb3VwZWQiIGBTZXVyYXRgIG9iamVjdCA7IGlmCmBGQUxTRWAsIG9ubHkgcGVyZm9ybSBzb3VwIGVzdGltYXRpb24gYW5kIHJldHVybiB0aGUgZXN0aW1hdGVkCnByb3BvcnRpb24gdmFsdWUgKHJobykKCi0gICBgZG9QbG90YCA6IFBlcmZvcm0gdGhlIFNvdXBYIGVzdGltYXRpb24gcGxvdCAocmhvIGRpc3RyaWJ1dGlvbikKCmBgYHtyIHNvdXB4X2Z1bmMsIGV2YWwgPSBUUlVFfQojIHNvdXB4X2Z1bmMKClNvdXBYX2F1dG8gPC0gZnVuY3Rpb24oc2NtYXRfZmlsdCA9IE5VTEwsIHNjbWF0X3JhdyA9IE5VTEwsIHNvdXBRdWFudGlsZSA9IDAuOSwKICAgICAgICAgICAgICAgICAgICAgICBjb250YW1pbmF0aW9uUmFuZ2UgPSBjKC4wMSwgLjgpLCBzb3VwUmFuZ2UgPSBjKDAsMTAwKSwKICAgICAgICAgICAgICAgICAgICAgICByZXR1cm5fb2JqZWN0ID0gRkFMU0UsIGRvUGxvdCA9IEZBTFNFKSB7CiAgCiAgIyMgQ2hlY2tzCiAgaWYoaXMubnVsbChzY21hdF9maWx0KSkgc3RvcCgnQSBmaWx0ZXJlZCBjb3VudCBtYXRyaXggaXMgcmVxdWlyZWQgIScpCiAgCiAgaWYoaXMubnVsbChzY21hdF9yYXcpKSBtZXNzYWdlKCdObyB1bmZpbHRlcmVkIHJhdyBjb3VudHMgbWF0cml4IHByb3ZpZGVkLiBFc3RpbWF0aW9uIHdpbGwgYmUgYmFzZWQgb24gZmlsdGVyZWQgbWF0cml4IG9ubHkuJykKICAKICAjIyBJZiBubyByYXcgbWF0cml4CiAgaWYgKGlzLm51bGwoc2NtYXRfcmF3KSkgewogICAgc3BDaGFuUmF3IDwtIFNvdXBYOjpTb3VwQ2hhbm5lbCgKICAgICAgdG9kID0gc2NtYXRfZmlsdCwgCiAgICAgIHRvYyA9IHNjbWF0X2ZpbHQsIAogICAgICBjYWxjU291cFByb2ZpbGUgPSBGQUxTRSkKICAgIHNjX3Jvd3N1bSA8LSBzcGFyc2VNYXRyaXhTdGF0czo6cm93U3VtczIoc2NtYXRfZmlsdCkKICAgIHNwUHJvZiA8LSBkYXRhLmZyYW1lKAogICAgICByb3cubmFtZXMgPSByb3duYW1lcyhzY21hdF9maWx0KSwgCiAgICAgIGVzdCA9IHNjX3Jvd3N1bS9zdW0oc2NtYXRfZmlsdCksIAogICAgICBjb3VudHMgPSBzY19yb3dzdW0pCiAgICBzcENoYW4gPC0gU291cFg6OnNldFNvdXBQcm9maWxlKHNwQ2hhblJhdywgc3BQcm9mKQogIH0gZWxzZSB7CiAgICBzcENoYW4gPC0gU291cFg6OlNvdXBDaGFubmVsKAogICAgICB0b2QgPSBzY21hdF9yYXcsIAogICAgICB0b2MgPSBzY21hdF9maWx0LCAKICAgICAgY2FsY1NvdXBQcm9maWxlID0gRkFMU0UpCiAgICBpZiAobWluKHNwQ2hhbiRuRHJvcFVNSXMpID4gbWF4KHNvdXBSYW5nZSkpIHN0b3AoCiAgICAgICdNaW5pbXVtIGZvdW5kIGNvdW50cyBwZXIgYmFyY29kZSBpcyA6ICcsIAogICAgICBtaW4oc3BDaGFuJG5Ecm9wVU1JcyksIAogICAgICAnLCB3aGljaCBpcyBzbWFsbGVyIHRoYW4gdGhlIHVwcGVyIGJvdW5kIG9mIHNvdXBSYW5nZSAhIFBsZWFzZSBpbmNyZWFzZSBzb3VwUmFuZ2UgbWF4ICEnKQogICAgc3BDaGFuIDwtIFNvdXBYOjplc3RpbWF0ZVNvdXAoc2MgPSBzcENoYW4sIHNvdXBSYW5nZSA9IHNvdXBSYW5nZSkKICB9CiAgIyMgRGlzcGxheSBUb3AgMjAgY29udHJpYnV0aW5nIGdlbmVzCiAgaWYgKCFyZXR1cm5fb2JqZWN0KSB7CiAgICBjYXQoJ1xuU291cC1jb250cmlidXRpbmcgZmVhdHVyZXMgKFRvcCAyMCkgOlxuJykKICAgIHByaW50KGtuaXRyOjprYWJsZShoZWFkKAogICAgICBzcENoYW4kc291cFByb2ZpbGVbb3JkZXIoc3BDaGFuJHNvdXBQcm9maWxlJGVzdCwgZGVjcmVhc2luZyA9IFRSVUUpLCBdLCAKICAgICAgbiA9IDIwKSkpCiAgfQogICMjIFF1aWNrIGNsdXN0ZXJpbmcgbmVlZGVkCiAgc3BDbHVzdCA8LSBzY3Jhbjo6cXVpY2tDbHVzdGVyKHNjbWF0X2ZpbHQsIG1ldGhvZCA9ICJpZ3JhcGgiKQogICMjIEFkZGluZyBjbHVzdGVycyB0byB0aGUgU291cENoYW5uZWwgb2JqZWN0CiAgc3BDaGFuIDwtIFNvdXBYOjpzZXRDbHVzdGVycyhzYyA9IHNwQ2hhbiwgY2x1c3RlcnMgPSBzcENsdXN0KQogICMjIEVzdGltYXRpbmcgc291cAogIHNYIDwtIFNvdXBYOjphdXRvRXN0Q29udChzYyA9IHNwQ2hhbiwgZG9QbG90ID0gZG9QbG90LCB0ZmlkZk1pbiA9IDEsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBzb3VwUXVhbnRpbGUgPSBzb3VwUXVhbnRpbGUsIG1heE1hcmtlcnMgPSAxMDAsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBjb250YW1pbmF0aW9uUmFuZ2UgPSBjb250YW1pbmF0aW9uUmFuZ2UsIAogICAgICAgICAgICAgICAgICAgICAgICAgICByaG9NYXhGRFIgPSAuMiwgcHJpb3JSaG8gPSAuMDUsIHByaW9yUmhvU3RkRGV2ID0gLjEsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBmb3JjZUFjY2VwdCA9IEZBTFNFKQogIAogICMjIFJlbW92aW5nIHNvdXAgKGFkanVzdGluZyBjb3VudHMpCiAgaWYocmV0dXJuX29iamVjdCkgewogICAgY2F0KCdDb3VudHMgQkVGT1JFIFNvdXBYIDogJywgc3VtKHNjbWF0X2ZpbHQpLCAnXG4nKQogICAgc2NtYXRfc291cHggPC0gU291cFg6OmFkanVzdENvdW50cygKICAgICAgc1gsIG1ldGhvZCA9ICdzdWJ0cmFjdGlvbicsIHJvdW5kVG9JbnQgPSBUUlVFLCAKICAgICAgdG9sID0gLjAwMSwgcEN1dCA9IC4wMSkKICAgIGNhdCgnQ291bnRzIEFGVEVSIFNvdXBYIDogJywgc3VtKHNjbWF0X3NvdXB4KSwgJ1xuJykKICAgIHJtKHNjbWF0X2ZpbHQpCiAgICByZXR1cm4oc2NtYXRfc291cHgpCiAgfSBlbHNlIHJldHVybihzWCRmaXQkcmhvRXN0KQp9CgpgYGAKCgo8YnI+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBTdGFydCBSc3R1ZGlvCgotICAgVXNpbmcgdGhlIFtPcGVuT25EZW1hbmQvUnN0dWRpbyBjaGVhdAogICAgc2hlZXRdKGh0dHBzOi8vbW9vZGxlLmZyYW5jZS1iaW9pbmZvcm1hdGlxdWUuZnIvcGx1Z2luZmlsZS5waHAvMTQ3NS9tb2RfZm9sZGVyL2NvbnRlbnQvMC9Pb0RfUl9Sc3R1ZGlvLmh0bWw/Zm9yY2Vkb3dubG9hZD0xKXt0YXJnZXQ9Il9ibGFuayJ9ICoqW0xJTktfVE9fVVBEQVRFXSoqLAogICAgY29ubmVjdCB0byB0aGUgW09wZW5PbkRlbWFuZAogICAgcG9ydGFsXShodHRwczovL29uZGVtYW5kLmNsdXN0ZXIuZnJhbmNlLWJpb2luZm9ybWF0aXF1ZS5mcil7dGFyZ2V0PSJfYmxhbmsifSBhbmQKICAgICoqY3JlYXRlIGEgUnN0dWRpbyBzZXNzaW9uKiogd2l0aCB0aGUgcmlnaHQgcmVzb3VyY2UgcmVxdWlyZW1lbnRzLCB0aGFua3MgdG8gdGhlIGNoZWF0IHNoZWV0LgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgV2FybS11cAoKLSAgIFdlIG5vdyBzZXQgKipjb21tb24gcGFyYW1ldGVycyoqIGFzIG5ldyB2YXJpYWJsZXMsIG9uY2UgYW5kIGZvciBhbGwgZm9yIHRoaXMKc2Vzc2lvbiA6CgpgYGB7ciBzZXRwYXJhbX0KIyBzZXRwYXJhbQoKCiMjIFNldCB5b3VyIHByb2plY3QgbmFtZQojIFdBUk5JTkcgOiBEbyBub3QganVzdCBjb3B5LXBhc3RlIHRoaXMgISBJdCdzIE1ZIHByb2plY3QgbmFtZSAhIFB1dCBZT1VSUyAhIQpwcm9qZWN0X25hbWUgPC0gImViYWlpX3NjX3RlYWNoZXJzIgoKCiMjIENvbnRyb2wgaWYgdGhlIHByb2plY3RfbmFtZSBleGlzdHMgb24gdGhlIGNsdXN0ZXIKY2F0KCdQQVRIIENIRUNLIDogJywgZGlyLmV4aXN0cyhwYXN0ZTAoJy9zaGFyZWQvcHJvamVjdHMvJywgcHJvamVjdF9uYW1lKSkpCgojIyBTZWVkIGZvciB0aGUgUk5HCm15X3NlZWQgPC0gMTMzN0wKCiMjIEVtcHR5IGRyb3BsZXRzIG1heCBwLXZhbHVlCm1heF9wIDwtIDFFLTAzCgpgYGAKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIFByZXBhcmUgdGhlIGRhdGEgc3RydWN0dXJlIFtQUkVQUk9DLjJdCgojIyBNYWluIGRpcmVjdG9yeQoKYGBge3IgbWFpbmRpcn0KIyBtYWluZGlyCgojIyBQcmVwYXJpbmcgdGhlIHBhdGgKVERfZGlyIDwtIHBhc3RlMCgiL3NoYXJlZC9wcm9qZWN0cy8iLCBwcm9qZWN0X25hbWUsICIvU0NfVEQiKQoKIyMgQ3JlYXRpbmcgdGhlIHJvb3QgZGlyZWN0b3J5CmRpci5jcmVhdGUocGF0aCA9IFREX2RpciwgcmVjdXJzaXZlID0gVFJVRSkKCiMjIFByaW50IHRoZSByb290IGRpcmVjdG9yeSBvbi1zY3JlZW4KcHJpbnQoVERfZGlyKQoKYGBgCgojIyBDdXJyZW50IHNlc3Npb24KCmBgYHtyIHNlc3Npb25kaXJ9CiMgc2Vzc2lvbmRpcgoKIyMgQ3JlYXRpbmcgdGhlIHNlc3Npb24gKFByZXByb2MuMikgZGlyZWN0b3J5CnNlc3Npb25fZGlyIDwtIHBhc3RlMChURF9kaXIsICIvMDJfUHJlcHJvYy4yIikKZGlyLmNyZWF0ZShwYXRoID0gc2Vzc2lvbl9kaXIsIHJlY3Vyc2l2ZSA9IFRSVUUpCgojIyBQcmludCB0aGUgc2Vzc2lvbiBkaXJlY3Rvcnkgb24tc2NyZWVuCnByaW50KHNlc3Npb25fZGlyKQoKYGBgCgojIyBJbnB1dCBkaXJlY3RvcnkKCmBgYHtyIGluZGlyfQojIGluZGlyCgojIyBDcmVhdGluZyB0aGUgSU5QVVQgZGF0YSBkaXJlY3RvcnkKaW5wdXRfZGlyIDwtIHBhc3RlMChzZXNzaW9uX2RpciwgIi9EQVRBIikKZGlyLmNyZWF0ZShwYXRoID0gaW5wdXRfZGlyLCByZWN1cnNpdmUgPSBUUlVFKQoKIyMgUHJpbnQgdGhlIGlucHV0IGRpcmVjdG9yeSBvbi1zY3JlZW4KcHJpbnQoaW5wdXRfZGlyKQoKYGBgCgojIyBHZW5lbGlzdHMgZGlyZWN0b3J5CgpUaGlzIGlzIGEgZGlyZWN0b3J5IHdoZXJlIHdlIHdpbGwgc3RvcmUgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiBmcm9tIAprbm93bGVkZ2UgYmFzZXMgYWJvdXQgZ2VuZXMgdXNlZCB0byBlc3RpbWF0ZSB0aGUgY2VsbCBjeWNsZSBwaGFzZSBvZiBjZWxscy4KCmBgYHtyIHJlc2Rpcn0KIyByZXNkaXIKCnJlc19kaXIgPC0gcGFzdGUwKFREX2RpciwgIi9SZXNvdXJjZXMiKQpnbGlzdF9kaXIgPC0gcGFzdGUwKHJlc19kaXIsICIvR2VuZWxpc3RzIikKCiMjIENyZWF0ZSB0aGUgZGlyZWN0b3J5CmRpci5jcmVhdGUocGF0aCA9IGdsaXN0X2RpciwgcmVjdXJzaXZlID0gVFJVRSkKCiMjIFByaW50IHRoZSByZXNvdXJjZXMgZGlyZWN0b3J5IG9uLXNjcmVlbgpwcmludChnbGlzdF9kaXIpCgpgYGAKCiMjIE91dHB1dCBkaXJlY3RvcnkKCmBgYHtyIG91dGRpcn0KIyBvdXRkaXIKCiMjIENyZWF0aW5nIHRoZSBPVVRQVVQgZGF0YSBkaXJlY3RvcnkKb3V0cHV0X2RpciA8LSBwYXN0ZTAoc2Vzc2lvbl9kaXIsICIvUkVTVUxUUyIpCmRpci5jcmVhdGUocGF0aCA9IG91dHB1dF9kaXIsIHJlY3Vyc2l2ZSA9IFRSVUUpCgojIyBQcmludCB0aGUgb3V0cHV0IGRpcmVjdG9yeSBvbi1zY3JlZW4KcHJpbnQob3V0cHV0X2RpcikKCmBgYAoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIExvYWQgdGhlIHJhdyBtYXRyaXggW1ByZVByb2MuMl0KCldlIHJldHJpZXZlIHRoZSBpbnB1dCBkYXRhIGZpbGUKCmBgYHtyIG1hdF9kbH0KIyBtYXRfZGwKCmxvY2FsIDwtIEZBTFNFCgojIyBUaGUgcmF3IGNvdW50IG1hdHJpeCB3ZSB3aWxsIHN0YXJ0IGZyb20Kc2NtYXRfc291cmNlIDwtICJHU000ODYxMTk0X2dleF8yX3Jhd19nZW5lX2V4cHJlc3Npb24udHN2Lmd6IgoKIyMgRG93bmxvYWQgdGhlIGZpbGUgZnJvbSBaZW5vZG8KaWYgKCFsb2NhbCkgewogIAogICMjIyBaZW5JRAogIHplbl9pZCA8LSAiMTQwMzM5NDEiCiAgIyMjIFplbiBQYXRoCiAgemVuX2JhY2t1cF9maWxlIDwtIHBhc3RlMCgiaHR0cHM6Ly96ZW5vZG8ub3JnL3JlY29yZHMvIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHplbl9pZCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICIvZmlsZXMvIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNjbWF0X3NvdXJjZSkKICAKICAjIyBUaGUgcGF0aCB0byB0aGUgbG9jYWxseSBzYXZlZCBpbnB1dCBmaWxlCiAgc2NtYXRfZmlsZSA8LSBwYXN0ZTAoaW5wdXRfZGlyLAogICAgICAgICAgICAgICAgICAgICAgICcvJywKICAgICAgICAgICAgICAgICAgICAgICBzY21hdF9zb3VyY2UpCiAgIyMgRG93bmxvYWQgdGhlIGZpbGUKICBkb3dubG9hZC5maWxlKHVybCA9IHplbl9iYWNrdXBfZmlsZSwKICAgICAgICAgICAgICAgIGRlc3RmaWxlID0gc2NtYXRfZmlsZSkKfSBlbHNlIHsKICBlYmFpaV9zZXNzaW9uIDwtICcyNTM4X2ViM2lfbjFfMjAyNScKICBzY21hdF9maWxlIDwtIHBhc3RlMCgKICAgICAgJy9zaGFyZWQvcHJvamVjdHMvJywKICAgICAgZWJhaWlfc2Vzc2lvbiwKICAgICAgJy9hdGVsaWVyX3Njcm5hc2VxL1REL0JBQ0tVUC9UU1YvJywKICAgICAgc2NtYXRfc291cmNlKQp9CmBgYAoKV2UgY2FuIGxvYWQgaXQgaW50byBSIDoKCmBgYHtyIG1hdF9sb2FkfQojIG1hdF9sb2FkCgojIyBMb2FkaW5nIHRoZSBtYXRyaXggZGlyZWN0bHkgYXMgYSBzcGFyc2VNYXRyaXgKc2NtYXQgPC0gc2N1dHRsZTo6cmVhZFNwYXJzZUNvdW50cygKICAgIGZpbGUgPSBzY21hdF9maWxlLCAKICAgIHNlcCA9ICJcdCIpCgojIyBEaXNwbGF5aW5nIGl0cyBzaXplIGluLW1lbW9yeSAodGhpcyBpcyBhIGJhc2ljIG1hdHJpeCkKZm9ybWF0KHV0aWxzOjpvYmplY3Quc2l6ZShzY21hdCksIHVuaXRzID0gImF1dG8iKQoKYGBgCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgTG9hZCB0aGUgZ2VuZWxpc3RzIHJlc291cmNlcyBbUHJlUHJvYy4yXQoKV2UgcmV0cmlldmUgdGhlIGdlbmVsaXN0cwoKYGBge3IgZ2xfZGx9CiMgZ2xfZGwKCmxvY2FsIDwtIEZBTFNFCgojIyBUaGUgZ2VuZWxpc3QgZmlsZXMKbWl0b19zb3VyY2UgPC0gIm11c19tdXNjdWx1c19taXRvX3N5bWJvbHNfMjAxOTEwMTUucmRzIgpyaWJvX3NvdXJjZSA8LSAibXVzX211c2N1bHVzX2NyaWJvX3N5bWJvbHNfMjAxOTEwMTUucmRzIgpzdHJlc3Nfc291cmNlIDwtICJtdXNfbXVzY3VsdXNfc3RyZXNzX3N5bWJvbHNfMjAyMDAyMjQucmRzIgpnbF9zb3VyY2VzIDwtIGMobWl0b19zb3VyY2UsIHJpYm9fc291cmNlLCBzdHJlc3Nfc291cmNlKQoKIyMgVGhlIChmdXR1cmUpIGxvY2FsIGZpbGVzCm1pdG9fZmlsZSA8LSBwYXN0ZTAoaW5wdXRfZGlyLCAnLycsIG1pdG9fc291cmNlKQpyaWJvX2ZpbGUgPC0gcGFzdGUwKGlucHV0X2RpciwgJy8nLCByaWJvX3NvdXJjZSkKc3RyZXNzX2ZpbGUgPC0gcGFzdGUwKGlucHV0X2RpciwgJy8nLCBzdHJlc3Nfc291cmNlKQpnbF9maWxlcyA8LSBjKG1pdG9fZmlsZSwgcmlib19maWxlLCBzdHJlc3NfZmlsZSkKCiMjIERvd25sb2FkIHRoZSBmaWxlIGZyb20gWmVub2RvCmlmICghbG9jYWwpIHsKICAKICAjIyMgWmVuSUQKICB6ZW5faWQgPC0gIjE0MDM3MzU1IgogICMjIyBMb29waW5nIG9uIGZpbGVzCiAgZm9yIChnbGYgaW4gc2VxX2Fsb25nKGdsX3NvdXJjZXMpKSB7CiAgICAjIyMgWmVuIFBhdGgKICAgIHplbl9iYWNrdXBfZmlsZSA8LSBwYXN0ZTAoImh0dHBzOi8vemVub2RvLm9yZy9yZWNvcmRzLyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHplbl9pZCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIi9maWxlcy8iLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnbF9zb3VyY2VzW2dsZl0pCiAgICAKICAgICMjIERvd25sb2FkIHRoZSBmaWxlCiAgICBkb3dubG9hZC5maWxlKHVybCA9IHplbl9iYWNrdXBfZmlsZSwKICAgICAgICAgICAgICAgICAgZGVzdGZpbGUgPSBnbF9maWxlc1tnbGZdKQogIH0KICBybShnbF9maWxlcykKfSBlbHNlIHsgICMjIExvY2FsIG1vZGUKICBlYmFpaV9zZXNzaW9uIDwtICcyNTM4X2ViM2lfbjFfMjAyNScKICBsb2NhbGJhY2t1cF9kaXIgPC0gcGFzdGUwKCcvc2hhcmVkL3Byb2plY3RzLycsIGViYWlpX3Nlc3Npb24sICcvYXRlbGllcl9zY3JuYXNlcS9URC9SRVNPVVJDRVMvR0VORUxJU1RTLycpCiAgbWl0b19maWxlIDwtIHBhc3RlMChsb2NhbGJhY2t1cF9kaXIsICcvbXVzX211c2N1bHVzX21pdG9fc3ltYm9sc18yMDE5MTAxNS5yZHMnKQogIHJpYm9fc291cmNlIDwtIHBhc3RlMChpbnB1dF9kaXIsICcvbXVzX211c2N1bHVzX2NyaWJvX3N5bWJvbHNfMjAxOTEwMTUucmRzJykKICBzdHJlc3Nfc291cmNlIDwtIHBhc3RlMChpbnB1dF9kaXIsICcvbXVzX211c2N1bHVzX3N0cmVzc19zeW1ib2xzXzIwMjAwMjI0LnJkcycpCn0KYGBgCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKIyBSZWxvYWQgdGhlIFNldXJhdCBPYmplY3QgKGV4YW1wbGUgZnJvbSBQcmVQcm9jLjMpCgotICAgV2UgY2FuIHJlbG9hZCB0aGUgb2JqZWN0IHdlIHNhdmVkIGF0IHRoZSBmb3JtZXIgc3RlcAoKYGBge3IgZGF0YWxvYWR9CiMgZGF0YWxvYWQKCiMjIFRoZSBsYXRlc3QgU2V1cmF0IG9iamVjdCBzYXZlZCBhcyBSRFMgKG5hbWUpCnNvYmpfZmlsZSA8LSAiMDJfVEQzQV9TNV9NZXRyaWNzLkJpb18zMTA1My40NTg3LlJEUyIKCiMjIFRoZSBsYXRlc3QgU2V1cmF0IG9iamVjdCBzYXZlZCBhcyBSRFMgKGZ1bGwgcGF0aCkKc29ial9wYXRoIDwtIHBhc3RlMChURF9kaXIsIAogICAgICAgICAgICAgICAgICAgICIvMDJfUHJlcHJvYy4yL1JFU1VMVFMvIiwKICAgICAgICAgICAgICAgICAgICBzb2JqX2ZpbGUpCgpmb3JjZSA8LSBGQUxTRSAgIyMgVG8gZm9yY2UgYSByZS1kb3dubG9hZCBvZiBhIFplbm9kby1ob3N0ZWQgYmFja3VwCmxvY2FsIDwtIEZBTFNFICAjIyBUbyBmb3JjZSBhIGxvYWRpbmcgZnJvbSBhIGxvY2FsIGJhY2t1cAoKIyMgSW4gY2FzZSBvZiBlcnJvci9sb3N0IGRhdGEgOiBmb3JjZSBhIHJlbG9hZCBmcm9tIGEgWmVub2RvIGJhY2t1cCByZXBvc2l0b3J5CmlmKGZvcmNlKSB7CiAgemVuX2lkIDwtICIxNDAzNTI5MyIKICB6ZW5fYmFja3VwX2ZpbGUgPC0gcGFzdGUwKCJodHRwczovL3plbm9kby5vcmcvcmVjb3Jkcy8iLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgemVuX2lkLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIi9maWxlcy8iLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgc29ial9maWxlKQogICMjIFJlY3JlYXRlIHRoZSBleHBlY3RlZCBwYXRoIGlmIGl0IGRvZXMgbm90IGV4aXN0CiAgZGlyLmNyZWF0ZShwYXRoID0gZGlybmFtZShzb2JqX3BhdGgpLCByZWN1cnNpdmUgPSBUUlVFKQogICMjIERvd25sb2FkIHRoZSBmaWxlCiAgZG93bmxvYWQuZmlsZSh1cmwgPSB6ZW5fYmFja3VwX2ZpbGUsCiAgICAgICAgICAgICAgICBkZXN0ZmlsZSA9IHNvYmpfcGF0aCkKfQoKIyMgSW4gY2FzZSBvZiBlcnJvci9sb3N0IGRhdGEgOiBmb3JjZSBhIHJlbG9hZCBmcm9tIGEgbG9jYWwgYmFja3VwIHJlcG9zaXRvcnkKaWYobG9jYWwpIHsKICBzb2JqX3BhdGggPC0gcGFzdGUwKAogICAgIi9zaGFyZWQvcHJvamVjdHMvMjQyMl9lYmFpaV9uMS9hdGVsaWVyX3Njcm5hc2VxL1REL0JBQ0tVUC9SRFMvIiwKICAgIHNvYmpfZmlsZSkKfQoKIyMgTG9hZCB0aGUgb2JqZWN0CnNvYmogPC0gcmVhZFJEUyhmaWxlID0gc29ial9wYXRoKQoKYGBgCgojIEV4YW1wbGUgb2YgYSBzZXQgb2YgdGFicyB7LnRhYnNldCAudGFic2V0LWZhZGUgLnRhYnNldC1waWxsc30KCiMjIFRhYiBPbmUKCi0gICBDb250YWlucyBzb21lIHRleHQKCiAgICBgYGB7ciB0YWIxY2h1bmt9CiAgICAjIHRhYjFjaHVuawogICAgCiAgICBnZXR3ZCgpCiAgICAKICAgIGBgYAoKIyMgVGFiIFR3bwoKLSAgIENvbnRhaW5zIHNvbWUgdGV4dCB0b28KCiAgICBgYGB7ciB0YWIyY2h1bmt9CiAgICAjIHRhYjJjaHVuawogICAgCiAgICBnZXR3ZCgpCiAgICAKICAgIGBgYAoKIyAgey51bm51bWJlcmVkfQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgRXhhbXBsZSBvZiB0aGUgIlRFQU1XT1JLIiBsb2dvCgpUaGF0J3Mgd2hhdCBJIHVzZSB3aGVuIHRyYWluZWVzIHdvcmsgaW4gNSBiaW5vbWVzIDoKCjxicj4KPENFTlRFUj4qKlRlQW1Xb1JrIFRpTWUgISoqCjxicj4KIVtdKGEybWlibGV1ZnJhaXNlNTAuanBnKQo8L0NFTlRFUj4KPGJyPgoKCjxicj48YnI+PGJyPgoKIyBSc2Vzc2lvbgoKRm9yIHJlcHJvZHVjaWJpbGl0eSBhbmQgY29udGV4dCwgaXQgaXMgcmVjb21tZW5kZWQgdG8gaW5jbHVkZSBpbiB5b3VyIFJNYXJrZG93biB0aGUgbGlzdCBvZiBsb2FkZWQgcGFja2FnZXMgYW5kIHRoZWlyIHZlcnNpb24uCgpgYGB7ciByc2Vzc2lvbiwgY2xhc3Muc291cmNlPSJub3RydW4iLCBjbGFzcy5vdXRwdXQ9Im5vdHJ1bm8ifQojIHJzZXNzaW9uCgp1dGlsczo6c2Vzc2lvbkluZm8oKQoKYGBgCg==</div>
    
             
       

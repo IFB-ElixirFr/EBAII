@@ -358,8 +358,8 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
 
 # Start Rstudio
 
--   Using the [OpenOnDemand cheat
-    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"} **[LINK_TO_UPDATE]**,
+-   Using the [OpenOnDemand/Rstudio cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"},
     connect to the [OpenOnDemand
     portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and
     **create a Rstudio session** with the right resource requirements, thanks to the cheat sheet.
