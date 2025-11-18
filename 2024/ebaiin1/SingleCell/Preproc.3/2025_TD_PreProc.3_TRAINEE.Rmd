@@ -201,6 +201,10 @@ print(output_dir)
 ```{r dataload}
 # dataload
 
+
+## This is the path to the current EB3I backup
+sessionid <- '2538_eb3i_n1_2025'
+
 ## The latest Seurat object saved as RDS (name)
 sobj_file <- "02_TD3A_S5_Metrics.Bio_31053.4587.RDS"
 
@@ -229,7 +233,7 @@ if(force) {
 ## In case of error/lost data : force a reload from a local backup repository
 if(local) {
   sobj_path <- paste0(
-    "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/",
+    "/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/RDS/",
     sobj_file)
 }
 
@@ -505,7 +509,7 @@ saveRDS(object = sobj,
     
     ### Define remote folder
     remote_folder <- if (backup) {
-      "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/RESOURCES/GENELISTS/"
+      paste0("/shared/projects/", sessionid, "/atelier_scrnaseq/TD/RESOURCES/GENELISTS/")
     }  else {
       paste0("https://zenodo.org/records/", zen_id, "/files/")
     }

@@ -344,7 +344,7 @@ force <- FALSE
 if(force) message("Forcing (re)download !")
 
 ### Define remote folder
-remote_folder <- if (backup) "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/10X/" else paste0("https://zenodo.org/records/", zen_id, "/files/")
+remote_folder <- if (backup) "/shared/projects/2538_eb3i_n1_2025/atelier_scrnaseq/TD/BACKUP/10X/" else paste0("https://zenodo.org/records/", zen_id, "/files/")
 
 ### Reconstruct the input paths
 remote_path <- paste0(remote_folder, "/", toget_files)

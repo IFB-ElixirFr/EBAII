@@ -2,7 +2,7 @@
 title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR><B>PROCESSING (II)</B><BR>-<BR>Dimension reduction & visualization</CENTER>"
 date: "2025-16-21.22"
 author:
-  - name: "EBAII n1 scRNAseq Team"
+  - name: "EB3I n1 scRNAseq Team"
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
   - name: "Lilia YOUNSI"
@@ -125,7 +125,7 @@ knitr::knit_hooks$set(
 
 ## Purpose of this session
 
-This file describes the different steps to perform **fifth** part of the data processing for the single cell RNAseq data analysis training course for the **EBAII n1 2025**, covering these steps :
+This file describes the different steps to perform **fifth** part of the data processing for the single cell RNAseq data analysis training course for the **EB3I n1 2025**, covering these steps :
 
 -   **Dimension reduction** of the expression data
 
@@ -141,8 +141,8 @@ This file describes the different steps to perform **fifth** part of the data pr
 
 # Start Rstudio
 
--   Using the [OpenOnDemand cheat
-    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html),
+-   Using the [OpenOnDemand/Rstudio cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html),
     connect to the [OpenOnDemand
     portal](https://ondemand.cluster.france-bioinformatique.fr) and
     **create a Rstudio session** with the right resource requirements.
@@ -249,6 +249,11 @@ print(output_dir)
 ```{r dataload}
 ##  dataload
 
+
+## This is the path to the current EB3I backup
+sessionid <- '2538_eb3i_n1_2025'
+
+
 ## The latest Seurat object saved as RDS (name)
 sobj_file <- "08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS"
 
@@ -277,7 +282,7 @@ if(force) {
 ## In case of error/lost data : force a reload from a local backup repository
 if(local) {
   sobj_path <- paste0(
-    "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/RDS/",
+    "/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/RDS/",
     sobj_file)
 }
 

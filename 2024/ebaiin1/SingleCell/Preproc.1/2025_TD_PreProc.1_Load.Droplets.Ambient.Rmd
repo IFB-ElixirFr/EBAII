@@ -509,6 +509,9 @@ SoupX_auto <- function(scmat_filt = NULL, scmat_raw = NULL, soupQuantile = 0.9,
     ## This is actually to help me updating this training without hassle
     zen_id <- '14034221'
     
+    ## This is the path to the current EB3I backup
+    sessionid <- '2538_eb3i_n1_2025'
+    
     ```
 
 -   Here will we train ourselves to load into R a single cell RNAseq
@@ -576,7 +579,7 @@ force <- FALSE
 if(force) message("Forcing (re)download !")
 
 ### Define remote folder
-remote_folder <- if (backup) "/shared/projects/2422_ebaii_n1/atelier_scrnaseq/TD/BACKUP/10X/" else paste0("https://zenodo.org/records/", zen_id, "/files/")
+remote_folder <- if (backup) paste("/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/10X/") else paste0("https://zenodo.org/records/", zen_id, "/files/")
 
 ### Reconstruct the input paths
 remote_path <- paste0(remote_folder, "/", toget_files)
