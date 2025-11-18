@@ -272,7 +272,7 @@ print(output_dir)
 # dataload
 
 ## The latest Seurat object saved as RDS (name)
-sobj_file <- "02_TD3A_S5_Metrics.Bio_31053.4587.RDS"
+sobj_file <- "02_TD3A_S5_Metrics_31053.4587.RDS"
 
 ## The latest Seurat object saved as RDS (full path)
 sobj_path <- paste0(TD_dir, 
@@ -403,7 +403,7 @@ rm(sobj_VIZ_pre)
 # featsel
 
 ## Restrict the Seurat object
-sobj <- sobj[nFeat_keep,]
+sobj <- subset(x = sobj, features = rownames(sobj)[nFeat_keep])
 
 ```
 
@@ -490,48 +490,6 @@ patchwork::wrap_plots(
 We are now able to **apply all the filtering strategies** we established for
 each QC metric.
 
--   Identify "good" cells
-
-```{r bckeep}
-# bckeep
-
-## Identify the cells to keep
-bc_keep <-  sobj$nFeature_RNA_in_range & 
-            sobj$nCount_RNA_in_range & 
-            sobj$percent_mt_in_range & 
-            sobj$percent_rb_in_range & 
-            sobj$percent_st_in_range
-
-## Contengency
-table(bc_keep)
-
-```
-
-<br>
-
--   Visualize metrics filtering effect (as an upset-plot)
-
-    ```{r bcupset, class.source="notrun", class.output="notruno"}
-    # bcupset
-    
-    ## Create a list of all cells filtered OUT for each criterion
-    up_list <-list(
-      "nFeature" = colnames(sobj)[!sobj$nFeature_RNA_in_range],
-      "nCount" = colnames(sobj)[!sobj$nCount_RNA_in_range],
-      "%MITO" = colnames(sobj)[!sobj$percent_mt_in_range],
-      "%RIBO" = colnames(sobj)[!sobj$percent_rb_in_range],
-      "%STRESS" = colnames(sobj)[!sobj$percent_st_in_range])
-    
-    ## Create an upset-plot
-    UpSetR::upset(data = UpSetR::fromList(up_list), 
-                  nintersects = NA, 
-                  sets = rev(names(up_list)),
-                  keep.order = TRUE,
-                  order.by = "freq")
-    
-    ```
-
-<br>
 
 -   Apply the filter
 
@@ -542,7 +500,7 @@ table(bc_keep)
     dim(sobj)
     
     ## Apply cell filtering
-    sobj <- subset(x = sobj, cells = colnames(sobj)[bc_keep])
+    sobj <- subset(x = sobj, cells = colnames(sobj)[sobj$fail_qc == "pass"])
     
     ## Seurat object AFTER cell filtering
     dim(sobj)
@@ -1052,7 +1010,7 @@ table(sobj$doublet_scds.hybrid)
 ```
 
 
-### scDblFinder
+### `scDblFinder`
 
 ```{r scdbl}
 # scdbl
