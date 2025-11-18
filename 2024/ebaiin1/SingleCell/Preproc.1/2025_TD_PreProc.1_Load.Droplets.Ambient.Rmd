@@ -6,7 +6,7 @@ author:
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
   - name: "William JARASSIER"
-    email: "william.jarassier@univ-lyon1.fr" 
+    email: "w.jarassier@gmail.com" 
 output:
   rmdformats::readthedown:
     fig_width: 8
