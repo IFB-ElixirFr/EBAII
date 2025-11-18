@@ -117,7 +117,7 @@ Lancez votre workflow dans le terminal
 bash script_01.sh
 ```
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_01.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_01.sh
 
 ## Avec définition de la variable SAMPLE
 
@@ -154,7 +154,7 @@ bash script_02.sh
 ```
 
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_02.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_02.sh
 
 
 ## On redirige les sorties 
@@ -207,7 +207,7 @@ bash script_03.sh
 ```
 
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_03.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_03.sh
 
 `
 # Utilisation des boucles `for`
@@ -261,7 +261,7 @@ Lancez votre workflow dans le terminal
 bash script_04.sh
 ```
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_04.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_04.sh
 
 
 ## Itérer sur le résultat d’une commande
@@ -292,7 +292,7 @@ bash script_05.sh
 ```
 
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_05.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_05.sh
 
 ## Ajouter des options pour SLURM
 
@@ -346,7 +346,7 @@ sbatch script_06.sh
 
 ```
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_06.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_06.sh
 Cette fois ci, on lance le script avec la commande sbatch et on monitore avec squeue
 
 
@@ -398,7 +398,7 @@ sbatch script_07.sh
 sacct -u $USER | grep RUNNING | grep FILE
 ```
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_07.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_07.sh
 
 
 # Ajouter une etape
@@ -441,7 +441,7 @@ sacct -u $USER | grep RUNNING | grep FILE
 ```
 
 
-Si besoin: wget https://github.com/IFB-ElixirFr/EBAII/tree/master/2024/ebaiin1/workflow/scripts/script_08.sh
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_08.sh
 
 
 # 🔬 Workflow ChIP-seq
