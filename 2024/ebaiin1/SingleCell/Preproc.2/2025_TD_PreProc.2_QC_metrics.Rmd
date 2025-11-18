@@ -2,7 +2,7 @@
 title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR> <B>PRE-PROCESSING (II)</B><BR>-<BR>Quality control : Counts & metrics</CENTER>"
 date: "2025-16-21.22"
 author:
-  - name: "EBAII n1 scRNAseq Team"
+  - name: "EB3I n1 scRNAseq Team"
   - name: "Lilia YOUNSI"
     email: "lilia.younsi@inserm.fr"
   - name: "Sebastien MELLA"
@@ -140,7 +140,7 @@ a single cell dataset, based on (per cell) :
 
 **Input data**: A filtered, flat count matrix retrieved from GEO.
 
-**Output data**: A Seurat object annotated for the "bad" cells to filter out for downstream analysis.
+**Output data**: A `Seurat` object annotated for the "bad" cells to filter out for downstream analysis.
 
 
 ------------------------------------------------------------------------
@@ -149,8 +149,8 @@ a single cell dataset, based on (per cell) :
 
 # Start Rstudio
 
--   Using the [OpenOnDemand cheat
-    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"} **[LINK_TO_UPDATE]**,
+-   Using the [OpenOnDemand/Rstudio cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"},
     connect to the [OpenOnDemand
     portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and
     **create a Rstudio session** with the right resource requirements, thanks to the cheat sheet.
@@ -414,8 +414,6 @@ We load the packages of interest:
 
 ```{r packages, message=FALSE, warning=FALSE}
 # packages
-
-library(dplyr)
 library(ggplot2)
 library(Seurat)
 
@@ -551,6 +549,7 @@ stress_symbols
 
 What is already available in the Seurat object ?
 
+
 ```{r see_metadata}
 # see_metadata
 
@@ -644,26 +643,15 @@ If the filtering thresholds are modified, do not forget to run again this chunk.
 
 ```{r fail_cells}
 # fail_cells
+fail_percent_mt <- rownames(sobj@meta.data)[sobj$percent_mt > cut_percent_mt]
 
-fail_percent_mt = sobj@meta.data %>%
-  dplyr::filter(percent_mt > cut_percent_mt) %>%
-  rownames()
+fail_percent_rb <- rownames(sobj@meta.data)[sobj$percent_rb > cut_percent_rb]
 
-fail_percent_rb = sobj@meta.data %>%
-  dplyr::filter(percent_rb > cut_percent_rb) %>%
-  rownames()
+fail_percent_st <- rownames(sobj@meta.data)[sobj$percent_st > cut_percent_st]
 
-fail_percent_st = sobj@meta.data %>%
-  dplyr::filter(percent_st > cut_percent_st) %>%
-  rownames()
+fail_nFeature_RNA <- rownames(sobj@meta.data)[sobj$nFeature_RNA < cut_nFeature_RNA]
 
-fail_nCount_RNA = sobj@meta.data %>%
-  dplyr::filter(nCount_RNA < cut_nCount_RNA) %>%
-  rownames()
-
-fail_nFeature_RNA = sobj@meta.data %>%
-  dplyr::filter(nFeature_RNA < cut_nFeature_RNA) %>%
-  rownames()
+fail_nCount_RNA <- rownames(sobj@meta.data)[sobj$nCount_RNA < cut_nCount_RNA]
 
 ```
 
@@ -755,10 +743,12 @@ print_1_qc_metric = function(object = sobj,
     theme(aspect.ratio = 1)
   
   # Dim plot
-  object$failorpass = ifelse(colnames(object) %in% failing_cells,
-                             yes = "fail", no = "pass") %>%
-    as.factor()
-  
+  object$failorpass = as.factor(
+    ifelse(test = colnames(object) %in% failing_cells,
+           yes = "fail", 
+           no = "pass")
+    )
+
   p_fail = Seurat::DimPlot(object,
                            group.by = "failorpass",
                            order = "fail") +
@@ -857,18 +847,7 @@ print_1_qc_metric(object = sobj_tmp,
 
 ```
 
-Actually, **we won't filter out** cells expressing high levels of riboprotein-coding genes for this dataset :
 
-```{r fail_cells_rb}
-# fail_cells_rb
-
-cut_percent_rb <- 100
-
-fail_percent_rb = sobj@meta.data %>%
-  dplyr::filter(percent_rb > cut_percent_rb) %>%
-  rownames()
-
-```
 
 ### Mechanical stress genes expression
 
@@ -926,9 +905,12 @@ To filter a Seurat object, we use the `Seurat::subset()` function:
 # filter_sobj
 
 sobj_filtered = subset(sobj, invert = TRUE,
-                       cells = unique(c(fail_nCount_RNA, fail_nFeature_RNA,
-                                        fail_percent_mt, fail_percent_rb,
-                                        fail_percent_st)))
+                       cells = unique(c(fail_nCount_RNA, 
+                                        fail_nFeature_RNA,
+                                        fail_percent_mt, 
+                                        # fail_percent_rb, actually we decided not to filter on this parameter
+                                        fail_percent_st
+                                        )))
 
 sobj_filtered
 
