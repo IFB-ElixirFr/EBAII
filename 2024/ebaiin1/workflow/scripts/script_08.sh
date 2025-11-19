@@ -12,8 +12,8 @@ mkdir -p trimmomatic
 module load trimmomatic/0.39
 
 # le Nième fichier de ma liste
-SAMPLE=$(ls data/ | sed 's/R1.fastq.gz//' | \
-head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1)
+SAMPLE=$(basename $(ls data/*R1* | sed 's/.fastq.gz//' | \
+head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1))
 
 srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
 srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE/R1/R2}.fastq.gz
