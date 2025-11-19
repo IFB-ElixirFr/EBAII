@@ -16,7 +16,9 @@ SAMPLE=$(ls data/ | sed 's/R1.fastq.gz//' | \
 head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1)
 
 srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE/R1/R2}.fastq.gz
 srun --job-name TRIM-$SAMPLE trimmomatic PE -threads 4 -phred33 \
                             data/${SAMPLE}.fastq.gz  data/${SAMPLE/R1/R2}.fastq.gz \
                             trimmomatic/${SAMPLE}.fastq.gz trimmomatic/${SAMPLE/R1/R2}.fastq.gz \
+                            trimmomatic/${SAMPLE/R1/unpaired}.fastq.gz \
                             SLIDINGWINDOW:4:20 MINLEN:20

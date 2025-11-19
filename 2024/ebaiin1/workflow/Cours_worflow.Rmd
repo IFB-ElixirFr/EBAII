@@ -209,7 +209,7 @@ bash script_03.sh
 
 Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_03.sh
 
-`
+
 # Utilisation des boucles `for`
 
 Une boucle permet de réaliser des tâches itératives. 
@@ -331,8 +331,8 @@ module load fastqc/0.11.9
 for SAMPLE in $(ls data/ | sed 's/.fastq.gz//')
 do
 echo ">>> Processing $SAMPLE"
-srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
-srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
+srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+
 done
 ```
 
@@ -424,9 +424,11 @@ SAMPLE=$(ls data/ | sed 's/R1.fastq.gz//' | \
 head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1)
 
 srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
+srun --job-name FASTQC-$SAMPLE fastqc --outdir fastqc data/${SAMPLE/R1/R2}.fastq.gz
 srun --job-name TRIM-$SAMPLE trimmomatic PE -threads 4 -phred33 \
                             data/${SAMPLE}.fastq.gz  data/${SAMPLE/R1/R2}.fastq.gz \
                             trimmomatic/${SAMPLE}.fastq.gz trimmomatic/${SAMPLE/R1/R2}.fastq.gz \
+                            trimmomatic/${SAMPLE/R1/unpaired}.fastq.gz \
                             SLIDINGWINDOW:4:20 MINLEN:20
 ```
 
@@ -449,6 +451,69 @@ Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/
 
 <img src="images/chip_pipeline.png" style="width: 100% !important; max-width: 100% !important; display: block; margin: auto;">
 
+
+
+
+### Mise en pratique: Alignement avec bowtie2
+
+On vous propose maintenant de mettre en pratique ce que vous venez de voir et d’écrire
+un script SLURM pour aligner tous les échantillons sur le génome de référence avec Bowtie2
+
+```{bash, eval=FALSE}
+$ module load bowtie2/2.5.1
+$ bowtie2 --help
+```
+
+Si besoin de plus d'aide : [manuel Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml)
+
+Index Bowtie2: ```/shared/bank/arabidopsis_thaliana/TAIR10.1/bowtie2/```
+
+Annotation (GTF):
+`/shared/bank/arabidopsis_thaliana/TAIR10.1/gtf/GCF_000001735.4_TAIR10.1_genomic.gtf`
+
+### Script d'alignement avec Bowtie2
+
+On voudra lancer le script avec la commande sbatch :
+
+```{bash, eval=FALSE}
+sbatch script_mapping_chip.sh
+```
+
+<details>
+<summary>Cliquez <span style="color: green;">**ici**</span> pour voir la solution ! </summary>
+
+```{bash, eval=FALSE}
+#!/bin/bash
+
+#SBATCH --account=2538_eb3i_n1_2025
+#SBATCH --job-name=bowtie_align
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=20GB
+#SBATCH --array=1-3
+
+module load bowtie2/2.5.1
+module load samtools/1.18
+  
+OUT_DIR="bowtie_res"
+mkdir -p $OUT_DIR
+
+GENOME_INDEX="/shared/bank/arabidopsis_thaliana/TAIR10.1/bowtie2/GCF_000001735.4_TAIR10.1_genomic"
+
+
+SAMPLE=$(ls data/*R1* | sed 's/.fastq.gz//' | awk "NR==${SLURM_ARRAY_TASK_ID}")
+BASENAME=$(basename ${SAMPLE/_R1/.bowtie_TAIR10.1})
+
+  
+srun bowtie2 -p 2 --mm -x ${GENOME_INDEX} -1 ${SAMPLE}.fastq.gz -2 ${SAMPLE/R1/R2}.fastq.gz -S bowtie_res/${BASENAME}.sam
+srun samtools view -@ 2 -q 10 -b bowtie_res/${BASENAME}.sam | samtools sort -@ 2 - -o bowtie_res/${BASENAME}.bam 
+```
+
+
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_mapping_chip.sh
+
+
+
+</details>
 
 
 # 🧬 Workflow RNA-seq
@@ -479,7 +544,7 @@ Annotation (GTF):
 On voudra lancer le script avec la commande sbatch :
 
 ```{bash, eval=FALSE}
-sbatch star_align.sh
+sbatch script_mapping_rna.sh
 ```
 
 <details>
@@ -513,7 +578,13 @@ srun STAR --runThreadN ${SLURM_CPUS_PER_TASK} --genomeDir ${STAR_INDEX} \
   --outSAMunmapped Within KeepPairs
 ```
 
+
+Si besoin: wget https://raw.githubusercontent.com/IFB-ElixirFr/EBAII/refs/heads/master/2024/ebaiin1/workflow/scripts/script_mapping_rna.sh
+
+
+
 </details>
+
 
 
 
