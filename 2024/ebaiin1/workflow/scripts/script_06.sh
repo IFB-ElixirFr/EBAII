@@ -12,6 +12,5 @@ module load fastqc/0.11.9
 for SAMPLE in $(ls data/ | sed 's/.fastq.gz//')
 do
 	echo ">>> Processing $SAMPLE"
-	srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R1.fastq.gz
-	srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}_R2.fastq.gz
+	srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
 done
