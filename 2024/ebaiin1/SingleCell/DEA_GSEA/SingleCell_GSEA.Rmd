@@ -1,7 +1,9 @@
 ---
-title: "<CENTER>EBAII n1 2024<BR /><B>Gene Set Enrichment Analysis</B></CENTER>"
+title: "<CENTER>EBAII n1 2025<BR /><B>Gene Set Enrichment Analysis</B></CENTER>"
 date: "`r Sys.Date()`"
 author:
+  - name: "Audrey ONFROY"
+    email: "onfroy@bio.ens.psl.eu"
   - name: "Thibault DAYRIS"
     email: "thibault.dayris@gustaveroussy.fr"
   - name: "Bastien JOB"
@@ -366,7 +368,7 @@ mh_hallmark <- escape::getGeneSets(
   species = "Mus musculus", 
   library = "H"
 )
-utils::head(pathways)
+utils::head(mh_hallmark)
 ```
 
 ## Run exploratory analysis
