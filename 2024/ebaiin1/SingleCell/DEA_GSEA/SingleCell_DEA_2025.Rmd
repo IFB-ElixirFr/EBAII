@@ -7,6 +7,8 @@ author:
     email: "thibault.dayris@gustaveroussy.fr"
   - name: "Bastien JOB"
     email: "bastien.job@gustaveroussy.fr"
+  - name: "William JARASSIER"
+    email: "w.jarassier@gmail.com"
 output:
   rmdformats::readthedown:
     fig_width: 8
@@ -121,14 +123,161 @@ knitr::knit_hooks$set(
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+# Start Rstudio
 
+-   Using the [OpenOnDemand/Rstudio cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html),
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr) and
+    create a Rstudio session with the right resource requirements.
+
+# Warm-up
+
+-   We set common parameters we will use throughout this session :
+
+```{r setparam}
+# setparam
+
+
+## Set your project name
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
+
+## Seed for the RNG
+my_seed <- 1337L
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Prepare the data structure
+
+We will do the same as for former steps, just changing the session name
+:
+
+## Main directory
+
+```{r maindir}
+#maindir
+
+## Preparing the path
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Creating the root directory
+# dir.create(path = TD_dir, recursive = TRUE)
+
+## Print the root directory on-screen
+print(TD_dir)
+
+```
+
+## Current session
+
+```{r sessiondir}
+# sessiondir
+
+## Creating the session (Preproc.2) directory
+session_dir <- paste0(TD_dir, "/05_Proc.2")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+
+```
+
+## Input directory
+
+```{r indir}
+#indir
+
+## Creating the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+
+```
+
+## Output directory
+
+```{r outdir}
+#outdir
+
+## Creating the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Reload the Seurat Object
+
+-   We can reload the object we saved at the former step
+
+```{r dataload}
+##  dataload
+
+
+## This is the path to the current EB3I backup
+sessionid <- '2538_eb3i_n1_2025'
+
+
+## The latest Seurat object saved as RDS (name)
+
+sobj_file <- "12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
+
+## The latest Seurat object saved as RDS (full path)
+sobj_path <- paste0(TD_dir, 
+                    "/05_DEA/RESULTS/",
+                    sobj_file)
+
+force <- TRUE  ## To force a re-download of a Zenodo-hosted backup
+local <- FALSE  ## To force a loading from a local backup
+
+## In case of error/lost data : force a reload from a Zenodo backup repository
+if(force) {
+  zen_id <- "14035293"
+  zen_backup_file <- paste0("https://zenodo.org/records/",
+                            zen_id,
+                            "/files/",
+                            sobj_file)
+  ## Recreate the expected path if it does not exist
+  dir.create(path = dirname(sobj_path), recursive = TRUE)
+  ## Download the file
+  download.file(url = zen_backup_file,
+                destfile = sobj_path)
+}
+
+## In case of error/lost data : force a reload from a local backup repository
+if(local) {
+  sobj_path <- paste0(
+    "/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/RDS/",
+    sobj_file)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+
+```
 
 # Forewords
 
 I need three teams for this session: 
 -   Team [`Wilcoxon`](https://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test)
 -   Team [`Student`](https://en.wikipedia.org/wiki/Student%27s_t-test) 
--   Team [`ROC`](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
+-   Team [`MAST`]
 
 I will also need your help because I can't make [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
 work correctly. 
@@ -161,19 +310,6 @@ base::library(package = "SeuratObject")    # Handle SingleCell objects for Seura
 base::library(package = "SingleCellExperiment") # Handle SingleCell file formats
 base::library(package = "UpSetR")          # Nice venn-like graphs
 base::library(package = "EnhancedVolcano") # Draw Volcano plot
-```
-
-First, we load Seurat object:
-
-```{r load_rds, eval=FALSE, echo=TRUE, class.source="notrun", class.output="notruno"}
-# load_rds
-
-sobj <- base::readRDS(
-  # Path to the RDS file
-  # file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
-  file = "12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
-)
-
 ```
 
 Then we join layers:
@@ -224,27 +360,6 @@ At the end of this session you will know:
 2. how to select the correct normalization (if any?) that must be provided to 
    your differential analysis method
 3. How to read differential expression results
-
-
-## Load RDS dataset
-
-You already have a dataset loaded ? Good. Keep on going with it ! You don't have one ? Use mine:
-
-```{r load_rds_exec, eval=TRUE, echo=TRUE}
-# load_rds_exec
-
-# The function `readRDS` from package `base`.
-sobj <- base::readRDS(
-  # Path to the RDS file
-  # file = "/shared/projects/ebaii_sc_teachers/SC_TD/06_Integration/RESULTS/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
-  file = "12_TD3A.TDCT_S5_Integrated_12926.3886.RDS"
-)
-
-```
-
-The command above, uses the function [`readRDS`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/readRDS) 
-from `base` R package. and git it the path to the [RDS](https://riptutorial.com/r/example/3650/rds-and-rdata--rda--files) 
-file we built in previous session.
 
 ## Insight
 
@@ -318,7 +433,7 @@ You can access them with:
 
 utils::head(
   # Object to visualize
-  x = SeuratObject::GetAssayData(object = sobj, assay = "RNA", layer = "data.TD3A"),
+  x = SeuratObject::GetAssayData(object = sobj, assay = "RNA", layer = "counts"),
   # Number of rows to display
   n = 10
 
@@ -331,7 +446,7 @@ Prettier with a table in HTML :
 # head_seurat_count_table_dt
 
 tmp <- utils::head(
-  x = SeuratObject::GetAssayData(object = sobj, assay = "RNA", layer = "data.TD3A"), 
+  x = SeuratObject::GetAssayData(object = sobj, assay = "RNA", layer = "counts"), 
   10
 )
 DT::datatable(
@@ -812,6 +927,16 @@ In conclusion, to select your DEA method, use the following rules of thumb :
 
 **Please, never ever use a simple Wilcoxon on bulk RNA-Seq data !!**
 
+## NB MAST DE
+
+MAST uses a hurdle model divided into two parts:
+
+-   Discrete – models the probability that a feature is detected in a cell (present or not).
+-   Continuous – models the level of expression for the feature in cells where it is detected.
+
+MAST also uses the Cellular Detection Rate (CDR) as a covariate to adjust for sequencing effects, calculated as the fraction of detected genes per cell 
+(nFeature barcode >0 / nHVG). It is also possible to include additional covariates, such as batch or experimental metrics, when analyzing more than two samples.
+
 # Select a dataset
 
 ## Dataset depends on selected method
@@ -839,7 +964,7 @@ from package `Seurat`, we want to make three groups:
 
 1. One using `wilcoxon` to perform DEA between clusters "8" and "10".
 1. One using `t`-test to perform DEA between clusters "8" and "10".
-1. One using `ROC` to perform DEA between "8" and "10".
+1. One using `MAST` to perform DEA between "8" and "10".
 
 We will observe the results and compare our gene lists.
 
@@ -882,7 +1007,7 @@ sobj_t <- Seurat::FindMarkers(
   test.use = "t"
 )
 
-sobj_roc <- Seurat::FindMarkers(
+sobj_mast <- Seurat::FindMarkers(
   # The variable that contains Seurat Object
   object = sobj,
   # Name of condition 1
@@ -892,7 +1017,7 @@ sobj_roc <- Seurat::FindMarkers(
   # Factor name in the Seurat Object
   group.by = "HarmonyStandalone_clusters",
   # Differential analysis method
-  test.use = "roc"
+  test.use = "MAST"
 )
 ```
 
@@ -1031,18 +1156,18 @@ We have the following columns:
 
 ```{r sobj_roc_res_display, eval=TRUE, echo=FALSE}
 DT::datatable(
-  head(sobj_roc, n = 10),
-  caption = "ROC test results"
+  head(sobj_mast, n = 10),
+  caption = "MAST test results"
 )
 ```
 
 We have the following columns:
 
-1. `myAUC`: The area under the curve
-1. `avg_diff`: Average difference in AUC
-1. `power`: `abs(AUC-0.5) * 2`, useful to sort genes based on AUC
+1. `p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
+1. `avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expressed between samples in each condition.
 1. `pct.1`: Percent of cells with gene expression in condition one, here in cluster 8.
 1. `pct.2`: Percent of cells with gene expression in condition two, here in cluster 10.
+1. `p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error.
 
 
 ```{r sobj_deseq_res_display, eval=TRUE, echo=FALSE}
@@ -1074,7 +1199,7 @@ data <- base::list(
   # We use a threshold of 5% on adjusted p-values
   t_test = base::rownames(sobj_t[sobj_t$p_val_adj <= 0.05, ]),
   # We use a threshold of 0.2 in AUC power
-  roc    = base::rownames(sobj_roc[sobj_roc$power >= 0.2, ]),
+  mast    = base::rownames(sobj_mast[sobj_roc$power >= 0.2, ]),
   # We use a threshold of 5% on adjusted p-values
   deseq2 = base::rownames(sobj_deseq2[sobj_deseq2$p_val_adj <= 0.05, ])
 )
@@ -1115,8 +1240,128 @@ UpSetR::upset(
 )
 ```
 
+## Others functions in Seurat for DEA
+
+There are two other functions in Seurat package to do DEA in different context. For example, you will see the difference between one cluster versus many of them. You could be use `FindAllMarkers`. Usage is equivalent to `FindMarkers` but it need to indicate which variable cluster variable.
+
+```{r findallmarkers_dea}
+
+sobj_findallmarkers_mast <- FindAllMarkers(sobj,
+                                           assay="RNA",
+                                           group.by="HarmonyStandalone_clusters",
+                                           test.use = "MAST",
+                                           only.pos = T,
+                                           logfc.threshold = 0.9,
+                                           min.pct = 0.1,
+                                           random.seed = my_seed)
+
+DT::datatable(
+  head(sobj_findallmarkers_mast, n = 10),
+  caption = "MAST results"
+)
 
 
+p <- EnhancedVolcano(
+  toptable = sobj_findallmarkers_mast,
+  lab = rownames(sobj_findallmarkers_mast),
+  x = "avg_log2FC",
+  y = "p_val_adj",
+  FCcutoff = 0.2,
+  drawConnectors = FALSE,
+  title = 'Volcano by cluster'
+)
+
+p + facet_wrap(~ cluster)
+
+```
+
+Another function is `FindConservedMarkers`. It the same function of `FindMarkers` but this usage is to identify the same features expression between clusters
+
+```{r findconservedmarkers_dea}
+sobj_conservedmarkers_mast <- Seurat::FindConservedMarkers(
+  # The variable that contains Seurat Object
+  object = sobj,
+  # Name of condition 1
+  ident.1 = "8",
+  # Name of condition 2
+  ident.2 = "10",
+  # Factor name in the Seurat Object
+  grouping.var = "orig.ident",
+  # Differential analysis method
+  assay="RNA",
+  slot="counts"
+)
+
+DT::datatable(
+  head(sobj_conservedmarkers_mast, n = 10),
+  caption = "MAST results"
+)
+``` 
+
+1. `TDCT_p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
+1. `TDCT_avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expessed between samples in TDCT condition.
+1. `TDCT_pct.1`: Percent of cells with gene expression in condition one, here in cluster 8 in TDCT condition.
+1. `TDCT_pct.2`: Percent of cells with gene expression in condition two, here in cluster 10 in TDCT condition.
+1. `TDCT_p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error in TDCT condition.
+
+1. `TD3A_p_val`: Ignore this column. Always ignore raw p-values. Look at corrected ones, and if they are missing, then compute them.
+1. `TD3A_avg_log2FC`: Average Log2(FoldChange). Illustrates how much a gene is differentially expessed between samples in TD3A condition.
+1. `TD3A_pct.1`: Percent of cells with gene expression in condition one, here in cluster 8 in TD3A condition.
+1. `TD3A_pct.2`: Percent of cells with gene expression in condition two, here in cluster 10 in TD3A condition.
+1. `TD3A_p_val_adj`: The confidence we have in the result. The closer to 0, the lesser is the risk of error in TD3A condition.
+
+1. `max_pval`:  Maximum of p_val between comparison TDCT vs TD3A. It must be low to indicate a conserved feature
+1. `minimump_p_val`: Minimum of p_val between comparison TDCT vs TD3A.
+
+```{r volcano_plac8 _by_sample}
+Seurat::VlnPlot(
+  # A subset of the Seurat object
+  # limited to clusters 8 and 10, 
+  # or else we will plot all the clusters
+  object = subset(sobj, HarmonyStandalone_clusters %in% c("8", "10")),
+  
+  # The name of the gene of interest (feature = gene)
+  features = "Plac8",
+  
+  # The name of the Seurat cell annotation
+  split.by = "orig.ident",
+  
+  # Change color for presentation
+  cols = c("blue", "red")
+  
+)
+
+sobj_conservedmarkers_mast$direction = case_when(
+  sign(sobj_conservedmarkers_mast$TDCT_avg_log2FC) == sign(sobj_conservedmarkers_mast$TD3A_avg_log2FC) &
+    sign(sobj_conservedmarkers_mast$TDCT_avg_log2FC) == -1 ~ "negative",
+  sign(sobj_conservedmarkers_mast$TDCT_avg_log2FC) == sign(sobj_conservedmarkers_mast$TD3A_avg_log2FC) &
+    sign(sobj_conservedmarkers_mast$TDCT_avg_log2FC) == 1 ~ "positive",
+  .default = "opposite")
+
+
+t_dataframe <- table(sobj_conservedmarkers_mast$direction,sobj_conservedmarkers_mast$max_pval<0.05)[,2]
+
+levels_direction <- paste0(names(t_dataframe)," (nFeature=",t_dataframe,")")
+
+sobj_conservedmarkers_mast_filtered = sobj_conservedmarkers_mast[sobj_conservedmarkers_mast$minimump_p_val<0.05,]
+sobj_conservedmarkers_mast_filtered$direction = factor(sobj_conservedmarkers_mast_filtered$direction,
+                                                              levels=c("negative","opposite","positive"),
+                                                              labels=levels_direction)  
+
+ggplot() +
+  geom_point(data=sobj_conservedmarkers_mast_filtered,
+             aes(x = TDCT_avg_log2FC, y = TD3A_avg_log2FC, color = direction)) +
+  scale_color_manual(values=c("lightblue","grey70","red")) +
+
+  theme_bw() +
+  labs(x = "TDCT Average Log2 FoldChange cluster 8 vs cluster 12",
+       y = "TD3A Average Log2 FoldChange cluster 8 vs cluster 12",
+       title = "Result of Wilcoxon Test between cluster 8 vs cluster 12 between condition TDCT vs TD3A",
+       color = "Direction Log2FoldChange") 
+       
+
+
+```
 ## Heatmap
 
 We'd like to display the expression of genes identified by FindMarkers. 
