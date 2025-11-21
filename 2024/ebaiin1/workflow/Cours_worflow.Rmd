@@ -336,6 +336,7 @@ srun --job-name $SAMPLE fastqc --outdir fastqc data/${SAMPLE}.fastq.gz
 done
 ```
 
+/!\ indiquer le temps permet de faire passer le job plus vite
 
 ### Lancement du workflow
 
@@ -410,7 +411,7 @@ Dans un script_08.sh :
 #SBATCH --partition=fast
 #SBATCH --job-name=my_fastqc
 #SBATCH --account=2538_eb3i_n1_2025 # Modifier en fonction du projet
-#SBATCH --cpus-per-task=1       # Modifier en fonction des besoins
+#SBATCH --cpus-per-task=$SLURM_CPUS_PER_TASK       # Modifier en fonction des besoins
 #SBATCH --mem=4GB               # Idem
 #SBATCH --array=1-3             # Modifier en fonction du nb de tâches à lancer en parallèle
 
