@@ -112,6 +112,14 @@ Pas encore ouvert.
 
 ## Matériel pédagogique
 
+### 2026
+
+ - [Analyse et traitement de données NGS, niveau débutant](https://moodle.france-bioinformatique.fr/course/view.php?id=47)
+
+### 2025
+
+ - [Analyse et traitement de données NGS, niveau débutant](https://moodle.france-bioinformatique.fr/course/view.php?id=37)
+
 ### 2024
 
 - [Analyse et traitement de données NGS, niveau débutant](https://moodle.france-bioinformatique.fr/course/view.php?id=28)
