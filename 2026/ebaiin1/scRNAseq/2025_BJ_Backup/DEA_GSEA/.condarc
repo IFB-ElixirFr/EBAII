@@ -1,4 +1,0 @@
-channels:
-  - https://prefix.dev/conda-forge
-  - https://prefix.dev/bioconda
-  - nodefaults
