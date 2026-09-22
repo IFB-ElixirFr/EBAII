@@ -1,0 +1,723 @@
+---
+title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR> <B>PROCESSING (I)</B><BR>-<BR>Normalization & scaling</CENTER>"
+date: "2025-16-21.22"
+author:
+  - name: "EB3I n1 scRNAseq Team"
+  - name: "Lilia YOUNSI"
+    email: "lilia.younsi@inserm.fr"
+  - name: "Sebastien MELLA"
+    email: "sebastien.mella@pasteur.fr"
+output:
+  rmdformats::readthedown:
+    fig_width: 8
+    fig_height: 6
+    highlight: tango  ## Theme for the code chunks
+    embed_fonts: TRUE
+    number_sections: true  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    collapsed: true  ## By default, the TOC is folded
+    toc_depth: 3
+    smooth_scroll: true ## Smooth scroll of the HTML page
+    self_contained: true ## Includes all plots/images within the HTML
+    code_download: true ## Adds a button to download the Rmd
+    code_folding: show
+    thumbnails: false
+    lightbox: true
+    fig_caption: false
+    gallery: true
+    use_bookdown: true
+always_allow_html: true ## Allow plain HTML code in the Rmd
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- knit setup -->
+
+```{r knit_setup, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE,
+  fig.align="center", 
+  # results = 'hide',
+  width = 100       # Number of characters per line
+)
+```
+
+
+<!-- CSS to color chunks and outputs -->
+
+
+```{css, echo=FALSE}
+.notrun {
+  background-color: lightgrey !important;
+  border: 3px solid black !important;
+}
+.notruno {
+  background-color: lightgrey !important;
+  color : black !important;
+}
+.question {
+  background-color: aquamarine !important;
+  color : black !important;
+  border: 3px solid limegreen !important;
+}
+.questiono {
+  background-color: aquamarine !important;
+  color : black !important;
+}
+.answer {
+  background-color: navajowhite !important;
+  border: 3px solid brown !important;
+}
+.answero {
+  background-color: navajowhite !important;
+  color : black !important;
+}
+.beyond {
+  background-color: violet !important;
+  border: 3px solid purple !important;
+}
+.beyondo {
+  background-color: violet !important;
+  color : black !important;
+}
+```
+
+
+<!-- Hook to handle code blocks output folding -->
+
+```{r knit_hook, echo = FALSE}
+hooks = knitr::knit_hooks$get()
+hook_foldable = function(type) {
+  force(type)
+  function(x, options) {
+    res = hooks[[type]](x, options)
+    
+    if (isFALSE(options[[paste0("fold.", type)]])) return(res)
+    
+    paste0(
+      "<details><summary>Show ", type, "</summary>\n\n",
+      res,
+      "\n\n</details>"
+    )
+  }
+}
+knitr::knit_hooks$set(
+  output = hook_foldable("output"),
+  plot = hook_foldable("plot")
+)
+```
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<center>![](eb3i_banner.png)</center>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+This practical session is designed to help you understand the importance of normalization, scaling, and regression in single-cell RNA-seq analysis. You will apply these steps using different methods and visualize the effects on the data.
+
+**Input data**: Seurat object containing the filtered count matrix from the previous class. It's called `05_TD3A_S5_Doublets.Filtered_12508.4035.RDS`.
+
+**Output data**: Seurat object after the normalization, scaling and regression. It's called `sobj_TD3A_normalized.rds`.
+
+## Learning Objectives
+
+-   Discuss why normalizing counts is necessary to compare cells
+-   Be able to understand different normalization approaches
+-   Be able to decide when to regress out a given variable, by evaluating the effects from any unwanted sources of variation
+
+## Motivation
+
+Up to this point, we have filtered out empty droplets, ambient RNA contamination, low-quality cells, and doublets. 
+
+The data is now a count matrix with cells as rows and genes as columns. These counts reflect the capture, reverse transcription, and sequencing steps of the scRNA-seq experiment, each introducing variability. This means the observed differences in gene expression may be influenced by sampling noise rather than true biological differences, resulting in uneven variance across the dataset.
+
+Normalization addresses this by adjusting raw counts to minimize the effects of variable sampling, making the data more suitable for analysis, which often assumes uniform variance. Various normalization techniques exist, each tailored to support different downstream analyses.
+
+A recent study by Ahlmann-Eltze and Huber (2023) benchmarked 22 normalization methods. It's essential to select the normalization method based on the specific analysis goals. However, for this practical we will just explore the most well-known way to doing single-cell normalization.
+
+## Setup
+
+We first load the packages that are needed :
+
+```{r load-libraries, message=FALSE, warning=FALSE}
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(scater)
+# library(dplyr)
+library(reshape2)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"},
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"}      and **create a Rstudio session** with the right resource requirements, thanks 
+    to the cheat sheet.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Warm-up
+
+-   We now set **common parameters** as new variables, once and for all for this
+session :
+
+```{r setparam}
+# setparam
+
+
+## Set your project name
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
+
+## Seed for the RNG
+my_seed <- 1337L
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Prepare the data structure 
+
+## Main directory
+
+```{r maindir}
+# maindir
+
+## Preparing the path
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Creating the root directory
+# dir.create(path = TD_dir, recursive = TRUE)
+
+## Print the root directory on-screen
+print(TD_dir)
+
+```
+
+## Current session
+
+```{r sessiondir}
+# sessiondir
+
+## Creating the session (Proc.1) directory
+session_dir <- paste0(TD_dir, "/04_Proc.1")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+
+```
+
+## Input directory
+
+```{r indir}
+# indir
+
+## Creating the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+
+```
+
+## Output directory
+
+```{r outdir}
+# outdir
+
+## Creating the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+
+```
+
+# Reload the Seurat Object
+
+-   We can reload the object we saved at the former step
+
+```{r dataload}
+# dataload
+
+
+## This is the path to the current EB3I backup
+sessionid <- '2538_eb3i_n1_2025'
+
+
+## The latest Seurat object saved as RDS (name)
+sobj_file <- "05_TD3A_S5_Doublets.Filtered_12508.4035.RDS"
+
+## The latest Seurat object saved as RDS (full path)
+sobj_path <- paste0(TD_dir, 
+                    "/03_Preproc.3/RESULTS/",
+                    sobj_file)
+
+force <- FALSE  ## To force a re-download of a Zenodo-hosted backup
+local <- FALSE  ## To force a loading from a local backup
+
+## In case of error/lost data : force a reload from a Zenodo backup repository
+if(force) {
+  zen_id <- "14035293"
+  zen_backup_file <- paste0("https://zenodo.org/records/",
+                            zen_id,
+                            "/files/",
+                            sobj_file)
+  ## Recreate the expected path if it does not exist
+  dir.create(path = dirname(sobj_path), recursive = TRUE)
+  ## Download the file
+  download.file(url = zen_backup_file,
+                destfile = sobj_path)
+}
+
+## In case of error/lost data : force a reload from a local backup repository
+if(local) {
+  sobj_path <- paste0(
+    "/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/RDS/",
+    sobj_file)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+## Exploring the object
+
+```{r printout_sobj}
+sobj
+```
+
+What's in the metadata ?
+
+```{r explore_metadata}
+head(sobj@meta.data)
+```
+
+What are the assays ?
+
+```{r explore_assays}
+Seurat::Assays(object = sobj)
+```
+
+What's a layer ? How to know how many there are ?
+
+```{r explore_rna_layers}
+Layers(object = sobj, assay = "RNA")
+```
+
+Display first 10 row and first 10 columns of raw matrice
+
+```{r explore_count_mat}
+sobj@assays$RNA@layers$counts[1:10, 1:10]
+```
+
+If there is another matrix, display its first 10 row and first 10 columns
+
+```{r, explore_data_mat}
+sobj@assays$RNA@layers$data[1:10, 1:10]
+```
+
+### Assessing of the level of data sparcity
+
+```{r extract raw_counts}
+raw_count <- GetAssayData(object = sobj, assay = "RNA", layer = "counts")
+```
+
+Can you spot the difference between `sobj@assays$RNA@layers$data[1:10, 1:10]` and `raw_count[1:10, 1:10]`
+
+```{r explore raw_counts}
+raw_count[1:10, 1:10]
+```
+
+```{r proptable_sparce}
+prop.table(
+  table(as.matrix(raw_count)>0)
+  )*100
+```
+
+```{r mean_sparse}
+mean(as.matrix(raw_count)>0)*100
+```
+
+Extracting genes attributes
+
+```{r gene_attr_df}
+gene_attr <- data.frame("mean" = rowMeans(raw_count), 
+                        "detection_rate" = rowMeans(raw_count > 0), 
+                        "var" = apply(raw_count, 1, var))
+gene_attr$log_mean <- log10(gene_attr$mean)
+gene_attr$log_var <- log10(gene_attr$var)
+```
+
+Extracting cell attributes
+
+```{r cell_attr_df}
+cell_attr <- data.frame(n_umi = colSums(raw_count), 
+                        n_gene = colSums(raw_count >0))
+```
+
+Mean-Variance relationship
+
+```{r varBYmeanPlot}
+ggplot(gene_attr, aes(x = mean, y = var))+
+  geom_point()
+```
+
+Can we do better ??
+
+```{r}
+ggplot(gene_attr, aes(x = log_mean, y = log_var)) + 
+  geom_point(alpha = 0.3, shape = 16) + 
+  geom_abline(intercept = 0, slope = 1, color = "red")+
+  geom_vline(xintercept = log10(mean(gene_attr$mean)), linetype = "dashed")
+```
+
+Other types of relevant information to look at
+
+```{r}
+summary(sobj$nCount_RNA)
+summary(sobj$nFeature_RNA)
+summary(sobj$percent_mt*100)
+```
+
+Relationship between nUMI & number of detected genes
+
+```{r nGenes_nUMIseurat}
+FeatureScatter(
+  object = sobj, 
+  feature1 = "nCount_RNA", 
+  feature2 = "nFeature_RNA",
+  cols = "grey10"
+)
+```
+
+```{r nGenes_nUMIggplot}
+ggplot(sobj@meta.data,
+       aes(x = nCount_RNA, y = nFeature_RNA))+
+  geom_point()
+```
+
+```{r mito_nUMI}
+FeatureScatter(
+  object = sobj, 
+  feature1 = "nCount_RNA", 
+  feature2 = "percent_mt",
+  cols = "grey10"
+)
+```
+
+## Normalize data: Shifted logarithm method
+
+```{r lognorm}
+sobj <- NormalizeData(object = sobj,
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 1e4)
+```
+
+Visualize the effect of the normalization
+
+```{r extract lognormmat}
+logNorm_count <- GetAssayData(object = sobj, assay = "RNA", layer = "data")
+```
+
+```{r}
+SumCount_df <- data.frame(
+  "raw" = colSums(raw_count),
+  "logNorm" = colSums(logNorm_count)
+)
+```
+
+```{r, fig.width=12, fig.height=4}
+(ggplot(SumCount_df, aes(raw))+
+   geom_density()+
+   ggtitle("Raw (i.e not normalized) data")+
+   theme(plot.title = element_text(face = "bold", hjust = .5, color = "steelblue")))+ (ggplot(SumCount_df, aes(logNorm))+
+                                                                                         geom_density()+
+                                                                                         ggtitle("Lognorm data")+
+                                                                                         theme(plot.title = element_text(face = "bold", hjust = .5, color = "steelblue"))
+   )
+```
+
+Effect of the normalization on Expression of genes
+
+```{r, fig.width=12, fig.height=6}
+raw_exp <- VlnPlot(
+  object = sobj, 
+  features = c("Srm", "Apoe", "Top2a"),
+  assay = "RNA", 
+  layer = "counts"
+)
+norm_exp <- VlnPlot(
+  object = sobj, 
+  features = c("Srm", "Apoe", "Top2a"),
+  assay = "RNA", 
+  layer = "data"
+)
+
+wrap_plots(raw_exp,norm_exp) + plot_layout(nrow = 2)
+```
+
+
+```{r}
+logNorm_exp_3genes <- FetchData(object = sobj, vars = c("Srm", "Apoe", "Top2a"), layer = "data")
+logNorm_exp_3genes_l <- reshape2::melt(logNorm_exp_3genes)
+```
+
+```{r}
+raw_exp_3genes <- FetchData(object = sobj, vars = c("Srm", "Apoe", "Top2a"), layer = "counts")
+raw_exp_3genes_l <- reshape2::melt(raw_exp_3genes)
+```
+
+
+```{r, fig.width=12, fig.height=4}
+(ggplot(data = raw_exp_3genes_l, aes(x = variable, y = value))+
+  geom_jitter(height = 0, width = .2, size = .1)+
+  geom_boxplot(
+    data = raw_exp_3genes_l[raw_exp_3genes_l$value>0,],
+    outliers = F, 
+    size = .5,
+    width = .1)+
+   ggtitle("Raw Expression")+
+   theme(plot.title = element_text(size = 16, color = "grey50", face = "bold", hjust = .5))) + (ggplot(data = logNorm_exp_3genes_l, aes(x = variable, y = value))+
+  geom_jitter(height = 0, width = .2, size = .1)+
+  geom_boxplot(
+    data = logNorm_exp_3genes_l[logNorm_exp_3genes_l$value>0,],
+    outliers = F, 
+    size = .5,
+    width = .1)+
+   ggtitle("logNorm Expression")+
+   theme(plot.title = element_text(size = 16, color = "grey50", face = "bold", hjust = .5)))
+```
+
+## Normalize data II: What's the name already ???
+
+```{r sctransform}
+sobj <- SCTransform(object = sobj)
+```
+
+How this normalization affect the expression of the 3 genes ??
+
+```{r}
+sct_exp <- VlnPlot(
+  object = sobj, 
+  features = c("Srm", "Apoe", "Top2a"),
+  assay = "SCT", 
+  layer = "data"
+)
+```
+
+```{r, fig.width=12, fig.height=12}
+wrap_plots(raw_exp,norm_exp,sct_exp) + plot_layout(nrow = 3)
+```
+
+```{r}
+SCT_exp_3genes <- FetchData(object = sobj, vars = c("Srm", "Apoe", "Top2a"), assay = "SCT", layer = "data")
+SCT_exp_3genes_l <- reshape2::melt(SCT_exp_3genes)
+```
+
+```{r, fig.width=12, fig.height=4}
+(ggplot(data = raw_exp_3genes_l, aes(x = variable, y = value))+
+  geom_jitter(height = 0, width = .2, size = .1)+
+  geom_boxplot(
+    data = raw_exp_3genes_l[raw_exp_3genes_l$value>0,],
+    outliers = F, 
+    size = .5,
+    width = .1)+
+   ggtitle("Raw Expression")+
+   theme(plot.title = element_text(size = 16, color = "grey50", face = "bold", hjust = .5))) + (ggplot(data = logNorm_exp_3genes_l, aes(x = variable, y = value))+
+  geom_jitter(height = 0, width = .2, size = .1)+
+  geom_boxplot(
+    data = logNorm_exp_3genes_l[logNorm_exp_3genes_l$value>0,],
+    outliers = F, 
+    size = .5,
+    width = .1)+
+   ggtitle("logNorm Expression")+
+   theme(plot.title = element_text(size = 16, color = "grey50", face = "bold", hjust = .5))) + (ggplot(data = SCT_exp_3genes_l, aes(x = variable, y = value))+
+  geom_jitter(height = 0, width = .2, size = .1)+
+  geom_boxplot(
+    data = SCT_exp_3genes_l[SCT_exp_3genes_l$value>0,],
+    outliers = F, 
+    size = .5,
+    width = .1)+
+   ggtitle("SCT Expression")+
+   theme(plot.title = element_text(size = 16, color = "grey50", face = "bold", hjust = .5)))
+```
+
+Compare the Layers available in the different "Assays" available
+
+```{r}
+Layers(sobj, assay = "SCT")
+```
+
+```{r}
+Layers(sobj, assay = "RNA")
+```
+
+What's missing ?
+
+```{r}
+sobj <- ScaleData(object = sobj, assay = "RNA")
+```
+
+```{r}
+Layers(sobj, assay = "RNA")
+```
+
+```{r}
+Reductions(object = sobj)
+```
+
+```{r findrnaHVG}
+sobj <- FindVariableFeatures(object = sobj, assay = "RNA")
+```
+
+Compare the variance-stabilization for the 2 methods
+
+```{r}
+rna_hvg <- VariableFeaturePlot(
+  object = sobj,
+  assay = "RNA"
+)
+sct_hvg <- VariableFeaturePlot(
+  object = sobj,
+  assay = "SCT"
+)
+```
+
+```{r, fig.width=12, fig.height=4}
+wrap_plots(rna_hvg,sct_hvg)+plot_layout(ncol = 2)
+```
+
+```{r}
+rna_hvg+ylim(c(0,10))
+```
+
+```{r}
+sct_hvg+ylim(c(0,10))
+```
+
+Comparing the 2 normalization methods at the PCA level
+
+```{r compute PCA}
+sobj <- RunPCA(object = sobj, assay = "RNA", reduction.name = "pcaRNA", reduction.key = "PCrna_")
+sobj <- RunPCA(object = sobj, assay = "SCT", reduction.name = "pcaSCT", reduction.key = "PCsct_")
+```
+
+```{r rnageneLoad_PC}
+print(sobj[["pcaRNA"]], dims = 1:5, nfeatures = 30)
+```
+
+```{r sctgeneLoad_PC}
+print(sobj[["pcaSCT"]], dims = 1:5, nfeatures = 30)
+```
+
+
+```{r display dimplots, fig.width=12, fig.height=6}
+DimPlot(object = sobj, reduction = "pcaRNA")+DimPlot(object = sobj, reduction = "pcaSCT")
+```
+
+
+
+```{r, fig.width=12, fig.height=6}
+FeaturePlot(object = sobj, reduction = "pcaRNA", features = "nCount_RNA")
+FeaturePlot(object = sobj, reduction = "pcaSCT", features = "nCount_RNA")
+```
+
+
+```{r, fig.width=12, fig.height=5}
+FeatureScatter(object = sobj, 
+               feature1 = "PCrna_1", 
+               feature2 = "nCount_RNA") + FeatureScatter(object = sobj, 
+                                                         feature1 = "PCsct_1", 
+                                                         feature2 = "nCount_RNA")
+```
+
+```{r, fig.width=12, fig.height=5}
+FeatureScatter(object = sobj, 
+               feature1 = "PCrna_1", 
+               feature2 = "CC_Seurat_S.Score") + FeatureScatter(object = sobj, 
+                                                                feature1 = "PCsct_1",
+                                                                feature2 = "CC_Seurat_S.Score")
+```
+
+```{r, fig.width=12, fig.height=6}
+DimPlot(object = sobj, 
+        reduction = "pcaRNA",
+        group.by = "CC_Seurat_Phase")+DimPlot(object = sobj, 
+                                              reduction = "pcaSCT",
+                                              group.by = "CC_Seurat_Phase")
+```
+
+## Regressing out unwanted source of variation
+
+```{r regOutccg}
+sobj_ccg <- ScaleData(object = sobj, 
+                      vars.to.regress = c("CC_Seurat_S.Score", "CC_Seurat_G2M.Score"), 
+                      assay = "RNA")
+sobj_ccg <- RunPCA(object = sobj_ccg, assay = "RNA", reduction.name = "pcaRNAccg", reduction.key = "PCrnaccg_")
+```
+
+
+```{r, fig.width=12, fig.height=6}
+DimPlot(object = sobj, 
+        reduction = "pcaRNA",
+        group.by = "CC_Seurat_Phase")+DimPlot(object = sobj, 
+                                              reduction = "pcaSCT",
+                                              group.by = "CC_Seurat_Phase")+DimPlot(object = sobj_ccg, 
+                                              reduction = "pcaRNAccg",
+                                              group.by = "CC_Seurat_Phase")
+```
+
+```{r}
+print(sobj_ccg[["pcaRNAccg"]], dims = 1:5, nfeatures = 30)
+```
+
+# R session
+
+This is a good practice to show the version of the packages used in this notebook.
+
+```{r rsession, class.source = "fold-hide"}
+# rsession
+
+sessionInfo()
+
+```

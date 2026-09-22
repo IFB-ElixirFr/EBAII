@@ -1,0 +1,1113 @@
+---
+title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR> <B>Connexion at OoD\n\n\nR/Rstudio : theory</B><BR>-<BR></CENTER>"
+date: "2025-16-21.22"
+author:
+  - name: "EBAII n1 scRNAseq Team"
+  - name: "William JARASSIER"
+    email: "w.jarassier@gmail.com"
+  - name: "Emilie DROUINEAU"
+    email: "emilie.drouineau@cea.fr"
+  - name: "Thibault DAYRIS"
+    email: "thibault.dayris@gustaveroussy.fr"
+
+output:
+  rmdformats::readthedown:
+    fig_width: 8
+    fig_height: 6
+    highlight: tango  ## Theme for the code chunks
+    embed_fonts: TRUE
+    number_sections: true  ## Adds number to headers (sections)
+    theme: flatly  ## CSS theme for the HTML page
+    collapsed: true  ## By default, the TOC is folded
+    toc_depth: 3
+    smooth_scroll: true ## Smooth scroll of the HTML page
+    self_contained: true ## Includes all plots/images within the HTML
+    code_download: true ## Adds a button to download the Rmd
+    code_folding: show
+    thumbnails: false
+    lightbox: true
+    fig_caption: false
+    gallery: true
+    use_bookdown: true
+always_allow_html: true ## Allow plain HTML code in the Rmd
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+<!-- knit setup -->
+
+```{r knit_setup, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,        # Print the code
+  eval = TRUE,        # Run command lines
+  message = FALSE,    # Print messages
+  prompt = FALSE,     # Do not display prompt
+  comment = NA,       # No comments on this section
+  warning = FALSE,    # Display warnings
+  tidy = FALSE,
+  fig.align="center", 
+  # results = 'hide',
+  width = 100       # Number of characters per line
+)
+```
+
+<!-- CSS to color chunks and outputs -->
+
+```{css, echo=FALSE}
+.notrun {
+  background-color: lightgrey !important;
+  border: 3px solid black !important;
+}
+.notruno {
+  background-color: lightgrey !important;
+  color : black !important;
+}
+.question {
+  background-color: aquamarine !important;
+  color : black !important;
+  border: 3px solid limegreen !important;
+}
+.questiono {
+  background-color: aquamarine !important;
+  color : black !important;
+}
+.answer {
+  background-color: navajowhite !important;
+  border: 3px solid brown !important;
+}
+.answero {
+  background-color: navajowhite !important;
+  color : black !important;
+}
+.beyond {
+  background-color: violet !important;
+  border: 3px solid purple !important;
+}
+.beyondo {
+  background-color: violet !important;
+  color : black !important;
+}
+```
+
+<!-- Hook to handle code blocks output folding -->
+
+```{r knit_hook, echo = FALSE}
+hooks = knitr::knit_hooks$get()
+hook_foldable = function(type) {
+  force(type)
+  function(x, options) {
+    res = hooks[[type]](x, options)
+    
+    if (isFALSE(options[[paste0("fold.", type)]])) return(res)
+    
+    paste0(
+      "<details><summary>Show ", type, "</summary>\n\n",
+      res,
+      "\n\n</details>"
+    )
+  }
+}
+knitr::knit_hooks$set(
+  output = hook_foldable("output"),
+  plot = hook_foldable("plot")
+)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<center>![](eb3i_banner.png)</center>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+This file describes the theory inside R/Rstudio to perform data
+analysis, especially the **first part** of the **single cell RNAseq**
+data analysis training course for the **EBAII n1 2025**, covering these
+steps :
+
+-   **Speaking in R**
+-   **Writing code in Rstudio**
+-   **Think about what you want with which tools?**
+
+## What should you run ?
+
+-   This training presentation, written in Rmarkdown, contains **many**
+    chunks ( = code blocks)
+
+-   You **do not need to** run them all !
+
+-   Chunks follow a **color scheme** :
+
+### Chunks you **ARE** expected to run :
+
+```{r chunk_run}
+# chunk_run
+
+## Example of a chunk to run
+getwd()
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start OpenOnDemand
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html){target="_blank"}
+
+<center>![](connection_ood.png)</center>
+
+<center>![](desktop_ood.png)</center>
+
+-   Connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"}
+
+<center>![](parametrage_rstudio_2_up.png)</center>
+<center>![](parametrage_rstudio_2_dn.png)</center>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start Rstudio
+
+-   **Create a Rstudio session** with the right resource requirements,
+    thanks to the cheat sheet.
+
+## First sight
+
+<center>![](rstudio_first_sight.png)</center>
+
+-   A : global functions tools
+-   B : Quick-launch functions 1
+-   C : Script pane
+-   D : Console pane
+-   E : Monitoring console
+-   F : Work folder
+-   G : Work session
+-   H : Quick-launch function 2
+-   I : Environment console pane
+-   J : Environment monitoring console
+-   K : Multi-widgets interface
+-   L : Quick-launch function 3
+
+## Console Pane (D + E)
+
+This is a standard R console. Open your bash terminal, enter the
+following command: R, and you will get the same console.
+
+```         
+Warning: Here, we are in a RStudio session powered by the IFB. Your local RStudio might differ: the version of R, the list of available packages, etc. On your local machine, RStudio console will match with the R available in your terminal.
+```
+
+Let’s try to enter the command print():
+
+```{r helloworld}
+print("Hello World")
+```
+
+We just used a function, called print. This function tries to print on
+screen everything provided between parenthesis ( and ). In this
+particular case, we gave the character string "Hello World", and the
+function print successfully printed it on screen !
+
+Now click on Session -\> Save Workspace as and save the current work
+space. What happened in the R console pane? You saw it! A command has
+been automatically written. For me, it is:
+
+```{r first}
+save.image("./SingleCell.RData")
+```
+
+When you need help with R, whether on a function error, on a script
+result or anything alike, please save your work space and send-it to
+your favorite R-developer. This contains everything you did in your
+session.
+
+```         
+Info: There is a syntax coloration, there is a good autocompletion and parameter suggestion. If I ever see anyone writing down a complete command without typing the tabulation key, then I’ll have to steal their dessert. And I’m always hungry enough for desserts.
+```
+
+## Environment/History/Connection/Git (F + G + H + I + J)
+
+### Environment
+
+This pane has three tabs: Environment, History and Connections.
+
+Environment lists every single variable, object or data loaded in R.
+This includes only what you typed yourself and does not include
+environment variables. Example; in you console pane, enter the following
+command:
+
+```{r second}
+zero <- 0  # May also be written zero = 0
+```
+
+What happened in the Environment pane ? You’re right: a variable is now
+available!
+
+<center>![](environment.png)</center>
+
+When a more complex object is declared in your work space, then some
+general information may be available. Example:
+
+```{r third}
+small_table <- data.frame("col_a"=c(1, 3), "col_b"=c(2, 4))
+```
+
+You can see the dataframe. Click on it to have a preview of the data it
+contains, then click on the light-blue arrow have a deeper insight of
+its content:
+
+<center>![](dataframe.png)</center>
+
+Now click on Session -\> Clear Work space: and see your work disappear.
+This action cannot be undone. While it is useful to clear one work space
+from time to time in order to avoid name space collisions, it is better
+to save your work space before.
+
+## History
+
+<center>![](history.png)</center>
+
+This tab is quite important: while you test and search in the console,
+your history keeps a track of each command line you entered. This will
+definitely help you to build your scripts, to pass your command lines to
+your coworkers, and to revert possible unfortunate errors.
+
+Each history is related to a session. You may see many commands in your
+history. Some of them are not even listed in your console. R Studio in
+writes there every command, even the ones that were masked for the sake
+of your eyes (knitting commands, display commands, help commands, etc.)
+
+Your history has a size limit. This limit is set by an environment
+variable called R_HISTSIZE (standing for: R History Size). It may be
+checked with the function Sys.getenv() and set with the function
+Sys.setenv():
+
+```{r fourth, eval=FALSE, include=FALSE}
+Sys.getenv("R_HISTSIZE")
+Sys.setenv(R_HISTSIZE = new_number)
+```
+
+## The Help/Plot/Packages/File pane (K + L)
+
+### Help
+
+This is maybe the most important pane of your R Studio. THIS is the
+difference between R Studio and another code editor. Search for any
+function here and not on the internet. This pane shows you the available
+help for YOUR version of R, YOUR version of a given package.
+
+Different versions may have different default parameters and interfaces.
+Please be sure over the internet, to copy and type commands that are not
+harmfull for your computer.
+
+<center>![](help_dataframe.png)</center>
+
+#### How find help for one object ?
+
+```{r help1}
+?data.frame
+```
+
+```{r help2}
+??data.frame
+```
+
+### File
+
+Just like any file explorer, we can move accross directories, create
+folders and file, delete them, etc.
+
+Where am I ?
+
+```{r fifth}
+getwd()
+```
+
+<center>![](file_1.png)</center>
+
+Or use the function dir.create():
+
+```{r sixth}
+dir.create("~/introR/intro_R")
+```
+
+You should change your working directory right now:
+
+<center>![](file_2.png)</center>
+
+Or use setwd():
+
+```{r seventh, eval=FALSE, include=FALSE}
+setwd("~/introR/intro_R")
+```
+
+<center>![](file_3.png)</center>
+
+### The script pane (C)
+
+This is where you write your R scripts. This also accepts other
+languages (e.g. bash, python, …), but R Studio shines for its R
+integration.
+
+<center>![](example_scripts.png)</center>
+
+Please, please ! Write your commands in the Script pane, then execute
+them by hitting CTRL + Enter. This is very much like your lab-workbook:
+the history pane only keeps a limited number of function in memory while
+this script keeps your commands in a file on your disk. You may share
+it, edit it, comment it, etc.
+
+TLDR – Too Long Didn’t Read
+
+Graphic interface presentation :
+
+```         
+Write command lines in Script pane
+Execute command lines by hitting CTRL + Enter from script pane et see them in the console.
+Have a look at the environment and history in case on the upper right pane
+Search for help in the lower right pane.
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# R
+
+## Speaking R
+
+### Vocabulary
+
+A **variable** is a container or a content named. A container is an
+**object**. A content is an element. Inside elements, we distinguish
+between **data** and **metadata**. We manipulate elements inside an
+object with **functions**.
+
+We talk in R with commands to do a task in application of rules and in
+following best-practice guidelines. The process is not linear : it can
+be modified by different **control structures**. The whole describes an
+**algorithm**.
+
+In the good conditions, we use a "work plane" as an **IDE** as Rstudio.
+Object have properties : **types**, **data structure**, **dimension**,
+**class**, **functions**
+
+### Packages
+
+#### ... in IFB core cluster
+
+You may install a new package on your local computer. You shall not do
+it on a cluster. The IFB core cluster you are working on today is shared
+and highly valuable ; no one can install anything besides the official
+maintainers.
+
+The following lines are written for instruction purpose and should not
+be used on IFB core cluster.
+
+#### ... in local
+
+A package is a collection of functions organizing to make a job in a
+field We can show these functions in cheat-sheets or in a tutorial. \###
+How calling packages ? There are 2 methods to call a package :
+`library()` and `require()`
+
+`library` load in global environment and stop process if package don't
+installed Perfect at the start of a script
+
+```{r m1}
+#library(Seurat)
+```
+
+`require` load in global environment and return TRUE/FALSE if package
+don't installed Perfect for functions
+
+```{r m2}
+#require(Seurat)
+```
+
+### How installing packages ?
+
+You may install a new package on your local computer. You shall not do
+it on a cluster. The IFB core cluster you are working on today is shared
+and highly valuable ; no one can install anything besides the official
+maintainers.
+
+The following lines are written for instruction purpose and should not
+be used on IFB core cluster.
+
+<center>![](packages.png)</center>
+
+There are different functions to install a package :
+
+-   classic
+
+```{r m3}
+#install.packages(Seurat)
+```
+
+This will raise a prompt asking for simple questions : where to download
+from (choose somewhere in France), whether to update other packages or
+not.
+
+Do not be afraid by the large amount of things prompted in the console
+and let R do the trick.
+
+Alternatively, you can click Tool -\> Install Packages in RStudio.
+
+You can list installed packages with installed.packages(), and find for
+packages that can be updates with old.packages(). These packages can be
+updated with update.packages().
+
+While the function install.packages() searches packages in the common R
+package list, many bioinformatics packages are available on other shared
+packages warehouses. Just like AppleStore and GoogleStore do not have
+the same applications on mobile, R has multiple sources for its
+packages. You need to know one of them, and one only Bioconductor.
+
+-   bioconductor
+
+```{r m4, eval=FALSE, include=FALSE}
+install.packages("BiocManager")
+BiocManager::install(Seurat)
+```
+
+-   devtools
+
+```{r m5, eval=FALSE, include=FALSE}
+devtools::install_github("depot_github")
+devtools::install_gitlab("depot_gitlab")
+```
+
+-   remotes
+
+```{r m6, eval=FALSE, include=FALSE}
+remotes::install_github("depot_github")
+remotes::install_gitlab("depot_gitlab")
+```
+
+Today, a package has dependencies that are also packages
+
+<center>![](dependences.png)</center>
+
+### Few usefull packages for general use
+
+<center>![](packages_usefull.png)</center>
+
+### ... And in single cell/nuclei/spatial transcriptomic
+
+<center>![](other_usefull_package.png)</center>
+
+## Types
+
+As any language, we use different symbols to different concepts :
+
+-   numbers (integer and real)
+-   character
+-   boolean (TRUE or FALSE)
+-   date
+-   factor
+
+### Numbers
+
+```{r a1}
+val1 <- 3
+```
+
+With the code above, the number 3 is stored in a variable called “val1”.
+You can do this in R with anything. Literally anything. Whole files,
+pipelines, images, anything.
+
+Maths in R works the same as your regular calculator:
+
+```{r a2}
+3 + val1 # Add
+```
+
+```{r a3}
+3 + val1 # Add
+```
+
+```{r a4}
+4 / 2 # Divide
+```
+
+```{r a5}
+3 * 4 # Multiply
+```
+
+```{r a6}
+7 %/% 2 # Floor division
+```
+
+### Characters
+
+Characters are delimited with quotes, either double `"` or single `'` :
+
+```{r b1}
+val2 <- "4"
+val5 <- '5'
+
+# The example below is a very good example of
+# how to never ever name a variable.
+シ <- "happy"
+```
+
+Mathematics does not work with characters at all … Try the following:
+
+```{r b2, eval=FALSE, include=FALSE}
+"4" + 1
+val2 + 1
+```
+
+You can try to turn characters in numbers with the function: as.numeric:
+
+```{r b3}
+as.numeric("4") + 1
+```
+
+```{r b4}
+as.numeric(val2) + 1
+```
+
+A function is a R command that is followed by parenthesis `(` and `)`.
+Between these parenthesis, we enter arguments. Use the help pane to have
+information about the list of arguments expected and/or understood by a
+given function.
+
+As said previously, you can store any of the previously typed commands
+in a variable:
+
+```{r b5}
+val4 <- as.numeric("4") + 1
+val5 <- 1 + (0.5 * 2)
+print(val5)
+```
+
+Please! Please! Give your variable a name understandable by humans. I
+don’t want to see any of you calling their variable `a`, `b`, `my_var`
+
+### Boolean
+
+Aside from characters and numbers, there is another very important type
+in R (and computer science in general): booleans. There are two boolean
+values : TRUE and FALSE.
+
+```{r c1}
+3 > 4
+```
+
+```{r c2}
+10 < 2
+```
+
+```{r c3}
+5 < 10
+```
+
+### Factor
+
+Factor are similar as vector but... it's a categorical vector.
+
+```{r c4}
+factor_element <- factor(x = c("1","2","4","4","5","6","2","3"),
+                         levels = c("1","2","3","4","5","6"))
+print(factor_element)
+```
+
+```{r c5}
+table(factor_element)
+```
+
+## Data Structure
+
+To manipulate information, we conserve data in a group and it depend of
+the type or a combination of type
+
+-   vector
+-   matrix
+-   array
+-   list
+-   data.frame
+
+### Vector
+
+You can make vectors in R. Don’t panic, there will be no maths in this
+presentation.
+
+In R, vectors are created with the function `c`:
+
+```{r e1}
+vector_numbers <- c("1", "2", "3", "4", "10", "20")
+print(vector_numbers)
+```
+
+```{r e2}
+is.vector(vector_numbers)
+```
+
+One can select an element of the vector with squared brackets `[` and
+`]`:
+
+```{r e3}
+vector_numbers[1]
+```
+
+One can select multiple elements of a vector with `:`:
+
+```{r e4}
+vector_numbers[2:4]
+```
+
+Ok ? So, vector is simply data in one dimension \#### Questions
+
+Question 1: Is there a difference between these two vectors ?
+
+```{r e5}
+c_vector <- c("1", "2", "3", "3")
+n_vector <- c( 1,   2,   3,   3 )
+```
+
+Question 2: Can I include both text and numbers in a vector ?
+
+```{r e6}
+mixed_vector <- c(1, "2", 3)
+```
+
+### Matrix/Array
+
+Matrix is a table in two dimensions : row and column
+
+```{r e7}
+mat <- matrix(1:12, nrow=3, ncol=4)
+print(mat)
+```
+
+To access in one element to cross row and column :
+
+```{r e8}
+mat[2,3]
+```
+
+Array is a table in 3 and more dimension.
+
+Basically, in 3D, your have a cube, in nD, your have a hypercube.
+
+The advantage of matrices and arrays is that you can apply
+transformations to them, because these data structures accept only one
+type.
+
+```{r e9}
+mat2 <- log(mat)
+print(mat2)
+```
+
+### Data.frame
+
+In R, tables are created with the function data.frame:
+
+```{r h1}
+dataframe_numbers <- data.frame(c(1, 3), c(2, 4))
+print(dataframe_numbers)
+```
+
+You can rename columns and row names respectively with function
+`colnames()` and `rownames()`.
+
+```{r h2}
+colnames(dataframe_numbers) <- c("Col_1_3", "Col_2_4")
+rownames(dataframe_numbers) <- c("Row_1_2", "Row_3_4")
+print(dataframe_numbers)
+```
+
+You can access a column and a line of the data frame using squared
+brackets `[` and `]`. Use the following syntax: `[row, column]`. Use
+either the name of the row/column or its position.
+
+```{r h3}
+# Select a row by its name
+print(dataframe_numbers["Row_1_2", ])
+```
+
+```{r h4}
+# Select a row by its index
+print(dataframe_numbers[1, ])
+```
+
+```{r h5}
+ # Select a column by its name
+print(dataframe_numbers[, "Col_1_3"])
+```
+
+```{r h6}
+ # Select a column by its index
+print(dataframe_numbers[, 1])
+```
+
+```{r h7}
+ # Select a cell in the table
+print(dataframe_numbers["Row_1_2", "Col_1_3"])
+```
+
+```{r h8}
+# Select the first two rows and the first column in the table
+print(dataframe_numbers[1:2, 1]) 
+```
+
+If you like maths, you will remember the order `[row, column]`. If
+you’re not familiar with that, then you will do like 99% of all software
+engineer: you will write `[column, row]`, and you will get an error.
+Trust me. 99%. Remember, an error is never a problem in informatics
+
+### List
+
+In R, list is a collection of others data structures.
+
+### Question
+
+Question : Who is what ?
+
+<center>![](datastructure.png)</center>
+
+#### Read a table as data frame
+
+Exercise: Use the Help pane to find how to use the function read.csv.
+You can find `example_table.csv` in
+`/shared/projects/2538_eb3i_n1_2025/atelier_scrnaseq/TD/`
+
+Use the function read.csv to:
+
+1.  copy and open the file ./example_table.csv in your project
+    directory.
+2.  this table has a header (TRUE).
+3.  this table has row names in the column called “ensembl_gene_id”.
+
+Let all other parameters to their default values.
+
+Save the opened table in a variable called example_table.
+
+Now let us explore this dataset.
+
+We can click on environment pane :
+
+Be careful, large table may hang your session.
+
+Alternatively, we can use the function `head` which prints the first
+lines of a table:
+
+```{r h9}
+example_table <- read.csv("example_table.csv")
+head(example_table)
+```
+
+```{r h9bis}
+library(readxl)
+example_table <- read_xlsx("example_table.xlsx")
+head(example_table)
+```
+
+The function summary describes the dataset per sample:
+
+```{r h10}
+summary(example_table)
+```
+
+Have a look at the summary of the dataset per gene, using the function t
+to transpose:
+
+```{r h11}
+head(t(example_table))
+```
+
+```{r h12}
+summary(t(example_table))
+```
+
+## Object
+
+In R, everything is an object !
+
+An object is a container that has a defined class of objects having
+properties, such as dimensions or a data structure, and contains
+elements having a type and a value.
+
+## Functions
+
+Functions are script blocks created to perform specific tasks.
+
+We already see different functions :
+
+`as.numeric()` - `print()` - `is.vector()` - `data.frame()` - `head()` -
+`summary()` - `t()`
+
+There are generic functions to specific class
+
+```{r j2}
+#getS3method("print", "data.frame")
+print.data.frame = function (x, ..., digits = NULL, quote = FALSE, right = TRUE, 
+    row.names = TRUE, max = NULL) 
+{
+    n <- length(row.names(x))
+    if (length(x) == 0L) {
+        cat(sprintf(ngettext(n, "data frame with 0 columns and %d row", 
+            "data frame with 0 columns and %d rows"), n), "\n", 
+            sep = "")
+    }
+    else if (n == 0L) {
+        print.default(names(x), quote = FALSE)
+        cat(gettext("<0 rows> (or 0-length row.names)\n"))
+    }
+    else {
+        if (is.null(max)) 
+            max <- getOption("max.print", 99999L)
+        if (!is.finite(max)) 
+            stop("invalid 'max' / getOption(\"max.print\"): ", 
+                max)
+        omit <- (n0 <- max%/%length(x)) < n
+        m <- as.matrix(format.data.frame(if (omit) 
+            x[seq_len(n0), , drop = FALSE]
+        else x, digits = digits, na.encode = FALSE))
+        if (!isTRUE(row.names)) 
+            dimnames(m)[[1L]] <- if (isFALSE(row.names)) 
+                rep.int("", if (omit) 
+                  n0
+                else n)
+            else row.names
+        print(m, ..., quote = quote, right = right, max = max)
+        if (omit) 
+            cat(" [ reached 'max' / getOption(\"max.print\") -- omitted", 
+                n - n0, "rows ]\n")
+    }
+    invisible(x)
+}
+```
+
+We could be create new functions
+
+```{r j3}
+
+calculate_toto <- function(x,y) {
+  
+  if (x == 0 & y == x) {
+    return("tete a toto !")
+  } else {
+    return(x + y)
+  }
+}
+
+calculate_toto(x=0,y=0)
+calculate_toto(x=1,y=0)
+calculate_toto(x=0,y=1)
+calculate_toto(x=1,y=1)
+```
+
+R is your best friend but...sometimes, it want your gain time and
+arguments are "indexing" when you called function. **BUT IT IS NOT
+RECOMMANDED**
+
+```{r j4}
+calculate_toto(0,0)
+```
+
+<center>![](any_functions_seurat.png)</center>
+
+## Control Structures
+
+A script is just an execution flow.
+
+We could be modify this flow with :
+
+-   conditional structures
+
+-   loop
+
+-   intern flux structures
+
+<center>![](control_structure.png)</center>
+
+## Special functions
+
+Many functions are built to perform specific and optimized tasks
+
+-   Vectorise functions
+
+```{r l1}
+scores <- c(12, 8, 15, 7, 20)
+
+results <- ifelse(scores >= 10, "Pass", "Fail")
+
+print(results)
+
+score <- 15
+if (score >= 10) {
+  print("Pass")
+} else {
+  print("Fail")
+}
+
+```
+
+-   Iterative applicative functions
+
+```{r l5}
+my_list <- list(a = 1:5, b = 6:10, c = 11:15)
+result_lapply <- lapply(my_list, mean)
+print(result_lapply)
+```
+
+```{r l6}
+result_sapply <- sapply(my_list, mean)
+print(result_sapply)
+```
+
+```{r l8}
+mat <- matrix(1:9, nrow = 3, byrow = TRUE)
+print(mat)
+row_means <- apply(mat, 1, mean)
+print(row_means)
+col_means <- apply(mat, 2, mean)
+print(col_means)
+```
+
+-   Functional functions
+
+```{r l10}
+numbers <- 1:10
+
+# Garder seulement les nombres pairs
+even_numbers <- Filter(function(x) x %% 2 == 0, numbers)
+
+print(even_numbers)
+
+```
+
+```{r l11}
+list1 <- list(1, 2, 3)
+list2 <- list(10, 20, 30)
+
+# Ajouter les éléments correspondants
+result <- Map(function(x, y) x + y, list1, list2)
+
+print(result)
+```
+
+## Saves
+
+Rstudio are two formats : `.rds` and `.Rdata`
+
+### Save
+
+While working on your projects and leaning this week, you will process
+datasets in R. The results of these analyses will be stored on
+variables. This means, that when you close RStudio, some of this work
+might be lost.
+
+We already saw the function `save.image()` to save a complete copy of
+your working environment.
+
+However, you can save only the content of a give variable. This is
+useful when you want to save the result of a function (or a pipeline)
+but not the whole 5 hours of work you’ve been spending on
+how-to-make-that-pipeline-work-correctly.
+
+The format is called: RDS for R Data Serialization. This is done with
+the function `saveRDS()`:
+
+```{r n1}
+saveRDS(object = example_table, file = "example_table.RDS")
+```
+
+### Load
+
+You can also load a RDS into a variable. This is useful when you receive
+a RDS from a coworker, or you’d like to keep going your work from a
+saved point. This is done with the function `readRDS()`:
+
+```{r n2}
+example_table <- readRDS(file = "example_table.RDS")
+head(example_table)
+```
+
+But there are other solutions :
+
+-   `fst`, `qs`, `feather`, `parquet`
+-   `csv`, `tsv`, `xlsx`, `yaml`, `json`
+-   `SQLite`, `DuckDB`, `HDF5`, `MonetDB Lite`,
+    `Feather IPC/Arrow IPC streams`,
+-   `gz`, `bz2`, `xz`, `zip`
+-   `binaire`
+
+## Help
+
+Directly in the package documentation in Help pane or :
+
+```{r y}
+?print
+??print
+```
+
+<center>![](help.png)</center>
+
+## Writing code in Rstudio
+
+Ok, it's time to write R code. But how do you do that ? Like a writing a
+book !
+
+Best practises :
+
+-   <https://style.tidyverse.org/syntax.html>
+-   Comment
+-   Script structure
+
+```{r z}
+###############################################################################
+# Script name : analysis_pipeline.R
+# Author      : Your Name
+# Date        : 2025-11-15
+# Purpose     : Example of clean R script structure
+###############################################################################
+
+########################
+# 0. Load packages ----
+########################
+########################
+# 1. Define parameters ----
+########################
+########################
+# 2. Define custom functions ----
+########################
+########################
+# 3. Load data ----
+########################
+########################
+# 4. Data cleaning ----
+########################
+########################
+# 5. Analysis ----
+########################
+########################
+# 6. Visualizations ----
+########################
+########################
+# 7. Save outputs ----
+########################
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
