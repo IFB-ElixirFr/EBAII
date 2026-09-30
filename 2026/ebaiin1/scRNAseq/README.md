@@ -13,7 +13,7 @@ Le contenu de ce dossier est appelé à évoluer !
 
 ## Liens utiles
 
-- [Gdrive (2026)](https://drive.google.com/drive/u/0/folders/1XlRIiCwE1pQD4oTL6eUBJrT8NQvxCF8I) ()
+- [Gdrive (2026)](https://drive.google.com/drive/u/0/folders/1XlRIiCwE1pQD4oTL6eUBJrT8NQvxCF8I) (Edition 2026)
     - [PPTX : Trombinoscope](https://docs.google.com/presentation/d/1jkyBBQOX7DZ9BznzdmYEl6g5EZhrh7a8ApHtCOd2ULQ)
     - [XLSX : Fichier des intervenants](https://docs.google.com/spreadsheets/d/1-rVccnoQfMBwA4euNuvsOfXVk75DTiPNxIEIT1UHd8M) (informations personnelles, préférences hôtel et alimentaires, trajets, logins, ...)
     - [XLSX : Planning détaillé de notre atelier](https://docs.google.com/spreadsheets/d/17h1q8oOdZnu7WpDxwRdP-uKD4TfHrr_aV114iD35EPM)

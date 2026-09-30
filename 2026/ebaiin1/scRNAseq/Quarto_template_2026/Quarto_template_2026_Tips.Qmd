@@ -322,9 +322,243 @@ As these are *additional* content, we will **NOT** support questions related to 
 | Additional question | `warning` | "false" | **"true"** | [**yellow**]{style="color:yellow;"} | "OPTIONAL QUESTION X" | Yes |
 | Additional answer | `warning` | "false" | **"true"** | [**orange**]{style="color:orange;"} | "OPTIONAL ANSWER X" | Yes |
 
+
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+
+
+# Example of data loading
+
+Here, we will depict an example of :
+
+- How the "local" (ie, on the IFB cluster) data architecture is shaped and built
+- How data is fetched :
+  - From Zenodo by default
+  - From a cluster-based "local" backup (in case of loss of internet connection)
+
+>The aim is to ease as much as possible this step that is notoriously the first obstacle students meet when starting the practical session.<br>The pros are that it allows to avoid some early time loss, but in counterpart, it does not really learn them how to train and build their paths...
+
+## Building the local data structure
+
+-   During the current and remaining training sessions, we will work on
+    different **data** **objects**, some retrieved from **external**
+    resources, some we will **create**.
+
+-   In order to reuse these for further steps, or other sessions, we
+    need to **store** them, thus create a **directory structure** on the
+    cluster.
+
+-   We will create this structure in **your project** folder (the one
+    you registered at the IFB Core, in which you stored your own data
+    for the tutoring).
+
+-   To ensure that *you* will always use the same structure for *your*
+    work, the code hereafter has been writen so that you just have to
+    define a single **variable** that corresponds to your project name.
+
+-   We now set your **project name** as new variable, once and for all
+    for this session, so that the directory structure will be automatically shaped around this :
+
+::: {.callout-warning}
+
+`ebaii_sc_teachers` is a project created by and for us, teachers, to mimic the interaction you, students will have regarding the training sessions in your own project directory.
+Thus, **DO NOT just copy-paste this `ebaii_sc_teachers` project name as-is, put YOURS !
+
+:::
+
+
+``` {r}
+#| label: fs_set_pjname
+#| filename: fs_set_pjname
+
+## Set your project name
+project_name <- "ebaii_sc_teachers"
+
+```
+
+
+### Main (root) directory
+
+>We create the **general** training courses directory
+
+:::{.callout-warning}
+We also check that such a directory exists on the cluster.
+
+If not, you may have misspelled your project name !
+
+:::
+
+
+```{r}
+#| label: fs_set_maindir
+#| filename: fs_set_maindir
+
+## Prepare the path in a "TD_dir" variable
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Check if it exists on the HPC
+maindir_check <- dir.exists(paths = TD_dir)
+if (!maindir_check) {
+  message('Directory [', TD_dir, '] does not exist !')
+} else {
+  ## Create the root directory
+  dir.create(path = TD_dir, recursive = TRUE)
+  
+  ## Print the root directory on-screen
+  print(TD_dir)
+}
+
+```
+
+
+### Current session
+
+>Create the **current** training course sub-directory
+
+```{r}
+#| label: fs_set_sessiondir
+#| filename: fs_set_sessiondir
+
+## Create the session (Preproc.1) directory
+session_dir <- paste0(TD_dir, "/01_Preproc.1")
+dir.create(path = session_dir, recursive = TRUE)
+
+## Print the session directory on-screen
+print(session_dir)
+
+```
+
+### Input data directory
+
+>We create the directory in which the **input** data we will **retrieve** will 
+be stored.
+
+```{r}
+#| label: fs_set_inputdir
+#| filename: fs_set_inputdir
+
+## Create the INPUT data directory
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE)
+
+## Print the input directory on-screen
+print(input_dir)
+
+```
+
+### Output results directory
+
+>We create the directory in which the **output** data we will **create** will 
+be stored.
+
+```{r}
+#| label: fs_set_outputdir
+#| filename: fs_set_outputdir
+
+## Create the OUTPUT data directory
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE)
+
+## Print the output directory on-screen
+print(output_dir)
+
+```
+
+Now, the we have everything needed to :
+
+-   **load** data (`input_dir`)
+
+-   **save** the results we will generate (`output_dir`).
+
+
+# Load a 10X Cell Ranger raw count matrix
+
+```{r zid}
+## This is actually to help me updating this training without hassle
+zen_id <- '14034221'
+
+## This is the path to the current EB3I backup
+sessionid <- '2538_eb3i_n1_2025'
+
+```
+
+```{r}
+
+```
+
+
+
+```{r}
+#| label: data_dl_func
+#| filename: data_dl_func
+
+file_name <- "matrix.mtx.gz"
+zenodo_id <- "14034221" ## If set to null, the local backup will be used
+
+remote_path <- paste0("https://zenodo.org/records/", zenodo_id, "/files/")
+remote_path <- paste0("https://zenodo.org/records/", zenodo_id, "/files/")
+
+backup <- FALSE
+
+eb3isc_get_data <- function(file_name = NULL, remote_path = NULL, local_path = NULL, force = FALSE) {
+  
+}
+
+### Named files (will be used later on !)
+mtx_file <- "matrix.mtx.gz"
+features_file <- "features.tsv.gz"
+barcodes_file <- "barcodes.tsv.gz"
+summary_file <- "pbmc_10k_v3_summary.html"
+
+## Filename(s) to retrieve
+toget_files <- c(mtx_file,
+                 features_file,
+                 barcodes_file,
+                 summary_file)
+
+## Folder to store retrieved files
+local_folder <- input_dir
+
+## Use local backup ?
+backup <- FALSE
+if(backup) message("Using local backup !")
+
+## Force download ?
+force <- FALSE
+if(force) message("Forcing (re)download !")
+
+### Define remote folder
+remote_folder <- if (backup) paste("/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/10X/") else paste0("https://zenodo.org/records/", zen_id, "/files/")
+
+### Reconstruct the input paths
+remote_path <- paste0(remote_folder, "/", toget_files)
+
+### Reconstruct the output paths
+local_path <- paste0(local_folder, "/", toget_files)
+
+## Retrieve files (if they don't exist), in loop
+for (tg in seq_along(toget_files)) {
+  ## If the file does not locally exist
+  if (!file.exists(local_path[tg]) | force) {
+    ## Retrieve data
+    if(backup) {
+      file.copy(from = remote_path[tg],
+                to = local_path[tg])
+    } else {
+      download.file(url = remote_path[tg], 
+                    destfile = local_path[tg])
+    }
+    ## Check if downloaded files exist locally
+    if(file.exists(local_path[tg])) message("\tOK")
+  } else message(paste0(toget_files[tg], " already downloaded !"))
+}
+
+```
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
 
 # Example of code embedding and wrapping
 
