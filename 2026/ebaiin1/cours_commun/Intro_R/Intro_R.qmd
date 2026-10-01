@@ -4,8 +4,11 @@ subtitle: "Ecole de Bioinformatique IFB Inserm Inrae à Roscoff - Novembre 2026"
 author: 
   - name: Elise Jacquemet
     orcid: 0000-0001-7539-3011
-  - name: Charlotte Berthelier
-    orcid: 0000-0002-9349-7233
+  - name: Mathieu Genete
+    orcid: 0000-0002-9640-8793
+  - name: Elodie Darbo
+    orcid: 0000-0002-6692-4949
+  - name: Stephanie Le Gras
 format: 
   revealjs:
     scrollable: true
