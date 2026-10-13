@@ -1,0 +1,274 @@
+---
+title: "R explained in 1h45 : Exercices"
+format: html
+editor: visual
+---
+
+## Reminders
+
+### What is R ?
+
+R is a **programming language** developed to :
+
+- Manage data : import, transform, clean, process, export ...\
+- Compute **statistical analyses**, from basic to complex ones : descriptive, exploration, modelling, machine learning ...\
+- Create nice **visualisations**, reports ...
+
+[[R is free, cross-platform, open-source & collaborative !]{.smallcaps}]{style="color: #74C476"}
+
+### How to use
+
+You can use it directly in command line using `R` to start a session or `Rscript` to launch a full script at once. Scripts are saved with `.R` extension file.\
+For reporting, statistical analyses ... it's advised to use notebooks documents, like this one, to allow you mix notes & formatting along with your code. You can use quarto `.qmd` files or Rmarkdown `.Rmd` files.
+
+Using Rstudio allows you to navigate through files, packages and all variables stored in your environment.
+
+## Basic operations
+
+```{r, eval=F}
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+## Objects & variables
+
+R manipulates several kind of **objects**, that can be stored in **variables** with given names, so that they can be used later\
+[[Be careful to **never** use those as variable names :]{.smallcaps}]{style="color : #E39E4F;"} TRUE, FALSE, T, F, c, t, pi, data, LETTERS, letters, ...
+
+### Numerical values
+
+```{r}
+a <- 2    # create a variable named "a" and assign its value to 2
+print(a)  # displays a
+a == 2    # Test if a is equal to 2  
+```
+
+Now, create a second variable named `b` with a value of 3. Test if it is equal to a.
+
+```{r}
+
+```
+
+Store the result of a + b in a new variable. What happens if we change a's value to 7 ?
+
+```{r}
+
+```
+
+### Vectors
+
+Several values can be stored in a vector :
+
+```{r}
+measures <-  c()    # One vector containing 1, 10 and the values contained in a and b
+integers <-  1:10		   # One vector with all integer values from 1 to 10
+ducks <-  c("riri", "fifi", "loulou")    # A vector containing character strings
+```
+
+Does this work ?
+
+```{r, eval=F}
+test <-  c("riri", 1, 4:6)
+```
+
+We can compute mathematical operations on vectors :
+
+```{r, eval=F}
+measures + a 		# sum of a vector and a numerical value
+integers / 2		# dividing a whole vector
+```
+
+Does this work ?
+
+```{r, eval=F}
+ducks / 2		
+```
+
+`[ ]` can be used to access elements of a vector, using *indexes* :
+
+```{r}
+integers[8]		
+```
+
+Can you change the first value of `measures` to *12* ?
+
+```{r}
+
+```
+
+### Lists
+
+Lists are another way to store values : they can be created using `list()` function :
+
+```{r}
+empty <- list()  # Create an empty list
+groceries <- list("banana"=2,"apple"=5,"kiwi"=8) # a list of fruits
+unnamed <- list(2,5,8) # a list of unnamed numbers
+vrac <- list("A"=1:4,"B"=c(0,1),"C"="hey") # a list with multiple class of objects !
+```
+
+- They contain several objects called `elements`
+- Those elements can have different classes of objects : numerical values, vectors, characters, other lists ...
+- Elements are a combination of a `name`, called a key, and a `value`
+- Names can be empty
+
+To access an `element` of a list, this time use `[[ ]]` and either its index (position of the element in the list) or its name :
+
+```{r}
+groceries[["banana"]]     # Access the value stored under banana name  
+groceries[[1]]            # Access the value of the first grocerires element (banana)
+```
+
+If an element is already named, you can use `$` to access it directly :
+
+```{r}
+groceries$banana          # Access the value stored under banana name 
+```
+
+Try to access an element of the list `unnamed` with `$` : what happens ?
+
+```{r, eval=F}
+
+```
+
+[[TIP:]{.smallcaps}]{style="color: #1155cc"} R auto completion will help you select the right element
+
+Use `[[ ]]` to add a named element to the list `empty`
+
+```{r}
+
+```
+
+Use `[[ ]]` to add an unnamed element in the 4th position of the list `empty`
+
+```{r}
+
+```
+
+What does this list contain now ?
+
+```{r}
+
+```
+
+Using `c()`, we can add new values to a vector :
+
+```{r}
+measures <- c(measures, 9, 8)
+```
+
+Some values can be empty : R will use `NA` as their value
+
+```{r}
+measures[4] <- NA
+measures
+```
+
+[[warning :]{.smallcaps}]{style="color: #E39E4F"} Objects with missing values might raise unexpected behaviors
+
+### Functions
+
+A function has :
+
+- A `name`, to execute the function or look for help\
+- One or more `arguments` : some are necessary for the function to run, others have default values
+- An `output` : the result of the computations on the given arguments. With complex functions, this will often be a list
+
+Look at the function `mean` help :
+
+```{r}
+?mean
+```
+
+We use `( )` to give the function its `arguments` before running : for mean, a vector of numerical values. How can you compute the mean of measures ?
+
+```{r}
+
+```
+
+If any of the values is missing, `mean` will return a missing value `NA`. We can use the argument `na.rm` to ignore them :
+
+```{r}
+
+```
+
+Arguments can be :\
+- named =\> they can be written in any order\
+- unnamed =\> R will expect them in their appearing order
+
+We can store the output of a function in a variable as well :
+
+```{r}
+
+```
+
+**Variable != Arguments**\
+`mean_measures` is now stored in the environment, but `x` and `na.rm` are not : they where only given to the mean function
+
+Finally, you can create your own functions by defining its name, arguments, output and the list of operations needed to compute the results you want
+
+```{r}
+square <- function(x) {
+  # as many lines as you want here !
+  output = x * x
+  return(output)
+}
+```
+
+This can be useful if you need to repeat the same computations several times, or if you need to modify some existing functions
+
+## Memos for later
+
+### Manipulate basic objects
+
+| Symbol | Goal | Examples |
+|------------------------|------------------------|------------------------|
+| `=` or `<-` or `->` | assign a `value` to a `variable` or an `argument` | a `<-` 10 or read.table(file `=` "file.txt") |
+| `( )` | to give `arguments` to a function | mean`(`x = c`(`10,6,8,2`))` |
+| `[ ]` | get a value from a vector | measures`[`1`]` or measures`[`2:8`]` or measures`[`c(3,6,4)`]` |
+| `[[ ]]` or `$` | get an element from a list | groceries`$`banana or groceries`[[`"banana"`]]` or groceries`[[`1`]]` |
+| `[ , ]` ou `$` | extract elements from a data-frame | annotation`$`geneID or annotation`[`1:5`,`geneID`]` |
+
+### Good practices
+
+| To | Do this | Avoid this |
+|------------------------|------------------------|------------------------|
+| Clean your environment | `rm(list = ls())` | mixing-up variables |
+| Use explicit names | expression_data, annotation, groceries_list | dat, var1, dfslkgj |
+| Use comments | with `#`, using lines, stars ... | obscure functions, 100+ lines without comment |
+|  | use spaces, skip lines, add blocks ... | all commands in one block |
+
+[Tidyverse guidelines](https://style.tidyverse.org/syntax.html){.external target="_blank"}
+
+### Logical operators
+
+| Operator | Description      | Example        | Result  |
+|----------|------------------|----------------|---------|
+| `==`     | Equal to         | `5 == 3`       | `FALSE` |
+| `!=`     | Not equal to     | `5 != 3`       | `TRUE`  |
+| `>`      | Greater than     | `5 > 3`        | `TRUE`  |
+| `<`      | Less than        | `5 < 3`        | `FALSE` |
+| `>=`     | Greater or equal | `5 >= 5`       | `TRUE`  |
+| `<=`     | Less or equal    | `5 <= 3`       | `FALSE` |
+| `&`      | Element-wise AND | `TRUE & FALSE` | `FALSE` |
+| `|`      | Element-wise OR  | `TRUE | FALSE` | `TRUE`  |
+| `!`      | NOT              | `!TRUE`        | `FALSE` |
+
+### Aritmetic operators
+
+| Operator | Description      | Example   | Result |
+|----------|------------------|-----------|--------|
+| `+`      | Addition         | `5 + 3`   | `8`    |
+| `-`      | Subtraction      | `5 - 3`   | `2`    |
+| `*`      | Multiplication   | `5 * 3`   | `15`   |
+| `/`      | Division         | `5 / 2`   | `2.5`  |
+| `^`      | Exponentiation   | `2 ^ 3`   | `8`    |
+| `%%`     | Modulus          | `5 %% 2`  | `1`    |
+| `%/%`    | Integer Division | `5 %/% 2` | `2`    |
