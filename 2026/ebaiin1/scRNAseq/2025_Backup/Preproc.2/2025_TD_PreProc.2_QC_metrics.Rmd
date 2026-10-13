@@ -371,7 +371,7 @@ if (!local) {
 
 # Biological context
 
-For this series of training sessions, we will work on data from this [Paiva et al.](https://www.sciencedirect.com/science/article/pii/S2211124721002813) publication.
+For this series of training sessions, we will work on data from this [Paiva et al.](https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00281-3) publication.
 
 * The study concerns **thymus autonomy**:
 
