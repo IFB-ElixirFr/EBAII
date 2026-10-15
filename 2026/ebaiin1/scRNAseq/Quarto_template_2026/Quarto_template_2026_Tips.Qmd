@@ -117,11 +117,10 @@ This QMD script is a template/example. Among its characteristics :
 -   **Callout collapsing** is available and recommended to hide callouts corresponding to **special cases** : **questions, and answers** (roughly).
     -   It is **inactive** by default (can be activated per-callout using `collapse="true"`)
 -   Code chunk **output collapsing** is available thanks to a knitr hook provided in the HTML header. It is useful in some cases (like, hiding a UMAP output for which an intuition question was asked), but please do not overuse it as it may make some trainees loose the track...
-    -   It is **inactive** by default (can be activated per-chunk using `class.source="fold-hide"`)
+    -   It is **inactive** by default (can be activated per-chunk using the Quarto R chunk comment `#| attr.output: '.details summary="Show output"'`)
 -   An HTML code is provided in the HTML header to force the **drawing of HTML tables border** (only useful if one intend to use basic HTML tables rather than kable, by ex)? An example is provided [here](#tldr-for-authors)
 -   A "hack" of callouts is used to **color sections/chunks**, depending on their purpose. See [here](#what-to-run).
 -   In this template, R chunks always include the QMD `#| label:` and `#| filename:` with the **same text value**. This is a trick used to display the chunk name in the output, as a header for each evaluated chunk. This is useful to use as anchors to help trainees keep in synch between the projected output and the QMD source on their own screen. While using this trick is not mandatory, it is highly recommended.
-
 
 :::
 
@@ -150,6 +149,11 @@ This file describes the different steps to perform the **first part** of the **s
 
 :::
 
+::: {.callout-note icon="true" style="background: lightblue"}
+As this is a template, most chunks here will not be evaluated. They will be
+only where their output matters for the following chunks.
+
+:::
 
 # What to run ? {#what-to-run}
 
@@ -171,18 +175,37 @@ Here is a set of example of (customized) `callouts` used to distinguish the diff
 
 ## Example of a chunk to run
 getwd()
-
 ```
 
 -   They would appear like this on the rendered HTML / projection screen :
 
-```{r, attr.output='.details summary="Output"'}
+```{r}
 #| label: chunk_run
 #| filename: chunk_run
 
 ## Example of a chunk to run
 getwd()
+```
 
+-   One can also **fold the chunk output** to hide its content when desired, using
+the Quarto comment `#| attr.output: '.details summary="Show output"'` :
+
+```{{r}}
+#| label: chunk_run_folded
+#| filename: chunk_run_folded
+#| attr.output: '.details summary="Show output"'     <=== HERE !
+
+## Example of a chunk to run
+getwd()
+```
+
+```{r}
+#| label: chunk_run_folded
+#| filename: chunk_run_folded
+#| attr.output: '.details summary="Show output"'
+
+## Example of a chunk to run
+getwd()
 ```
 
 ::: {.callout-note icon="true" style="background: lightblue"}
@@ -200,7 +223,7 @@ This is useful for trainees to stay synched between what they see on their own s
 
 -   Some parts or code chunks are not expected to be run by trainees
 -   Some may be run by the teacher in real time (like examples of output of parameters variation), others may be pre-computed in the rendered HTML and just displayed on-screen
--   In such cases, a [**pink**]{style="color:pink;"} **"important" callout** will be displayed ahead of the chunk(s)
+-   In such cases, a [**pink**]{style="color:pink"} **"important" callout** will be displayed ahead of the chunk(s)
 -   By default, the source is **collapsed** (folded)
 -   Sometimes, its output (figure, message, ...) may be *hidden* and can be revealed using the `Show output` button :
 
@@ -209,15 +232,16 @@ This is useful for trainees to stay synched between what they see on their own s
 
 This is a demonstration, you are ***NOT*** expected to run the following chunks !
 
-```{r class.source="fold-hide", attr.output='.details summary="Output"'}
+```{r}
 #| label: notrun_si
 #| filename: notrun_si
+#| attr.output: '.details summary="Show output"'
 
 ## Example of a chunk to NOT run (session info)
 utils::sessionInfo()
 ```
 
-```{r class.source="fold-hide", attr.output='.details summary="Output"'}
+```{r}
 #| label: notrun_gc
 #| filename: notrun_gc
 
@@ -231,9 +255,9 @@ base::gc()
 ## Questions & answers
 
 -   Sometimes, questions will be asked, whether to evaluate the trainees understanding of the subject, or just to probe their intuition.
-    -   They will appear as *uncollapsed* [**lightblue**]{style="color:lightblue;"} **callouts**.
+    -   They will appear as *uncollapsed* [**lightblue**]{style="color:lightblue"} **callouts**.
 -   Answers will directly follow.
-    -   They will appear as [**lightgreen**]{style="color:lightgreen;"} **callouts**.
+    -   They will appear as [**lightgreen**]{style="color:lightgreen"} **callouts**.
     -   They will be *collapsed* by default (to remain hidden).
 
 ::: {.callout-note icon="false" style="background: lightblue"}
@@ -261,8 +285,8 @@ That's all there is. (I always thought something was fundamentally wrong with th
 
 -   Due to the heterogeneity of the trainees level or mood for R code, some may run the training course by their one, then feel bored. To keep them busy, we may sometimes have additional questions or exercises for them.
 -   These are obviously not mandatory, and just a bit beyond the scope of our training courses.
--   These will appear as [**yellow**]{style="color:yellow;"} **callouts**.
--   Their solution will appear as [**orange**]{style="color:orange;"} **callout**
+-   These will appear as [**yellow**]{style="color:yellow"} **callouts**.
+-   Their solution will appear as [**orange**]{style="color:orange"} **callout**
 -   Both will be *collapsed* by default
 
 ::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
@@ -288,7 +312,6 @@ You may have two different ways :
 
 x <- 3
 x^2
-
 ```
 
 ```{r}
@@ -297,7 +320,6 @@ x^2
 
 ## This one is less known !
 x**2
-
 ```
 
 :::
@@ -316,12 +338,13 @@ As these are *additional* content, we will **NOT** support questions related to 
 | Section / chunk type | Callout type | "icon" | "collapse" | "style-background" | Name | Numbered |
 |:----------|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|
 | Regular | *NA* | *NA* | context-dependent | *NA* | No | No |
-| Demo / Not run | `important` | "false" | "false" | [**pink**]{style="color:pink;"} | "DEMO" | No |
-| Question | `note` | "false" | "false" | [**lightblue**]{style="color:lightblue;"} | "QUESTION X" | Yes |
-| Answer | `note` | "false" | **"true"** | [**lightgreen**]{style="color:lightgreen;"} | "ANSWER X" | Yes |
-| Additional question | `warning` | "false" | **"true"** | [**yellow**]{style="color:yellow;"} | "OPTIONAL QUESTION X" | Yes |
-| Additional answer | `warning` | "false" | **"true"** | [**orange**]{style="color:orange;"} | "OPTIONAL ANSWER X" | Yes |
+| Demo / Not run | `important` | "false" | "false" | [**pink**]{style="color:pink"} | "DEMO" | No |
+| Question | `note` | "false" | "false" | [**lightblue**]{style="color:lightblue"} | "QUESTION X" | Yes |
+| Answer | `note` | "false" | **"true"** | [**lightgreen**]{style="color:lightgreen"} | "ANSWER X" | Yes |
+| Additional question | `warning` | "false" | **"true"** | [**yellow**]{style="color:yellow"} | "OPTIONAL QUESTION X" | Yes |
+| Additional answer | `warning` | "false" | **"true"** | [**orange**]{style="color:orange"} | "OPTIONAL ANSWER X" | Yes |
 
+<br>
 
 ------------------------------------------------------------------------
 
@@ -330,8 +353,9 @@ As these are *additional* content, we will **NOT** support questions related to 
 
 # Example of input data retrieval
 
+[**[DO NOT CARE ABOUT ALL THE ZENODO STUFF]**]{style="color:red"}
 
-::: {.callout-note}
+::: {.callout-note style="background: lightblue"}
 To ease the manipulation of input and intermediate/backups data (and mostly avoid losing time on trivial path problems), the students will just have to write their project code, and we will automatically build the expected in (data reading) and out (data writing) paths for them (as long as they don't misspell their project code, which happens way more than I would like...).
 
 Data should be retrieved and loaded from a Zenodo repo, and corresponding identifiers will thus change in function of the training session block (see a list in TL;DR 2)
@@ -347,7 +371,10 @@ Here, we will depict an example of :
   - From Zenodo by default
   - From a cluster-based "local" backup (in case of loss of internet connection)
 
->The aim is to ease as much as possible this step that is notoriously the first obstacle students meet when starting the practical session.<br>The pros are that it allows to avoid some early time loss, but in counterpart, it does not really learn them how to train and build their paths...
+>The aim is to ease as much as possible this step that is notoriously the 
+first obstacle students meet when starting the practical session.<br>The pros 
+are that it allows to avoid some early time loss, but in counterpart, it does 
+not really learn them how to train and build their paths...
 
 ## Building the local data structure
 
@@ -368,12 +395,16 @@ Here, we will depict an example of :
     define a single **variable** that corresponds to your project name.
 
 -   We now set your **project name** as new variable, once and for all
-    for this session, so that the directory structure will be automatically shaped around this :
+    for this session, so that the directory structure will be automatically 
+    shaped around this :
 
 ::: {.callout-warning}
+`ebaii_sc_teachers` is a project created by and for us, teachers, to mimic the 
+interaction you, students will have regarding the training sessions in your own 
+project directory.
 
-`ebaii_sc_teachers` is a project created by and for us, teachers, to mimic the interaction you, students will have regarding the training sessions in your own project directory.
-Thus, **DO NOT just copy-paste this `ebaii_sc_teachers` project name as-is, put YOURS !
+Thus, **DO NOT** just copy-paste this `ebaii_sc_teachers` project name as-is, 
+put **YOURS** !
 
 :::
 
@@ -384,21 +415,28 @@ Thus, **DO NOT just copy-paste this `ebaii_sc_teachers` project name as-is, put 
 
 ## Set your project name
 project_name <- "ebaii_sc_teachers"
+```
+
+We check if such project name **actually exists** !
+
+``` {r}
+#| label: check_pjname
+#| filename: check_pjname
+
+## Check
+file.exists(paste0("/shared/projects/", project_name))
 
 ```
 
-
-### Main (root) directory
-
->We create the **general** training courses directory
-
-:::{.callout-warning}
-We also check that such a directory exists on the cluster.
-
-If not, you may have misspelled your project name !
+:::{.callout-important}
+If this chunk returned `FALSE`, you may have misspelled your project name !
 
 :::
 
+
+### [Main]{style="color:red"} (root) directory
+
+>We create the **general** training courses directory
 
 ```{r}
 #| label: fs_set_maindir
@@ -406,22 +444,10 @@ If not, you may have misspelled your project name !
 
 ## Prepare the path in a "TD_dir" variable
 TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
-
-## Check if it exists on the HPC
-maindir_check <- dir.exists(paths = TD_dir)
-if (maindir_check) {
-  message('Directory [', TD_dir, '] does exist !')
-} else {
-  ## Create the root directory
-  dir.create(path = TD_dir, recursive = TRUE)
-  message('Directory [', TD_dir, '] created.')
-
-}
-
 ```
 
 
-### Current session dir
+### [Current session]{style="color:red"} dir
 
 >Create the **current** training course sub-directory
 
@@ -438,7 +464,7 @@ message('Directory [', session_dir, '] created.')
 
 ```
 
-### Input data dir
+### [Input]{style="color:red"} data dir
 
 >We create the directory in which the **input** data we will **retrieve** will 
 be stored.
@@ -456,7 +482,7 @@ message('Directory [', input_dir, '] created.')
 
 ```
 
-### Output results dir
+### [Output]{style="color:red"} results dir
 
 >We create the directory in which the **output** data we will **create** will 
 be stored.
@@ -480,11 +506,11 @@ Now, the we have everything needed to :
 
 -   **save** the results we will generate (`output_dir`).
 
-::: {.callout-note}
+::: {.callout-note style="background: lightblue"}
 
 This "step-by-step" version is only needed for the very first traning session for which the data structure will be created (namely, **Preproc.1**).
 
-Further sessions may perform all steps in a single chunk.
+[**Further sessions may perform all steps in a single chunk**]{style="color:red"}.
 
 :::
 
@@ -495,19 +521,21 @@ Further sessions may perform all steps in a single chunk.
 
 We created 2 functions to handle two cases :
 
-1. When we have access to Zenodo and can **download** the input data to the students project directory.
+1. When we have access to Zenodo and can **download** the input data to the students project directory. [**[But we won't thanks to AIs]**]{style="color:red"}
 
 2. When we lose the access to Zenodo, we can **copy** a local backup (from the IFB cluster)
 
 In the hypothetical case we lose the internet connection : all is lost, even the access to the cluster is impossible !
 
-The latter code chunk has to be copy-pasted in all Quarto scripts that correspond to practical sessions that require external data loading.
+The code of these functions is :
 
-While externalizing it to an outside script to source when neede would have been cleaner, we feared that students have problems copying locally such script / source it...
+-   available in the `/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R` script that can be sourced when needed in all training sessions that require external data loading.
 
-::: {.callout-note}
+-   displayed below for educational purpose and not evaluated in this template. It will be **sourced** from the script cited above. 
 
-Both functions return the complete **local** path to the downloaded/copied file, so that it can be then used to load the data.
+::: {.callout-note style="background: lightblue"}
+
+Both functions return the complete **local** (ie, user-based) path to the downloaded/copied file, so that it can be then used to load the data.
 
 :::
 
@@ -516,6 +544,7 @@ Both functions return the complete **local** path to the downloaded/copied file,
 ```{r}
 #| label: data_dl_zenofunc
 #| filename: data_dl_zenofunc
+#| eval: false
 
 ## ZENODO : Downloads the requested file_name to the provided local_path, 
 ## and returns the local position. 'force' forces the download despite 
@@ -555,6 +584,7 @@ zenodo_get_data <- function(file_name = NULL, zenodo_id = NULL, local_path = NUL
 ```{r}
 #| label: data_dl_locfunc
 #| filename: data_dl_locfunc
+#| eval: false
 
 ## BACKUP : Copies the requested backup_file to the provided local_path, 
 ## and returns the local position. 'force' forces the copy despite a local 
@@ -590,24 +620,47 @@ backup_get_data <- function(backup_file = NULL, local_path = NULL, force = FALSE
 
 ### Actual data fetching
 
+First we source the fetching functions script :
+
+```{r}
+#| label: fetch_src
+#| filename: fetch_src
+#| attr.output: '.details summary="Show output"'
+
+source(
+  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
+  echo = TRUE)
+
+```
+
+
 #### The remote way
 
-The "normal way" : when stars are aligned, students can retrieve data from Zenodo :
+:::{.callout-important}
+
+[**[ABANDONED]**]{style="color:red"}
+
+_(I just keep this section in case next year Zenodo will be reliable again)_
+
+> The data we will work on is hosted on a [Zenodo](https://zenodo.org/records/14034221){target="_blank"} repository.<br> 
+We will retrieve it thanks to its corresponding Zenodo ID (14034221).
 
 ```{r}
 #| label: zenodo_dl_10x
 #| filename: zenodo_dl_10x
+#| eval: false
 
-zenodo_id <- "14034221"
+## Set the zenodo ID as a variable
+zenodo_id <- "14034221" # <1>
 
 ## Download the requested files locally, return their user-based paths
 
 ### The 10X MTX file
 matrix_mtx_file <- zenodo_get_data(
-  file_name = "matrix.mtx.gz", 
-  zenodo_id = zenodo_id, 
-  local_path = input_dir, 
-  force = TRUE)
+  file_name = "matrix.mtx.gz",  # <2>
+  zenodo_id = zenodo_id,  # <1>
+  local_path = input_dir,  # <3>
+  force = TRUE) # <4>
 
 ### The 10X features metadata
 features_file <- zenodo_get_data(
@@ -625,16 +678,25 @@ barcodes_file <- zenodo_get_data(
 
 ```
 
+1. `zenodo_id` : The ID of the Zenodo repository
+2. `file_name` : The name of the file we want to retrieve
+3. `local_path` : The local path where we want the downloaded data 
+to be stored. Here, it is the `input_dir` we previously defined !
+4. `force` : if `TRUE`, attempts to download the file even if a local copy
+already exists.
+
+:::
+
 #### The local backup
 
-The panic mode : when we lose the access to zenodo and have to copy data from a local backup on the IFB cluster !
+[**[ADOPTED AS PRIMARY]**]{style="color:red"}
 
-::: {.callout-important icon="false" style="background: pink"}
-## FROM BACKUP
+The panic mode : when we lose the access to Zenodo and have to copy data from a local backup on the IFB cluster !
 
-```{r class.source="fold-hide", attr.output='.details summary="Output"'}
+```{r}
 #| label: backup_cp_10x
 #| filename: backup_cp_10x
+#| eval: false
 
 ## Copy the requested files from a local backup, return their user-based local paths
 
@@ -658,8 +720,6 @@ barcodes_file <- backup_get_data(
 
 ```
 
-:::
-
 
 ### TL;DR for authors (2) {#tldr-for-authors-2}
 
@@ -668,9 +728,13 @@ barcodes_file <- backup_get_data(
 
 >Here are tables summarizing files hosted in, their Zenodo repo ID and paths in the
 backup, for each training part [NOTE : based on 2025. Has to be updated if new
-files or resources changed !] :
+files or resources get changed !] :
 
->The local backup path root is `/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/`
+:::{.callout-important}
+
+>The local backup path root is **`/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/`**
+
+:::
 
 #### Data input
 
@@ -865,6 +929,102 @@ SoupX_auto <- function(scmat_filt = NULL, # <1>
 10. Handle the worst case of the unfiltered matrix not provided
 11. Handle the better case of the unfiltered matrix provided
 
+### Sourcing
+
+```{r}
+#| label: soupx_func_src
+#| filename: soupx_func_src
+#| eval: false
+
+source(
+  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/soupx_function.R",
+  echo = TRUE)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# SeuratObject RDS naming convention
+
+>At the end of each training session, or for intermediate steps that may take
+quite some time to reproduce in case of error, the modified SeuratObject is
+saved as a compressed RDS.
+
+A proposal for a naming convention :
+
+<CENTER>**[06]{style="color:blue"}\_TD3A\_S5\_[LogNorm]{style="color:red"}\_[12508]{style="color:green"}.[4035]{style="color:brown"}.RDS**</CENTER>
+
+-   [**06**]{style="color:blue"} : The ordered step number
+-   **TD3A** : The sample name (fixed)
+-   **S5** : To recall the RDS contains a SeuratObject v5
+-   [**LogNorm**]{style="color:red"} : The step name
+-   [**12508**]{style="color:green"} : The number of features at the current step
+-   [**4035**]{style="color:brown"} : The number of barcodes at the current step
+
+And here is a chunk to describe how it is real-time generated :
+
+```{r}
+#| label: save_rds
+#| filename: save_rds
+#| eval: false
+
+## Save our Seurat object (rich naming)
+out_name <- paste0(
+              output_dir, "/", paste(
+                c("06", 
+                  Seurat::Project(sobj), 
+                  "S5", 
+                  "LogNorm",
+                  paste(
+                    dim(sobj), 
+                    collapse = '.')
+                ), collapse = "_"),
+              ".RDS")
+
+## Check
+print(out_name)
+
+## Write on disk
+saveRDS(object = sobj, 
+        file = out_name)
+```
+
+::: {.callout-note style="background: lightblue"}
+## NOTE 1
+
+Some steps require additional information. By example, for **scaling**, the number of HVGs is added (abbreviated in "`2k`").
+:::
+
+::: {.callout-note style="background: lightblue"}
+## NOTE 2
+
+The entirety of the intermediate SeuratObjects saved as RDS is available here :
+
+`/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE`
+
+And here are all the files :
+
+```
+01_TD3A_S5_Metrics.Tech_31053.4587.RDS
+02_TD3A_S5_Metrics.Bio_31053.4587.RDS
+03_TD3A_S5_Metrics.Filtered_12508.4278.RDS
+04_TD3A_S5_CC_12508.4278.RDS
+05_TD3A_S5_Doublets.Filtered_12508.4035.RDS
+06_TD3A_S5_LogNorm_12508.4035.RDS
+07_TD3A_S5_Scaled.2k_12508.4035.RDS
+08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS
+09_TD3A_S5_DimRed.PCA_12508.4035.RDS
+10_TD3A_S5_Clustered.0.8_12508.4035.RDS
+11_TD3A.TDCT_S5_Merged_12926.3886.RDS
+12_TD3A.TDCT_S5_Integrated_12926.3886.RDS
+13_TD3A.TDCT_S5_Integrated_Annotated.RDS
+```
+
+:::
+
 
 ------------------------------------------------------------------------
 
@@ -880,10 +1040,12 @@ For reproducibility and context, it is recommended to include in the Quart/Rmark
 
 Students, you are not expected to run the following chunk ***BUT*** you are more than welcome to include it at the end of your own Rmardown / Quarto script !
 
-```{r attr.output='.details summary="Output"'}
+```{r}
 #| code-fold: false
 #| label: rsession
 #| filename: rsession
+#| attr.output: '.details summary="Show output"'
+
 
 utils::sessionInfo()
 
