@@ -264,7 +264,6 @@ base::gc()
 ## QUESTION 1
 
 What's the Answer to Life ? The Universe ? Everything ??
-
 :::
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
@@ -277,7 +276,6 @@ Forty-two. Six by nine : forty-two.
 That's it.
 
 That's all there is. (I always thought something was fundamentally wrong with the universe.)
-
 :::
 
 
@@ -1046,9 +1044,7 @@ Students, you are not expected to run the following chunk ***BUT*** you are more
 #| filename: rsession
 #| attr.output: '.details summary="Show output"'
 
-
 utils::sessionInfo()
-
 ```
 :::
 

@@ -1,6 +1,6 @@
 ## Allows to run SoupX with or without the unfiltered matrix (filtered matrix is required). By default, does not return the "unsouped" matrix, just the soup rate estimate (rho). Unsouped matrix is returned when 'return_object' is set to TRUE.
 SoupX_auto <- function(scmat_filt = NULL,
-                       # scmat_raw = NULL,
+                       scmat_raw = NULL,
                        soupQuantile = 0.9,
                        contaminationRange = c(.01, .8),
                        soupRange = c(0,100),
