@@ -1,20 +1,21 @@
 ---
-title: "EB3I n1 2026 scRNAseq<br>Quarto Template"
+title: "EB3I n1 2026 scRNAseq<br><br>[Quarto Template]{.mark}<br><i>Guidelines and examples for teachers</i><br> <br>"
 author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
   - name: "<i>Bastien JOB</i>"
     email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr"
 lightbox: 
-  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots by click
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
 format:
   html:
-    fig_width: 8
-    fig_height: 6
+    fig-width: 8
+    fig-height: 6
+    fig-align: center
     embed-fonts: true
     number-sections: true  ## Adds number to headers (sections)
     embed-resources: true  ## Make a self-contained HTML
     anchor-sections: true  ## Create HTML anchors for all section titles
-    theme: flatly  ## CSS theme for the HTML page
+    theme: zephyr  ## CSS theme for the HTML page
     syntax-highlighting: tango  ## Theme for the code chunks
     toc: true  ## Add a table of content
     toc-location: left  ## Position of TOC on the left side
@@ -35,7 +36,6 @@ format:
     code-annotations: hover  ## For code annotation, show values in mouseover
     html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
     echo: true
-    fig-align: center
 filters: 
  - foldablecodeblock.lua  ## LUA code for foldable code output
 ---
@@ -84,6 +84,8 @@ td, th {
 <!-- BODY -->
 
 
+<br>
+
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -95,8 +97,11 @@ td, th {
 ------------------------------------------------------------------------
 
 
+<br>
 
-# PREAMBLE FOR AUTHORS
+# Preamble for authors
+
+<br>
 
 ::: {.callout-warning}
 ## I beg your attention please
@@ -124,10 +129,14 @@ This QMD script is a template/example. Among its characteristics :
 
 :::
 
+<br>
+<br>
+
 # Purpose of this session {#purpose-of-this-session}
 
->Here is an example of a training session preamble : a very synthetic description of the upcoming content, with a specific warning from the very first training session ("Preproc.1").<br>The targets of this section are the students.
+<br>
 
+Here is an example of a training session preamble : a very synthetic description of the upcoming content, with a specific warning from the very first training session ("Preproc.1").<br>The targets of this section are the students.
 
 This file describes the different steps to perform the **first part** of the **single cell RNAseq** data analysis training course for the **EB3I n1 2026**, covering these steps :
 
@@ -135,39 +144,55 @@ This file describes the different steps to perform the **first part** of the **s
 -   **Remove** barcodes from **empty droplets**
 -   **Estimate** and remove **ambient RNA** contamination *("soup")*
 
+<br>
+
 ::: {.callout-important}
 ## An important notice
 
--   These early (but mandatory) steps of the analysis are not covered by the renowned, higher-level analysis frameworks like **Seurat** nor **scran/scater**.
--   Thus, we will write/use a certain amount of **lines of code**, some of which of a higher complexity for R beginners.
--   **Newcomer, do not fear** !
-    -   While you are **welcome to try** writing some by yourself, depending on your R knowledge and self-confidence in it ...
-    -   ... you do not have to know [**how**]{.underline} these code work ...
-    -   ... thus you **should not feel ashamed** copy-pasting the pre-written code hereafter ...
-    -   ... but in both cases, please try **your best understanding** [**what**]{.underline} these code do, and even more, [**why**]{.underline} !
-    -   In this purpose, you may use whatever **help** you can **by** **searching**.
+These early (but mandatory) steps of the analysis are not covered by the renowned, higher-level analysis frameworks like **Seurat** nor **scran/scater**.
 
+Thus, we will write/use a certain amount of **lines of code**, some of which of a higher complexity for R beginners.
+
+**Newcomer, do not fear** !
+
+-   While you are **welcome to try** writing some by yourself, depending on your R knowledge and self-confidence in it ...
+-   ... you do not have to know [**how**]{.underline} these code work ...
+-   ... thus you **should not feel ashamed** copy-pasting the pre-written code hereafter ...
+-   ... but in both cases, please try **your best understanding** [**what**]{.underline} these code do, and even more, [**why**]{.underline} !
+-   In this purpose, you may use whatever **help** you can **by** **searching**.
 :::
 
-::: {.callout-note icon="true" style="background: lightblue"}
+<br>
+
+::: {.callout-note}
 As this is a template, most chunks here will not be evaluated. They will be
 only where their output matters for the following chunks.
-
 :::
+
+<br>
+<br>
 
 # What to run ? {#what-to-run}
 
-Here is a set of example of (customized) `callouts` used to distinguish the different types of chunks / text corresponding to mandatory / demo / Q&A / optional sections :
+<br>
 
--   Trainees are **not intended** to run all of the chunks :
-    -   Some are for additional demo content
-    -   Others correspond to questions (and their answers) to the audience
-    -   Others are additional / optional content (for bored "advanced" users)
--   We will use a **color code** :
+Here is a set of examples of **customized** `callouts` used to distinguish the different types of `chunks` / text corresponding to mandatory / demo / Q&A / optional sections :
+
+Trainees are **not intended** to run all of the chunks :
+
+-   Some are for additional demo content
+-   Others correspond to questions (and their answers) to the audience
+-   Others are additional / optional content (for bored "advanced" users)
+
+We will use a **color code** :
+
+<br>
 
 ## Chunks trainees are expected to run :
 
--   These chunks would appear like this in the provided QMD script :
+<br>
+
+These chunks would appear like this in the provided QMD script :
 
 ```{{r}}
 #| label: chunk_run
@@ -177,7 +202,9 @@ Here is a set of example of (customized) `callouts` used to distinguish the diff
 getwd()
 ```
 
--   They would appear like this on the rendered HTML / projection screen :
+<br>
+
+They would appear like this on the rendered HTML / projection screen :
 
 ```{r}
 #| label: chunk_run
@@ -187,8 +214,12 @@ getwd()
 getwd()
 ```
 
--   One can also **fold the chunk output** to hide its content when desired, using
-the Quarto comment `#| attr.output: '.details summary="Show output"'` :
+<br>
+
+One can also **fold the chunk output** to hide its content when desired, using
+the Quarto comment :
+
+`#| attr.output: '.details summary="Show output"'` :
 
 ```{{r}}
 #| label: chunk_run_folded
@@ -208,24 +239,35 @@ getwd()
 getwd()
 ```
 
-::: {.callout-note icon="true" style="background: lightblue"}
+<br>
 
+::: {.callout-note}
 This chunk example also shows a recommended behavior :
 
 -   Setting the chunk name `label` in the code block as a custom commentary (this is a Quarto behavior)
 -   Setting a `filename` option with the same value as this `label` : this is a way to display the chunk filename ahead of the chunk in the HTML output.
 
 This is useful for trainees to stay synched between what they see on their own screen (the QMD source) and what they see projected (the rendered HTML).
-
 :::
+
+<br>
+<br>
 
 ## Chunks trainees are **not** expected to run
 
--   Some parts or code chunks are not expected to be run by trainees
--   Some may be run by the teacher in real time (like examples of output of parameters variation), others may be pre-computed in the rendered HTML and just displayed on-screen
--   In such cases, a [**pink**]{style="color:pink"} **"important" callout** will be displayed ahead of the chunk(s)
+<br>
+
+Some parts or code chunks are not expected to be run by trainees
+
+Some may be run by the teacher in real time (like examples of output of parameters variation), others may be pre-computed in the rendered HTML and just displayed on-screen
+
+In such cases, a [**pink**]{style="color:pink"} **"important" callout** will be displayed ahead of the chunk(s)
+
+-   It is entitled **DEMO**
 -   By default, the source is **collapsed** (folded)
 -   Sometimes, its output (figure, message, ...) may be *hidden* and can be revealed using the `Show output` button :
+
+<br>
 
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
@@ -248,27 +290,39 @@ utils::sessionInfo()
 ## Example of a chunk to NOT run (garbage collector)
 base::gc()
 ```
-
 :::
 
+<br>
+<br>
 
 ## Questions & answers
 
--   Sometimes, questions will be asked, whether to evaluate the trainees understanding of the subject, or just to probe their intuition.
-    -   They will appear as *uncollapsed* [**lightblue**]{style="color:lightblue"} **callouts**.
--   Answers will directly follow.
-    -   They will appear as [**lightgreen**]{style="color:lightgreen"} **callouts**.
-    -   They will be *collapsed* by default (to remain hidden).
+<br>
+
+Sometimes, questions will be asked, whether to evaluate the trainees understanding of the subject, or just to probe their intuition.
+
+-   The are entitled **QUESTION N** (iterating throughout the document)
+-   They appear as *uncollapsed* [**lightblue**]{style="color:lightblue"} **callouts**.
+
+Answers directly follow.
+
+-   They are entitled **ANSWER N** 
+-   They appear as [**lightgreen**]{style="color:lightgreen"} **callouts**.
+-   They are *collapsed* by default (to remain hidden).
+
+<br>
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 1
 
 What's the Answer to Life ? The Universe ? Everything ??
-
 :::
+
+<br>
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 1
+
 
 The Answer to the Great Question... is ...
 
@@ -277,26 +331,40 @@ Forty-two. Six by nine : forty-two.
 That's it.
 
 That's all there is. (I always thought something was fundamentally wrong with the universe.)
-
 :::
 
+<br>
+<br>
 
 ## Additional exercises / questions
 
--   Due to the heterogeneity of the trainees level or mood for R code, some may run the training course by their one, then feel bored. To keep them busy, we may sometimes have additional questions or exercises for them.
--   These are obviously not mandatory, and just a bit beyond the scope of our training courses.
--   These will appear as [**yellow**]{style="color:yellow"} **callouts**.
--   Their solution will appear as [**orange**]{style="color:orange"} **callout**
--   Both will be *collapsed* by default
+<br>
+
+Due to the heterogeneity of the trainees level or mood for R code, some may run the training course by their one, then feel bored. To keep them busy, we may sometimes have additional questions or exercises for them.
+
+These are obviously not mandatory, and just a bit beyond the scope of our training courses.
+
+-   They are entitled **OPTIONAL QUESTION N**
+-   They appear as [**yellow**]{style="color:yellow"} **callouts**.
+
+Obviously, they are also followed by their respective answers or solutions
+
+-   Thye are entitled **OPTIONAL ANSWER N**
+-   They appear as [**orange**]{style="color:orange"} **callouts**
+
+Both will be *collapsed* by default
+
+<br>
 
 ::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
 ## OPTIONAL QUESTION 1
 
-How do you compute the square of a value in R ?
+How do you compute the **square** of a value in R ?
 
-Show me by computing the square of 3 !
-
+Show me by computing the **square of `3`** !
 :::
+
+<br>
 
 ::: {.callout-warning icon="false" collapse="true" style="background: orange"}
 ## OPTIONAL ANSWER 1
@@ -321,19 +389,24 @@ x^2
 ## This one is less known !
 x**2
 ```
-
 :::
+
+<br>
 
 ::: {.callout-important}
 ## UNSUPPORTED
 
 As these are *additional* content, we will **NOT** support questions related to these during the progression of the training session *(but you may ask some support during peer mentoring or on after-hours)*
-
 :::
+
+<br>
+<br>
 
 ## TL;DR for authors {#tldr-for-authors}
 
-> Here is a summary of expected callout types and parameters, depending on their purpose :
+<br>
+
+Here is a summary of expected callout types and parameters, depending on their purpose :
 
 | Section / chunk type | Callout type | "icon" | "collapse" | "style-background" | Name | Numbered |
 |:----------|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|
@@ -350,62 +423,63 @@ As these are *additional* content, we will **NOT** support questions related to 
 
 ------------------------------------------------------------------------
 
+<br>
 
 # Example of input data retrieval
 
+<br>
+
 [**[DO NOT CARE ABOUT ALL THE ZENODO STUFF]**]{style="color:red"}
 
-::: {.callout-note style="background: lightblue"}
+::: {.callout-note}
 To ease the manipulation of input and intermediate/backups data (and mostly avoid losing time on trivial path problems), the students will just have to write their project code, and we will automatically build the expected in (data reading) and out (data writing) paths for them (as long as they don't misspell their project code, which happens way more than I would like...).
 
 Data should be retrieved and loaded from a Zenodo repo, and corresponding identifiers will thus change in function of the training session block (see a list in TL;DR 2)
 
 In case we may lose the internet connection to Zenodo (it happened in 2025 when CloudFlare went down!), a "local" backup is available on the IFB instance [**NOTE : WILL** be available : it has not yet been moved from the 2025 location for the moment, due to cluster being down and 2026 project id not yet defined and opened]
-
 :::
+
+<br>
 
 Here, we will depict an example of :
 
-- How the "local" (ie, on the IFB cluster) working dir tree is shaped and built
-- How data is fetched :
-  - From Zenodo by default
-  - From a cluster-based "local" backup (in case of loss of internet connection)
+-   How the "local" (ie, on the IFB cluster) working dir tree is shaped and built
+-   How data is fetched :
+    -   From Zenodo by default
+    -   From a cluster-based "local" backup (in case of loss of internet connection)
 
->The aim is to ease as much as possible this step that is notoriously the 
-first obstacle students meet when starting the practical session.<br>The pros 
-are that it allows to avoid some early time loss, but in counterpart, it does 
+The aim is to ease as much as possible this step that is notoriously the 
+first obstacle students meet when starting the practical session.
+
+The pros  are that it allows to avoid some early time loss, but in counterpart, it does 
 not really learn them how to train and build their paths...
+
+<br>
+<br>
 
 ## Building the local data structure
 
--   During the current and remaining training sessions, we will work on
-    different **data** **objects**, some retrieved from **external**
-    resources, some we will **create**.
+<br>
 
--   In order to reuse these for further steps, or other sessions, we
-    need to **store** them, thus create a **directory structure** on the
-    cluster.
+During the current and remaining training sessions, we will work on different **data** **objects**, some retrieved from **external** resources, some we will **create**.
 
--   We will create this structure in **your project** folder (the one
-    you registered at the IFB Core, in which you stored your own data
-    for the tutoring).
+In order to reuse these for further steps, or other sessions, we need to **store** them, thus create a **directory structure** on the cluster.
 
--   To ensure that *you* will always use the same structure for *your*
-    work, the code hereafter has been writen so that you just have to
-    define a single **variable** that corresponds to your project name.
+We will create this structure in **your project** folder (the one you registered at the IFB Core, in which you stored your own data for the tutoring).
 
--   We now set your **project name** as new variable, once and for all
-    for this session, so that the directory structure will be automatically 
-    shaped around this :
+To ensure that *you* will always use the same structure for *your* work, the code hereafter has been writen so that you just have to define a single **variable** that corresponds to your project name.
+
+We now set your **project name** as new variable, once and for all for this session, so that the directory structure will be automatically shaped around this :
+
+<br>
 
 ::: {.callout-warning}
-`ebaii_sc_teachers` is a project created by and for us, teachers, to mimic the 
+`ebaii_sc_teachers` is a project created **by us** and **for us, teachers**, to mimic the 
 interaction you, students will have regarding the training sessions in your own 
 project directory.
 
 Thus, **DO NOT** just copy-paste this `ebaii_sc_teachers` project name as-is, 
 put **YOURS** !
-
 :::
 
 
@@ -416,6 +490,8 @@ put **YOURS** !
 ## Set your project name
 project_name <- "ebaii_sc_teachers"
 ```
+
+<br>
 
 We check if such project name **actually exists** !
 
@@ -428,15 +504,20 @@ file.exists(paste0("/shared/projects/", project_name))
 
 ```
 
+<br>
+
 :::{.callout-important}
 If this chunk returned `FALSE`, you may have misspelled your project name !
-
 :::
 
+<br>
+<br>
 
 ### [Main]{style="color:red"} (root) directory
 
->We create the **general** training courses directory
+<br>
+
+We create the **general** training courses directory
 
 ```{r}
 #| label: fs_set_maindir
@@ -446,10 +527,14 @@ If this chunk returned `FALSE`, you may have misspelled your project name !
 TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
 ```
 
+<br>
+<br>
 
 ### [Current session]{style="color:red"} dir
 
->Create the **current** training course sub-directory
+<br>
+
+Create the **current** training course sub-directory
 
 ```{r}
 #| label: fs_set_sessiondir
@@ -461,13 +546,16 @@ dir.create(path = session_dir, recursive = TRUE)
 
 ## Print the session directory on-screen
 message('Directory [', session_dir, '] created.')
-
 ```
+
+<br>
+<br>
 
 ### [Input]{style="color:red"} data dir
 
->We create the directory in which the **input** data we will **retrieve** will 
-be stored.
+<br>
+
+We create the directory in which the **input** data we will **retrieve** will be stored.
 
 ```{r}
 #| label: fs_set_inputdir
@@ -482,10 +570,14 @@ message('Directory [', input_dir, '] created.')
 
 ```
 
+<br>
+<br>
+
 ### [Output]{style="color:red"} results dir
 
->We create the directory in which the **output** data we will **create** will 
-be stored.
+<br>
+
+We create the directory in which the **output** data we will **create** will be stored.
 
 ```{r}
 #| label: fs_set_outputdir
@@ -500,26 +592,33 @@ message('Directory [', output_dir, '] created.')
 
 ```
 
+<br>
+
 Now, the we have everything needed to :
 
 -   **load** data (`input_dir`)
-
 -   **save** the results we will generate (`output_dir`).
 
-::: {.callout-note style="background: lightblue"}
+<br>
 
+::: {.callout-note}
 This "step-by-step" version is only needed for the very first traning session for which the data structure will be created (namely, **Preproc.1**).
 
 [**Further sessions may perform all steps in a single chunk**]{style="color:red"}.
-
 :::
 
+<br>
+<br>
 
 ## Fetching some input data
 
+<br>
+
 ### The loading functions
 
-We created 2 functions to handle two cases :
+<br>
+
+We created two functions to handle two cases :
 
 1. When we have access to Zenodo and can **download** the input data to the students project directory. [**[But we won't thanks to AIs]**]{style="color:red"}
 
@@ -533,13 +632,15 @@ The code of these functions is :
 
 -   displayed below for educational purpose and not evaluated in this template. It will be **sourced** from the script cited above. 
 
-::: {.callout-note style="background: lightblue"}
+<br>
 
+::: {.callout-note}
 Both functions return the complete **local** (ie, user-based) path to the downloaded/copied file, so that it can be then used to load the data.
-
 :::
 
-- Remote from Zenodo :
+<br>
+
+Remote from Zenodo :
 
 ```{r}
 #| label: data_dl_zenofunc
@@ -579,7 +680,9 @@ zenodo_get_data <- function(file_name = NULL, zenodo_id = NULL, local_path = NUL
 
 ```
 
-- Locally from a backup :
+<br>
+
+Locally from a backup :
 
 ```{r}
 #| label: data_dl_locfunc
@@ -618,7 +721,12 @@ backup_get_data <- function(backup_file = NULL, local_path = NULL, force = FALSE
 
 ```
 
+<br>
+<br>
+
 ### Actual data fetching
+
+<br>
 
 First we source the fetching functions script :
 
@@ -633,8 +741,12 @@ source(
 
 ```
 
+<br>
+<br>
 
 #### The remote way
+
+<br>
 
 :::{.callout-important}
 
@@ -642,7 +754,7 @@ source(
 
 _(I just keep this section in case next year Zenodo will be reliable again)_
 
-> The data we will work on is hosted on a [Zenodo](https://zenodo.org/records/14034221){target="_blank"} repository.<br> 
+The data we will work on is hosted on a [Zenodo](https://zenodo.org/records/14034221){target="_blank"} repository.<br> 
 We will retrieve it thanks to its corresponding Zenodo ID (14034221).
 
 ```{r}
@@ -684,12 +796,16 @@ barcodes_file <- zenodo_get_data(
 to be stored. Here, it is the `input_dir` we previously defined !
 4. `force` : if `TRUE`, attempts to download the file even if a local copy
 already exists.
-
 :::
+
+<br>
+<br>
 
 #### The local backup
 
-[**[ADOPTED AS PRIMARY]**]{style="color:red"}
+<br>
+
+[**[ADOPTED AS PRIMARY]**]{style="color:blue"}
 
 The panic mode : when we lose the access to Zenodo and have to copy data from a local backup on the IFB cluster !
 
@@ -720,34 +836,49 @@ barcodes_file <- backup_get_data(
 
 ```
 
+<br>
+<br>
 
 ### TL;DR for authors (2) {#tldr-for-authors-2}
 
->Two functions are there to ease the retrieval of data from<br>1) a Zenodo repo
-<br>2) a local backup folder on the IFB cluster.
+<br>
 
->Here are tables summarizing files hosted in, their Zenodo repo ID and paths in the
+Two functions are there to ease the retrieval of data from
+
+1.  a Zenodo repo
+2.  a local backup folder on the IFB cluster.
+
+Here are tables summarizing files hosted in, their Zenodo repo ID and paths in the
 backup, for each training part [NOTE : based on 2025. Has to be updated if new
 files or resources get changed !] :
 
+<br>
+
 :::{.callout-important}
+The local backup path root is :
 
->The local backup path root is **`/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/`**
-
+**`/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/`**
 :::
+
+<br>
 
 #### Data input
 
 | Training part | File | Desc | Type | Zenodo repo | Backup path (subdir) |
 |:----------:|:---------|:---------:|:---------:|:---------:|:---------|
 | `Preproc 1` | `barcodes.tsv.gz` | 10X barcodes | `Input` | 14034221 | `INPUT/10X/barcodes.tsv.gz` |
-| `Preproc 1` | `features.tsv.gz` | 10X features | `Input` | 14034221 | INPUT/10X/features.tsv.gz |
-| `Preproc 1` | `matrix.mtx.gz` | 10X matrix | Input | 14034221 | INPUT/10X/matrix.mtx.gz |
+| `Preproc 1` | `features.tsv.gz` | 10X features | `Input` | 14034221 | `INPUT/10X/features.tsv.gz` |
+| `Preproc 1` | `matrix.mtx.gz` | 10X matrix | `Input` | 14034221 | `INPUT/10X/matrix.mtx.gz` |
 | `Preproc 2` | `GSM4861194_gex_2_raw_gene_expression.tsv.gz` | sc flat matrix | `Input` | 14033941 | `INPUT/TSV/GSM4861194_gex_2_raw_gene_expression.tsv.gz` |
 | `Integration` | `TD3A_Filtered_12508.2018.RDS` | SeuratObject (KO) | `Input` | 14094752 | `INPUT/RDS/TD3A_Filtered_12508.2018.RDS` |
 | `Integration` | `TDCT_Filtered_12254.1868.RDS` | SeuratObject (Ctrl) | `Input` | 14094752 | `INPUT/RDS/TDCT_Filtered_12254.1868.RDS` |
 
+<br>
+<br>
+
 #### Resources / additional data
+
+<br>
 
 | Training part | File | Desc | Type | Zenodo repo | Backup path (subdir) |
 |:----------:|:---------|:---------:|:---------:|:---------:|:---------|
@@ -758,9 +889,14 @@ files or resources get changed !] :
 | `Preproc 3` | `mus_musculus_Seurat_cc.genes_20191031.rds` | Seurat cell cycle genes (mm) | `Resource` | 14101506 | `RESOURCES/GENELISTS/mus_musculus_Seurat_cc.genes_20191031.rds` |
 | `Cell Annotation` | `ImmGenData.RDS` | ImmGenData cells DB | `Resource` | 14101506 | `RESOURCES/ImmGenData.RDS` |
 
+<br>
+<br>
+
 #### Intermediate SeuratObjects
 
-> The cited training part is the one where the dataset is **produced**.
+<br>
+
+The cited training part is the one where the dataset is **produced**.
 
 | Training part | File | Desc | Type | Zenodo repo | Backup path (subdir) |
 |:----------:|:---------|:---------:|:---------:|:---------:|:---------|
@@ -778,10 +914,14 @@ files or resources get changed !] :
 | `Integration` | `12_TD3A.TDCT_S5_Integrated_12926.3886.RDS` | SO with TD3A+TDCT integrated with Harmony (standalone) | `Intermediate` | 14035293 | `INTERMEDIATE/12_TD3A.TDCT_S5_Integrated_12926.3886.RDS` |
 | `Cell Annotation` | `13_TD3A.TDCT_S5_Integrated_Annotated.RDS` | SO with ImmGen annotations | `Intermediate` | 14035293 | `INTERMEDIATE/13_TD3A.TDCT_S5_Integrated_Annotated.RDS` |
 
+<br>
+<br>
 
-#### Human resources (for tutoring)
+#### Additional resources for homo sapiens (for tutoring)
 
->These are gene lists for the tutoring (when students have human data). All these are using HGNC symbols.
+<br>
+
+These are gene lists for the tutoring (when students have human data). All these are using HGNC symbols.
 
 | Training part | File | Desc | Type | Zenodo repo | Backup path (subdir) |
 |:----------:|:---------|:---------:|:---------:|:---------:|:---------|
@@ -791,10 +931,16 @@ files or resources get changed !] :
 | `Preproc 3` | `homo_sapiens_Seurat_cc.genes_20191031.rds` | Seurat cell cycle genes (hs) | `Resource` | 14101506 | `RESOURCES/GENELISTS/homo_sapiens_Seurat_cc.genes_20191031.rds` |
 | `Preproc 3` | `homo_sapiens_cyclone_pairs_symbols_20191001.rds` | Cyclone cell cycle gene pairs (hs) | `Resource` | 14101506 | `RESOURCES/GENELISTS/homo_sapiens_cyclone_pairs_symbols_20191001.rds` |
 
+<br>
+<br>
 
-#### Arabidopsis resources (for tutoring)
+#### Additional resources for Arabidopsis thaliana (for tutoring)
 
->These are gene lists for the tutoring (when students have _A. thaliana_ data). All these are using symbols.
+<br>
+
+These are gene lists for the tutoring (when students have _A. thaliana_ data). All these are using symbols.
+
+<br>
 
 ::: {.callout-warning}
 ## QUICK AND DIRTY !
@@ -804,30 +950,51 @@ I (Bastien) collected these after a quick Google search !
 I'm not that confident in their content :P !
 
 These RDS are only available in the cluster backup as of now !
-
 :::
+
+<br>
 
 | Training part | File | Desc | Type | Zenodo repo | Backup path (subdir) |
 |:----------:|:---------|:---------:|:---------:|:---------:|:---------|
 | `Preproc 2` | `arabidopsis_thaliana_cribo_symbols_20261012.rds` | mito genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_cribo_symbols_20261012.rds` |
 | `Preproc 2` | `arabidopsis_thaliana_mito_symbols_20261012.rds` | riboprot genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_mito_symbols_20261012.rds` |
-| `Preproc 3` | `arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` | Seurat cell cycle genes (hs) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` |
+| `Preproc 3` | `arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` | Seurat cell cycle genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` |
 
+
+<br>
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
+<br>
+<br>
 
 # Example of code embedding and wrapping
 
-> *Here is an example of a chunk containing a copy of a function (for display purpose) that is supposed to be sourced from this QMD script.*<br>Example of code chunk filenaming is provided.<br>Examples of code annotation are provided, to explain function parameters, and some condition testing.<br>*A small CSS hack was written to slightly move the "code-copy" button so that it does not interfere with the earliest annotations in the upper-right corner of the chunk*
+<br>
+
+*Here is an example of a chunk containing a copy of a function (for display purpose) that is supposed to be sourced from this QMD script.*
+
+Example of code chunk filenaming is provided.<br>Examples of code annotation are provided, to explain function parameters, and some condition testing.
+
+*A small CSS hack was written to slightly move the "code-copy" button so that it does not interfere with the earliest annotations in the upper-right corner of the chunk*
+
+<br>
 
 ## Functions
 
+<br>
+
 ### SoupX helper function {#soupx-helper-function}
 
-> This function was written to ease the use of SoupX on a Seurat object.<br>In practice, this code is already available in a separate script `soupX_auto.R` that will be **sourced**. It is just displayed here for educational purpose.<br>It was tested on `SoupX` = 1.6.2 with `igraph` = 1.5.1, `Seurat` = 4.4.0, 5.1.0
+<br>
+
+This function was written to ease the use of SoupX on a Seurat object.
+
+In practice, this code is already available in a separate script `soupX_auto.R` that will be **sourced**. It is just displayed here for educational purpose.
+
+It was tested with `SoupX` = 1.6.2, `igraph` = 1.5.1, `Seurat` = 4.4.0, 5.1.0
 
 ```{r}
 #| label: soupx_func
@@ -929,7 +1096,12 @@ SoupX_auto <- function(scmat_filt = NULL, # <1>
 10. Handle the worst case of the unfiltered matrix not provided
 11. Handle the better case of the unfiltered matrix provided
 
+<br>
+<br>
+
 ### Sourcing
+
+<br>
 
 ```{r}
 #| label: soupx_func_src
@@ -942,20 +1114,27 @@ source(
 
 ```
 
-------------------------------------------------------------------------
+<br>
 
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+
+<br>
 
 # SeuratObject RDS naming convention
 
->At the end of each training session, or for intermediate steps that may take
+<br>
+
+At the end of each training session, or for intermediate steps that may take
 quite some time to reproduce in case of error, the modified SeuratObject is
 saved as a compressed RDS.
 
 A proposal for a naming convention :
 
 <CENTER>**[06]{style="color:blue"}\_TD3A\_S5\_[LogNorm]{style="color:red"}\_[12508]{style="color:green"}.[4035]{style="color:brown"}.RDS**</CENTER>
+
+Where :
 
 -   [**06**]{style="color:blue"} : The ordered step number
 -   **TD3A** : The sample name (fixed)
@@ -965,6 +1144,8 @@ A proposal for a naming convention :
 -   [**4035**]{style="color:brown"} : The number of barcodes at the current step
 
 And here is a chunk to describe how it is real-time generated :
+
+<br>
 
 ```{r}
 #| label: save_rds
@@ -992,11 +1173,15 @@ saveRDS(object = sobj,
         file = out_name)
 ```
 
-::: {.callout-note style="background: lightblue"}
+<br>
+
+::: {.callout-note}
 ## NOTE 1
 
 Some steps require additional information. By example, for **scaling**, the number of HVGs is added (abbreviated in "`2k`").
 :::
+
+<br>
 
 ::: {.callout-note style="background: lightblue"}
 ## NOTE 2
@@ -1022,18 +1207,24 @@ And here are all the files :
 12_TD3A.TDCT_S5_Integrated_12926.3886.RDS
 13_TD3A.TDCT_S5_Integrated_Annotated.RDS
 ```
-
 :::
 
+<br>
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
+<br>
+<br>
 
 # Rsession
 
-For reproducibility and context, it is recommended to include in the Quart/Rmarkdown the list of loaded packages and their version.
+<br>
+
+For reproducibility and context, it is recommended to include in the Quarto/Rmarkdown the list of loaded packages and their version.
+
+<br>
 
 ::: {.callout-important icon="false" style="background: pink"}
 ## Session info
@@ -1046,9 +1237,7 @@ Students, you are not expected to run the following chunk ***BUT*** you are more
 #| filename: rsession
 #| attr.output: '.details summary="Show output"'
 
-
 utils::sessionInfo()
-
 ```
 :::
 
