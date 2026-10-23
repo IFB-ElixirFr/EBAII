@@ -1,0 +1,1472 @@
+---
+title: "EB3I n1 2026 scRNAseq<br>Processing 1<br>Normalization, Scaling & Regressing out"
+author:
+  - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
+  - name: "<i>Lijiao NING</i>"
+    email: "lijiao.ning@cnrs.fr"
+  - name: "Contributors: Bastien JOB, Léa BELLENGER, Sébastien MELLA, Lilia YOUNSI, Nathalie LEHMANN"
+    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr; lea.bellenger@univ-nantes.fr; sebastien.mella@maestro.pasteur.fr; lilia.younsi@inserm.fr;"
+lightbox:
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots by click
+format:
+  html:
+    fig_width: 8
+    fig_height: 6
+    fig-align: center
+    embed-fonts: true
+    number-sections: true  ## Adds number to headers (sections)
+    embed-resources: true  ## Make a self-contained HTML
+    anchor-sections: true  ## Create HTML anchors for all section titles
+    theme: zephyr  ## CSS theme for the HTML page
+    syntax-highlighting: tango  ## Theme for the code chunks
+    toc: true  ## Add a table of content
+    toc-location: left  ## Position of TOC on the left side
+    collapsed: true  ## By default, the TOC is folded
+    grid:
+      body-width: 1600px  ## Extends the main body to fill the right space up to 1600px
+      margin-width: 0px
+    smooth-scroll: true ## Smooth scroll of the HTML page
+    code-fold: show  ## Show (unfold) code by default
+    code-tools:
+      source: true  ## Show the upper-right "Code" button to allow downloading this source
+      toggle: true
+    code-block-bg: true  ## Use a (default grey) background for code chunks
+    code-block-border-left: "#31BAE9"  ## Use a (here electric blue) left boarder for code chunks
+    code-overflow: wrap  ## Wrap long code lines
+    code-line-numbers: true  ## Add line number to the left
+    code-copy: true  ## Adds a button to copy chunk code to clipboard
+    code-annotations: hover  ## For code annotation, show values in mouseover
+    html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
+    echo: true
+execute:
+  message: false
+  warning: false
+filters:
+ - foldablecodeblock.lua  ## LUA code for foldable code output
+---
+
+<!-- ADDITIONAL CODES / HACKS -->
+
+<!-- CSS code to center the QMD title -->
+<style>
+#title-block-header .title {
+  text-align: center;
+}
+</style>
+
+
+<!-- CSS code to center the imported images -->
+<style>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+<!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+<style>
+.code-with-filename .code-copy-button {
+  right: 2.5rem !important;
+}
+</style>
+
+
+
+<!-- HTML code to force table borders -->
+```{=html}
+<style>
+td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+```
+
+
+```{r}
+#| label: local_test
+#| include: false
+
+## LOCAL TEST ONLY (hidden in the HTML): FALSE when rendering outside the IFB cluster.
+## Chunks marked "eval: !expr on_cluster" only run on the cluster, and hidden
+## "local_*" chunks replace them on a personal computer.
+on_cluster <- dir.exists("/shared/projects")
+```
+
+
+<!-- BODY -->
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+![](eb3i_banner.png){.center-image}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Purpose of this session {#purpose-of-this-session}
+
+This practical session follows the course on normalization, scaling and regressing out. We will apply each step to the thymus dataset and **look at what it changes**. By the end, you should be able to:
+
+1.  **Explore** the raw counts, and explain why they cannot be compared between cells as they are
+2.  **Normalize** the counts with two methods, **log-normalization** and **SCTransform**, and check what each of them corrects
+3.  **Select the highly variable genes** and **scale** them, and explain what these steps prepare for the next session
+4.  **Regress out** an unwanted source of variation, and decide whether to do it by looking at what it removes
+
+**Input**: the Seurat object filtered in the previous session, `05_TD3A_S5_Doublets.Filtered_12508.4035.RDS`.
+
+**Outputs**, saved in your `RESULTS` directory:
+
+| File | Content |
+|:---|:---|
+| `06_TD3A_S5_LogNorm_12508.4035.RDS` | log-normalized object |
+| `07_TD3A_S5_Scaled.2k_12508.4035.RDS` | + 2,000 highly variable genes, scaled |
+| `08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS` | + ribosomal fraction regressed out: the input of the next session |
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# What to run ? {#what-to-run}
+
+You are **not intended** to run all of the chunks. We use a **color code**:
+
+| What you see | What it means |
+|:----------|:----------|
+| A regular code chunk | **Run it** |
+| A [**lightblue**]{style="color:lightblue"} "QUESTION" callout | Think about it before unfolding the answer |
+| A [**lightgreen**]{style="color:lightgreen"} "ANSWER" callout | Folded by default |
+| A [**yellow**]{style="color:yellow"} / [**orange**]{style="color:orange"} "OPTIONAL" callout | Extra content if you are ahead, not supported during the session |
+| A [**pink**]{style="color:pink"} "DEMO" callout | Shown by the teacher, **do not run** |
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Start Rstudio
+
+Using the [OpenOnDemand cheat sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"}, connect to the [OpenOnDemand portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and **create a Rstudio session** with the right resource requirements.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Warm-up
+
+## Load the packages
+
+```{r}
+#| label: load_libraries
+#| filename: load_libraries
+
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+
+```
+
+## Common parameters
+
+```{r}
+#| label: set_param
+#| filename: set_param
+
+## Seed for the random number generator
+my_seed <- 1337L
+
+## A common look for all the figures of this session
+theme_set(theme_minimal(base_size = 13))
+
+## Axis labels as plain numbers (0.001, 1, 10...) instead of 1e-03, 1e+00, 1e+01
+plain <- function(x) format(x, scientific = FALSE, drop0trailing = TRUE, trim = TRUE, big.mark = ",")
+
+```
+
+## Directories and input data
+
+::: {.callout-warning}
+`ebaii_sc_teachers` is a project created by and for us, teachers.
+
+Thus, **DO NOT** just copy-paste this `ebaii_sc_teachers` project name as-is, put **YOURS** !
+:::
+
+``` {r}
+#| label: fs_set_pjname
+#| filename: fs_set_pjname
+
+## Set your project name
+project_name <- "ebaii_sc_teachers"
+
+## Check that it exists
+file.exists(paste0("/shared/projects/", project_name))
+
+```
+
+:::{.callout-important}
+If this chunk returned `FALSE`, you may have misspelled your project name !
+:::
+
+We build the directories of this session in one go (they were explained in Preprocessing 1):
+
+```{r}
+#| label: fs_set_dirs
+#| filename: fs_set_dirs
+#| message: true
+#| eval: !expr on_cluster
+
+## Main training directory
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Current session (Proc.1) directory, with its input and output sub-directories
+session_dir <- paste0(TD_dir, "/04_Proc.1")
+input_dir <- paste0(session_dir, "/DATA")
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = input_dir, recursive = TRUE)
+dir.create(path = output_dir, recursive = TRUE)
+
+message('Directory [', session_dir, '] created.')
+
+```
+
+```{r}
+#| label: local_dirs
+#| include: false
+#| eval: !expr (!on_cluster)
+
+## LOCAL TEST ONLY: same structure in the current directory
+TD_dir <- "."
+session_dir <- paste0(TD_dir, "/04_Proc.1")
+input_dir <- paste0(session_dir, "/DATA")
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = input_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(path = output_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+We load the functions that fetch the input data:
+
+```{r}
+#| label: fetch_src
+#| filename: fetch_src
+#| attr.output: '.details summary="Show output"'
+#| eval: !expr on_cluster
+
+source(
+  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
+  echo = TRUE
+)
+
+## Folder of the backup of all intermediate Seurat objects
+backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE"
+
+```
+
+```{r}
+#| label: local_fetch
+#| include: false
+#| eval: !expr (!on_cluster)
+
+## LOCAL TEST ONLY: copy of backup_get_data() from the template, backup in ./data
+backup_get_data <- function(
+  backup_file = NULL, local_path = NULL, force = FALSE
+) {
+  if (!file.exists(backup_file)) stop("Provided [", backup_file, "] does not exist !")
+  local_file <- paste0(local_path, "/", basename(backup_file))
+  if (file.exists(local_file) && !force) return(local_file)
+  file.copy(from = backup_file, to = local_file)
+  return(local_file)
+}
+backup_dir <- "data"
+```
+
+We load the Seurat object saved at the end of the previous session. If you do not have it (error, lost file...), a copy is fetched from the backup:
+
+```{r}
+#| label: data_load
+#| filename: data_load
+
+## The Seurat object saved at the end of Preprocessing 3
+sobj_file <- "05_TD3A_S5_Doublets.Filtered_12508.4035.RDS"
+sobj_path <- paste0(TD_dir, "/03_Preproc.3/RESULTS/", sobj_file)  # <1>
+
+## If it does not exist, copy it from the backup
+if (!file.exists(sobj_path)) {
+  sobj_path <- backup_get_data(
+    backup_file = paste0(backup_dir, "/", sobj_file),  # <2>
+    local_path = input_dir)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+sobj
+
+```
+
+1.  Where your own object from Preprocessing 3 should be
+2.  The backup copy, copied into your `DATA` directory
+
+We also prepare a small function to save the objects of this session with the naming convention of the course (step number, sample, Seurat v5, step name, number of genes and cells):
+
+```{r}
+#| label: save_func
+#| filename: save_func
+
+save_step <- function(object, step_number, step_name) {
+  out_name <- paste0(
+    output_dir, "/",
+    paste(
+      c(step_number, Seurat::Project(object), "S5", step_name,
+        paste(dim(object), collapse = ".")),
+      collapse = "_"),
+    ".RDS")
+  saveRDS(object = object, file = out_name)
+  message("Saved [", out_name, "]")
+}
+
+```
+
+For example, `save_step(sobj, "06", "LogNorm")` will write `06_TD3A_S5_LogNorm_12508.4035.RDS`.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Explore the raw counts
+
+## Assays and layers
+
+```{r}
+#| label: explore_layers
+#| filename: explore_layers
+
+Assays(object = sobj)
+Layers(object = sobj, assay = "RNA")
+
+```
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 1
+
+What is a *layer*? Why is there already a `data` layer before we normalize anything?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 1
+
+A layer is one version of the expression matrix stored in an assay: `counts` for the raw counts, `data` for the normalized values, `scale.data` for the scaled values.
+
+The `data` layer exists because a log-normalization was needed in Preprocessing 3 to compute the cell cycle scores. We will recompute it ourselves in this session.
+:::
+
+We extract the raw count matrix. `LayerData()` is the Seurat v5 way to get a layer, with the gene and cell names:
+
+```{r}
+#| label: extract_raw_counts
+#| filename: extract_raw_counts
+
+raw_count <- LayerData(object = sobj, assay = "RNA", layer = "counts")
+raw_count[1:5, 1:5]
+
+```
+
+What proportion of the matrix is not zero?
+
+```{r}
+#| label: sparsity
+#| filename: sparsity
+
+Matrix::nnzero(raw_count) / prod(dim(raw_count)) * 100  # <1>
+
+```
+
+1.  Number of non-zero values / total number of values, in %
+
+## Cells are not sequenced equally
+
+The total number of UMIs of a cell (its library size) reflects its sequencing depth. Seurat stores it in the metadata, as `nCount_RNA`:
+
+```{r}
+#| label: fig-depth-hist
+#| filename: fig-depth-hist
+#| fig-cap: "Total UMIs per cell (log scale)."
+#| fig-width: 8
+#| fig-height: 4
+
+summary(sobj$nCount_RNA)
+
+ggplot(sobj@meta.data, aes(x = nCount_RNA)) +
+  geom_histogram(bins = 60, fill = "steelblue", color = "white") +
+  scale_x_log10(labels = plain) +  # <1>
+  labs(x = "Total UMIs per cell (log scale)", y = "Number of cells")
+
+```
+
+1.  A log scale, because the depth varies over more than one order of magnitude
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 2
+
+Look at the `summary()` and @fig-depth-hist. Do all cells have about the same total number of UMIs? What could explain the differences?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 2
+
+No. The shallowest cell has `r format(min(sobj$nCount_RNA), big.mark = ",")` UMIs (the minimum kept by the QC filters of Preprocessing 3), the median cell `r format(median(sobj$nCount_RNA), big.mark = ",")`, and the deepest `r format(max(sobj$nCount_RNA), big.mark = ",")`: about `r round(max(sobj$nCount_RNA) / min(sobj$nCount_RNA))` times more than the shallowest.
+
+```{r}
+#| label: depth_ratio
+#| filename: depth_ratio
+
+## Deepest cell / shallowest cell
+max(sobj$nCount_RNA) / min(sobj$nCount_RNA)
+
+```
+
+Part of it is technical: the capture efficiency, the reverse transcription and the sequencing differ from one droplet to another. Part of it can be biological: large or very active cells contain more RNA.
+:::
+
+## Raw counts follow the depth
+
+Does the count of a gene depend on the depth of the cell? We look at *Actb*, a housekeeping gene that should be expressed at a similar level in all cells.
+
+To compare cells of similar depth, we cut the cells into 6 groups of equal size, from the shallowest to the deepest:
+
+```{r}
+#| label: depth_groups
+#| filename: depth_groups
+
+depth_group <- cut(
+  sobj$nCount_RNA,
+  breaks = quantile(
+    sobj$nCount_RNA, probs = seq(0, 1, length.out = 7)
+  ),
+  include.lowest = TRUE, dig.lab = 5
+)
+table(depth_group)
+
+```
+
+We will reuse this plot several times, so we write it as a function:
+
+```{r}
+#| label: depth_plot_func
+#| filename: depth_plot_func
+
+plot_vs_depth <- function(object, gene, assay, layer, title) {
+  df <- data.frame(
+    depth_group = depth_group,
+    value = LayerData(object, assay = assay, layer = layer)[gene, ]
+  )
+  ggplot(df, aes(x = depth_group, y = value)) +
+    geom_boxplot(fill = "grey85", outlier.size = 0.3) +
+    labs(
+      title = title,
+      x = "Total UMIs per cell (6 groups)", y = gene
+    ) +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+}
+
+```
+
+```{r}
+#| label: fig-actb-raw
+#| filename: fig-actb-raw
+#| fig-cap: "Raw counts of *Actb* in 6 groups of cells of increasing depth."
+#| fig-width: 6
+#| fig-height: 4
+
+plot_vs_depth(
+  sobj, gene = "Actb", assay = "RNA",
+  layer = "counts", title = "Raw counts"
+)
+
+```
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 3
+
+Is *Actb* more expressed in the deepest cells? Can we compare the raw counts of a gene between two cells?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 3
+
+The count of *Actb* rises with the depth of the cell. From the raw counts alone, we cannot tell whether a cell expresses more of a gene or was simply sequenced more deeply.
+
+This is the goal of normalization: **remove the effect of sequencing depth**, so that cells can be compared.
+:::
+
+## Noise grows with expression
+
+For each gene, we compute its mean and its variance over all cells:
+
+```{r}
+#| label: gene_attr
+#| filename: gene_attr
+
+## Variance of each row (gene) of a matrix, same result as var()
+row_var <- function(m) {
+  n <- ncol(m)  # <1>
+  (Matrix::rowMeans(m^2) - Matrix::rowMeans(m)^2) * n / (n - 1)  # <2>
+}
+
+gene_attr <- data.frame(
+  mean = Matrix::rowMeans(raw_count),
+  var_raw = row_var(raw_count)
+)
+head(gene_attr)
+
+```
+
+1.  $n$: the number of cells
+2.  The unbiased variance, as `var()` computes it: $\displaystyle \frac{n}{n-1}\left(\overline{x^2} - \bar{x}^2\right)$, with $\overline{x^2}$ the mean of the squared values and $\bar{x}$ the mean of the gene. Written this way, the sparse matrix is never converted to a dense one, it's much faster than `apply(raw_count, 1, var)`.
+
+```{r}
+#| label: fig-mean-var-raw
+#| filename: fig-mean-var-raw
+#| fig-cap: "Mean-variance relationship of the raw counts. Each point is a gene; red line: variance = mean (Poisson)."
+#| fig-width: 6
+#| fig-height: 5
+
+ggplot(gene_attr, aes(x = mean, y = var_raw)) +
+  geom_point(alpha = 0.3, size = 0.8) +
+  geom_abline(intercept = 0, slope = 1, color = "red") +  # <1>
+  scale_x_log10(labels = plain) + scale_y_log10(labels = plain) +
+  labs(
+    x = "Mean raw count per gene (UMIs per cell, log scale)",
+    y = "Variance (log scale)",
+    title = "Raw counts"
+  )
+
+```
+
+1.  Red line: variance = mean, what we would see if the only noise were the random sampling of molecules (Poisson)
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 4
+
+Each point is a gene. What do you see?
+:::
+
+::: {#answer-4 .callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 4
+
+-   The variance **grows with the mean**: highly expressed genes vary much more than lowly expressed ones. This is **heteroscedasticity**.
+-   Expressed genes lie **above the red line**: they vary more than pure sampling noise predicts. This is **overdispersion**.
+
+These are the two properties of counts that SCTransform models (see the SCTransform section).
+:::
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Log-normalization
+
+## The `NormalizeData()` function
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 5
+
+Open the help page of `NormalizeData()` (`?NormalizeData`). Which normalization methods are available? Which one is the default, and what is its default scale factor?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 5
+
+Three methods: `LogNormalize` (the default), `CLR` and `RC`. The default scale factor is 10,000.
+
+`LogNormalize` divides each count by the total UMIs of its cell, multiplies by the scale factor, adds 1 and takes the natural log.
+:::
+
+```{r}
+#| label: lognorm
+#| filename: lognorm
+
+sobj <- NormalizeData(
+  object = sobj,
+  assay = "RNA",
+  normalization.method = "LogNormalize",
+  scale.factor = 1e4  # <1>
+)
+
+```
+
+1.  "UMIs per 10,000": a change of unit, every cell now has the same total
+
+## Check one value by hand
+
+We recompute the normalized value of *Actb* in the first cell:
+
+```{r}
+#| label: lognorm_by_hand
+#| filename: lognorm_by_hand
+
+count_actb <- raw_count["Actb", 1]  # <1>
+total_cell <- sum(raw_count[, 1])  # <2>
+log1p(count_actb / total_cell * 1e4)  # <3>
+
+## The value computed by Seurat
+LayerData(sobj, assay = "RNA", layer = "data")["Actb", 1]
+
+```
+
+1.  The raw count of *Actb* in the first cell
+2.  The total UMIs of this cell
+3.  `log1p(x)` is `log(x + 1)`: the + 1 keeps the zeros at 0
+
+## Did it remove the depth effect?
+
+```{r}
+#| label: fig-actb-lognorm
+#| filename: fig-actb-lognorm
+#| fig-cap: "*Actb* by depth group, before and after log-normalization."
+#| fig-width: 12
+
+plot_vs_depth(
+  sobj, gene = "Actb", assay = "RNA",
+  layer = "counts", title = "Raw counts"
+) +
+  plot_vs_depth(
+    sobj, gene = "Actb", assay = "RNA",
+    layer = "data", title = "Log-normalized"
+  )
+
+```
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 6
+
+Compare the two plots. Did the log-normalization work for *Actb*?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 6
+
+Yes: after log-normalization, the level of *Actb* is almost the same in all depth groups. The strong trend of the raw counts is gone.
+:::
+
+## Effect on all the cells
+
+@fig-actb-raw and @fig-actb-lognorm looked at *Actb* in groups of cells of similar depth. Now we look at every cell, colored by its depth, for three genes with different patterns:
+
+-   *Actb*: a housekeeping gene, highly expressed in all cells
+-   *Cd3d*: a T cell gene, expressed at a moderate level in almost all cells of this thymus
+-   *Apoe*: a gene specific to a few rare cell types, at 0 in most cells
+
+```{r}
+#| label: genes_plot_func
+#| filename: genes_plot_func
+
+target_genes <- c("Actb", "Cd3d", "Apoe")
+
+plot_genes <- function(object, genes, assay, layer, title) {
+  m <- as.matrix(
+    LayerData(object, assay = assay, layer = layer)[genes, ]
+  )
+  df <- data.frame(
+    gene = factor(rep(genes, times = ncol(m)), levels = genes),  # <1>
+    value = as.vector(m),
+    depth = rep(object$nCount_RNA, each = length(genes))
+  )
+  df <- df[order(df$depth), ]  # <2>
+  ggplot(df, aes(x = gene, y = value, color = depth)) +
+    geom_jitter(height = 0, width = 0.3, size = 0.4) +
+    scale_color_viridis_c(
+      trans = "log10", name = "Total UMIs\nof the cell"
+    ) +
+    facet_wrap(vars(gene), scales = "free") +  # <3>
+    labs(title = title, x = NULL, y = "Expression") +
+    theme(axis.text.x = element_blank())
+}
+
+```
+
+1.  One row per cell and gene ("long" format, as ggplot needs)
+2.  The deepest cells are drawn last, on top of the others
+3.  One panel per gene, each with its own y axis
+
+```{r}
+#| label: fig-genes-raw-lognorm
+#| filename: fig-genes-raw-lognorm
+#| fig-cap: "Three genes in every cell, colored by the total UMIs of the cell, before and after log-normalization."
+#| fig-width: 10
+#| fig-height: 7
+
+plot_genes(
+  sobj, target_genes, assay = "RNA",
+  layer = "counts", title = "Raw counts"
+) /
+  plot_genes(
+    sobj, target_genes, assay = "RNA",
+    layer = "data", title = "Log-normalized"
+  ) +
+  plot_layout(guides = "collect")  # <1>
+
+```
+
+1.  One shared color legend for the two plots
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 7
+
+For *Actb* and *Cd3d*: in the raw counts, which cells have the highest values? And after log-normalization?
+
+For *Apoe*: are the cells with the highest raw counts the deepest ones? What happens to them after log-normalization?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 7
+
+-   *Actb* and *Cd3d*: in the raw counts, the highest values come from the **deepest cells** (green and yellow, at the top). After log-normalization, the deep cells are mixed with the others: each count has been divided by the total UMIs of its cell, so a deep cell no longer gets a higher value just because it was sequenced more.
+-   *Apoe*: the cells that express it are **not** the deepest ones (dark colors): their high counts are not a depth effect, but biology (a few cell types express this gene). They stay high after log-normalization: normalization removes the depth effect and keeps the **biological differences** between cells.
+:::
+
+## Save the log-normalized object
+
+```{r}
+#| label: save_lognorm
+#| filename: save_lognorm
+#| message: true
+
+save_step(sobj, step_number = "06", step_name = "LogNorm")
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# SCTransform
+
+SCTransform does not divide by the depth. For each gene, it **models** how the raw count depends on the depth of the cell, with a negative binomial distribution (which describes the heteroscedasticity and overdispersion seen in [ANSWER 4](#answer-4) and @fig-mean-var-raw). It keeps the **Pearson residuals**:
+
+$$
+\text{Pearson residual}_{g,c} = \frac{\text{observed count}_{g,c} - \text{expected count}_{g,c}}{\text{expected SD}_{g,c}}
+$$
+
+with $g$ a gene, $c$ a cell.
+
+Two consequences, which we check below:
+
+-   **The variance is stabilized**: for genes that are not too rare, the variance of the residuals no longer depends on the expression level of the gene (@fig-mean-var-sct).
+-   **No separate scaling step is needed**: the Pearson residuals are already centered and scaled, like the output of `ScaleData()` (see the scaling section).
+
+## Run SCTransform
+
+SCTransform stores its results in a new assay, `SCT`, next to the `RNA` assay, and makes it the **default assay**: the assay that Seurat functions use when we do not name one.
+
+```{r}
+#| label: sctransform
+#| filename: sctransform
+
+sobj <- SCTransform(
+  object = sobj,
+  assay = "RNA",
+  new.assay.name = "SCT",  # <1>
+  seed.use = my_seed,
+  verbose = FALSE
+)
+
+Assays(sobj)
+DefaultAssay(sobj)
+Layers(sobj, assay = "SCT")
+
+```
+
+1.  The name of the new assay (`SCT` is the default). The `RNA` assay is kept unchanged.
+
+In the rest of the course, we continue with the log-normalization, so we set the default assay back to `RNA`. We will still name the assay in each call, to be sure which one is used:
+
+```{r}
+#| label: default_rna
+#| filename: default_rna
+
+DefaultAssay(sobj) <- "RNA"
+DefaultAssay(sobj)
+
+```
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+## OPTIONAL QUESTION 1
+
+Both `RNA` and `SCT` assays have layers with the same names (`counts`, `data`, `scale.data`). For each pair of layers, how do their contents differ?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+## OPTIONAL ANSWER 1
+
+| Layer | `RNA` assay | `SCT` assay |
+|---|---|---|
+| `counts` | Raw UMI counts | Corrected counts, recomputed as if all cells had the median sequencing depth |
+| `data` | `log1p(count / total × 10,000)` (LogNormalize) | `log1p(corrected counts)` |
+| `scale.data` | Log-normalized values scaled to mean 0 and SD 1, for the variable genes (2,000 by default), after `ScaleData()` | Pearson residuals, for the variable genes of SCTransform (3,000 by default) |
+
+The names are the same, but the contents come from different strategies. The assays can also differ in their number of genes, since SCTransform drops genes detected in too few cells:
+
+```{r}
+#| label: compare_layers
+#| filename: compare_layers
+
+dim(LayerData(sobj, assay = "RNA", layer = "counts"))
+dim(LayerData(sobj, assay = "SCT", layer = "counts"))
+
+## The totals per cell vary a lot in RNA, much less in SCT
+summary(colSums(
+  LayerData(sobj, assay = "RNA", layer = "counts")
+))
+summary(colSums(
+  LayerData(sobj, assay = "SCT", layer = "counts")
+))
+
+```
+:::
+
+## Did it remove the depth effect?
+
+The same plots as @fig-actb-lognorm and @fig-genes-raw-lognorm, with the `data` layer of the `SCT` assay added:
+
+```{r}
+#| label: fig-actb-sct
+#| filename: fig-actb-sct
+#| fig-cap: "*Actb* by depth group: raw counts, log-normalization and SCTransform."
+#| fig-width: 15
+#| fig-height: 4
+
+plot_vs_depth(
+  sobj, gene = "Actb", assay = "RNA",
+  layer = "counts", title = "Raw counts"
+) +
+  plot_vs_depth(
+    sobj, gene = "Actb", assay = "RNA",
+    layer = "data", title = "Log-normalized"
+  ) +
+  plot_vs_depth(
+    sobj, gene = "Actb", assay = "SCT",
+    layer = "data", title = "SCTransform"
+  )
+
+```
+
+```{r}
+#| label: fig-genes-sct
+#| filename: fig-genes-sct
+#| fig-cap: "The three genes of @fig-genes-raw-lognorm, with SCTransform added."
+#| fig-width: 10
+#| fig-height: 10
+
+plot_genes(
+  sobj, target_genes, assay = "RNA",
+  layer = "counts", title = "Raw counts"
+) /
+  plot_genes(
+    sobj, target_genes, assay = "RNA",
+    layer = "data", title = "Log-normalized"
+  ) /
+  plot_genes(
+    sobj, target_genes, assay = "SCT",
+    layer = "data", title = "SCTransform"
+  ) +
+  plot_layout(guides = "collect")
+
+```
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+## OPTIONAL QUESTION 2
+
+Why are the log-normalized values continuous, while the SCTransform values are arranged in horizontal lines?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+## OPTIONAL ANSWER 2
+
+With log-normalization, each count is divided by the total of its cell before the log. Since every cell has a different total, the same raw count gives a slightly different value in each cell.
+
+SCTransform recomputes the counts at a common depth and rounds them back to integers. Its `data` layer is the log of these integers, so all cells with the same corrected count get exactly the same value: log1p(1) ≈ 0.69, log1p(2) ≈ 1.10, and so on. Each horizontal line is one count value.
+:::
+
+## Did it stabilize the variance?
+
+The goal of a normalization is to remove the depth effect, which we checked above. SCTransform also aims to **stabilize the variance**: the variance of a gene should no longer depend on its expression level (heteroscedasticity, @fig-mean-var-raw). We compare the variance of each gene against its mean, for the raw counts and for the Pearson residuals, whose variance SCTransform stores for each gene:
+
+```{r}
+#| label: fig-mean-var-sct
+#| filename: fig-mean-var-sct
+#| fig-cap: "Variance of each gene against its mean, before and after SCTransform (both axes in log scale). Red line: variance = mean (Poisson); red dashed line: variance = 1."
+#| fig-width: 11
+#| fig-height: 4.5
+
+## Variance of the Pearson residuals
+sct_attr <- SCTResults(sobj, assay = "SCT", slot = "feature.attributes")  # <1>
+gene_attr$var_sct <- sct_attr[rownames(gene_attr), "residual_variance"]  # <2>
+
+mv_plot <- function(y, title) {
+  ggplot(gene_attr, aes(x = mean, y = .data[[y]])) +
+    geom_point(alpha = 0.3, size = 0.8) +
+    scale_x_log10(labels = plain) + scale_y_log10(labels = plain) +
+    labs(
+      x = "Mean raw count per gene (UMIs per cell, log scale)",
+      y = "Variance (log scale)",
+      title = title
+    )
+}
+
+mv_plot("var_raw", "Raw counts") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  mv_plot("var_sct", "SCTransform (Pearson residuals)") +
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed")
+
+```
+
+1.  A table of statistics computed by SCTransform for each gene
+2.  `NA` for the genes dropped by SCTransform (detected in too few cells); ggplot removes them
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 8
+
+Does the variance still depend on the mean expression after SCTransform?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 8
+
+-   **Raw counts**: the variance rises with the mean over the whole range.
+-   **SCTransform**: from about 0.1 UMI per cell, most genes sit around a variance of 1 (red dashed line), whatever their mean: the variance is stabilized. A variance of 1 is what the model expects for a gene with only technical noise.
+-   Two groups of genes stand apart. At the bottom left, the rarest genes (mostly zeros) are not stabilized. Above the line, a few hundred genes vary much more than technical noise: they are candidates for biological differences.
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+## OPTIONAL QUESTION 3
+
+And the log-normalization? Does it stabilize the variance?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+## OPTIONAL ANSWER 3
+
+Only partly, and it is not its main job: its job is to remove the depth effect, which it does (@fig-actb-lognorm).
+
+```{r}
+#| label: mean_var_lognorm
+#| filename: mean_var_lognorm
+#| fig-width: 5.5
+#| fig-height: 4.5
+
+## Variance of the log-normalized values
+lognorm <- LayerData(sobj, assay = "RNA", layer = "data")
+gene_attr$var_lognorm <- row_var(lognorm)
+
+mv_plot("var_lognorm", "Log-normalized") +
+  geom_vline(xintercept = 1, linetype = "dashed")  # <1>
+
+```
+
+1.  Dashed line: genes with 1 UMI per cell on average
+
+-   **Right of the dashed line** (expressed genes): the variance stops rising with the mean (it even decreases slightly). The log shrinks large values much more than small ones: log(1 + 10) ≈ 2.4, but log(1 + 100) ≈ 4.6. Highly expressed genes therefore no longer get much larger variances.
+-   **Left of the dashed line** (rare genes): the variance still rises with the mean, as for the raw counts. Their counts are 0, 1 or 2, and the log barely changes such small values.
+
+In the log-normalization pipeline, this remaining dependence on the mean is taken into account in the next section: `FindVariableFeatures()` compares the variance of each gene with the variance expected for genes of the same mean expression, and the scaling gives all genes the same weight.
+:::
+
+::: {.callout-tip icon="false"}
+## Which one should I use?
+
+Both are sound choices for 10X data. A benchmark of 22 transformations found that the simple log-normalization does as well as more sophisticated methods for the usual downstream analyses ([Ahlmann-Eltze and Huber, 2023](https://doi.org/10.1038/s41592-023-01814-1){target="_blank"}). Pick one, stay consistent, and report it in your methods.
+
+In the rest of the course, we use the **log-normalization**.
+:::
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Highly variable genes and scaling
+
+These two steps are **not** part of the normalization: they prepare the data for the dimension reduction and the clustering of the next session.
+
+## Highly variable genes (HVG)
+
+Most genes hardly vary between cells, so they say nothing about what makes cells different. We keep the genes that vary the most: the **highly variable genes**.
+
+The selection is not simply on the variance, since highly expressed genes naturally vary more (@fig-mean-var-raw). `FindVariableFeatures()` compares the variance of each gene with the variance expected for genes of the **same mean expression**, and ranks the genes on this **standardized variance**.
+
+```{r}
+#| label: find_hvg
+#| filename: find_hvg
+
+sobj <- FindVariableFeatures(
+  object = sobj,
+  assay = "RNA",
+  selection.method = "vst",  # <1>
+  nfeatures = 2000           # <2>
+)
+
+top10 <- head(VariableFeatures(sobj, assay = "RNA"), 10)
+top10
+
+```
+
+1.  The default method: on the raw counts, it fits the trend between mean and variance over all genes, then standardizes each gene with the variance expected from this trend
+2.  The number of genes kept (2,000 is the usual choice)
+
+```{r}
+#| label: fig-hvg
+#| filename: fig-hvg
+#| fig-cap: "Standardized variance of each gene against its mean. Red: the 2,000 highly variable genes; labelled: the 10 most variable."
+#| fig-width: 8
+#| fig-height: 5
+
+LabelPoints(
+  plot = VariableFeaturePlot(object = sobj, assay = "RNA"),
+  points = top10, repel = TRUE
+)
+
+```
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 9
+
+Look at the 10 most variable genes. Do you recognize some of them? What kind of biology do they point to in a thymus?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 9
+
+-   Cell cycle genes (*Top2a*, *Ube2c*, *Pclaf*) and histone genes (*Hist1h...*): proliferating thymocytes.
+-   T cell receptor genes (*Trbv...*): each T cell has its own rearranged receptor.
+-   *Nr4a1*: a gene induced by T cell receptor signaling, during thymocyte selection.
+
+The most variable genes reflect the biology of the tissue, which is what we want the next steps to capture.
+:::
+
+::: {.callout-note}
+With SCTransform, `FindVariableFeatures()` is not needed: SCTransform selects its own 3,000 variable genes, the genes with the highest variance of the Pearson residuals. Its `scale.data` layer holds these genes only.
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+## OPTIONAL QUESTION 4
+
+SCTransform also selected its own variable genes. How many of the 2,000 genes selected here are among them?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+## OPTIONAL ANSWER 4
+
+```{r}
+#| label: hvg_overlap
+#| filename: hvg_overlap
+
+length(VariableFeatures(sobj, assay = "SCT"))
+length(intersect(
+  VariableFeatures(sobj, assay = "RNA"),
+  VariableFeatures(sobj, assay = "SCT")
+))
+
+```
+
+Less than a third of the 2,000 genes: the two lists differ a lot. They do not rank the genes on the same value: `FindVariableFeatures()` uses a standardized variance computed on the raw counts, SCTransform the variance of its Pearson residuals. Here, the genes selected only by `FindVariableFeatures()` tend to be detected in fewer cells than those selected only by SCTransform: since `FindVariableFeatures()` compares each gene only with genes of similar mean, a rare gene expressed strongly in a few cells (such as a T cell receptor gene) can stand out, while SCTransform gives rare genes a low residual variance.
+
+The choice of the normalization therefore also changes the genes used in the next steps.
+:::
+
+## Scaling
+
+Scaling standardizes **each gene across all cells**. For each gene, we:
+
+1.  subtract its mean over all cells (centering),
+2.  divide by its standard deviation (SD).
+
+$$
+z = \frac{x - \text{mean of the gene}}{\text{SD of the gene}}
+$$
+
+After scaling, every gene has a mean of 0 and an SD of 1 (so a variance of 1), so that a few highly variable genes do not dominate the dimension reduction. What is left is the **pattern** of each gene: in which cells it is above or below its own average.
+
+::: {.callout-note}
+Scaling is **not** about making cells comparable: that is the job of the normalization. Scaling makes **genes** comparable.
+:::
+
+```{r}
+#| label: scale_data
+#| filename: scale_data
+
+sobj <- ScaleData(object = sobj, assay = "RNA")  # <1>
+
+Layers(sobj, assay = "RNA")
+dim(LayerData(sobj, assay = "RNA", layer = "scale.data"))
+
+```
+
+1.  By default, `ScaleData()` scales the variable genes only
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 10
+
+How many genes are in the `scale.data` layer? Why?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 10
+
+2,000: `ScaleData()` scales the variable genes by default, since they are the ones used by the next steps. The `data` layer still holds all the genes.
+:::
+
+Let us check that each scaled gene has a mean of 0 and a variance of 1, and compare with the log-normalized values of the same genes:
+
+```{r}
+#| label: fig-check-scaling
+#| filename: fig-check-scaling
+#| fig-cap: "Mean and variance of the 2,000 variable genes, before and after scaling."
+#| fig-width: 10
+#| fig-height: 4.5
+
+hvg <- VariableFeatures(sobj, assay = "RNA")
+before <- as.matrix(LayerData(sobj, assay = "RNA", layer = "data")[hvg, ])
+after <- LayerData(sobj, assay = "RNA", layer = "scale.data")
+
+## Mean and variance of each gene, one row per gene and statistic
+gene_stats <- function(m, step) {
+  data.frame(
+    step = step,
+    statistic = rep(
+      c("Mean of the gene", "Variance of the gene"),
+      each = nrow(m)
+    ),
+    value = c(rowMeans(m), row_var(m))
+  )
+}
+
+scaling_long <- rbind(
+  gene_stats(before, "Log-normalized"),
+  gene_stats(after, "Scaled")
+)
+
+ggplot(scaling_long, aes(x = value, fill = step)) +
+  geom_histogram(
+    bins = 40,
+    position = "dodge",  # <1>
+    color = "white", linewidth = 0.1  # <2>
+  ) +
+  facet_wrap(vars(statistic), scales = "free_x") +  # <3>
+  scale_fill_manual(
+    values = c("#eb6834", "#2a78d6"), name = NULL
+  ) +
+  labs(x = NULL, y = "Number of genes") +
+  theme(legend.position = "top")
+
+```
+
+1.  In each bin, the two bars are drawn side by side, not stacked
+2.  A white outline, to separate the bars
+3.  One panel for the mean, one for the variance; the y axis is shared
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 11
+
+What happened to the 2,000 genes? Why do some scaled genes have a variance below 1?
+:::
+
+::: {#answer-11 .callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 11
+
+Before scaling, the means and variances of the genes are spread over a wide range. After scaling, all genes have a mean of (about) 0, and most of them are in one tall bar at a variance of 1. A smaller group of genes has a variance below 1 (and a mean very slightly below 0, too small to see on the plot).
+
+These are genes detected in very few cells (< 1%), such as T cell receptor genes. In the few cells that express them, their z-score would be very large, and `ScaleData()` caps the scaled values at 10 (`scale.max = 10`). Capping these values lowers their variance. It prevents a handful of cells from dominating the next steps.
+
+```{r}
+#| label: check_capping
+#| filename: check_capping
+
+## Number of scaled genes with a variance below 0.99, and how many of them reach the cap
+low_var <- apply(after, 1, var) < 0.99
+sum(low_var)
+sum(apply(after[low_var, ], 1, function(x) max(abs(x)) >= 10))
+
+```
+:::
+
+::: {.callout-tip icon="false"}
+## Which values for what?
+
+Scaling erases the expression level of the genes. It is made for methods that compare **patterns**.
+
+| Use | Which layer |
+|:---|:---|
+| Dimension reduction (PCA), then clustering and UMAP | `scale.data` |
+| Heatmaps of marker genes | `scale.data` |
+| Plotting the expression of a gene (violin, feature plot) | `data` |
+| Differential expression | `data` or `counts`, depending on the test |
+
+You will see each of these uses in detail in the later sessions.
+
+**NOTE**: with SCTransform, there is no `ScaleData()` step: the Pearson residuals in `scale.data` are already centered and scaled.
+:::
+
+## Save the scaled object
+
+The `SCT` assay was only used to compare the two normalizations. We remove it, so that the saved objects only contain the log-normalization pipeline used in the rest of the course (and stay smaller):
+
+```{r}
+#| label: rm_sct
+#| filename: rm_sct
+
+sobj[["SCT"]] <- NULL
+Assays(sobj)
+
+```
+
+```{r}
+#| label: save_scaled
+#| filename: save_scaled
+#| message: true
+
+save_step(sobj, step_number = "07", step_name = "Scaled.2k")
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Regressing out an unwanted source of variation
+
+Some differences between cells are real but not what we want to study, and we can measure them for each cell: cell cycle scores, mitochondrial or ribosomal fraction...
+
+`ScaleData(vars.to.regress = ...)` fits, **for each gene**, a linear model of its expression on these variables, keeps the **residuals** (what the variables do not explain) and scales them.
+
+::: {.callout-important}
+## Not a first step
+
+In a real analysis, run the pipeline through to the clustering first. Regress a variable out only if the clusters or the UMAP follow it, then rerun the pipeline. Here, we do it now to see what it does.
+:::
+
+## Example: the ribosomal fraction
+
+For the rest of the course, we regress out the **ribosomal fraction** (`percent_rb`). Let us first look at it:
+
+```{r}
+#| label: fig-rb-depth
+#| filename: fig-rb-depth
+#| fig-cap: "Ribosomal fraction against the total UMIs of each cell."
+#| fig-width: 6
+#| fig-height: 4
+
+ggplot(sobj@meta.data, aes(x = nCount_RNA, y = percent_rb)) +
+  geom_point(alpha = 0.3, size = 0.6) +
+  scale_x_log10(labels = plain) +
+  labs(
+    x = "Total UMIs per cell (log scale)",
+    y = "Ribosomal fraction",
+    title = paste(
+      "Correlation:",
+      round(cor(sobj$nCount_RNA, sobj$percent_rb), 2)
+    )
+  )
+
+```
+
+We will judge the regression by the correlation of each scaled gene with the ribosomal fraction. A small function computes it for the 2,000 variable genes:
+
+```{r}
+#| label: cor_func
+#| filename: cor_func
+
+cor_with <- function(object, variable) {
+  z <- LayerData(object, assay = "RNA", layer = "scale.data")
+  apply(z, 1, cor, y = object@meta.data[[variable]])  # <1>
+}
+
+cor_rb_before <- cor_with(sobj, "percent_rb")
+head(sort(cor_rb_before, decreasing = TRUE))
+
+```
+
+1.  For each gene (row), the correlation of its scaled values with the variable
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 12
+
+How does the ribosomal fraction relate to the depth? Which genes are the most correlated with it: only ribosomal protein genes (*Rpl*, *Rps*)?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 12
+
+The ribosomal fraction is higher in the deeper cells.
+
+The most correlated genes are ribosomal protein genes, as expected, but also genes such as *Nkg7* and *Plac8*, which are markers of some cell types. Regressing out the ribosomal fraction will therefore also remove some biological differences between cell types: we check this below.
+:::
+
+```{r}
+#| label: regress_rb
+#| filename: regress_rb
+
+sobj <- ScaleData(
+  object = sobj,
+  assay = "RNA",
+  vars.to.regress = "percent_rb"  # <1>
+)
+
+cor_rb_after <- cor_with(sobj, "percent_rb")
+
+```
+
+1.  This time we overwrite the `scale.data` layer of `sobj`: this is the version we keep. The `counts` and `data` layers are not changed.
+
+```{r}
+#| label: fig-regress-rb
+#| filename: fig-regress-rb
+#| fig-cap: "Correlation of each variable gene with the ribosomal fraction, before and after regressing it out."
+#| fig-width: 12
+#| fig-height: 4
+
+cor_rb_df <- rbind(
+  data.frame(
+    step = "Scaled", 
+    cor = cor_rb_before
+  ),
+  data.frame(
+    step = "Scaled, ribosomal fraction regressed out",
+    cor = cor_rb_after
+  )
+)
+ggplot(cor_rb_df, aes(x = cor)) +
+  geom_histogram(bins = 60, fill = "steelblue") +
+  facet_wrap(vars(step)) +
+  labs(
+    x = "Correlation of each variable gene with the ribosomal fraction", 
+    y = "Number of genes"
+  )
+
+## The cell type marker Nkg7, before and after
+c(before = cor_rb_before[["Nkg7"]], after = cor_rb_after[["Nkg7"]])
+
+```
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 13
+
+What did the regression remove? Is it only technical?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 13
+
+Almost all correlations are now around 0, including for *Nkg7*: the part of its variation shared with the ribosomal fraction is gone, even if part of it was biological.
+
+The few genes left around -0.1 or -0.2 are very rare genes (detected in fewer than 1% of the cells). The regression leaves residuals that are balanced against the ribosomal fraction, so their correlation is 0. Then, as in [ANSWER 11](#answer-11), the few very large values of these genes are capped at 10. Only these few cells are changed, the balance is broken, and a small correlation comes back.
+
+Regressing out removes **everything** correlated with the variable, biology included. Ask every time: is this variation something I want to study, or something I want to ignore?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+## OPTIONAL QUESTION 5
+
+How would you regress out the ribosomal fraction with SCTransform?
+:::
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+## OPTIONAL ANSWER 5
+
+With the same argument: the variable is added to the model of each gene.
+
+```{r}
+#| label: sct_regress_rb
+#| filename: sct_regress_rb
+#| eval: false
+
+sobj_test <- SCTransform(  # <1>
+  object = sobj,
+  assay = "RNA",
+  vars.to.regress = "percent_rb",
+  new.assay.name = "SCTrb",
+  seed.use = my_seed,
+  verbose = FALSE
+)
+
+```
+
+1.  A separate object, so that `sobj`, saved below, is not changed
+
+:::
+
+## Save the final object
+
+This is the object used in the next session:
+
+```{r}
+#| label: save_regressed
+#| filename: save_regressed
+#| message: true
+
+save_step(
+  sobj, 
+  step_number = "08", 
+  step_name = "Scaled.2k_Reg.PCrb"
+)
+
+```
+
+::: {.callout-tip icon="false"}
+## Tip
+
+Seurat keeps track of the steps run on an object:
+
+-   `names(sobj@commands)` lists the recorded steps (e.g. `NormalizeData.RNA`, `ScaleData.RNA`);
+-   `sobj@commands$ScaleData.RNA` shows the parameters used, such as `vars.to.regress`.
+
+Only the last run of each command is kept.
+:::
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Take-home messages
+
+-   **Normalization** makes **cells** comparable, by removing the effect of sequencing depth. Log-normalization divides by the depth and takes the log; SCTransform models the counts and keeps Pearson residuals.
+-   **Highly variable genes** are the genes that vary more than expected for their expression level; the next steps use only them.
+-   **Scaling** makes **genes** comparable: every gene gets a mean of 0 and an SD of 1. Use scaled values for patterns (PCA, heatmaps), not for expression levels.
+-   **Regressing out** is optional. It removes everything correlated with the variable, biology included, so justify each one.
+-   Always **look** at your data after each step, to check that it did what you expected.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+
+# Session Information
+
+::: {.callout-important icon="false" style="background: pink"}
+## Session info
+
+You are not expected to run the following chunk ***BUT*** you are more than welcome to include it at the end of your own Rmarkdown / Quarto script !
+
+```{r}
+#| code-fold: false
+#| label: rsession
+#| filename: rsession
+#| attr.output: '.details summary="Show output"'
+
+utils::sessionInfo()
+
+```
+:::
