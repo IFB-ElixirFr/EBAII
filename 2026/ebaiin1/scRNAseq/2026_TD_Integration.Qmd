@@ -1,0 +1,828 @@
+---
+title: "EB3I n1 2026 scRNAseq<br><br>[Integration]{.mark}<br><i>Integrate multiple samples</i><br> <br>"
+date: "2026-11-15.20"
+author:
+  - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
+  - name: "<i>Bastien JOB</i>"
+    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr"
+  - name: "Contributors : Sébastien MELLA, Eulalie LIORZOU"
+    email: "sebastien.mella@maestro.pasteur.fr; eulalie.liorzou@pasteur.fr" 
+
+lightbox: 
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
+format:
+  html:
+    fig-width: 8
+    fig-height: 6
+    fig-align: center
+    embed-fonts: true
+    number-sections: true  ## Adds number to headers (sections)
+    embed-resources: true  ## Make a self-contained HTML
+    anchor-sections: true  ## Create HTML anchors for all section titles
+    theme: zephyr  ## CSS theme for the HTML page
+    syntax-highlighting: tango  ## Theme for the code chunks
+    toc: true  ## Add a table of content
+    toc-location: left  ## Position of TOC on the left side
+    collapsed: true  ## By default, the TOC is folded
+    grid:
+      body-width: 1600px  ## Extends the main body to fill the right space up to 1600px
+      margin-width: 0px
+    smooth-scroll: true ## Smooth scroll of the HTML page
+    code-fold: show  ## Show (unfold) code by default 
+    code-tools:
+      source: true  ## Show the upper-right "Code" button to allow downloading this source
+      toggle: true
+    code-block-bg: true  ## Use a (default grey) background for code chunks
+    code-block-border-left: "#31BAE9"  ## Use a (here electric blue) left boarder for code chunks
+    code-overflow: wrap  ## Wrap long code lines (should not be in use due to the high grid:body-width value, but just in case it is deactivated)
+    code-line-numbers: true  ## Add line number to the left
+    code-copy: true  ## Adds a button to copy chunk code to clipboard
+    code-annotations: hover  ## For code annotation, show values in mouseover
+    html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
+    echo: true
+filters: 
+ - foldablecodeblock.lua  ## LUA code for foldable code output
+---
+
+<!-- ADDITIONAL CODES / HACKS -->
+
+<!-- CSS code to center the QMD title -->
+<style>
+#title-block-header .title {
+  text-align: center;
+}
+</style>
+
+
+<!-- CSS code to center the imported images -->
+<style>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+<!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+<style>
+.code-with-filename .code-copy-button {
+  right: 2.5rem !important;
+}
+</style>
+
+
+
+<!-- HTML code to force table borders -->
+```{=html}
+<style>
+td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+```
+
+
+<!-- BODY -->
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+![](imgs/eb3i_banner.png){.center-image}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# PREAMBLE
+
+<br>
+
+## Purpose of this session
+
+<br>
+
+
+During this training session, we will **integrate** a pair of samples into a single `SeuratObject` and into the same **multidimensional space**.
+
+<br>
+
+## The integration data set
+
+We will still use data from the [Paiva et al.](https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00281-3) publication.
+    
+While we focused on the **KO sample `TD3a`** until now, we will integrate it with its **wild-type** counterpart **`TDCT`**.
+
+`TDCT` was processed in a very **similar manner** (QC, doublets, filtering, LogNormalization, HVGs and scaling) to what you performed for `TD3A`.
+    
+Both samples were **halved** for their number of cells, for practical reasons in the context of this training *(computation time)*
+    
+As the purpose is to **integrate** both samples into a single analytical entity, the objects we will use as input are `SeuratObjects` synced up to the data **scaling and regression** (thus, there are no *dimension reduction* data in these objects)
+
+<br>
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand cheat
+    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html),
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr) and
+    **create a Rstudio session** with the right resource requirements.
+
+# Warm-up : setting global parameters
+
+-   We set the **common parameters** we will use throughout this session :
+
+```{r}
+#| label: setparam
+#| filename: setparam
+
+## Seed for the RNG (our sole parameter for this session)
+my_seed <- 1337L
+
+## Just an environment variable to change so that or big Seurat objects are accepted by R
+options(future.globals.maxSize = 1E+09)
+```
+
+```{r}
+#| label: libload
+#| filename: libload
+#| eval: false
+
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+```
+
+<br>
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Prepare the data structure
+
+We will do as usual, just editing the session name
+:
+
+```{r createstruc}
+#| label: createstruc
+#| filename: createstruc
+
+## Setting the project name
+project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project !!
+
+## PROJECT directory path
+project_dir <- paste0("/shared/projects/", project_name)
+
+## Test on PROJECT directory
+if (dir.exists(project_dir)) {
+  ## TD directory path
+  TD_dir <- paste0(project_dir, "/SC_TD")
+  
+  ## SESSION directory path
+  session_dir <- paste0(TD_dir, "/06_Integration")
+  
+  ##INPUT data directory path
+  input_dir <- paste0(session_dir, "/DATA")
+  
+  ## OUTPUT data directory path
+  output_dir <- paste0(session_dir, "/RESULTS")
+  
+  ## Creating the required directores
+  dir.create(path = input_dir, recursive = TRUE, showWarnings = TRUE)
+  dir.create(path = output_dir, recursive = TRUE, showWarnings = TRUE)
+  
+} else {
+  warning("Provided project directory [", project_dir, "] does not exist !")
+}
+```
+
+<br>
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Load input data
+
+<br>
+
+The data consists in a **pair of `SeuratObject`s** saved as RDS, one per sample.
+
+<br>
+
+## Fetch data
+
+<br>
+
+First, we **source** the fetching function script :
+
+<br>
+
+```{r}
+#| label: source_fetch_funcs
+#| filename: source_fetch_funcs
+#| attr.output: '.details summary="Show output"'
+
+## Name of the script to source
+fetch_script <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R"
+
+## Sourcing
+source(file = fetch_script, echo = TRUE)
+```
+
+<br>
+
+Now we can retrieve the input data :
+
+<br>
+
+```{r}
+#| label: backup_integr
+#| filename: backup_integr
+
+## Copy the requested files from a local backup, return their user-based local paths
+
+### The TD3A SeuratObject
+TD3A_rds <- backup_get_data(
+  backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/RDS/TD3A_Filtered_12508.2018.RDS",
+  local_path = input_dir,
+  force = TRUE)
+
+### The TDCT SeuratObject
+TDCT_rds <- backup_get_data(
+  backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/RDS/TDCT_Filtered_12254.1868.RDS",
+  local_path = input_dir,
+  force = TRUE)
+```
+
+<br>
+
+## Load into R
+
+<br>
+
+```{r}
+#| label: rds_load
+#| filename: rds_load
+
+## Loading TD3A
+TD3A_so <- readRDS(file = TD3A_rds)
+
+## Loading TDCT
+TDCT_so <- readRDS(file = TDCT_rds)
+```
+
+<br>
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Merge datasets
+
+-   We simply merge the two objects into a single one :
+
+```{r}
+#| label: integr_merge
+#| filename: integr_merge
+
+TD3A_TDCT_merge <- base::merge(
+  ## First object to merge
+  x = TD3A_so, 
+  ## Second object to merge
+  y = TDCT_so, 
+  ## Keep track of sample of origin for cells (optional)
+  add.cell.ids = c("TD3A", "TDCT"), 
+)
+```
+
+<br>
+
+::: {.callout-note}
+We used the `base::merge()` function, thus the one natively packaged with R, but one can see that we used a parameter specific to `SeuratObject` : `add.cell.ids`, which can sound counterintuitive.
+
+This is because the **base::merge()** function, while being a generic one **can be modified** by additional packages, so that it adapts to **objects with new formats**.
+:::
+
+<br>
+
+We can get a quick summary of the merged `SeuratObject` :
+
+<br>
+
+```{r}
+#| label: merged_smry
+#| filename: merged_smry
+
+## A summary of the merged object
+TD3A_TDCT_merge
+```
+
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 1A
+
+What can you guess from the dimensions of `TD3A_TDCT_merge` on **the way it was merged** ?
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true"}
+## A HINT ?
+
+To get to the answer, you'll have to **compare** its dimensions to those of the individual objects.
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 1A
+
+We check the dimensions of the three objects :
+
+```{r}
+#| label: dim_comp
+#| filename: dim_comp
+
+## TD3A
+dim(TD3A_so)
+
+## TDCT
+dim(TDCT_so)
+
+## Merged
+dim(TD3A_TDCT_merge)
+```
+
+<br>
+
+One can see that the **numbers of cells add up**, but **not those of features** !
+:::
+
+<br>
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 1B
+
+Thus, What can you actually guess **what happened for features** ?
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 1B
+
+We can compare the features in the individual and merged objects :
+
+```{r}
+#| label: featnames_comp
+#| filename: featnames_comp
+
+## Features of TD3A in TDCT
+table(SeuratObject::Features(TD3A_so) %in% SeuratObject::Features(TDCT_so))
+
+## Features of TDCT in TD3A
+table(SeuratObject::Features(TDCT_so) %in% SeuratObject::Features(TD3A_so))
+
+## Union of features
+length(unique(c(SeuratObject::Features(TD3A_so), 
+                SeuratObject::Features(TDCT_so))))
+
+## Control
+
+### Common features
+feats_common <- intersect(SeuratObject::Features(TDCT_so), SeuratObject::Features(TD3A_so))
+message("Common features : ", length(feats_common))
+
+### TD3A only
+TD3A_specific <- setdiff(SeuratObject::Features(TD3A_so), SeuratObject::Features(TDCT_so))
+message("TD3A-specific : ", length(TD3A_specific))
+
+### TDCT only
+TDCT_specific <- setdiff(SeuratObject::Features(TDCT_so), SeuratObject::Features(TD3A_so))
+message("TDCT-specific : ", length(TDCT_specific))
+
+### TOTAL
+sum(length(feats_common), 
+    length(TD3A_specific), 
+    length(TDCT_specific))
+```
+
+So, `Seurat` performed the **union** of the features from both individual objects
+:::
+
+<br>
+
+::: {.callout-note}
+This would remain true for **any number** of individual objects to merge !
+:::
+
+<br>
+
+Now a bit of cleaning :
+
+<br>
+
+```{r}
+#| label: merge_clean
+#| filename: merge_clean
+
+## Clean unneeded objects
+rm(TD3A_so, TDCT_so, feats_common, TD3A_specific, TDCT_specific)
+```
+
+<br>
+<br>
+
+## Process the merged dataset
+
+In order to visualize the data in a 2-D space, one needs to process it the way
+one learnt :
+
+```{r mproc}
+#| label: merge_proc
+#| filename: merge_proc
+
+## All steps
+TD3A_TDCT_merge <- Seurat::NormalizeData(object = TD3A_TDCT_merge, verbose = FALSE)
+TD3A_TDCT_merge <- Seurat::FindVariableFeatures(object = TD3A_TDCT_merge, nfeatures = 2000, verbose = FALSE)
+TD3A_TDCT_merge <- Seurat::ScaleData(object = TD3A_TDCT_merge, verbose = FALSE)
+TD3A_TDCT_merge <- Seurat::RunPCA(object = TD3A_TDCT_merge, npcs = 50, verbose = FALSE)
+```
+
+
+```{r elbow}
+Seurat::ElbowPlot(object = TD3A_TDCT_merge, ndims = 50, reduction = "pca")
+```
+
+## Visualization of batch effect
+
+```{r settingSampleCols, echo=FALSE}
+sample_cols <- c("grey30", "indianred1")
+```
+
+
+```{r , message = FALSE}
+Seurat::DimPlot(object = TD3A_TDCT_merge, 
+        reduction = "pca",
+        group.by = "orig.ident", 
+        cols = sample_cols)
+```
+
+```{r}
+TD3A_TDCT_merge <- Seurat::RunUMAP(object = TD3A_TDCT_merge, seed = my_seed, dims = 1:20, verbose = FALSE)
+```
+
+```{r}
+Seurat::DimPlot(object = TD3A_TDCT_merge, 
+        reduction = "umap",
+        group.by = "orig.ident", 
+        cols = sample_cols)
+```
+
+CCL ??
+
+
+
+# Integration
+
+## Seurat : [CCA](https://satijalab.org/seurat/reference/ccaintegration)
+
+### CCA integration
+
+```{r}
+computing_time <- data.frame()
+```
+
+
+```{r cca integration, eval=TRUE}
+start <- Sys.time()
+TD3A_TDCT_merge <- IntegrateLayers(object = TD3A_TDCT_merge, 
+                                      orig.reduction = "pca",
+                                      method = CCAIntegration, 
+                                      new.reduction = "integrated.cca", 
+                                      normalization.method = "LogNormalize")
+end <- Sys.time()
+computing_time["cca","comptime"] <- end-start
+```
+
+### Seurat : [RPCA](https://satijalab.org/seurat/articles/integration_rpca)
+
+```{r rPCA integration}
+start <- Sys.time()
+TD3A_TDCT_merge <- IntegrateLayers(object = TD3A_TDCT_merge, 
+                                      orig.reduction = "pca",
+                                      method = RPCAIntegration, 
+                                      new.reduction = "integrated.rpca", 
+                                      normalization.method = "LogNormalize")
+end <- Sys.time()
+computing_time["rPCA","comptime"] <- end-start
+```
+
+### Seurat : [Harmony](https://satijalab.org/seurat/reference/harmonyintegration)
+
+```{r harmony integration}
+start <- Sys.time()
+TD3A_TDCT_merge <- IntegrateLayers(object = TD3A_TDCT_merge, 
+                                      orig.reduction = "pca",
+                                      method = HarmonyIntegration, 
+                                      new.reduction = "harmony",
+                                      normalization.method = "LogNormalize")
+end <- Sys.time()
+computing_time["Harmony","comptime"] <- end-start
+```
+
+```{r, echo=FALSE}
+knitr::kable(
+  computing_time
+  )
+```
+
+Reductions(object = TD3A_TDCT_merge)
+
+## Computing umap from "corrected" spaces
+
+```{r cca umap, eval=TRUE}
+TD3A_TDCT_merge <- RunUMAP(object = TD3A_TDCT_merge, 
+                           reduction = "integrated.cca", 
+                           dims = 1:20, 
+                           reduction.name = "umapcca")
+```
+
+```{r rpca umap, eval=TRUE}
+TD3A_TDCT_merge <- RunUMAP(object = TD3A_TDCT_merge, 
+                           reduction = "integrated.rpca",
+                           dims = 1:20, 
+                           reduction.name = "umaprpca")
+```
+
+```{r harmony umap, eval=TRUE}
+TD3A_TDCT_merge <- RunUMAP(object = TD3A_TDCT_merge, 
+                           reduction = "harmony", 
+                           dims = 1:20, 
+                           reduction.name = "umapharm")
+```
+
+```{r}
+Reductions(object = TD3A_TDCT_merge)
+```
+
+## Effect of the correction/integration
+
+## Visualization of the different methods of integration: Projecting the sample id onto the different umap spaces obtained
+
+```{r, echo=FALSE}
+no_corr <- DimPlot(object = TD3A_TDCT_merge, group.by = "orig.ident", reduction = "umap", cols = sample_cols)+
+  ggtitle("No Correction")+
+  theme_linedraw()+
+  theme(plot.title = element_text(face = "bold", hjust = .5))
+
+cca_corr <- DimPlot(object = TD3A_TDCT_merge, group.by = "orig.ident", reduction = "umapcca", cols = sample_cols)+
+  ggtitle("CCA Integration")+
+  theme_linedraw()+
+  theme(plot.title = element_text(face = "bold", hjust = .5))
+
+rpca_corr <- DimPlot(object = TD3A_TDCT_merge, group.by = "orig.ident", reduction = "umaprpca", cols = sample_cols)+
+  ggtitle("rPCA Integration")+
+  theme_linedraw()+
+  theme(plot.title = element_text(face = "bold", hjust = .5))
+
+harm_corr <- DimPlot(object = TD3A_TDCT_merge, group.by = "orig.ident", reduction = "umapharm", cols = sample_cols)+
+  ggtitle("Harmony Integration")+
+  theme_linedraw()+
+  theme(plot.title = element_text(face = "bold", hjust = .5))
+```
+
+
+```{r, fig.width=12, fig.height=9, echo=FALSE}
+no_corr + cca_corr + rpca_corr + harm_corr + plot_layout(ncol = 2)
+```
+
+
+### Clustering
+
+
+
+##### Graph based on CCA Intgration
+
+```{r, cca clustering, eval=TRUE}
+TD3A_TDCT_merge <- FindNeighbors(object = TD3A_TDCT_merge, 
+                                 reduction = "integrated.cca", 
+                                 dims = 1:20, 
+                                 graph.name = "snn_cca")
+TD3A_TDCT_merge <- FindClusters(object = TD3A_TDCT_merge,
+                                graph.name = "snn_cca",
+                                resolution = c(.5,.8,1), 
+                                algorithm = 4)
+```
+
+##### Graph based on rPCA Intgration
+
+```{r rpca clustering, eval=TRUE}
+TD3A_TDCT_merge <- FindNeighbors(object = TD3A_TDCT_merge, 
+                                 reduction = "integrated.rpca", 
+                                 dims = 1:20, 
+                                 graph.name = "snn_rpca")
+TD3A_TDCT_merge <- FindClusters(object = TD3A_TDCT_merge,
+                                graph.name = "snn_rpca",
+                                resolution = c(.5,.8,1), 
+                                algorithm = 4)
+```
+
+##### Graph based on Harmony Intgration
+
+```{r, harm clustering, eval=TRUE}
+TD3A_TDCT_merge <- FindNeighbors(object = TD3A_TDCT_merge, 
+                                 reduction = "harmony", 
+                                 dims = 1:20, 
+                                 graph.name = "snn_harm")
+TD3A_TDCT_merge <- FindClusters(object = TD3A_TDCT_merge,
+                                graph.name = "snn_harm",
+                                resolution = c(.5,.8,1), 
+                                algorithm = 4)
+```
+
+```{r, fig.width=12, fig.height=4,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_cca_res.0.5", 
+        reduction = "umapcca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_rpca_res.0.5", 
+        reduction = "umaprpca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+                                           group.by = "snn_harm_res.0.5", 
+                                           reduction = "umapharm", 
+                                           label = TRUE)+NoLegend()
+```
+
+```{r, fig.width=12, fig.height=4,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_cca_res.0.8", 
+        reduction = "umapcca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_rpca_res.0.8", 
+        reduction = "umaprpca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+                                           group.by = "snn_harm_res.0.8", 
+                                           reduction = "umapharm", 
+                                           label = TRUE)+NoLegend()
+```
+
+```{r, fig.width=12, fig.height=4,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_cca_res.1", 
+        reduction = "umapcca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_rpca_res.1", 
+        reduction = "umaprpca", 
+        label = TRUE)+NoLegend() | DimPlot(object = TD3A_TDCT_merge, 
+                                           group.by = "snn_harm_res.1", 
+                                           reduction = "umapharm", 
+                                           label = TRUE)+NoLegend()
+```
+
+```{r, fig.width=12, fig.height=5,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_cca_res.1", 
+        reduction = "umapcca", 
+        label = TRUE,
+        split.by = "orig.ident")+
+   theme_linedraw()+
+   NoLegend()+
+  theme(strip.text = element_text(size = 16, face = "bold", color = "indianred"),
+        plot.title = element_text(size = 18, face = "bold", color = "steelblue4", hjust = .5))
+```
+
+```{r, fig.width=12, fig.height=5,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_rpca_res.1", 
+        reduction = "umaprpca", 
+        label = TRUE,
+        split.by = "orig.ident")+
+   theme_linedraw()+
+   NoLegend()+
+  theme(strip.text = element_text(size = 16, face = "bold", color = "indianred"),
+        plot.title = element_text(size = 18, face = "bold", color = "steelblue4", hjust = .5))
+```
+
+
+```{r, fig.width=12, fig.height=5,echo=FALSE}
+DimPlot(object = TD3A_TDCT_merge, 
+        group.by = "snn_harm_res.1", 
+        reduction = "umapharm", 
+        label = TRUE,
+        split.by = "orig.ident")+
+   theme_linedraw()+
+   NoLegend()+
+  theme(strip.text = element_text(size = 16, face = "bold", color = "indianred"),
+        plot.title = element_text(size = 18, face = "bold", color = "steelblue4", hjust = .5))
+```
+
+```{r}
+table("snn_harm_res.1" = TD3A_TDCT_merge$snn_harm_res.1,
+      "snn_rpca_res.1" = TD3A_TDCT_merge$snn_rpca_res.1)
+```
+
+```{r}
+table(TD3A_TDCT_merge$orig.ident, TD3A_TDCT_merge$snn_cca_res.1)
+```
+
+```{r}
+table(TD3A_TDCT_merge$orig.ident, TD3A_TDCT_merge$snn_harm_res.1)
+```
+
+
+
+```{r}
+TD3A_TDCT_merge <- JoinLayers(object = TD3A_TDCT_merge, assay = "RNA")
+```
+
+If we have extra-time
+
+```{r}
+Idents(object = TD3A_TDCT_merge) <- "snn_harm_res.1"
+harm_res1_markers <- FindAllMarkers(
+  object = TD3A_TDCT_merge,
+  only.pos = TRUE,
+  logfc.threshold = 1
+)
+```
+
+```{r}
+harm_res1_topmarkers <- harm_res1_markers %>%
+  group_by(cluster) %>%
+  dplyr::slice_head(n = 20)
+```
+
+```{r, fig.width=12, fig.height=24}
+DoHeatmap(object = TD3A_TDCT_merge,
+          features = harm_res1_topmarkers$gene,
+          group.by = "snn_harm_res.1")
+```
+
+# Save the Seurat object
+
+```{r saverds2, warning = FALSE, fold.output = FALSE, fold.plot = FALSE}
+## A name for our Seurat object file (rich naming)
+out_name <- paste0(
+          output_dir, "/", paste(
+            c("Twelve", Seurat::Project(TD3A_TDCT_merge), "S5", 
+              "Integrated", paste(
+                dim(TD3A_TDCT_merge), collapse = '.'
+              )
+            ), collapse = "_"),
+            ".RDS")
+
+## Check (I like this)
+print(out_name)
+```
+
+
+```{r saverds2b, warning = FALSE, fold.output = FALSE, fold.plot = FALSE}
+## Write on disk
+saveRDS(object = TD3A_TDCT_merge, 
+        file = out_name)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<BR><BR><BR>
+
+# Rsession
+
+<div class = "notrun">
+
+```{r}
+utils::sessionInfo()
+```
+
+</div>
