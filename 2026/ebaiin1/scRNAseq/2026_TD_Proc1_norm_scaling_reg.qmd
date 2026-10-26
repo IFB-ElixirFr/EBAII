@@ -530,8 +530,8 @@ head(gene_attr)
 
 ```
 
-1.  $n$: the number of cells
-2.  The unbiased variance, as `var()` computes it: $\displaystyle \frac{n}{n-1}\left(\overline{x^2} - \bar{x}^2\right)$, with $\overline{x^2}$ the mean of the squared values and $\bar{x}$ the mean of the gene. Written this way, the sparse matrix is never converted to a dense one, it's much faster than `apply(raw_count, 1, var)`.
+1.  *n*: the number of cells
+2.  The unbiased variance, as `var()` computes it: *n* / (*n* − 1) × (mean(*x*²) − *x̄*²), with mean(*x*²) the mean of the squared values and *x̄* the mean of the gene. Written this way, the sparse matrix is never converted to a dense one, it's much faster than `apply(raw_count, 1, var)`.
 
 ```{r}
 #| label: fig-mean-var-raw
@@ -543,7 +543,8 @@ head(gene_attr)
 ggplot(gene_attr, aes(x = mean, y = var_raw)) +
   geom_point(alpha = 0.3, size = 0.8) +
   geom_abline(intercept = 0, slope = 1, color = "red") +  # <1>
-  scale_x_log10(labels = plain) + scale_y_log10(labels = plain) +
+  scale_x_log10(labels = plain) + 
+  scale_y_log10(labels = plain) +
   labs(
     x = "Mean raw count per gene (UMIs per cell, log scale)",
     y = "Variance (log scale)",
@@ -566,7 +567,7 @@ Each point is a gene. What do you see?
 -   The variance **grows with the mean**: highly expressed genes vary much more than lowly expressed ones. This is **heteroscedasticity**.
 -   Expressed genes lie **above the red line**: they vary more than pure sampling noise predicts. This is **overdispersion**.
 
-These are the two properties of counts that SCTransform models (see the SCTransform section).
+These are the two properties of counts that SCTransform models (see @sec-sctransform).
 :::
 
 ------------------------------------------------------------------------
@@ -751,9 +752,9 @@ save_step(sobj, step_number = "06", step_name = "LogNorm")
 ------------------------------------------------------------------------
 
 
-# SCTransform
+# SCTransform {#sec-sctransform}
 
-SCTransform does not divide by the depth. For each gene, it **models** how the raw count depends on the depth of the cell, with a negative binomial distribution (which describes the heteroscedasticity and overdispersion seen in [ANSWER 4](#answer-4) and @fig-mean-var-raw). It keeps the **Pearson residuals**:
+SCTransform does not divide by the depth. For each gene, it **models** how the raw count depends on the depth of the cell, with a negative binomial distribution (which describes the heteroscedasticity and overdispersion seen in @fig-mean-var-raw and [ANSWER 4](#answer-4)). It keeps the **Pearson residuals**:
 
 $$
 \text{Pearson residual}_{g,c} = \frac{\text{observed count}_{g,c} - \text{expected count}_{g,c}}{\text{expected SD}_{g,c}}
@@ -764,7 +765,7 @@ with $g$ a gene, $c$ a cell.
 Two consequences, which we check below:
 
 -   **The variance is stabilized**: for genes that are not too rare, the variance of the residuals no longer depends on the expression level of the gene (@fig-mean-var-sct).
--   **No separate scaling step is needed**: the Pearson residuals are already centered and scaled, like the output of `ScaleData()` (see the scaling section).
+-   **No separate scaling step is needed**: the Pearson residuals are already centered and scaled, like the output of `ScaleData()` (see the @sec-scaling).
 
 ## Run SCTransform
 
@@ -917,7 +918,8 @@ gene_attr$var_sct <- sct_attr[rownames(gene_attr), "residual_variance"]  # <2>
 mv_plot <- function(y, title) {
   ggplot(gene_attr, aes(x = mean, y = .data[[y]])) +
     geom_point(alpha = 0.3, size = 0.8) +
-    scale_x_log10(labels = plain) + scale_y_log10(labels = plain) +
+    scale_x_log10(labels = plain) + 
+    scale_y_log10(labels = plain) +
     labs(
       x = "Mean raw count per gene (UMIs per cell, log scale)",
       y = "Variance (log scale)",
@@ -1085,7 +1087,7 @@ Less than a third of the 2,000 genes: the two lists differ a lot. They do not ra
 The choice of the normalization therefore also changes the genes used in the next steps.
 :::
 
-## Scaling
+## Scaling {#sec-scaling}
 
 Scaling standardizes **each gene across all cells**. For each gene, we:
 
