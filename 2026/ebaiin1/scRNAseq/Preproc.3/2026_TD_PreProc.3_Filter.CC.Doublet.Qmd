@@ -1,0 +1,1150 @@
+---
+title: "EB3I n1 2026 scRNAseq<br><br>[PRE-PROCESSING (III)]{.mark}<br><i>Cell Cycle scoring, doublet detection & cell filtering</i><br> <br>"
+author:
+  - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
+  - name: "<i>Margot ZAHM</i>"
+    email: "margot.zahm@inserm.fr,margot.zahm@cnrs.fr"
+  - name: "<i>Léa BELLENGER</i>"
+    email: "lea.bellenger@univ-nantes.fr,lea.bellenger@inserm.fr"
+lightbox: 
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
+format:
+  html:
+    fig-width: 8
+    fig-height: 6
+    fig-align: center
+    embed-fonts: true
+    number-sections: true  ## Adds number to headers (sections)
+    embed-resources: true  ## Make a self-contained HTML
+    anchor-sections: true  ## Create HTML anchors for all section titles
+    theme: zephyr  ## CSS theme for the HTML page
+    syntax-highlighting: tango  ## Theme for the code chunks
+    toc: true  ## Add a table of content
+    toc-location: left  ## Position of TOC on the left side
+    collapsed: true  ## By default, the TOC is folded
+    grid:
+      body-width: 1600px  ## Extends the main body to fill the right space up to 1600px
+      margin-width: 0px
+    smooth-scroll: true ## Smooth scroll of the HTML page
+    code-fold: show  ## Show (unfold) code by default 
+    code-tools:
+      source: true  ## Show the upper-right "Code" button to allow downloading this source
+      toggle: true
+    code-block-bg: true  ## Use a (default grey) background for code chunks
+    code-block-border-left: "#31BAE9"  ## Use a (here electric blue) left boarder for code chunks
+    code-overflow: wrap  ## Wrap long code lines (should not be in use due to the high grid:body-width value, but just in case it is deactivated)
+    code-line-numbers: true  ## Add line number to the left
+    code-copy: true  ## Adds a button to copy chunk code to clipboard
+    code-annotations: hover  ## For code annotation, show values in mouseover
+    html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
+    echo: true
+filters: 
+ - /shared/projects/ebaii_sc_teachers/SC_TD/Resources/foldablecodeblock.lua  ## LUA code for foldable code output
+---
+
+<!-- ADDITIONAL CODES / HACKS -->
+
+<!-- CSS code to center the QMD title -->
+
+```{=html}
+<style>
+#title-block-header .title {
+  text-align: center;
+}
+</style>
+```
+
+<!-- CSS code to center the imported images -->
+
+```{=html}
+<style>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+```
+
+<!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+
+```{=html}
+<style>
+.code-with-filename .code-copy-button {
+  right: 2.5rem !important;
+}
+</style>
+```
+
+<!-- HTML code to force table borders -->
+
+```{=html}
+<style>
+td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+```
+
+<!-- BODY -->
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+![](/shared/projects/ebaii_sc_teachers/SC_TD/Resources/eb3i_banner.png){.center-image}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Purpose of this session {#purpose-of-this-session}
+
+This file describes the different steps to perform the **third part** of the **single cell RNAseq** data analysis training course for the **EB3I n1 2026**, covering these steps :
+
+-   Calculate the **Cell cycle scoring** and asses the **Cell cycle state** of cells
+-   Detect **doublets** from your data
+-   **Filter out** cells that do not pass the filter quality
+
+**Input data**: the Seurat object with metrics calculated in the previous session. `02_TD3A_S5_Metrics_31053.4587.RDS`
+
+**Output data**: saved in your `RESULTS` directory:
+
+| File | Content |
+|:--------------------------------------|:-----------------------------------|
+| `03_TD3A_S5_Metrics.Filtered_12508.4035.RDS` | filtered for unwanted cells and genes |
+| `04_TD3A_S5_CC_12508.4035.RDS` | \+ Cell cycle prediction |
+| `05_TD3A_S5_Doublets.Filtered_12508.4035.RDS` | filtered for detected doublets |
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# What to run ? {#what-to-run}
+
+You are **not intended** to run all of the chunks. We use a **color code**:
+
+| What you see | What it means |
+|:-----------------------------------|:-----------------------------------|
+| A regular code chunk | **Run it** |
+| A [**lightblue**]{style="color:lightblue"} "QUESTION" callout | Think about it before unfolding the answer |
+| A [**lightgreen**]{style="color:lightgreen"} "ANSWER" callout | Folded by default |
+| A [**yellow**]{style="color:yellow"} / [**orange**]{style="color:orange"} "OPTIONAL" callout | Extra content if you are ahead, not supported during the session |
+| A [**pink**]{style="color:pink"} "DEMO" callout | Shown by the teacher, **do not run** |
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Start RStudio
+
+Using the [OpenOnDemand/Rstudio cheat sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html), connect to the [OpenOnDemand portal](https://ondemand.cluster.france-bioinformatique.fr/) and create a Rstudio session with the right resource requirements, thanks to the cheat sheet.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Warm-up
+
+## Load the packages
+
+```{r, message=FALSE}
+#| label: load_libraries
+#| filename: load_libraries
+
+library(Seurat)
+library(scDblFinder)
+```
+
+## Common parameters
+
+```{r}
+#| label: set_param
+#| filename: set_param
+
+## Seed for the random number generator
+my_seed <- 1337L
+
+## A common look for all the figures of this session
+theme_set(theme_minimal(base_size = 13))
+```
+
+## Directories and input data
+
+::: callout-warning
+`ebaii_sc_teachers` is a project created by and for us, teachers.
+
+Thus, **DO NOT** just copy-paste this `ebaii_sc_teachers` project name as-is, put **YOURS** !
+:::
+
+```{r}
+#| label: fs_set_pjname
+#| filename: fs_set_pjname
+
+## Set your project name
+project_name <- "ebaii_sc_teachers"
+
+## Check that it exists
+file.exists(paste0("/shared/projects/", project_name))
+
+```
+
+::: callout-important
+If this chunk returned `FALSE`, you may have misspelled your project name !
+:::
+
+We build the directories of this session in one go (they were explained in Preprocessing 1):
+
+```{r}
+#| label: fs_set_dirs
+#| filename: fs_set_dirs
+#| message: true
+
+## Main training directory
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+## Current session (Enrich) directory, with its input and output sub-directories
+session_dir <- paste0(TD_dir, "/08_Enrichment")
+input_dir <- paste0(session_dir, "/DATA")
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = input_dir, recursive = TRUE)
+dir.create(path = output_dir, recursive = TRUE)
+
+message('Directory [', session_dir, '] created.')
+
+```
+
+We load the functions that fetch the input data:
+
+```{r}
+#| label: fetch_src
+#| filename: fetch_src
+#| attr.output: '.details summary="Show output"'
+
+source(
+  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
+  echo = TRUE
+)
+
+## Folder of the backup of all intermediate Seurat objects
+backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE"
+
+```
+
+We load the Seurat object saved at the end of the previous session. If you do not have it (error, lost file...), a copy is fetched from the backup:
+
+```{r}
+#| label: data_load
+#| filename: data_load
+
+## The Seurat object saved at the end of 06_Integration
+sobj_file <- "02_TD3A_S5_Metrics_31053.4587.RDS"
+sobj_path <- paste0(TD_dir, "/02_Preproc.2/RESULTS/", sobj_file)  # <1>
+
+## If it does not exist, copy it from the backup
+if (!file.exists(sobj_path)) {
+  sobj_path <- backup_get_data(
+    backup_file = paste0(backup_dir, "/", sobj_file),  # <2>
+    local_path = input_dir)
+}
+
+## Load the object
+sobj <- readRDS(file = sobj_path)
+sobj
+```
+
+1.  Where your own seurat object is
+2.  The backup copy, copied into your `DATA` directory
+
+We also prepare a small function to save the objects of this session with the naming convention of the course (step number, sample, step name, comparison, enrichment test):
+
+```{r}
+#| label: save_func
+#| filename: save_func
+
+save_step <- function(object, step_number, step_name) {
+  out_name <- paste0(
+    output_dir, "/",
+    paste(
+      c(step_number, Seurat::Project(object), "S5", step_name,
+        paste(dim(object), collapse = ".")),
+      collapse = "_"),
+    ".RDS")
+  saveRDS(object = object, file = out_name)
+  message("Saved [", out_name, "]")
+}
+```
+
+For example, \`save_step(sobj, "05", "Doublet.Filtered")\` will write \`05_TD3A_S5_Doublet.Filtered_12508.4035.RDS\`.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Filtering
+
+## Features
+
+-   As already explained, the **sparsity** of the count matrix is high, *very* high.
+
+-   To the point that there probably are some features that have **so low expression** level that they were only counted in **very few cells**. As such, they have absolutely **no chance** to characterize any cell type, nor harbor some variation between different cell types.
+
+-   As such, we should **discard** these features
+
+<br>
+
+What are the actual dimensions of our expression data ?
+
+```{r}
+#| label: dim1
+#| filename: dim1
+
+## Dimensions of our Seurat object
+dim(sobj)
+
+```
+
+<br>
+
+We want to remove the features that are expressed in less than **`r min_cells`** cells.
+
+First, we quantify, for each feature, the number of cells with `0` count.
+
+```{r nfeatdiff}
+#| label: Ncell_no_exp
+#| filename: Ncell_no_exp
+
+## Compute the amount of 0s per feature
+nFeat_zero <- sparseMatrixStats::rowCounts(
+  x = SeuratObject::GetAssayData(
+    object = sobj, 
+    assay = "RNA", 
+    layer = "counts"), 
+  value = 0)
+
+## Inversion : computing the number of cells with at least one count, per feature
+nFeat_nonzero <- ncol(sobj) - nFeat_zero
+
+## Identify those with at least 5 cells with expression
+nFeat_keep <- nFeat_nonzero >= min_cells
+
+## Quantify the selected ones
+table(nFeat_keep)
+
+```
+
+<br>
+
+And now we can **discard** features expressed in less than `r min_cells` cells :
+
+<br>
+
+```{r}
+#| label: remove_gene_no_exp
+#| filename: remove_gene_no_exp
+
+## Create a temporary object for the DEMO part
+# sobj_VIZ_pre <- sobj
+
+## Restrict the Seurat object
+sobj <- subset(x = sobj, features = rownames(sobj)[nFeat_keep])
+
+```
+
+<br>
+
+What are the Seurat object dimensions, now ?
+
+```{r seudim2, class.source="notrun", class.output="notruno"}
+#| label: dim2
+#| filename: dim2
+
+dim(sobj)
+
+```
+
+<br>
+
+::: {.callout-important icon="false" style="background: pink"}
+### DEMO
+We can **visualize the cell space** before and after this features filtering.
+
+```{r}
+#| label: prefeatfiltviz
+#| filename: prefeatfiltviz
+
+## Usual set of "U can't C me" functions
+sobj_VIZ_pre <- Seurat::NormalizeData(object = sobj_VIZ_pre, verbose = FALSE)
+sobj_VIZ_pre <- Seurat::ScaleData(object = sobj_VIZ_pre, verbose = FALSE)
+sobj_VIZ_pre <- Seurat::FindVariableFeatures(object = sobj_VIZ_pre, verbose = FALSE)
+sobj_VIZ_pre <- Seurat::RunPCA(object = sobj_VIZ_pre, npcs = 21, verbose = FALSE)
+sobj_VIZ_pre <- Seurat::RunUMAP(object = sobj_VIZ_pre, dims = c(1:20), verbose = FALSE)
+
+## Cell space visualization
+dp_pre <- Seurat::DimPlot(
+  object = sobj_VIZ_pre, 
+  reduction = 'umap') + Seurat::DarkTheme()
+print(dp_pre)
+
+## Remove temporary object
+rm(sobj_VIZ_pre)
+```
+
+```{r}
+#| label: postfeatfiltviz
+#| filename: postfeatfiltviz
+
+## Create a temporary object
+sobj_VIZ_post <- sobj
+
+## Usual set of "U can't C me" functions
+sobj_VIZ_post <- Seurat::NormalizeData(object = sobj_VIZ_post, verbose = FALSE)
+sobj_VIZ_post <- Seurat::ScaleData(object = sobj_VIZ_post, verbose = FALSE)
+sobj_VIZ_post <- Seurat::FindVariableFeatures(object = sobj_VIZ_post, verbose = FALSE)
+sobj_VIZ_post <- Seurat::RunPCA(object = sobj_VIZ_post, npcs = 21, verbose = FALSE)
+sobj_VIZ_post <- Seurat::RunUMAP(object = sobj_VIZ_post, dims = c(1:20), verbose = FALSE)
+
+## Cell space visualization
+dp_post <- Seurat::DimPlot(
+  object = sobj_VIZ_post, 
+  reduction = 'umap') + Seurat::DarkTheme()
+print(dp_post)
+
+## Remove temporary object
+rm(sobj_VIZ_post)
+
+```
+
+Merging plots for ease of visualization :
+
+```{r}
+#| label: c5_pw
+#| filename: c5_pw
+
+## Using the patchwork package to merge plots (and ggplot2 to add titles)
+patchwork::wrap_plots(
+  list(
+    dp_pre & ggplot2::ggtitle(label = "BEFORE"),
+    dp_post & ggplot2::ggtitle(label = "AFTER")), 
+  nrow = 1)
+
+```
+:::
+
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+Do you see any difference when comparing before vs after features filtering ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+Not much changed.
+
+This is expected as we removec features with almost no expression.
+:::
+
+<br><br>
+
+## Cells
+
+We are now able to **apply all the filtering strategies** we established for each QC metric.
+
+```{r cellfilt}
+#| label: cell_filtering
+#| filename: cell_filtering
+
+## Seurat object BEFORE cell filtering
+dim(sobj)
+
+## Apply cell filtering
+sobj <- subset(x = sobj, cells = colnames(sobj)[sobj$fail_qc == "pass"])
+
+## Seurat object AFTER cell filtering
+dim(sobj)
+
+```
+
+<br>
+
+We can **visualize the cell space** since this cell filtering
+
+::: {.callout-important icon="false" style="background: pink"}
+### DEMO
+We can **visualize the cell space** before and after this features filtering.
+
+```{r}
+#| label: cell_filtering
+#| filename: cell_filtering
+
+## Create a temporary object
+sobj_VIZ <- sobj
+
+## Usual set of "U can't C me" functions
+sobj_VIZ <- Seurat::NormalizeData(object = sobj_VIZ, verbose = FALSE)
+sobj_VIZ <- Seurat::ScaleData(object = sobj_VIZ, verbose = FALSE)
+sobj_VIZ <- Seurat::FindVariableFeatures(object = sobj_VIZ, verbose = FALSE)
+sobj_VIZ <- Seurat::RunPCA(object = sobj_VIZ, npcs = 21, verbose = FALSE)
+sobj_VIZ <- Seurat::RunUMAP(object = sobj_VIZ, dims = c(1:20), verbose = FALSE)
+
+## Cell space visualization
+dp_VIZ <- Seurat::DimPlot(
+  object = sobj_VIZ, 
+  reduction = 'umap') + Seurat::DarkTheme()
+print(dp_VIZ)
+
+## Discard the temp object
+rm(sobj_VIZ)
+
+```
+
+One can associate the visualization after filtering cells :
+
+```{r}
+#| label: cfilt_umaps
+#| filename: cfilt_umaps
+
+## Using the patchwork package to merge plots (and ggplot2 to add titles)
+patchwork::wrap_plots(
+  list(
+    dp_post & ggplot2::ggtitle(label = "Features (count<5) filtered"),
+    dp_VIZ & ggplot2::ggtitle(label = "Cells filtered (metrics)")), 
+  nrow = 1)
+
+```
+:::
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+Do you see any difference when comparing before vs after features filtering ?
+:::
+<br>
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+Not much changed as well (we did not discard many cells).
+
+The biggest cluster structure seems more defined.
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Save the Seurat object
+
+We will **save our Seurat object** that now contains **filtered cells and features** :
+
+```{r}
+#| label: saverds1
+#| filename: saverds1
+
+## Use the function described in save_func chunk
+save_step(sobj, "03", "Metrics.Filtered")
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Cell cycle scores
+
+-   We are currently analyzing **independent** profiles from **isolated** cells, from a sample dissociation
+
+-   As such, cells were most probably **not synchronized**, thus the effect of their **cell cycle state** on genes expression may be strong, to the point that it can **bias the data** (ie, mask some lower amplitude biological variation).
+
+-   In order to **assess** (and maybe, *remove*) this bias, we have to **quantify** it.
+
+-   We will perform this estimation thanks to heuristics based on **knowledge** : Seurat includes a method that evaluates the cell cycle phase of cells through **scores for the S and G2M phases**, each based on phase-specific **gene signatures**.
+
+-   For this step, we will use additional gene lists from [](TODO : add paper reference). It was made on mouse data but can be used for human by determining ortholog genes.
+
+## Load gene lists
+
+We will directly retrieve data from the cluster :
+
+```{r}
+#| label: cc_load
+#| filename: cc_load
+
+## Copy the file into the DATA directory
+sobj_file <- "02_TD3A_S5_Metrics_31053.4587.RDS"
+sobj_path <- paste0(TD_dir, "/Resources/", sobj_file)  # <1>
+
+## Load the file
+cc_genes <- readRDS(file = sobj_path)
+cc_genes
+
+```
+
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+As explained, we will use gene lists extracted from community knowledge. 
+Our data contain values for genes also, so we will cross them. 
+
+Is there something we should check ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+We may check if the genes in our gene lists are effectively present in our Seurat object !
+:::
+
+<br>
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+### OPTIONAL EXERCISE
+
+1.  Write a code that performs this check
+
+2.  Add a code to adjust the content of the gene lists accordingly (remove genes from the gene lists that are not present in our dataset)
+*(NOTE : this is actually not needed as already checked and corrected by the cell cyle estimation method we will use)*
+:::
+
+<br>
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+### OPTIONAL ANSWER
+
+```{r}
+#| label: b_cc_answer
+#| filename: b_cc_answer
+#| eval: FALSE
+
+## Check if our data genes cover the gene lists
+lapply(cc_genes, function(x) x %in% rownames(sobj))
+
+## Remove genes not in sobj
+cc_genes <- lapply(cc_genes, function(gl) { gl[gl %in% rownames(sobj)] })
+
+## Check the modification
+str(cc_genes)
+
+## Check that all genes are available in sobj
+all(unique(unlist(cc_genes)) %in% rownames(sobj))
+
+```
+:::
+
+<br>
+
+## Estimation
+
+Let's perform this estimation. But how ? It is calculated using the function `CellCycleScoring()` from the `Seurat` package.
+
+```{r}
+#| label: h_CellCycleScoring
+#| filename: h_CellCycleScoring
+#| eval: FALSE
+
+## Reading the function help page
+?Seurat::CellCycleScoring
+
+```
+
+<br>
+
+Run the cell-cycle estimation
+
+```{r}
+#| label: cc_run
+#| filename: cc_run
+
+## Creating a temporary object
+sobj_CCS <- sobj
+
+sobj_CCS <- Seurat::NormalizeData(object = sobj_CCS, verbose = FALSE)
+
+## Perform the estimation
+set.seed(my_seed)
+sobj_CCS <- Seurat::CellCycleScoring(
+  object = sobj_CCS, 
+  s.features = cc_genes$s.genes, 
+  g2m.features = cc_genes$g2m.genes, 
+  # assay = 'RNA, ## Seurat v4
+  layer = 'RNA', ## Seurat v5
+  nbin = 24, 
+  seed = my_seed)
+
+## Transfering score from the temp object to the real one
+sobj$CC_Seurat_S.Score <- sobj_CCS$S.Score
+sobj$CC_Seurat_G2M.Score <- sobj_CCS$G2M.Score
+sobj$CC_Seurat_Phase <- as.factor(sobj_CCS$Phase)
+
+## Add "S minus G2M" score
+sobj$CC_Seurat_SmG2M.Score <- sobj$CC_Seurat_S.Score - sobj$CC_Seurat_G2M.Score
+
+## Discard temp object
+rm(sobj_CCS)
+```
+
+<br>
+
+Description of the object to see the data added
+
+```{r}
+#| label: desc_cc
+#| filename: desc_cc
+#| eval: FALSE
+
+View()
+
+```
+
+<br>
+
+::: {.callout-important icon="false" style="background: pink"}
+## Visualization DEMO
+
+As usual, we can visualize the results as violins :
+
+```{r}
+#| label: vlncc
+#| filename: vlncc
+
+Seurat::VlnPlot(object = sobj,
+                features = c("CC_Seurat_S.Score",
+                             "CC_Seurat_G2M.Score",
+                             "CC_Seurat_SmG2M.Score"))
+
+```
+
+<br>
+
+But it's not that easy to interpret...
+
+Let's plot it in the cell space
+
+```{r}
+#| label: vizccp
+#| filename: vizccp
+
+## Creating a temporary object.
+sobj_VIZ_cc <- sobj
+
+## Usual set of "U can't C me" functions
+sobj_VIZ_cc <- Seurat::NormalizeData(object = sobj_VIZ_cc, verbose = FALSE)
+sobj_VIZ_cc <- Seurat::ScaleData(object = sobj_VIZ_cc, verbose = FALSE)
+sobj_VIZ_cc <- Seurat::FindVariableFeatures(object = sobj_VIZ_cc, verbose = FALSE)
+sobj_VIZ_cc <- Seurat::RunPCA(object = sobj_VIZ_cc, npcs = 21, verbose = FALSE)
+sobj_VIZ_cc <- Seurat::RunUMAP(object = sobj_VIZ_cc, dims = c(1:20), verbose = FALSE)
+
+## Cell cycle phase feature plot
+dp_ccp <- Seurat::DimPlot(
+  object = sobj_VIZ_cc, 
+  reduction = 'umap', 
+  group.by = 'CC_Seurat_Phase') + Seurat::DarkTheme()
+print(dp_ccp)
+
+```
+
+<br>
+
+```{r}
+#| label: vizccs
+#| filename: vizccs
+
+## SmG2M feature plot
+fp_cc <- Seurat::FeaturePlot(
+  object = sobj_VIZ_cc, 
+  reduction = 'umap',
+  features = 'CC_Seurat_SmG2M.Score') + Seurat::DarkTheme()
+print(fp_cc)
+
+## We can discard the temp object
+rm(sobj_VIZ_cc)
+
+```
+:::
+
+<br> 
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+Does the structure of the cells in this representation seem to have a link with these cell cycle phases/scores ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+It's an absolute yes !
+:::
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+Do you think this is the result of an artifact, or biology-related ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+¯\_(ツ)_/¯
+
+We don't know.
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Save the Seurat object
+
+We will save our Seurat object that now contains the cell cycle states/scores :
+
+```{r}
+#| label: saverds2
+#| filename: saverds2
+
+## Use the function described in save_func chunk
+save_step(sobj, "04", "CC")
+
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Cell doublets
+
+We will use **two different methods** to detect and remove cell doublets :
+
+-   [`scds`](https://www.bioconductor.org/packages/release/bioc/html/scds.html){target="_blank"} (in its "hybrid" mode) : more efficient at detecting **homotypic** doublets
+
+-   [`scDblFinder`](https://www.bioconductor.org/packages/release/bioc/html/scDblFinder.html){target="_blank"} : more efficient at detecting **heterotypic** doublets
+
+None of the methods accepts a `SeuratObject` as input, but a [`SingleCellExperiment`](https://www.bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html){target="_blank"} object.
+
+Hopefully :
+
+-   Seurat has a function to perform the conversion
+-   The output results can be integrated into our Seurat object with ease
+
+## Two methods {.tabset .tabset-fade .tabset-pills}
+
+### `scds`
+
+```{r}
+#| label: scds
+#| filename: scds
+
+## Fix seed
+set.seed(my_seed)
+
+## Run scds
+sobj$doublet_scds.hybrid <- unname(
+  scds::cxds_bcds_hybrid(
+    Seurat::as.SingleCellExperiment(
+      sobj, assay = "RNA"))$hybrid_score > 1)
+
+## Contingencies
+table(sobj$doublet_scds.hybrid)
+
+```
+
+### `scDblFinder`
+
+```{r}
+#| label: scdbl
+#| filename: scdbl
+
+## Fix seed
+set.seed(my_seed)
+
+## Run scDblFinder (which needs another object type)
+sobj$doublet_scDblFinder <- scDblFinder::scDblFinder(
+  sce = Seurat::as.SingleCellExperiment(
+    x = sobj, 
+    assay = "RNA"),
+  returnType = "table")$class == "doublet"
+
+## Contingencies
+table(sobj$doublet_scDblFinder)
+
+```
+
+#  {.unnumbered}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+## Merge results
+
+We merge results of the two methods
+
+```{r}
+#| label: dblmerge
+#| filename: dblmerge
+
+## Logical union of both methods
+sobj$doublet_union <- sobj$doublet_scds.hybrid | sobj$doublet_scDblFinder
+
+## Quantify doublets
+table(sobj$doublet_union)
+
+```
+
+<br>
+
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
+We can assess **tool-specific** and **common** doublets
+
+```{r}
+#| label: dbl_types
+#| filename: dbl_types
+
+### Singlets by default
+sobj$doublet_viz <- "singlet"
+
+### Union
+sobj$doublet_viz[sobj$doublet_union] <- "both"
+
+### scds-specific
+sobj$doublet_viz[sobj$doublet_scds.hybrid & !sobj$doublet_scDblFinder] <- "scds"
+
+### scDblFinder-specific
+sobj$doublet_viz[sobj$doublet_scDblFinder & !sobj$doublet_scds.hybrid] <- "scDblFinder"
+
+## Convert to factor
+sobj$doublet_viz <- as.factor(sobj$doublet_viz)
+
+## Contingencies
+table(sobj$doublet_viz)
+
+```
+:::
+
+<br>
+
+::: {.callout-warning icon="false" collapse="true" style="background: yellow"}
+### OPTIONAL EXERCISE
+
+Create an upset-plot for the doublet status according to the two methods used
+:::
+
+<br>
+
+::: {.callout-warning icon="false" collapse="true" style="background: orange"}
+### OPTIONAL ANSWER
+
+```{r}
+#| label: b_upset
+#| filename: b_upset
+#| eval: FALSE
+
+## Build a list of cells tagged by one tool, the other, or both
+dbl_list <-list(
+  "scds" = colnames(sobj)[sobj$doublet_scds.hybrid & !sobj$doublet_scDblFinder],
+  "scDblFinder" = colnames(sobj)[!sobj$doublet_scds.hybrid & sobj$doublet_scDblFinder],
+  "both" = colnames(sobj)[sobj$doublet_scds.hybrid & sobj$doublet_scDblFinder])
+
+## Draw the upset plot
+UpSetR::upset(data = UpSetR::fromList(dbl_list), 
+              nintersects = NA, 
+              sets = rev(names(dbl_list)),
+              keep.order = TRUE,
+              order.by = "freq")
+
+```
+:::
+
+<br>
+
+Now we can remove barcodes identified as cell doublets, and visualize the cell space before and after.
+
+## Doublets filtering {.tabset .tabset-fade .tabset-pills}
+
+```{r}
+#| label: dblrm
+#| filename: dblrm
+
+## Dimensions before removal
+dim(sobj)
+
+## Create a temporary object
+sobj_VIZ_dbl <- sobj
+
+## Perform the removal
+# sobj <- sobj[,!sobj$doublet_union]
+sobj <- subset(
+  x = sobj, 
+  cells = colnames(sobj)[sobj$doublet_union], 
+  invert = TRUE)
+
+## Dimensions after
+dim(sobj)
+
+```
+
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO - See effect of doublet removal
+
+### BEFORE
+
+```{r}
+#| label: dblviz1
+#| filename: dblviz1
+
+### Doublets viz (before removal)
+
+## Usual set of "U can't C me" functions
+sobj_VIZ_dbl <- Seurat::NormalizeData(object = sobj_VIZ_dbl, verbose = FALSE)
+sobj_VIZ_dbl <- Seurat::ScaleData(object = sobj_VIZ_dbl, verbose = FALSE)
+sobj_VIZ_dbl <- Seurat::FindVariableFeatures(object = sobj_VIZ_dbl, verbose = FALSE)
+sobj_VIZ_dbl <- Seurat::RunPCA(object = sobj_VIZ_dbl, npcs = 21, verbose = FALSE)
+sobj_VIZ_dbl <- Seurat::RunUMAP(object = sobj_VIZ_dbl, dims = c(1:20), verbose = FALSE)
+
+## Doublets visualization
+dp_dbl <- Seurat::DimPlot(
+  object = sobj_VIZ_dbl, 
+  reduction = 'umap',
+  group.by = 'doublet_viz') + Seurat::DarkTheme()
+
+## Plot
+print(dp_dbl)
+
+## Discard temp object
+rm(sobj_VIZ_dbl)
+
+```
+
+### AFTER
+
+```{r}
+#| label: dblviz2
+#| filename: dblviz2
+
+### Doublets viz (after removal)
+
+## Create a temporary object
+sobj_VIZ_dblf <- sobj
+
+## Usual set of "U can't C me" functions
+sobj_VIZ_dblf <- Seurat::NormalizeData(object = sobj_VIZ_dblf, verbose = FALSE)
+sobj_VIZ_dblf <- Seurat::ScaleData(object = sobj_VIZ_dblf, verbose = FALSE)
+sobj_VIZ_dblf <- Seurat::FindVariableFeatures(object = sobj_VIZ_dblf, verbose = FALSE)
+sobj_VIZ_dblf <- Seurat::RunPCA(object = sobj_VIZ_dblf, npcs = 21, verbose = FALSE)
+sobj_VIZ_dblf <- Seurat::RunUMAP(object = sobj_VIZ_dblf, dims = c(1:20), verbose = FALSE)
+
+## Doublets-filtered visualization
+dp_dblf <- Seurat::DimPlot(
+  object = sobj_VIZ_dblf, 
+  reduction = 'umap',
+  group.by = 'doublet_viz') + Seurat::DarkTheme()
+
+## Plot
+print(dp_dblf)
+
+## Discard temp object
+rm(sobj_VIZ_dblf)
+
+```
+
+Merge plots for ease of use :
+
+```{r dbl_umaps, fig.width = 12, fig.height = 6, class.source = "notrun", class.output="notruno"}
+#| label: dbl_umaps
+#| filename: dbl_umaps
+
+## Using the patchwork package to merge plots (and ggplot2 to add titles)
+patchwork::wrap_plots(
+  list(
+    dp_dbl & ggplot2::ggtitle(label = "Cell doublets (unfiltered)"),
+    dp_dblf & ggplot2::ggtitle(label = "Cell doublets (filtered)")), 
+  nrow = 1)
+
+```
+:::
+
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+### QUESTION
+
+What do you observe when comparing before and after the doublets filtering ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+### ANSWER
+
+Actually not that much !
+
+This is due to the fact that this dataset did not contain a lot of heterotypic doublets
+
+When a dataset is heavily contaminated with lots of heterotypic doublets, their removal can drastically remodel the topology.
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Save the Seurat object
+
+We will save our Seurat object that is now filtered for doublets :
+
+```{r}
+#| label: saverds3
+#| filename: saverds3
+
+## Use the function described in save_func chunk
+save_step(sobj, "05", "Doublets.Filtered")
+
+```
+
+<br>
+
+# Rsession
+
+<br>
+
+For reproducibility and context, it is recommended to include in the Quarto/Rmarkdown the list of loaded packages and their version.
+
+<br>
+
+::: {.callout-important icon="false" style="background: pink"}
+## Session info
+
+Students, you are not expected to run the following chunk ***BUT*** you are more than welcome to include it at the end of your own Rmardown / Quarto script !
+
+```{r}
+#| code-fold: false
+#| label: rsession
+#| filename: rsession
+#| attr.output: '.details summary="Show output"'
+
+utils::sessionInfo()
+```
+:::
+
