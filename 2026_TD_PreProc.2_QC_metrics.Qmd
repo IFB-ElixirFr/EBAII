@@ -1,0 +1,1198 @@
+---
+title: "<CENTER>EB3I n1 2026 scRNAseq<BR>-<BR> <B>PRE-PROCESSING (II)</B><BR>-<BR>Quality control : Counts & metrics</CENTER>"
+date: "2026-10-28"
+author:
+  - name: "EB3I n1 scRNAseq Team"
+  - name: "Marine VERNIER"
+    email: "marinevernier@unistra.fr"
+  - name: "Lilia YOUNSI, Sebastien MELLA "
+  - email: "lilia.younsi@inserm.fr, sebastien.mella@pasteur.fr"
+lightbox: 
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
+format:
+  html:
+    fig-width: 8
+    fig-height: 6
+    fig-align: center
+    embed-fonts: true
+    number-sections: true  ## Adds number to headers (sections)
+    embed-resources: true  ## Make a self-contained HTML
+    anchor-sections: true  ## Create HTML anchors for all section titles
+    theme: zephyr  ## CSS theme for the HTML page
+    syntax-highlighting: tango  ## Theme for the code chunks
+    toc: true  ## Add a table of content
+    toc-location: left  ## Position of TOC on the left side
+    collapsed: true  ## By default, the TOC is folded
+    grid:
+      body-width: 1600px  ## Extends the main body to fill the right space up to 1600px
+      margin-width: 0px
+    smooth-scroll: true ## Smooth scroll of the HTML page
+    code-fold: show  ## Show (unfold) code by default 
+    code-tools:
+      source: true  ## Show the upper-right "Code" button to allow downloading this source
+      toggle: true
+    code-block-bg: true  ## Use a (default grey) background for code chunks
+    code-block-border-left: "#31BAE9"  ## Use a (here electric blue) left boarder for code chunks
+    code-overflow: wrap  ## Wrap long code lines (should not be in use due to the high grid:body-width value, but just in case it is deactivated)
+    code-line-numbers: true  ## Add line number to the left
+    code-copy: true  ## Adds a button to copy chunk code to clipboard
+    code-annotations: hover  ## For code annotation, show values in mouseover
+    html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
+    echo: true
+filters: 
+ - foldablecodeblock.lua  ## LUA code for foldable code output
+---
+
+<!-- ADDITIONAL CODES / HACKS -->
+
+<!-- CSS code to center the QMD title -->
+<style>
+#title-block-header .title {
+  text-align: center;
+}
+</style>
+
+
+<!-- CSS code to center the imported images -->
+<style>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+<!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+<style>
+.code-with-filename .code-copy-button {
+  right: 2.5rem !important;
+}
+</style>
+
+
+
+<!-- HTML code to force table borders -->
+```{=html}
+<style>
+td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+```
+
+
+<!-- BODY -->
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+![](eb3i_banner.png){.center-image}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# PREAMBLE
+
+## Purpose of this session
+
+<br>
+
+This file describes the different steps to perform the **quality control** of
+a single cell dataset, based on (per cell) :
+
+*   the number of **UMI** (~transcripts) detected
+*   the number of **expressed genes** detected
+*   the proportion of UMI corresponding to **mitochondrial** genes
+*   the proportion of UMI corresponding to **riboprotein-coding** genes
+*   the proportion of transcripts related to **stress** signature
+
+**Input data**: A filtered, flat count matrix retrieved from GEO.
+
+**Output data**: A `Seurat` object annotated for the "bad" cells to filter out for downstream analysis.
+
+<br>
+<br>
+
+## What to run ?
+
+<br>
+
+This training presentation, written in _Quarto_, contains **many** chunks ( = code blocks)
+
+You **do not have to** run them all !
+
+Chunks follow a **color code** :
+
+<br>
+
+### Chunks you **ARE** expected to run :
+
+<br>
+
+```{r}
+#| label: chunk_run
+#| filename: chunk_run
+
+## Example of a chunk to run
+getwd()
+
+```
+
+<br>
+
+### Chunks you **ARE NOT** expected to run
+
+<br>
+
+Hopefully, we will _demo_ them. You may run it by yourself, young
+padawan, but if you get late, lost or worst, break something, *you*'ll be the
+one to blame !
+
+
+::: {.callout-important icon="false" style="background: pink"}
+
+This is a demonstration, you are ***NOT*** expected to run the following chunks !
+
+```{r}
+#| label: notrun_si
+#| filename: notrun_si
+#| attr.output: '.details summary="Show output"'
+
+## Example of a chunk to NOT run (session info)
+utils::sessionInfo()
+```
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Start Rstudio
+
+-   Using the [OpenOnDemand/Rstudio cheat
+    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"},
+    connect to the [OpenOnDemand
+    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and
+    **create a Rstudio session** with the right resource requirements, thanks to the cheat sheet.
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Warm-up
+
+<br>
+
+-   We now set **common parameters** as new variables, once and for all for this
+session :
+
+```{r}
+#| label: set_params
+#| filename: set_params
+
+## Set your project name
+# WARNING : Do not just copy-paste this ! It's MY project name ! Put YOURS !!
+project_name <- "ebaii_sc_teachers"
+
+
+## Control if the project_name exists on the cluster
+cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
+
+## Seed for the RNG
+my_seed <- 1337L
+
+
+```
+
+<br>
+
+## Prepare the data structure
+<br>
+
+```{r}
+#| label: data_structure
+#| filename: data_structure
+#| message: false
+
+# TD
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+
+# Session
+session_dir <- paste0(TD_dir, "/02_Preproc.2")
+dir.create(path = session_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Input
+input_dir <- paste0(session_dir, "/DATA")
+dir.create(path = input_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Gene lists
+res_dir <- paste0(TD_dir, "/Resources")
+glist_dir <- paste0(res_dir, "/Genelists")
+dir.create(path = glist_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Output 
+output_dir <- paste0(session_dir, "/RESULTS")
+dir.create(path = output_dir, recursive = TRUE, showWarnings = FALSE)
+
+```
+
+::: {.callout-note}
+The gene list directory is where we will store additional information from 
+knowledge bases about genes used to estimate the QC metrics of cells.
+::: 
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+# Prerequisites
+
+<br>
+
+We have to retrieve the input data file and gene list for quality control metrics.
+
+Same as Preproc1, we will use a **function** to ease the make the process easier for you.
+
+The code for this function is stored in an **external R script** that we will
+**source** (ie, read by the R engine, then loaded in memory).
+
+<br>
+
+## Loading function to retrieve a file from a backup location
+
+<br>
+
+First, we **source** the fetching function script :
+```{r}
+#| label: fetch_src
+#| filename: fetch_src
+#| attr.output: '.details summary="Show output"'
+
+source(
+  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
+  echo = TRUE)
+
+```
+
+<br>
+
+### Actual data fetching
+
+#### Input data
+
+First the input data : *GSM4861194_gex_2_raw_gene_expression.tsv.gz* is the matrix containing genes counts for each cell. 
+
+```{r}
+#| label: load_input
+#| filename: load_input
+
+## Copy the requested files from a local backup, return their user-based local paths
+
+scmat_source <- "GSM4861194_gex_2_raw_gene_expression.tsv.gz"
+scmat_file <- backup_get_data(
+  backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/TSV/", scmat_source), 
+  local_path = input_dir, 
+  force = TRUE)
+
+```
+
+#### GeneList
+
+Then the gene lists for QC metrics :
+
+```{r}
+#| label: load_gene_lists
+#| filename: load_gene_lists
+
+## Copy the requested files from a local backup, return their user-based local paths
+
+mito_source <- "mus_musculus_mito_symbols_20191015.rds"
+mito_file <- backup_get_data(
+  backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", mito_source), 
+  local_path = input_dir, 
+  force = TRUE)
+
+ribo_source <- "mus_musculus_cribo_symbols_20191015.rds"
+ribo_file <- backup_get_data(
+  backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", ribo_source), 
+  local_path = input_dir, 
+  force = TRUE)
+
+stress_source <- "mus_musculus_stress_symbols_20200224.rds"
+stress_file <- backup_get_data(
+  backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", stress_source), 
+  local_path = input_dir, 
+  force = TRUE)
+
+```
+
+<br>
+
+**Why those metrics ?**
+<br>
+
+During single-cell RNA sequencing (scRNA-seq) quality control (QC), we calculate the percentage of transcripts belonging to specific gene lists to better understand the RNA composition of each cell and identify potential technical artefacts.
+
+* **Mitochondrial genes** : A high mitochondrial RNA percentage can indicate cell damage, cell death, or poor sample quality.
+
+* **Ribosomal genes** : The percentage of ribosomal transcripts provides information about RNA composition and cellular activity. Unusual values may indicate atypical expression profiles or differences in cell types.
+
+* **Stress-related genes** : High expression of stress-related genes may indicate a cellular stress response induced by sample collection, tissue dissociation, or sample processing, rather than the cell's original biological state.
+However, stress-related genes can also reflect genuine biological responses. Their expression should therefore be interpreted in the context of the experiment.
+
+::: {.callout-important}
+These metrics are indicators, not definitive measures of cell quality. They should be interpreted together with other QC metrics and in the context of the experiment, rather than used as strict, universal thresholds for cell removal.
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+<br>
+
+# Biological context
+
+For this series of training sessions, we will work on data from this [Paiva et al.](https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00281-3) publication.
+
+* The study concerns **thymus autonomy**:
+
+  * The thymus is an "organ of passage", critical in its function to the adaptive immune system for the maturation of T cell lymphocytes.
+  * This maturation involves two main steps, performed thanks to macrophages:
+    * Positive selection : keeping cells that successfully develop react appropriately with MHC immune receptors of the body
+    * Negative selection : keeping cells that do not react against natural proteins of the body.
+  * Thymus _autonomy_ is a natural mechanism that allows to create T cells in the thymus by differentiation and cell competition, even when normal progenitors from the bone marrow are lacking, in critical conditions.
+  * This mechanism is known in its effects, but the cells involved in are not.
+  * This study is of importance in the health field, as this mechanism relies on a temporary loss of control of the cell normal functions.
+  * The consequence is that if thymus is in autonomy for too long (few weeks), this is a prelude for leukemia !
+
+<br>
+
+<center>![](thymus_autonomy.png)</center>
+
+<br>
+
+* Organism is : **mus musculus**
+* Individuals are : newborn **mice, grafted**
+* The design corresponds to **two conditions** (Test / Control)
+  * **Control** : thymus from **wild type** newborn mice transplanted into **wild type** juvenile mouse. In this control case, **donor** T-cells progenitors (DN3) were replaced by **host** cells **3 weeks** after transplantation.
+  * **Test** : thymus from **wild type** newborn mice transplanted in **KO Rag-/-** type juvenile mouse (the KO partially impairs their ability to produce T-cell progenitors in normal amounts). In this test case, **donor** T-cells progenitors (DN3) were replaced by **host** cells **9 weeks** after transplantation, showing that the donor DN3 cells outlived their normal lifespan by ~6 weeks.
+  
+<br>
+
+  <center>![](paiva_wt_ko.png)</center>
+
+<br>
+  
+You will mainly work on the **KO sample : `TD3A`**. 
+
+The input data consists in a **count matrix**, as a gzipped tabular text file, that contains everything needed to create a basic Seurat object :
+
+* The expressions **counts**
+* The **feature names** (here, gene symbols)
+* The **barcode names**
+
+This matrix has already been **filtered for empty droplets**.
+
+<br>
+
+
+# Environment
+<br>
+
+We load the packages of interest:
+
+```{r}
+#| label: packages
+#| filename: packages
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(Seurat)
+
+```
+
+<br>
+
+# Data
+<br>
+
+We load the count matrix using `readSparseCounts` :
+
+```{r}
+#| label: mat_load
+#| filename: mat_load
+#| message: false
+#| warning: false
+
+
+## Loading the matrix directly as a sparseMatrix
+scmat <- scuttle::readSparseCounts(
+    file = scmat_file, 
+    sep = "\t")
+
+## Displaying its size in-memory (this is a basic matrix)
+format(utils::object.size(scmat), units = "auto")
+
+```
+
+```{r}
+#| label: mat_desc
+#| filename: mat_desc
+
+
+## A basic description of the matrix
+dim(scmat)
+scmat[c(1:5), c(1:5)]
+
+```
+
+::: {.callout-note}
+We have now a matrix with 31053 genes and 4587 cells
+:::
+
+<br>
+
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## Question 
+What is the type of this matrix ? 
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## Answer
+```{r}
+#| label: scmat_class
+#| filename: scmat_class
+
+class(scmat)
+```
+A `dgCMatrix` is a type of matrix designed to store sparse data efficiently.
+You can see that most values are '.' which represent 0, it's because a given gene is not detected in every cell.
+:::
+
+<br>
+
+
+We want to build a Seurat object from the count matrix.
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## Question
+But how do we do ??
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## Answer
+```{r}
+#| label: mat2seurat
+#| filename: mat2seurat
+
+?Seurat::CreateSeuratObject()
+
+```
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## Answer
+```{r}
+#| label: make_sobj
+#| filename: make_sobj
+
+sobj = Seurat::CreateSeuratObject(counts = scmat,
+                                  assay = "RNA",
+                                  project = "TD3A")
+sobj
+
+```
+:::
+
+
+We do not need the count matrix anymore :
+
+```{r}
+#| label: rm_mat
+#| filename: rm_mat
+
+rm(scmat)
+
+```
+
+We define a nice palette to visualize the QC metrics:
+
+```{r}
+#| label: color_palette
+#| filename: color_palette
+
+color_palette = c("lightgray", "#FDBB84", "#EF6548", "#7F0000", "black")
+
+```
+
+
+For the QC metrics related to the proportion of UMI belongs to a specific gene sets, we need to load the gene sets.
+
+```{r}
+#| label: load_lists
+#| filename: load_lists
+
+## MITO
+mito_symbols = readRDS(mito_file)
+mito_symbols
+
+## RIBO
+ribo_symbols = readRDS(ribo_file)
+ribo_symbols
+
+## MECHANICAL STRESS
+stress_symbols = readRDS(stress_file)
+stress_symbols
+```
+
+<br>
+
+We keep only the gene symbols available in our data :
+
+```{r}
+#| label: subset_symbols
+#| filename: subset_symbols
+
+mito_symbols = intersect(mito_symbols, rownames(sobj))
+mito_symbols
+
+ribo_symbols = intersect(ribo_symbols, rownames(sobj))
+ribo_symbols
+
+stress_symbols = intersect(stress_symbols, rownames(sobj))
+stress_symbols
+```
+::: {.callout-note}
+**Note**: A more robust analysis may use the gene _identifiers_ (like EntrezID) rather than gene _symbols_.
+::: 
+
+<br>
+<br>
+
+
+# Quality controls
+
+## Compute metrics
+<br>
+
+What is already available in the Seurat object ?
+
+```{r}
+#| label: see_metadata
+#| filename: see_metadata
+
+head(sobj@meta.data)
+
+```
+
+**nCount_RNA** = total number of counts per cell. Very low value, may indicate a poor cell quality, low amount of detected RNA or low expression level. Very high value can correspond to a cell that is highly transcriptionally active, but also to a doublet (two cells captured together).
+
+**nFeature_RNA** = number of different gene detected per cell. Very low value may indicate a cell of poor quality, low RNA or a cell with naturally low RNA content. Very high value can indicate an RNA-rich cell, but also a doublet.
+
+<br>
+
+**How do the two first QC metrics vary ?**
+
+```{r}
+#| label: summary_metadata
+#| filename: summary_metadata
+
+summary(sobj@meta.data)
+
+```
+
+In the column `nCount_RNA`, the maximum is far from the third quartile. For visualization purpose, we transform this column to log10 scale.
+
+```{r}
+#| label: log10_ncount_RNA
+#| filename: log10_ncount_RNA
+
+sobj$log10_nCount_RNA = log10(sobj$nCount_RNA)
+
+summary(sobj@meta.data)
+
+```
+
+<br>
+
+We compute the percentage of UMI related to each of the three list of genes.
+
+First, we compute the proportion of transcripts related to mitochondrial genes, per cell.
+
+```{r}
+#| label: percent_mt
+#| filename: percent_mt
+
+sobj = Seurat::PercentageFeatureSet(
+  object = sobj,
+  assay = "RNA",
+  features = mito_symbols,
+  col.name = "percent_mt")
+
+summary(sobj$percent_mt)
+
+```
+
+Then, we compute the proportion of transcripts related to riboprotein-coding genes, per cell:
+
+```{r}
+#| label: percent_rb
+#| filename: percent_rb
+
+sobj = Seurat::PercentageFeatureSet(
+  object = sobj,
+  assay = "RNA",
+  features = ribo_symbols,
+  col.name = "percent_rb")
+
+summary(sobj$percent_rb)
+
+```
+
+
+Finally, we compute the proportion of transcripts related to mechanical stress signature, per cell :
+
+```{r}
+#| label: percent_st
+#| filename: percent_st
+
+sobj = Seurat::PercentageFeatureSet(
+  sobj,
+  assay = "RNA",
+  features = stress_symbols,
+  col.name = "percent_st")
+
+summary(sobj$percent_st)
+
+```
+
+
+We now have all the QC-related metrics:
+
+```{r}
+#| label: final_summary
+#| filename: final_summary
+
+summary(sobj@meta.data)
+
+```
+
+<br>
+<br>
+
+
+## We visualize the distribution of the metrics to define thresholds
+
+<br>
+
+To quickly choose the metrics' thresholds, we look at their distribution with a violin plot. We will then be able to look more closely at the metrics and adjust the thresholds. 
+
+```{r}
+#| label: metrics_distribution
+#| filename: metrics_distribution
+#| warning: false
+
+qc <- c(
+  "nCount_RNA",
+  "nFeature_RNA",
+  "log10_nCount_RNA",
+  "percent_mt",
+  "percent_rb",
+  "percent_st"
+)
+
+p_violin <- Seurat::VlnPlot(
+  object = sobj,
+  features = qc,
+  ncol = 3
+) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+p_violin
+```
+
+
+We set the filtering range based on those violin plot.
+Adjust them as necessary based on the figures.
+
+```{r}
+#| label: set_range
+#| filename: set_range
+#| 
+range_nCount_RNA = c(1000, max(sobj$nCount_RNA))
+range_log10_nCount_RNA = c(log10(range_nCount_RNA[1]), log10(range_nCount_RNA[2]))
+range_nFeature_RNA = c(750, max(sobj$nFeature_RNA))
+range_percent_mt = c(0, 5)
+range_percent_rb = c(0,20)
+range_percent_st = c(0, 6)
+
+```
+
+<br>
+
+## Failing cells
+
+<br>
+
+We identify the cells that pass or do not pass the quality controls. This will be used for the visualization and later for cells filtering.
+
+If the filtering thresholds are modified, do not forget to run again those chunks.
+
+```{r}
+#| label: cells_in_range
+#| filename: cells_in_range
+
+
+sobj$nCount_RNA_in_range <-
+  sobj$nCount_RNA >= range_nCount_RNA[1] &
+  sobj$nCount_RNA <= range_nCount_RNA[2]
+
+sobj$log10_nCount_RNA_in_range <-
+  sobj$log10_nCount_RNA >= range_log10_nCount_RNA[1] &
+  sobj$log10_nCount_RNA <= range_log10_nCount_RNA[2]
+
+sobj$nFeature_RNA_in_range <-
+  sobj$nFeature_RNA >= range_nFeature_RNA[1] &
+  sobj$nFeature_RNA <= range_nFeature_RNA[2]
+
+sobj$percent_mt_in_range <-
+  sobj$percent_mt >= range_percent_mt[1] &
+  sobj$percent_mt <= range_percent_mt[2]
+
+sobj$percent_rb_in_range <-
+  sobj$percent_rb >= range_percent_rb[1] &
+  sobj$percent_rb <= range_percent_rb[2]
+
+sobj$percent_st_in_range <-
+  sobj$percent_st >= range_percent_st[1] &
+  sobj$percent_st <= range_percent_st[2]
+```
+
+<br>
+
+We can then identify failing cells : 
+
+```{r}
+#| label: fail_cells
+#| filename: fail_cells
+
+fail_nCount_RNA <- rownames(sobj@meta.data)[
+  !sobj$nCount_RNA_in_range
+]
+
+fail_nCount_RNA <- rownames(sobj@meta.data)[
+  !sobj$log10_nCount_RNA_in_range
+]
+
+fail_nFeature_RNA <- rownames(sobj@meta.data)[
+  !sobj$nFeature_RNA_in_range
+]
+
+fail_percent_mt <- rownames(sobj@meta.data)[
+  !sobj$percent_mt_in_range
+]
+
+fail_percent_rb <- rownames(sobj@meta.data)[
+  !sobj$percent_rb_in_range
+]
+
+fail_percent_st <- rownames(sobj@meta.data)[
+  !sobj$percent_st_in_range
+]
+```
+
+<br>
+
+## Visualization
+
+<br>
+
+This is difficult to handle the distribution of these metrics across cells. We opt for various visualization ways:
+
+* **histogram**, showing the distribution of the metric
+* **violin plot**, showing the distribution of the metric, useful if several datasets are considered
+* **UMAP** (or alternatively, tSNE), showing the distribution of the metric over a 2D projection of cells
+
+You may choose one of these visualization ways.
+
+To generate the UMAP 2D projection, we need to run multiple `Seurat` commands in a row. Understanding these commands is not the purpose of the current course, but will be detailed in the next few ones. So just run :
+
+```{r}
+#| label: quick_processing
+#| filename: quick_processing
+#| message: false
+#| warning: false
+
+sobj_tmp = Seurat::NormalizeData(sobj, verbose = FALSE)
+sobj_tmp = Seurat::ScaleData(sobj_tmp, verbose = FALSE)
+sobj_tmp = Seurat::FindVariableFeatures(sobj_tmp, verbose = FALSE)
+sobj_tmp = Seurat::RunPCA(sobj_tmp, npcs = 21, verbose = FALSE)
+sobj_tmp = Seurat::RunUMAP(sobj_tmp, dims = c(1:20), verbose = FALSE)
+
+```
+
+We can now visualize the cells on a 2D projection:
+
+```{r, fig.width = 8, fig.height = 8}
+#| label: visualize_cells
+#| filename: visualize_cells
+
+Seurat::DimPlot(object = sobj_tmp,
+                reduction = "umap") + Seurat::DarkTheme()
+
+```
+
+<br>
+
+### Define a R function
+
+We want to visualize our different metrics, but using the same kind of plots. Instead of copying-pasting and editing the same code multiple times (this is time-consuming and error-prone), we design a **function** using the template below:
+
+```{r}
+#| label: my_function_name
+#| filename: my_function_name
+#| eval: false
+
+my_function_name = function(param1, param2) {
+  # do something with the parameter values
+  output = "something"
+  
+  return(output)
+}
+
+```
+
+Here is the function we will use to plot our metrics :
+
+```{r}
+#| label: qc_print_function
+#| filename: qc_print_function
+
+print_1_qc_metric = function(object = sobj,
+                             qc = "log10_nCount_RNA",
+                             range_qc = range_log10_nCount_RNA,
+                             failing_cells = fail_nCount_RNA) {
+  # Description of the parameters:
+  # - sobj : the Seurat object, with default value to the one
+  # - qc : CHARACTER : the QC metric, must be a column in sobj@meta.data
+  # - range_qc : NUMERIC : the filtering range for the QC metric
+  # - failing_cells : CHARACTER VECTOR : the cells that fail the QC
+  
+  # Histogram
+  p_hist = ggplot(object@meta.data, aes(x = .data[[qc]])) +
+    geom_histogram(aes(y = after_stat(density)),
+                            colour = "black", fill = "#F8766D", bins = 100) +
+    geom_density(alpha = 0, col = "blue", lwd = 0.75) +
+    geom_vline(xintercept = range_qc, col = "red") +
+    labs(title = paste0("Range for ", qc, " is: ", range_qc[1], " - ", range_qc[2])) +
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5))
+  
+  # Violin plot
+  p_violin = Seurat::VlnPlot(object, features = qc) +
+    geom_hline(yintercept = range_qc, col = "red") +
+    scale_y_continuous( expand = expansion(mult = 0.05)) +
+    theme(axis.title.x = element_blank(),
+                   legend.position = "none")
+  
+  # Feature plot
+  p_umap = Seurat::FeaturePlot(object,
+                               reduction = "umap",
+                               features = qc) +
+    scale_color_gradientn(colors = color_palette) +
+    theme(aspect.ratio = 1)
+  
+  # Dim plot
+  object$failorpass = as.factor(
+    ifelse(test = colnames(object) %in% failing_cells,
+           yes = "fail", 
+           no = "pass")
+    )
+
+  p_fail = Seurat::DimPlot(object,
+                           group.by = "failorpass",
+                           order = "fail") +
+    scale_color_manual(values = c("#F8766D", "gray80"),
+                                breaks = levels(object$failorpass)) +
+    labs(title = qc,
+                  subtitle = paste0(length(failing_cells), " cells fail (",
+                                    round(100*length(failing_cells)/ncol(sobj), 2), " %)")) +
+    theme(aspect.ratio = 1,
+                   plot.title = element_text(hjust = 0.5),
+                   plot.subtitle = element_text(hjust = 0.5))
+  
+  
+  objectf = subset(object, cells = colnames(object)[object$failorpass == 'pass'])
+  objectf = Seurat::ScaleData(objectf, verbose = FALSE)
+  objectf = Seurat::FindVariableFeatures(objectf, verbose = FALSE)
+  objectf = Seurat::RunPCA(objectf, npcs = 21, verbose = FALSE)
+  objectf = Seurat::RunUMAP(objectf, dims = c(1:20), verbose = FALSE)
+
+  p_umapf = Seurat::FeaturePlot(object = objectf,
+                               reduction = "umap",
+                               features = qc) +
+    scale_color_gradientn(colors = color_palette) +
+    theme(aspect.ratio = 1)
+  
+  # Patchwork
+  p = patchwork::wrap_plots(p_umap, p_fail, p_hist, p_violin, p_umapf) +
+    patchwork::plot_layout(nrow = 1, widths = c(1, 1, 2, 1, 1))
+  
+  return(p)
+}
+
+```
+
+<br>
+
+### Number of UMI
+
+#### Check the function
+
+This function should directly work for `log10_nCount_RNA`, as it is set for this metric by default (`qc = "log10_nCount_RNA"`) :
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: check1_log10_nCount_RNA
+#| filename: check1_log10_nCount_RNA
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp)
+
+```
+
+Of course, it will work the same by expliciting all of the parameters value:
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: check2_log10_nCount_RNA
+#| filename: check2_log10_nCount_RNA
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp,
+                  qc = "log10_nCount_RNA",
+                  range_qc = range_log10_nCount_RNA,
+                  failing_cells = fail_nCount_RNA)
+
+```
+
+So we can copy-paste only this chunk for the next QC metrics !
+
+### Number of expressed genes
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: see_nFeature_RNA
+#| filename:  see_nFeature_RNA
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp,
+                  qc = "nFeature_RNA",
+                  range_qc = range_nFeature_RNA,
+                  failing_cells = fail_nFeature_RNA)
+
+```
+
+### Mitochondrial genes expression
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: see_percent_mt
+#| filename: see_percent_mt
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp,
+                  qc = "percent_mt",
+                  range_qc = range_percent_mt,
+                  failing_cells = fail_percent_mt)
+
+```
+
+### Riboprotein-coding genes expression
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: see_percent_rb
+#| filename: see_percent_rb
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp,
+                  qc = "percent_rb",
+                  range_qc = range_percent_rb,
+                  failing_cells = fail_percent_rb)
+
+```
+
+
+
+### Mechanical stress genes expression
+
+```{r, fig.width = 18, fig.height = 4}
+#| label: see_percent_st
+#| filename: see_percent_st
+#| warning: false
+#| message: false
+
+print_1_qc_metric(object = sobj_tmp,
+                  qc = "percent_st",
+                  range_qc = range_percent_st,
+                  failing_cells = fail_percent_st)
+
+```
+
+As we have finished with the visualization, we can discard our temporary object :
+
+```{r}
+#| label: rm_sobj_tmp
+#| filename: rm_sobj_tmp
+
+rm(sobj_tmp)
+
+```
+
+<br>
+
+### All metrics effect
+
+We can visualize metrics filtering effect as an **upset-plot**
+
+```{r}
+#| label: bcupset
+#| filename: bcupset
+#| warning: false
+
+## Create a list of all cells filtered OUT for each criterion
+up_list <-list(
+  "nFeature" = fail_nFeature_RNA,
+  "nCount" = fail_nCount_RNA,
+  "%MITO" = fail_percent_mt,
+  "%RIBO" = fail_percent_rb,
+  "%STRESS" = fail_percent_st)
+
+## Create an upset-plot
+UpSetR::upset(data = UpSetR::fromList(up_list), 
+              nintersects = NA, 
+              sets = rev(names(up_list)),
+              keep.order = TRUE,
+              order.by = "freq")
+
+```
+
+<br>
+<br>
+
+# Filtering ?
+
+<br>
+
+We could filter out cells based on these 5 QC metrics now. It is also possible to wait, perform various annotations such as cell type annotation or cell cycle phase scoring, to better characterize the low quality cells.
+
+To filter a Seurat object, we use the `Seurat::subset()` function:
+
+```{r}
+#| label: filter_sobj
+#| filename: filter_sobj
+
+sobj_filtered = subset(sobj, invert = TRUE,
+                       cells = unique(c(fail_nCount_RNA, 
+                                        fail_nFeature_RNA,
+                                        fail_percent_mt, 
+                                        # fail_percent_rb, actually we decided not to filter on this parameter
+                                        fail_percent_st
+                                        )))
+
+sobj_filtered
+
+```
+
+We are **not going to save** this filtered Seurat object, but we want to store in our `sobj` Seurat object the cells that failed the QC as a new cell metadata :
+
+```{r}
+#| label: add_fail_qc
+#| filename: add_fail_qc
+
+sobj$fail_qc = ifelse(test = colnames(sobj) %in% colnames(sobj_filtered),
+                      yes = "pass",
+                      no = "fail")
+
+table(sobj$fail_qc)
+
+```
+
+<br>
+<br>
+
+# Save
+
+<br>
+
+We save the **unfiltered** Seurat object:
+
+```{r}
+#| label: saverds1
+#| filename: saverds1
+
+## Save our Seurat object (rich naming)
+out_name <- paste0(
+          output_dir, "/", paste(
+            c("02", Seurat::Project(sobj), "S5", 
+              "Metrics", paste(
+                dim(sobj), 
+                collapse = '.'
+              )
+            ), collapse = "_"),
+            ".RDS")
+
+## Check
+print(out_name)
+
+## Write on disk
+saveRDS(object = sobj, 
+        file = out_name)
+
+```
+
+This Seurat object would then be loaded as the input for further analyses.
+
+<br>
+<br>
+
+# R session
+<br>
+
+This is a good practice to show the version of the packages used in this notebook.
+
+```{r, class.source = "fold-hide"}
+#| label: rsession
+#| filename: rsession
+
+sessionInfo()
+
+```
+
