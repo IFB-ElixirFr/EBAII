@@ -4,8 +4,10 @@ author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
   - name: "<i>Margot ZAHM</i>"
     email: "margot.zahm@inserm.fr,margot.zahm@cnrs.fr"
-  - name: "<i>Léa BELLENGER</i>"
-    email: "lea.bellenger@univ-nantes.fr,lea.bellenger@inserm.fr"
+  - name: "<i>Bastien JOB</i>"
+    email: "bastien.job@gustaveroussy.fr"
+  - name: "Lilia YOUNSI"
+    email: "lilia.younsi@inserm.fr" 
 lightbox: 
   match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
 format:
@@ -211,7 +213,7 @@ We build the directories of this session in one go (they were explained in Prepr
 #| message: true
 
 ## Main training directory
-TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD_2025")
+TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
 
 ## Current session (Preproc3) directory, with its input and output sub-directories
 session_dir <- paste0(TD_dir, "/03_Preproc.3")
@@ -558,7 +560,7 @@ We will **save our Seurat object** that now contains **filtered cells and featur
 #| filename: saverds1
 
 ## Use the function described in save_func chunk
-# save_step(sobj, "03", "Metrics.Filtered")
+save_step(sobj, "03", "Metrics.Filtered")
 
 ```
 
@@ -817,7 +819,7 @@ We will save our Seurat object that now contains the cell cycle states/scores :
 #| filename: saverds2
 
 ## Use the function described in save_func chunk
-# save_step(sobj, "04", "CC")
+save_step(sobj, "04", "CC")
 
 ```
 
@@ -1177,7 +1179,7 @@ We will save our Seurat object that is now filtered for doublets :
 #| filename: saverds3
 
 ## Use the function described in save_func chunk
-# save_step(sobj, "05", "Doublets.Filtered")
+save_step(sobj, "05", "Doublets.Filtered")
 
 ```
 
