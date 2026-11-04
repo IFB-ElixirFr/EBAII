@@ -5,7 +5,7 @@ author:
   - name: "<i>Lijiao NING</i>"
     email: "lijiao.ning@cnrs.fr"
   - name: "Contributors: Bastien JOB, Léa BELLENGER, Sébastien MELLA, Lilia YOUNSI, Nathalie LEHMANN"
-    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr; lea.bellenger@univ-nantes.fr; sebastien.mella@maestro.pasteur.fr; lilia.younsi@inserm.fr;"
+    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr; lea.bellenger@univ-nantes.fr;"
 lightbox:
   match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots by click
 format:
@@ -42,7 +42,12 @@ execute:
   message: false
   warning: false
 filters:
- - foldablecodeblock.lua  ## LUA code for foldable code output
+ - /shared/projects/ebaii_sc_teachers/SC_TD/Resources/foldablecodeblock.lua  ## LUA code for foldable code output
+resource-path:
+  - "."
+  - "/shared/projects/ebaii_sc_teachers/SC_TD/Resources"
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- ADDITIONAL CODES / HACKS -->
@@ -85,17 +90,6 @@ td, th {
 ```
 
 
-```{r}
-#| label: local_test
-#| include: false
-
-## LOCAL TEST ONLY (hidden in the HTML): FALSE when rendering outside the IFB cluster.
-## Chunks marked "eval: !expr on_cluster" only run on the cluster, and hidden
-## "local_*" chunks replace them on a personal computer.
-on_cluster <- dir.exists("/shared/projects")
-```
-
-
 <!-- BODY -->
 
 
@@ -119,15 +113,15 @@ This practical session follows the course on normalization, scaling and regressi
 3.  **Select the highly variable genes** and **scale** them, and explain what these steps prepare for the next session
 4.  **Regress out** an unwanted source of variation, and decide whether to do it by looking at what it removes
 
-**Input**: the Seurat object filtered in the previous session, `05_TD3A_S5_Doublets.Filtered_12508.4035.RDS`.
+**Input**: the Seurat object filtered in the previous session, `05_TD3A_S5_Doublets.Filtered_12508.4033.RDS`.
 
 **Outputs**, saved in your `RESULTS` directory:
 
 | File | Content |
 |:---|:---|
-| `06_TD3A_S5_LogNorm_12508.4035.RDS` | log-normalized object |
-| `07_TD3A_S5_Scaled.2k_12508.4035.RDS` | + 2,000 highly variable genes, scaled |
-| `08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS` | + ribosomal fraction regressed out: the input of the next session |
+| `06_TD3A_S5_LogNorm_12508.4033.RDS` | log-normalized object |
+| `07_TD3A_S5_Scaled.2k_12508.4033.RDS` | + 2,000 highly variable genes, scaled |
+| `08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4033.RDS` | + ribosomal fraction regressed out: the input of the next session |
 
 ------------------------------------------------------------------------
 
@@ -223,7 +217,6 @@ We build the directories of this session in one go (they were explained in Prepr
 #| label: fs_set_dirs
 #| filename: fs_set_dirs
 #| message: true
-#| eval: !expr on_cluster
 
 ## Main training directory
 TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
@@ -239,27 +232,12 @@ message('Directory [', session_dir, '] created.')
 
 ```
 
-```{r}
-#| label: local_dirs
-#| include: false
-#| eval: !expr (!on_cluster)
-
-## LOCAL TEST ONLY: same structure in the current directory
-TD_dir <- "."
-session_dir <- paste0(TD_dir, "/04_Proc.1")
-input_dir <- paste0(session_dir, "/DATA")
-output_dir <- paste0(session_dir, "/RESULTS")
-dir.create(path = input_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(path = output_dir, recursive = TRUE, showWarnings = FALSE)
-```
-
 We load the functions that fetch the input data:
 
 ```{r}
 #| label: fetch_src
 #| filename: fetch_src
 #| attr.output: '.details summary="Show output"'
-#| eval: !expr on_cluster
 
 source(
   file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
@@ -267,26 +245,8 @@ source(
 )
 
 ## Folder of the backup of all intermediate Seurat objects
-backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE"
+backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE_NEW"
 
-```
-
-```{r}
-#| label: local_fetch
-#| include: false
-#| eval: !expr (!on_cluster)
-
-## LOCAL TEST ONLY: copy of backup_get_data() from the template, backup in ./data
-backup_get_data <- function(
-  backup_file = NULL, local_path = NULL, force = FALSE
-) {
-  if (!file.exists(backup_file)) stop("Provided [", backup_file, "] does not exist !")
-  local_file <- paste0(local_path, "/", basename(backup_file))
-  if (file.exists(local_file) && !force) return(local_file)
-  file.copy(from = backup_file, to = local_file)
-  return(local_file)
-}
-backup_dir <- "data"
 ```
 
 We load the Seurat object saved at the end of the previous session. If you do not have it (error, lost file...), a copy is fetched from the backup:
@@ -296,7 +256,7 @@ We load the Seurat object saved at the end of the previous session. If you do no
 #| filename: data_load
 
 ## The Seurat object saved at the end of Preprocessing 3
-sobj_file <- "05_TD3A_S5_Doublets.Filtered_12508.4035.RDS"
+sobj_file <- "05_TD3A_S5_Doublets.Filtered_12508.4033.RDS"
 sobj_path <- paste0(TD_dir, "/03_Preproc.3/RESULTS/", sobj_file)  # <1>
 
 ## If it does not exist, copy it from the backup
@@ -335,7 +295,7 @@ save_step <- function(object, step_number, step_name) {
 
 ```
 
-For example, `save_step(sobj, "06", "LogNorm")` will write `06_TD3A_S5_LogNorm_12508.4035.RDS`.
+For example, `save_step(sobj, "06", "LogNorm")` will write `06_TD3A_S5_LogNorm_12508.4033.RDS`.
 
 ------------------------------------------------------------------------
 
@@ -358,15 +318,18 @@ Layers(object = sobj, assay = "RNA")
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 1
 
-What is a *layer*? Why is there already a `data` layer before we normalize anything?
+What is a *layer*? What does the `counts` layer store in the `RNA` assay?
 :::
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 1
 
-A layer is one version of the expression matrix stored in an assay: `counts` for the raw counts, `data` for the normalized values, `scale.data` for the scaled values.
+A layer is one version of the expression matrix stored in an assay.
+(Layers replace the slots of Seurat v4.)
 
-The `data` layer exists because a log-normalization was needed in Preprocessing 3 to compute the cell cycle scores. We will recompute it ourselves in this session.
+At this stage, the `RNA` assay contains only the `counts` layer, which stores the raw counts (genes × cells).
+
+Two more layers will be added in the next steps: `data` for the log-normalized values and `scale.data` for the scaled values.
 :::
 
 We extract the raw count matrix. `LayerData()` is the Seurat v5 way to get a layer, with the gene and cell names:
