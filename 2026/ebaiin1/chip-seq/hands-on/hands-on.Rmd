@@ -530,7 +530,7 @@ Your directory structure should be like this:
   * --outFileName: output file name
   * --outFileFormat: output file type
   * --effectiveGenomeSize : size of the mappable genome
-  * --normalizeUsing : different overall normalization methods; we will use RPGC method corresponding to 1x average coverage
+  * --normalizeUsing : different overall normalization methods; we will use the CPM method
   * --skipNonCoveredRegions: skip non-covered regions
   * --extendReads : Extend reads to fragment size
   * --ignoreDuplicates: reads that have the same orientation and start position will be considered only once
