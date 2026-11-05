@@ -129,6 +129,7 @@ bamCoverage \
   --outFileFormat bigwig \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
+  --extendReads \
   --ignoreDuplicates
 bamCoverage \
   --bam ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
@@ -136,6 +137,7 @@ bamCoverage \
   --outFileFormat bigwig \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
+  --extendReads \
   --ignoreDuplicates
 bamCoverage \
   --bam ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
@@ -143,6 +145,7 @@ bamCoverage \
   --outFileFormat bigwig \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
+  --extendReads \
   --ignoreDuplicates
 bamCoverage \
   --bam ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
@@ -150,6 +153,7 @@ bamCoverage \
   --outFileFormat bigwig \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
+  --extendReads \
   --ignoreDuplicates
 cd ..
 module unload deeptools/3.5.4

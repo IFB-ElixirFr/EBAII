@@ -532,7 +532,7 @@ Your directory structure should be like this:
   * --effectiveGenomeSize : size of the mappable genome
   * --normalizeUsing : different overall normalization methods; we will use RPGC method corresponding to 1x average coverage
   * --skipNonCoveredRegions: skip non-covered regions
-  * --extendReads 200: Extend reads to fragment size
+  * --extendReads : Extend reads to fragment size
   * --ignoreDuplicates: reads that have the same orientation and start position will be considered only once
 ```{bash eval=FALSE}
 bamCoverage \
@@ -541,6 +541,7 @@ bamCoverage \
   --outFileFormat bigwig \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
+  --extendReads \
   --ignoreDuplicates
 ```
 
