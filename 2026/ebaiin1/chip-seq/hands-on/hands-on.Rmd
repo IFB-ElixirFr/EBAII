@@ -529,7 +529,6 @@ Your directory structure should be like this:
   * --bam: BAM file to process
   * --outFileName: output file name
   * --outFileFormat: output file type
-  * --effectiveGenomeSize : size of the mappable genome
   * --normalizeUsing : different overall normalization methods; we will use the CPM method
   * --skipNonCoveredRegions: skip non-covered regions
   * --extendReads : Extend reads to fragment size
