@@ -1,12 +1,12 @@
 ---
 title: "<CENTER>EB3I n1 2026 scRNAseq<BR>-<BR> <B>PRE-PROCESSING (II)</B><BR>-<BR>Quality control : Counts & metrics</CENTER>"
-date: "2026-10-28"
+date: "2026-11-05"
 author:
   - name: "EB3I n1 scRNAseq Team"
   - name: "Marine VERNIER"
     email: "marinevernier@unistra.fr"
   - name: "Lilia YOUNSI, Sebastien MELLA "
-  - email: "lilia.younsi@inserm.fr, sebastien.mella@pasteur.fr"
+    email: "lilia.younsi@inserm.fr, sebastien.mella@pasteur.fr"
 lightbox: 
   match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
 format:
@@ -267,7 +267,7 @@ knowledge bases about genes used to estimate the QC metrics of cells.
 
 We have to retrieve the input data file and gene list for quality control metrics.
 
-Same as Preproc1, we will use a **function** to ease the make the process easier for you.
+Same as Preproc1, we will use a **function** to make the process easier for you.
 
 The code for this function is stored in an **external R script** that we will
 **source** (ie, read by the R engine, then loaded in memory).
@@ -301,10 +301,10 @@ First the input data : *GSM4861194_gex_2_raw_gene_expression.tsv.gz* is the matr
 ```{r}
 #| label: load_input
 #| filename: load_input
+#| message: false
 
 ## Copy the requested files from a local backup, return their user-based local paths
-
-scmat_source <- "GSM4861194_gex_2_raw_gene_expression.tsv.gz"
+scmat_source <- "TD3A_GSM4861194_gex_2_raw_gene_expression.tsv.gz"
 scmat_file <- backup_get_data(
   backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/TSV/", scmat_source), 
   local_path = input_dir, 
@@ -319,6 +319,7 @@ Then the gene lists for QC metrics :
 ```{r}
 #| label: load_gene_lists
 #| filename: load_gene_lists
+#| message: false
 
 ## Copy the requested files from a local backup, return their user-based local paths
 
@@ -610,7 +611,7 @@ head(sobj@meta.data)
 
 **nCount_RNA** = total number of counts per cell. Very low value, may indicate a poor cell quality, low amount of detected RNA or low expression level. Very high value can correspond to a cell that is highly transcriptionally active, but also to a doublet (two cells captured together).
 
-**nFeature_RNA** = number of different gene detected per cell. Very low value may indicate a cell of poor quality, low RNA or a cell with naturally low RNA content. Very high value can indicate an RNA-rich cell, but also a doublet.
+**nFeature_RNA** = number of different gene detected per cell. Very low value may indicate a cell of poor quality or a cell with naturally low RNA content. Very high value can indicate an RNA-rich cell, but also a doublet.
 
 <br>
 
@@ -724,15 +725,9 @@ qc <- c(
   "percent_st"
 )
 
-p_violin <- Seurat::VlnPlot(
-  object = sobj,
-  features = qc,
-  ncol = 3
-) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
-  )
+p_violin <- Seurat::VlnPlot(object = sobj, features = qc, ncol = 3 ) +
+  theme( axis.title.x = element_blank(),
+    legend.position = "none" )
 
 p_violin
 ```
