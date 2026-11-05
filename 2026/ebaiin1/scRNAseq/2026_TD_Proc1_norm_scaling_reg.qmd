@@ -239,13 +239,14 @@ We load the functions that fetch the input data:
 #| filename: fetch_src
 #| attr.output: '.details summary="Show output"'
 
+source_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq"
 source(
-  file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R",
+  file = paste0(source_dir, "/SOURCES/fetch_functions.R"),
   echo = TRUE
 )
 
 ## Folder of the backup of all intermediate Seurat objects
-backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE_NEW"
+backup_dir <- paste0(source_dir, "/DATA_BACKUP/INTERMEDIATE_NEW")
 
 ```
 
@@ -275,27 +276,21 @@ sobj
 1.  Where your own object from Preprocessing 3 should be
 2.  The backup copy, copied into your `DATA` directory
 
-We also prepare a small function to save the objects of this session with the naming convention of the course (step number, sample, Seurat v5, step name, number of genes and cells):
+We also load a small function to save the objects of this session with the naming convention of the course (step number, sample, Seurat version, step name, number of genes and cells):
 
 ```{r}
 #| label: save_func
 #| filename: save_func
+#| attr.output: '.details summary="Show output"'
 
-save_step <- function(object, step_number, step_name) {
-  out_name <- paste0(
-    output_dir, "/",
-    paste(
-      c(step_number, Seurat::Project(object), "S5", step_name,
-        paste(dim(object), collapse = ".")),
-      collapse = "_"),
-    ".RDS")
-  saveRDS(object = object, file = out_name)
-  message("Saved [", out_name, "]")
-}
+source(
+  file = paste0(source_dir, "/SOURCES/save_step.R"),
+  echo = TRUE
+)
 
 ```
 
-For example, `save_step(sobj, "06", "LogNorm")` will write `06_TD3A_S5_LogNorm_12508.4033.RDS`.
+For example, `save_step(sobj, step_number = "06", step_name = "LogNorm", output_dir = output_dir)` will write `06_TD3A_S5_LogNorm_12508.4035.RDS` in your `RESULTS` directory.
 
 ------------------------------------------------------------------------
 
@@ -706,7 +701,12 @@ For *Apoe*: are the cells with the highest raw counts the deepest ones? What hap
 #| filename: save_lognorm
 #| message: true
 
-save_step(sobj, step_number = "06", step_name = "LogNorm")
+save_step(
+  sobj,
+  step_number = "06",
+  step_name = "LogNorm",
+  output_dir = output_dir
+)
 
 ```
 
@@ -1201,7 +1201,12 @@ Assays(sobj)
 #| filename: save_scaled
 #| message: true
 
-save_step(sobj, step_number = "07", step_name = "Scaled.2k")
+save_step(
+  sobj,
+  step_number = "07",
+  step_name = "Scaled.2k",
+  output_dir = output_dir
+)
 
 ```
 
@@ -1384,7 +1389,8 @@ This is the object used in the next session:
 save_step(
   sobj, 
   step_number = "08", 
-  step_name = "Scaled.2k_Reg.PCrb"
+  step_name = "Scaled.2k_Reg.PCrb",
+  output_dir = output_dir
 )
 
 ```
