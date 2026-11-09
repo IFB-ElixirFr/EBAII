@@ -2,8 +2,24 @@
 
 <html lang="en">
 <head><meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>03_Structural_Variants</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<meta content="chrome=1" http-equiv="X-UA-Compatible"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>05_Manipulating_VCF_post_calling_EN slides</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+  import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.0/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+<!-- General and theme style sheets -->
+<link href="https://unpkg.com/reveal.js@4.0.2/dist/reveal.css" rel="stylesheet"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+}
+</script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7234,61 +7250,148 @@ all of MD as it is not optimized for dense, information rich UIs.
 }
 </style>
 <style type="text/css">
-/* Force rendering true colors when outputing to pdf */
-* {
-  -webkit-print-color-adjust: exact;
-}
-
-/* Misc */
 a.anchor-link {
-  display: none;
+   display: none;
+}
+.highlight  {
+    margin: 0.4em;
+}
+.jp-Notebook {
+    padding: 0;
+}
+:root {
+    --jp-ui-font-size1: 20px;       /* instead of 14px */
+    --jp-content-font-size1: 20px;  /* instead of 14px */
+    --jp-code-font-size: 19px;      /* instead of 13px */
+    --jp-cell-prompt-width: 110px;  /* instead of 64px */
+}
+@media print {
+  body {
+    margin: 0;
+  }
+}
+</style>
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+.reveal {
+  font-size: 160%;
+}
+.reveal table {
+  font-size: var(--jp-ui-font-size1);
+}
+.reveal pre {
+  width: inherit;
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace, sans-serif;
+  font-size: 80%;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+}
+.reveal pre code {
+  padding: 0px;
+}
+.reveal section img {
+  border: 0px solid black;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0);
+}
+.reveal .slides {
+  text-align: left;
+}
+.reveal.fade {
+  opacity: 1;
+}
+.reveal .progress {
+  position: static;
 }
 
-/* Input area styling */
-.jp-InputArea {
-  overflow: hidden;
+div.jp-InputArea-editor {
+  padding: 0.06em;
 }
 
-.jp-InputArea-editor {
-  overflow: hidden;
+div.code_cell {
+  background-color: transparent;
 }
 
-.cm-editor.cm-s-jupyter .highlight pre {
-/* weird, but --jp-code-padding defined to be 5px but 4px horizontal padding is hardcoded for pre.cm-line */
-  padding: var(--jp-code-padding) 4px;
+div.output_area pre {
+  font-family: monospace, sans-serif;
+  font-size: 80%;
+}
+
+div.jp-OutputPrompt {
+  /* 5px right shift to account for margin in parent container */
+  margin: 5px 5px 0 0;
+}
+
+.reveal div.highlight {
   margin: 0;
-
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
-
 }
 
-.jp-OutputArea-output pre {
-  line-height: inherit;
-  font-family: inherit;
-}
-
-.jp-RenderedText pre {
-  color: var(--jp-content-font-color1);
+.reveal div.highlight > pre {
+  margin: 0;
+  width: 100%;
   font-size: var(--jp-code-font-size);
 }
 
-/* Hiding the collapser by default */
-.jp-Collapser {
-  display: none;
+.reveal div.jp-OutputArea-output > pre {
+  margin: 0;
+  width: 90%;
+  font-size: var(--jp-code-font-size);
+  box-shadow: none;
 }
 
-@page {
-    margin: 0.5in; /* Margin for each printed piece of paper */
+main {
+  height: 100%;
 }
 
-@media print {
-  .jp-Cell-inputWrapper,
-  .jp-Cell-outputWrapper {
-    display: block;
-  }
+/* Reveal navigation controls */
+
+.reveal .controls .navigate-left,
+.reveal .controls .navigate-left.enabled {
+  border-right-color: #727272;
+}
+.reveal .controls .navigate-left.enabled:hover,
+.reveal .controls .navigate-left.enabled.enabled:hover {
+  border-right-color: #dfdfdf;
+}
+.reveal .controls .navigate-right,
+.reveal .controls .navigate-right.enabled {
+  border-left-color: #727272;
+}
+.reveal .controls .navigate-right.enabled:hover,
+.reveal .controls .navigate-right.enabled.enabled:hover {
+  border-left-color: #dfdfdf;
+}
+.reveal .controls .navigate-up,
+.reveal .controls .navigate-up.enabled {
+  border-bottom-color: #727272;
+}
+.reveal .controls .navigate-up.enabled:hover,
+.reveal .controls .navigate-up.enabled.enabled:hover {
+  border-bottom-color: #dfdfdf;
+}
+.reveal .controls .navigate-down,
+.reveal .controls .navigate-down.enabled {
+  border-top-color: #727272;
+}
+.reveal .controls .navigate-down.enabled:hover,
+.reveal .controls .navigate-down.enabled.enabled:hover {
+  border-top-color: #dfdfdf;
+}
+.reveal .progress span {
+  background: #727272;
+}
+
+/* Scrollbars */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar * {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #727272 !important;
 }
 </style>
 <!-- Load mathjax -->
@@ -7325,1365 +7428,1398 @@ a.anchor-link {
     }
     init_mathjax();
     </script>
-<!-- End of mathjax configuration --><script type="module">
-  document.addEventListener("DOMContentLoaded", async () => {
-    const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
-    // do not load mermaidjs if not needed
-    if (!diagrams.length) {
-      return;
-    }
-    const mermaid = (await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs")).default;
-    const parser = new DOMParser();
-
-    mermaid.initialize({
-      maxTextSize: 100000,
-      maxEdges: 100000,
-      startOnLoad: false,
-      fontFamily: window
-        .getComputedStyle(document.body)
-        .getPropertyValue("--jp-ui-font-family"),
-      theme: document.querySelector("body[data-jp-theme-light='true']")
-        ? "default"
-        : "dark",
-    });
-
-    let _nextMermaidId = 0;
-
-    function makeMermaidImage(svg) {
-      const img = document.createElement("img");
-      const doc = parser.parseFromString(svg, "image/svg+xml");
-      const svgEl = doc.querySelector("svg");
-      const { maxWidth } = svgEl?.style || {};
-      const firstTitle = doc.querySelector("title");
-      const firstDesc = doc.querySelector("desc");
-
-      img.setAttribute("src", `data:image/svg+xml,${encodeURIComponent(svg)}`);
-      if (maxWidth) {
-        img.width = parseInt(maxWidth);
-      }
-      if (firstTitle) {
-        img.setAttribute("alt", firstTitle.textContent);
-      }
-      if (firstDesc) {
-        const caption = document.createElement("figcaption");
-        caption.className = "sr-only";
-        caption.textContent = firstDesc.textContent;
-        return [img, caption];
-      }
-      return [img];
-    }
-
-    async function makeMermaidError(text) {
-      let errorMessage = "";
-      try {
-        await mermaid.parse(text);
-      } catch (err) {
-        errorMessage = `${err}`;
-      }
-
-      const result = document.createElement("details");
-      result.className = 'jp-RenderedMermaid-Details';
-      const summary = document.createElement("summary");
-      summary.className = 'jp-RenderedMermaid-Summary';
-      const pre = document.createElement("pre");
-      const code = document.createElement("code");
-      code.innerText = text;
-      pre.appendChild(code);
-      summary.appendChild(pre);
-      result.appendChild(summary);
-
-      const warning = document.createElement("pre");
-      warning.innerText = errorMessage;
-      result.appendChild(warning);
-      return [result];
-    }
-
-    async function renderOneMarmaid(src) {
-      const id = `jp-mermaid-${_nextMermaidId++}`;
-      const parent = src.parentNode;
-      let raw = src.textContent.trim();
-      const el = document.createElement("div");
-      el.style.visibility = "hidden";
-      document.body.appendChild(el);
-      let results = null;
-      let output = null;
-      try {
-        let { svg } = await mermaid.render(id, raw, el);
-        svg = cleanMermaidSvg(svg);
-        results = makeMermaidImage(svg);
-        output = document.createElement("figure");
-        results.map(output.appendChild, output);
-      } catch (err) {
-        parent.classList.add("jp-mod-warning");
-        results = await makeMermaidError(raw);
-        output = results[0];
-      } finally {
-        el.remove();
-      }
-      parent.classList.add("jp-RenderedMermaid");
-      parent.appendChild(output);
-    }
-
-
-    /**
-     * Post-process to ensure mermaid diagrams contain only valid SVG and XHTML.
-     */
-    function cleanMermaidSvg(svg) {
-      return svg.replace(RE_VOID_ELEMENT, replaceVoidElement);
-    }
-
-
-    /**
-     * A regular expression for all void elements, which may include attributes and
-     * a slash.
-     *
-     * @see https://developer.mozilla.org/en-US/docs/Glossary/Void_element
-     *
-     * Of these, only `<br>` is generated by Mermaid in place of `\n`,
-     * but _any_ "malformed" tag will break the SVG rendering entirely.
-     */
-    const RE_VOID_ELEMENT =
-      /<\s*(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\s*([^>]*?)\s*>/gi;
-
-    /**
-     * Ensure a void element is closed with a slash, preserving any attributes.
-     */
-    function replaceVoidElement(match, tag, rest) {
-      rest = rest.trim();
-      if (!rest.endsWith('/')) {
-        rest = `${rest} /`;
-      }
-      return `<${tag} ${rest}>`;
-    }
-
-    void Promise.all([...diagrams].map(renderOneMarmaid));
-  });
-</script>
-<style>
-  .jp-Mermaid:not(.jp-RenderedMermaid) {
-    display: none;
-  }
-
-  .jp-RenderedMermaid {
-    overflow: auto;
-    display: flex;
-  }
-
-  .jp-RenderedMermaid.jp-mod-warning {
-    width: auto;
-    padding: 0.5em;
-    margin-top: 0.5em;
-    border: var(--jp-border-width) solid var(--jp-warn-color2);
-    border-radius: var(--jp-border-radius);
-    color: var(--jp-ui-font-color1);
-    font-size: var(--jp-ui-font-size1);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  .jp-RenderedMermaid figure {
-    margin: 0;
-    overflow: auto;
-    max-width: 100%;
-  }
-
-  .jp-RenderedMermaid img {
-    max-width: 100%;
-  }
-
-  .jp-RenderedMermaid-Details > pre {
-    margin-top: 1em;
-  }
-
-  .jp-RenderedMermaid-Summary {
-    color: var(--jp-warn-color2);
-  }
-
-  .jp-RenderedMermaid:not(.jp-mod-warning) pre {
-    display: none;
-  }
-
-  .jp-RenderedMermaid-Summary > pre {
-    display: inline-block;
-    white-space: normal;
-  }
-</style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mathjax configuration --><!-- Reveal Theme -->
+<link href="https://unpkg.com/reveal.js@4.0.2/dist/theme/simple.css" id="theme" rel="stylesheet"/>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=567ac8a9-7a04-4036-b763-2308c3bad516">
+<div class="reveal">
+<div class="slides"><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c7c4c1cc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Workflow---Structural-Variant-Calling">Workflow - Structural Variant Calling<a class="anchor-link" href="#Workflow---Structural-Variant-Calling">¶</a></h2><p><em>École de bioinformatique IFB-INSERM 2024</em></p>
+<h1 id="Post-VCF-analysis-of-small-variants">Post-VCF analysis of small variants<a class="anchor-link" href="#Post-VCF-analysis-of-small-variants">¶</a></h1><p><em>INRAe-IFB-INSERM Bioinformatics School 2026</em></p>
 <ul>
-<li>Gabriele Adam - INRAe</li>
+<li>Elodie Girard - Institut Curie</li>
+</ul>
+<style>
+/* Slide text size and vertical overflow */
+.reveal { font-size: 26px !important; }
+.reveal .slides section.stack { overflow: visible !important; max-height: none !important; }
+.reveal .slides section:not(.stack) { max-height: 100% !important; overflow-y: auto !important; }
+.reveal img { max-height: 255px; width: auto; }
+/* Fenced markdown blocks */
+.reveal pre code { font-size: 1.2em !important; line-height: 1.4 !important; }
+/* Code cell outputs */
+.jp-OutputArea-output, .jp-OutputArea-output pre {
+    font-size: 18px !important; max-height: 290px !important;
+    overflow-y: auto !important; overflow-x: auto !important;
+    white-space: pre !important; width: 100% !important; box-sizing: border-box !important;
+}
+.jp-OutputArea-output table, .jp-OutputArea-output table th, .jp-OutputArea-output table td { font-size: 16px !important; }
+/* Code cell inputs */
+.jp-InputArea .highlight { overflow-x: auto !important; max-width: 100%; display: block; }
+.jp-InputArea .highlight pre { font-size: 18px !important; white-space: pre !important; }
+/* Very tall outputs (cell tag tall_output, exported as celltag_tall_output): bounded box instead of overflowing the slide */
+.celltag_tall_output .jp-OutputArea-output { display: block !important; max-height: 290px !important; overflow-y: auto !important; }
+</style>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ae03e4e7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Check that you are still in your <code>atelier_variant/TP_small_variants</code> folder, and load the packages used in this notebook.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f952b81c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="nf">suppressPackageStartupMessages</span><span class="p">({</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">tibble</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">tidyr</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">purrr</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ef4c5ab9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="I---Where-are-we-in-the-workflow?">I - Where are we in the workflow?<a class="anchor-link" href="#I---Where-are-we-in-the-workflow?">¶</a></h2>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6534f463">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>From reads to an annotated VCF</strong> (previous notebooks)</p>
+<div style="display:flex; flex-wrap:wrap; align-items:stretch; gap:6px; font-size:0.85em;">
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Reads</strong><br/><span style="font-size:0.9em">FASTQ<br/>+ reference genome (FASTA)</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Alignment</strong><br/><span style="font-size:0.9em">BWA-MEM2<br/>➜ BAM</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Post-alignment processing<br/>&amp; QC</strong><br/><span style="font-size:0.9em">GATK MarkDuplicates<br/>samtools, mosdepth, qualimap</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#dafbe1; border:2px solid #1f883d; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Variant calling</strong><br/><span style="font-size:0.9em">GATK HaplotypeCaller<br/>➜ VCF</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#dafbe1; border:2px solid #1f883d; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Annotation</strong><br/><span style="font-size:0.9em">SnpEff / SnpSift<br/>➜ annotated VCF</span></div>
+</div>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a6d397f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Post-VCF analysis</strong> (this notebook)</p>
+<div style="display:flex; flex-wrap:wrap; align-items:stretch; gap:6px; font-size:0.85em;">
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Reads</strong><br/><span style="font-size:0.9em">FASTQ<br/>+ reference genome (FASTA)</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Alignment</strong><br/><span style="font-size:0.9em">BWA-MEM2<br/>➜ BAM</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#f0f2f5; border:2px solid #9aa5b1; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Post-alignment processing<br/>&amp; QC</strong><br/><span style="font-size:0.9em">GATK MarkDuplicates<br/>samtools, mosdepth, qualimap</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#dafbe1; border:2px solid #1f883d; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Variant calling</strong><br/><span style="font-size:0.9em">GATK HaplotypeCaller<br/>➜ VCF</span></div>
+<div style="align-self:center; font-size:1.4em;">➜</div>
+<div style="background:#dafbe1; border:2px solid #1f883d; border-radius:8px; padding:8px 10px; min-width:130px; text-align:center;"><strong>Annotation</strong><br/><span style="font-size:0.9em">SnpEff / SnpSift<br/>➜ annotated VCF</span></div>
+</div>
+<div style="text-align:center; font-size:1.3em; margin:6px;">⬇</div>
+<div style="display:flex; flex-wrap:wrap; gap:6px; font-size:0.85em;">
+<div style="background:#e7f3fe; border:2px solid #2196F3; border-radius:8px; padding:8px 10px;"><strong>QC &amp; filters</strong><br/>descriptive statistics</div>
+<div style="background:#e7f3fe; border:2px solid #2196F3; border-radius:8px; padding:8px 10px;"><strong>Marker / QTL search</strong></div>
+<div style="background:#e7f3fe; border:2px solid #2196F3; border-radius:8px; padding:8px 10px;"><strong>GWAS</strong><br/>Genome-Wide Association Study</div>
+<div style="background:#e7f3fe; border:2px solid #2196F3; border-radius:8px; padding:8px 10px;"><strong>Phylogenetic analysis</strong></div>
+<div style="background:#e7f3fe; border:2px solid #2196F3; border-radius:8px; padding:8px 10px;"><strong>...</strong></div>
+</div>
+<p><strong>What comes after the VCF depends on the biological question.</strong></p>
+</div>
+</div>
+</div>
+</div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df48f1ee">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="II---Reminder:-the-VCF-format">II - Reminder: the VCF format<a class="anchor-link" href="#II---Reminder:-the-VCF-format">¶</a></h2>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e23f70d8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>A VCF file has three parts:</p>
+<ul>
+<li><strong>Meta-information</strong> (lines starting with <code>##</code>): definitions of the INFO, FORMAT and FILTER fields, contigs, command line...</li>
+<li><strong>Header line</strong> (starting with a single <code>#</code>): the column names.</li>
+<li><strong>Body</strong>: one line per variant, 8 fixed columns (<code>CHROM POS ID REF ALT QUAL FILTER INFO</code>), then <code>FORMAT</code>, then <strong>one column per sample</strong>.</li>
+</ul>
+<p>The <code>FORMAT</code> column describes how to read each sample column (for example <code>GT:AD:DP:GQ:PL</code>).</p>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=60fc0814">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Two real records from our annotated multi-sample VCF (4 animals: 2 carriers of the milca phenotype, 2 controls), embedded here so that the cells run without any file.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0bd5b738">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">vcf_header</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span>
+<span class="w">  </span><span class="s">'##fileformat=VCFv4.2'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##FORMAT=&lt;ID=GT,Number=1,Type=String,Description="Genotype"&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##FORMAT=&lt;ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed"&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description="Approximate read depth"&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##FORMAT=&lt;ID=GQ,Number=1,Type=Integer,Description="Genotype Quality"&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##INFO=&lt;ID=QD,Number=1,Type=Float,Description="Variant Confidence/Quality by Depth"&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##INFO=&lt;ID=ANN,...&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="s">'##contig=&lt;ID=NC_037329.1,length=136231102&gt;'</span><span class="p">,</span>
+<span class="w">  </span><span class="nf">paste</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"#CHROM"</span><span class="p">,</span><span class="w"> </span><span class="s">"POS"</span><span class="p">,</span><span class="w"> </span><span class="s">"ID"</span><span class="p">,</span><span class="w"> </span><span class="s">"REF"</span><span class="p">,</span><span class="w"> </span><span class="s">"ALT"</span><span class="p">,</span><span class="w"> </span><span class="s">"QUAL"</span><span class="p">,</span><span class="w"> </span><span class="s">"FILTER"</span><span class="p">,</span><span class="w"> </span><span class="s">"INFO"</span><span class="p">,</span><span class="w"> </span><span class="s">"FORMAT"</span><span class="p">,</span>
+<span class="w">          </span><span class="s">"milca_40995"</span><span class="p">,</span><span class="w"> </span><span class="s">"milca_40998"</span><span class="p">,</span><span class="w"> </span><span class="s">"control_41011"</span><span class="p">,</span><span class="w"> </span><span class="s">"control_41012"</span><span class="p">),</span><span class="w"> </span><span class="n">collapse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"\t"</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ef93829">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Record 1</strong>: <code>C&gt;A</code> in an intron of <em>TRAK2</em> (heterozygous in the two controls).</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ca20bc94">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">rec_1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">paste</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"NC_037329.1"</span><span class="p">,</span><span class="w"> </span><span class="s">"90000329"</span><span class="p">,</span><span class="w"> </span><span class="s">"."</span><span class="p">,</span><span class="w"> </span><span class="s">"C"</span><span class="p">,</span><span class="w"> </span><span class="s">"A"</span><span class="p">,</span><span class="w"> </span><span class="s">"226.62"</span><span class="p">,</span><span class="w"> </span><span class="s">"."</span><span class="p">,</span>
+<span class="w">        </span><span class="nf">paste0</span><span class="p">(</span><span class="s">"AC=2;AF=0.250;AN=8;BaseQRankSum=0.00;DP=54;ExcessHet=0.6695;FS=0.000;MLEAC=2;MLEAF=0.250;"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"MQ=60.00;MQRankSum=0.00;QD=6.30;ReadPosRankSum=-1.640e-01;SOR=0.781;"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"ANN=A|intron_variant|MODIFIER|exon-NM_001206233.1-1|GENE_exon-NM_001206233.1-1|transcript|rna-NM_001206233.1|protein_coding|1/15|c.-198+7962G&gt;T||||||,"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"A|non_coding_transcript_variant|MODIFIER|TRAK2|gene-TRAK2|transcript|NM_001206233.1|protein_coding||||||||WARNING_TRANSCRIPT_NO_START_CODON"</span><span class="p">),</span>
+<span class="w">        </span><span class="s">"GT:AD:DP:GQ:PL"</span><span class="p">,</span>
+<span class="w">        </span><span class="s">"0/0:2,0:2:6:0,6,49"</span><span class="p">,</span><span class="w"> </span><span class="s">"0/0:16,0:16:17:0,17,315"</span><span class="p">,</span><span class="w"> </span><span class="s">"0/1:10,6:16:99:100,0,199"</span><span class="p">,</span><span class="w"> </span><span class="s">"0/1:12,8:20:99:138,0,237"</span><span class="p">),</span>
+<span class="w">      </span><span class="n">collapse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"\t"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=622b999e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Record 2</strong>: <code>G&gt;C</code>, missense in <em>FZD7</em> (heterozygous in the two milca animals).</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=829cbb71">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">rec_2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">paste</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"NC_037329.1"</span><span class="p">,</span><span class="w"> </span><span class="s">"90572569"</span><span class="p">,</span><span class="w"> </span><span class="s">"."</span><span class="p">,</span><span class="w"> </span><span class="s">"G"</span><span class="p">,</span><span class="w"> </span><span class="s">"C"</span><span class="p">,</span><span class="w"> </span><span class="s">"612.00"</span><span class="p">,</span><span class="w"> </span><span class="s">"."</span><span class="p">,</span>
+<span class="w">        </span><span class="nf">paste0</span><span class="p">(</span><span class="s">"AC=2;AF=0.250;AN=8;BaseQRankSum=1.19;DP=72;ExcessHet=0.6695;FS=5.632;MLEAC=2;MLEAF=0.250;"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"MQ=60.00;MQRankSum=0.00;QD=19.13;ReadPosRankSum=0.410;SOR=0.138;"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"ANN=C|missense_variant|MODERATE|exon-NM_001144091.1-1|GENE_exon-NM_001144091.1-1|transcript|rna-NM_001144091.1|protein_coding|1/1|c.1241G&gt;C|p.Gly414Ala|1300/2207|1241/1725|414/574||,"</span><span class="p">,</span>
+<span class="w">               </span><span class="s">"C|non_coding_transcript_variant|MODIFIER|FZD7|gene-FZD7|transcript|NM_001144091.1|protein_coding||||||||WARNING_TRANSCRIPT_NO_START_CODON"</span><span class="p">),</span>
+<span class="w">        </span><span class="s">"GT:AD:DP:GQ:PGT:PID:PL:PS"</span><span class="p">,</span>
+<span class="w">        </span><span class="s">"0|1:8,8:16:99:0|1:90572567_G_T:312,0,312:90572567"</span><span class="p">,</span><span class="w"> </span><span class="s">"0|1:8,8:16:99:0|1:90572567_G_T:312,0,290:90572567"</span><span class="p">,</span>
+<span class="w">        </span><span class="s">"0/0:20,0:20:48:.:.:0,48,720"</span><span class="p">,</span><span class="w"> </span><span class="s">"0/0:18,0:18:54:.:.:0,54,445"</span><span class="p">),</span>
+<span class="w">      </span><span class="n">collapse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"\t"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cde0ae40">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">vcf_lines</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">vcf_header</span><span class="p">,</span><span class="w"> </span><span class="n">rec_1</span><span class="p">,</span><span class="w"> </span><span class="n">rec_2</span><span class="p">)</span>
+<span class="nf">length</span><span class="p">(</span><span class="n">vcf_lines</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+11
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0634e8c3">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Header vs body</strong>: split on the leading <code>#</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=54b52530">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">meta_lines</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vcf_lines</span><span class="p">[</span><span class="nf">str_starts</span><span class="p">(</span><span class="n">vcf_lines</span><span class="p">,</span><span class="w"> </span><span class="s">"##"</span><span class="p">)]</span>
+<span class="n">body_lines</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vcf_lines</span><span class="p">[</span><span class="o">!</span><span class="nf">str_starts</span><span class="p">(</span><span class="n">vcf_lines</span><span class="p">,</span><span class="w"> </span><span class="s">"##"</span><span class="p">)]</span><span class="w">   </span><span class="c1"># header line + records</span>
+
+<span class="nf">length</span><span class="p">(</span><span class="n">meta_lines</span><span class="p">)</span><span class="w">     </span><span class="c1"># meta-information</span>
+<span class="nf">length</span><span class="p">(</span><span class="n">body_lines</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c1"># number of variants</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+8
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+2
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fb0bb4ce">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Parse-the-records-into-a-tibble">Parse the records into a tibble<a class="anchor-link" href="#Parse-the-records-into-a-tibble">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dc677b25">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">vcf_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">read.delim</span><span class="p">(</span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">paste</span><span class="p">(</span><span class="n">body_lines</span><span class="p">,</span><span class="w"> </span><span class="n">collapse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"\n"</span><span class="p">),</span><span class="w"> </span><span class="n">header</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">,</span>
+<span class="w">                      </span><span class="n">comment.char</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="n">check.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">colClasses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"character"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">as_tibble</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">rename</span><span class="p">(</span><span class="n">CHROM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">`#CHROM`</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">POS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.integer</span><span class="p">(</span><span class="n">POS</span><span class="p">),</span><span class="w"> </span><span class="n">QUAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.numeric</span><span class="p">(</span><span class="n">QUAL</span><span class="p">))</span>
+
+<span class="n">samples</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"milca_40995"</span><span class="p">,</span><span class="w"> </span><span class="s">"milca_40998"</span><span class="p">,</span><span class="w"> </span><span class="s">"control_41011"</span><span class="p">,</span><span class="w"> </span><span class="s">"control_41012"</span><span class="p">)</span>
+<span class="nf">select</span><span class="p">(</span><span class="n">vcf_tbl</span><span class="p">,</span><span class="w"> </span><span class="n">CHROM</span><span class="p">,</span><span class="w"> </span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">REF</span><span class="p">,</span><span class="w"> </span><span class="n">ALT</span><span class="p">,</span><span class="w"> </span><span class="n">QUAL</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="nf">all_of</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 2 × 10</caption>
+<thead>
+<tr><th scope="col">CHROM</th><th scope="col">POS</th><th scope="col">REF</th><th scope="col">ALT</th><th scope="col">QUAL</th><th scope="col">FORMAT</th><th scope="col">milca_40995</th><th scope="col">milca_40998</th><th scope="col">control_41011</th><th scope="col">control_41012</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;int&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>NC_037329.1</td><td>90000329</td><td>C</td><td>A</td><td>226.62</td><td>GT:AD:DP:GQ:PL           </td><td>0/0:2,0:2:6:0,6,49                               </td><td>0/0:16,0:16:17:0,17,315                          </td><td>0/1:10,6:16:99:100,0,199   </td><td>0/1:12,8:20:99:138,0,237   </td></tr>
+<tr><td>NC_037329.1</td><td>90572569</td><td>G</td><td>C</td><td>612.00</td><td>GT:AD:DP:GQ:PGT:PID:PL:PS</td><td>0|1:8,8:16:99:0|1:90572567_G_T:312,0,312:90572567</td><td>0|1:8,8:16:99:0|1:90572567_G_T:312,0,290:90572567</td><td>0/0:20,0:20:48:.:.:0,48,720</td><td>0/0:18,0:18:54:.:.:0,54,445</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9510669f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="The-INFO-column">The <code>INFO</code> column<a class="anchor-link" href="#The-INFO-column">¶</a></h3><p><code>INFO</code> is a semicolon-separated list of <code>KEY=VALUE</code> pairs (plus flags without value). Metrics of the <strong>variant as a whole</strong> (QUAL, MQ, QD, FS...) live here, whatever the number of samples.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1153a4ef">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Parse an INFO string into a two-column tibble (key, value)</span>
+<span class="c1"># info: length-1 character, e.g. "AC=2;AF=0.250;DP=54"</span>
+<span class="c1"># return tibble with columns key (chr) and value (chr)</span>
+<span class="n">parse_info</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">stopifnot</span><span class="p">(</span><span class="nf">is.character</span><span class="p">(</span><span class="n">info</span><span class="p">),</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">tibble</span><span class="p">(</span><span class="n">kv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">str_split_1</span><span class="p">(</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="s">";"</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">separate</span><span class="p">(</span><span class="n">kv</span><span class="p">,</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"key"</span><span class="p">,</span><span class="w"> </span><span class="s">"value"</span><span class="p">),</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"="</span><span class="p">,</span><span class="w"> </span><span class="n">extra</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"merge"</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"right"</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=33a1eb26">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>parse_info()</code> applied to record 2 (the <code>ANN</code> key is dropped here)</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7364bd6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="nf">parse_info</span><span class="p">(</span><span class="n">vcf_tbl</span><span class="o">$</span><span class="n">INFO</span><span class="p">[</span><span class="m">2</span><span class="p">])</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">"ANN"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 14 × 2</caption>
+<thead>
+<tr><th scope="col">key</th><th scope="col">value</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>AC            </td><td>2     </td></tr>
+<tr><td>AF            </td><td>0.250 </td></tr>
+<tr><td>AN            </td><td>8     </td></tr>
+<tr><td>BaseQRankSum  </td><td>1.19  </td></tr>
+<tr><td>DP            </td><td>72    </td></tr>
+<tr><td>ExcessHet     </td><td>0.6695</td></tr>
+<tr><td>FS            </td><td>5.632 </td></tr>
+<tr><td>MLEAC         </td><td>2     </td></tr>
+<tr><td>MLEAF         </td><td>0.250 </td></tr>
+<tr><td>MQ            </td><td>60.00 </td></tr>
+<tr><td>MQRankSum     </td><td>0.00  </td></tr>
+<tr><td>QD            </td><td>19.13 </td></tr>
+<tr><td>ReadPosRankSum</td><td>0.410 </td></tr>
+<tr><td>SOR           </td><td>0.138 </td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=add0c712">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="The-FORMAT-column-and-the-sample-columns">The <code>FORMAT</code> column and the sample columns<a class="anchor-link" href="#The-FORMAT-column-and-the-sample-columns">¶</a></h3><p>Each sample column stores its values in the order given by <code>FORMAT</code>: <code>GT:AD:DP:GQ:...</code></p>
+<ul>
+<li><code>GT</code> genotype (<code>0/0</code> hom. ref, <code>0/1</code> het., <code>1/1</code> hom. alt; <code>|</code> instead of <code>/</code> means <strong>phased</strong>)</li>
+<li><code>AD</code> allelic depths (ref,alt), <code>DP</code> read depth, <code>GQ</code> genotype quality (Phred)</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="fragment">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c92b4ca9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div style="background-color: #fff3cd; border-left: 6px solid #ffc107; color: #856404; padding: 10px; border-radius: 4px;">
+    ⚠️ <strong>Warning</strong><br/>
+<code>FORMAT</code> can <b>differ between records</b>: here the second record also carries <code>PGT:PID:PS</code> (phasing information). Always look fields up <b>by name</b>, never by position.
+</div>
+</div>
+</div>
+</div>
+</div></div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bbdae2d9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Extract one FORMAT field (by name) from sample strings</span>
+<span class="c1"># sample_str: character vector of sample columns, e.g. "0/1:10,6:16:99:100,0,199"</span>
+<span class="c1"># format_str: character vector (same length) of FORMAT strings, e.g. "GT:AD:DP:GQ:PL"</span>
+<span class="c1"># key: single field name, e.g. "DP"</span>
+<span class="c1"># return character vector (NA when the key is absent)</span>
+<span class="n">get_fmt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">sample_str</span><span class="p">,</span><span class="w"> </span><span class="n">format_str</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">map2_chr</span><span class="p">(</span><span class="n">sample_str</span><span class="p">,</span><span class="w"> </span><span class="n">format_str</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">idx</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">match</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="nf">str_split_1</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="s">":"</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="kc">NA_character_</span><span class="w"> </span><span class="kr">else</span><span class="w"> </span><span class="nf">str_split_1</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="s">":"</span><span class="p">)[</span><span class="n">idx</span><span class="p">]</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9e9ce453">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Reading-all-samples-with-get_fmt()">Reading all samples with <code>get_fmt()</code><a class="anchor-link" href="#Reading-all-samples-with-get_fmt()">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=86970f4a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">gt_long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vcf_tbl</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">select</span><span class="p">(</span><span class="n">CHROM</span><span class="p">,</span><span class="w"> </span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">REF</span><span class="p">,</span><span class="w"> </span><span class="n">ALT</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="nf">all_of</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">all_of</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span><span class="w"> </span><span class="n">names_to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Indiv"</span><span class="p">,</span><span class="w"> </span><span class="n">values_to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"raw"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">GT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">get_fmt</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="s">"GT"</span><span class="p">),</span>
+<span class="w">         </span><span class="n">AD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">get_fmt</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="s">"AD"</span><span class="p">),</span>
+<span class="w">         </span><span class="n">DP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.integer</span><span class="p">(</span><span class="nf">get_fmt</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="s">"DP"</span><span class="p">)),</span>
+<span class="w">         </span><span class="n">GQ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.integer</span><span class="p">(</span><span class="nf">get_fmt</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">FORMAT</span><span class="p">,</span><span class="w"> </span><span class="s">"GQ"</span><span class="p">)))</span>
+<span class="nf">select</span><span class="p">(</span><span class="n">gt_long</span><span class="p">,</span><span class="w"> </span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">Indiv</span><span class="p">,</span><span class="w"> </span><span class="n">GT</span><span class="p">,</span><span class="w"> </span><span class="n">AD</span><span class="p">,</span><span class="w"> </span><span class="n">DP</span><span class="p">,</span><span class="w"> </span><span class="n">GQ</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 8 × 6</caption>
+<thead>
+<tr><th scope="col">POS</th><th scope="col">Indiv</th><th scope="col">GT</th><th scope="col">AD</th><th scope="col">DP</th><th scope="col">GQ</th></tr>
+<tr><th scope="col">&lt;int&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;int&gt;</th><th scope="col">&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>90000329</td><td>milca_40995  </td><td>0/0</td><td>2,0 </td><td> 2</td><td> 6</td></tr>
+<tr><td>90000329</td><td>milca_40998  </td><td>0/0</td><td>16,0</td><td>16</td><td>17</td></tr>
+<tr><td>90000329</td><td>control_41011</td><td>0/1</td><td>10,6</td><td>16</td><td>99</td></tr>
+<tr><td>90000329</td><td>control_41012</td><td>0/1</td><td>12,8</td><td>20</td><td>99</td></tr>
+<tr><td>90572569</td><td>milca_40995  </td><td>0|1</td><td>8,8 </td><td>16</td><td>99</td></tr>
+<tr><td>90572569</td><td>milca_40998  </td><td>0|1</td><td>8,8 </td><td>16</td><td>99</td></tr>
+<tr><td>90572569</td><td>control_41011</td><td>0/0</td><td>20,0</td><td>20</td><td>48</td></tr>
+<tr><td>90572569</td><td>control_41012</td><td>0/0</td><td>18,0</td><td>18</td><td>54</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=255604a4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="The-ANN-field-(SnpEff)">The <code>ANN</code> field (SnpEff)<a class="anchor-link" href="#The-ANN-field-(SnpEff)">¶</a></h3><p><code>ANN</code> holds <strong>one annotation per alternative allele and per transcript</strong>, separated by <code>,</code>. Each annotation has 16 sub-fields separated by <code>|</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e885cc9c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">ann_fields</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"allele"</span><span class="p">,</span><span class="w"> </span><span class="s">"effect"</span><span class="p">,</span><span class="w"> </span><span class="s">"impact"</span><span class="p">,</span><span class="w"> </span><span class="s">"gene_name"</span><span class="p">,</span><span class="w"> </span><span class="s">"gene_id"</span><span class="p">,</span><span class="w"> </span><span class="s">"feature_type"</span><span class="p">,</span><span class="w"> </span><span class="s">"feature_id"</span><span class="p">,</span>
+<span class="w">                </span><span class="s">"biotype"</span><span class="p">,</span><span class="w"> </span><span class="s">"rank"</span><span class="p">,</span><span class="w"> </span><span class="s">"hgvs_c"</span><span class="p">,</span><span class="w"> </span><span class="s">"hgvs_p"</span><span class="p">,</span><span class="w"> </span><span class="s">"cdna_pos"</span><span class="p">,</span><span class="w"> </span><span class="s">"cds_pos"</span><span class="p">,</span><span class="w"> </span><span class="s">"aa_pos"</span><span class="p">,</span><span class="w"> </span><span class="s">"distance"</span><span class="p">,</span><span class="w"> </span><span class="s">"messages"</span><span class="p">)</span>
+
+<span class="c1"># Split the SnpEff ANN field into one row per annotation</span>
+<span class="c1"># tbl: tibble with columns var_id (chr) and ANN (chr)</span>
+<span class="c1"># return tibble with var_id and the 16 ANN sub-fields (chr)</span>
+<span class="n">parse_ann</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">tbl</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">stopifnot</span><span class="p">(</span><span class="nf">is.data.frame</span><span class="p">(</span><span class="n">tbl</span><span class="p">),</span><span class="w"> </span><span class="nf">all</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"var_id"</span><span class="p">,</span><span class="w"> </span><span class="s">"ANN"</span><span class="p">)</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">tbl</span><span class="p">)))</span>
+<span class="w">  </span><span class="n">tbl</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">distinct</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="n">ANN</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">separate_rows</span><span class="p">(</span><span class="n">ANN</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">","</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">separate</span><span class="p">(</span><span class="n">ANN</span><span class="p">,</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ann_fields</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"\\|"</span><span class="p">,</span><span class="w"> </span><span class="n">extra</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"drop"</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"right"</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7af0f10a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Applying-parse_ann()-to-the-two-records">Applying <code>parse_ann()</code> to the two records<a class="anchor-link" href="#Applying-parse_ann()-to-the-two-records">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c9237da2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">recs</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">vcf_tbl</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">var_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">paste</span><span class="p">(</span><span class="n">CHROM</span><span class="p">,</span><span class="w"> </span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">REF</span><span class="p">,</span><span class="w"> </span><span class="n">ALT</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"_"</span><span class="p">),</span>
+<span class="w">         </span><span class="n">ANN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">str_extract</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">"(?&lt;=ANN=)[^;]+"</span><span class="p">))</span>
+
+<span class="n">ann_long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">parse_ann</span><span class="p">(</span><span class="n">recs</span><span class="p">)</span>
+<span class="n">ann_long</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="p">,</span><span class="w"> </span><span class="n">impact</span><span class="p">,</span><span class="w"> </span><span class="n">gene_name</span><span class="p">,</span><span class="w"> </span><span class="n">feature_id</span><span class="p">,</span><span class="w"> </span><span class="n">biotype</span><span class="p">,</span><span class="w"> </span><span class="n">hgvs_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 4 × 7</caption>
+<thead>
+<tr><th scope="col">var_id</th><th scope="col">effect</th><th scope="col">impact</th><th scope="col">gene_name</th><th scope="col">feature_id</th><th scope="col">biotype</th><th scope="col">hgvs_p</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>NC_037329.1_90000329_C_A</td><td>intron_variant               </td><td>MODIFIER</td><td>exon-NM_001206233.1-1</td><td>rna-NM_001206233.1</td><td>protein_coding</td><td> </td></tr>
+<tr><td>NC_037329.1_90000329_C_A</td><td>non_coding_transcript_variant</td><td>MODIFIER</td><td>TRAK2                </td><td>NM_001206233.1    </td><td>protein_coding</td><td> </td></tr>
+<tr><td>NC_037329.1_90572569_G_C</td><td>missense_variant             </td><td>MODERATE</td><td>exon-NM_001144091.1-1</td><td>rna-NM_001144091.1</td><td>protein_coding</td><td>p.Gly414Ala</td></tr>
+<tr><td>NC_037329.1_90572569_G_C</td><td>non_coding_transcript_variant</td><td>MODIFIER</td><td>FZD7                 </td><td>NM_001144091.1    </td><td>protein_coding</td><td> </td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5d4ed0ff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div style="background-color: #fff3cd; border-left: 6px solid #ffc107; color: #856404; padding: 10px; border-radius: 4px;">
+    ⚠️ <strong>Warning</strong><br/>
+    Look at <code>gene_name</code>: for the <code>missense_variant</code> annotation it is an <b>exon placeholder</b> (<code>exon-NM_...</code>) because the SnpEff database was built by hand from a GFF file. The gene symbol only appears in the <b>other</b> annotation of the same transcript.
+</div>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b47ed0cd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Recover gene symbols when SnpEff reports exon/transcript placeholders</span>
+<span class="c1"># ann_long (tibble): returned by parse_ann() (needs gene_name and feature_id)</span>
+<span class="c1"># placeholder: regex identifying placeholder gene names</span>
+<span class="c1"># return ann_long plus a column `gene` (chr)</span>
+<span class="n">resolve_gene_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">ann_long</span><span class="p">,</span><span class="w"> </span><span class="n">placeholder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"^(exon|cds|rna)-"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span>
+<span class="w">  </span><span class="nf">stopifnot</span><span class="p">(</span><span class="nf">is.data.frame</span><span class="p">(</span><span class="n">ann_long</span><span class="p">),</span><span class="w"> </span><span class="nf">all</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"gene_name"</span><span class="p">,</span><span class="w"> </span><span class="s">"feature_id"</span><span class="p">)</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">ann_long</span><span class="p">)))</span>
+<span class="w">    </span>
+<span class="w">  </span><span class="n">tx2gene</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ann_long</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">gene_name</span><span class="p">),</span><span class="w"> </span><span class="o">!</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">gene_name</span><span class="p">,</span><span class="w"> </span><span class="n">placeholder</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">mutate</span><span class="p">(</span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">str_remove</span><span class="p">(</span><span class="n">feature_id</span><span class="p">,</span><span class="w"> </span><span class="s">"^rna-"</span><span class="p">),</span><span class="w"> </span><span class="n">gene_symbol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gene_name</span><span class="p">,</span><span class="w"> </span><span class="n">.keep</span><span class="o">=</span><span class="s">"none"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">distinct</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="n">.keep_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="w">  </span><span class="n">ann_long</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">mutate</span><span class="p">(</span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">str_remove</span><span class="p">(</span><span class="n">feature_id</span><span class="p">,</span><span class="w"> </span><span class="s">"^rna-"</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">left_join</span><span class="p">(</span><span class="n">tx2gene</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"tx"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">mutate</span><span class="p">(</span><span class="n">gene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">coalesce</span><span class="p">(</span><span class="n">gene_symbol</span><span class="p">,</span><span class="w"> </span><span class="n">gene_name</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">    </span><span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">gene_symbol</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f2c5167d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Resolving-the-gene-symbols">Resolving the gene symbols<a class="anchor-link" href="#Resolving-the-gene-symbols">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=05792d75">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">ann_long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">resolve_gene_names</span><span class="p">(</span><span class="n">ann_long</span><span class="p">)</span>
+<span class="n">ann_long</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="p">,</span><span class="w"> </span><span class="n">gene</span><span class="p">,</span><span class="w"> </span><span class="n">hgvs_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 4 × 4</caption>
+<thead>
+<tr><th scope="col">var_id</th><th scope="col">effect</th><th scope="col">gene</th><th scope="col">hgvs_p</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>NC_037329.1_90000329_C_A</td><td>intron_variant               </td><td>TRAK2</td><td> </td></tr>
+<tr><td>NC_037329.1_90000329_C_A</td><td>non_coding_transcript_variant</td><td>TRAK2</td><td> </td></tr>
+<tr><td>NC_037329.1_90572569_G_C</td><td>missense_variant             </td><td>FZD7 </td><td>p.Gly414Ala</td></tr>
+<tr><td>NC_037329.1_90572569_G_C</td><td>non_coding_transcript_variant</td><td>FZD7 </td><td> </td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f391b633">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="III---Filtering-variants:-how-to-proceed?">III - Filtering variants: how to proceed?<a class="anchor-link" href="#III---Filtering-variants:-how-to-proceed?">¶</a></h2>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=476b39c5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Many filters can be applied to a VCF:</p>
+<ul>
+<li><strong>quality filters</strong> (thresholds are somewhat arbitrary): depth, genotype (<code>0/1</code>, <code>1/1</code>), allelic ratio... ➜ reduce the false-positive rate</li>
+<li><strong>type of variants</strong> to keep (SNVs only, Indels...)</li>
+<li><strong>region of interest</strong></li>
+</ul>
+<p><strong>The rest depends on the biological question</strong>: additional filters, statistical analyses, graphical representations...</p>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7bb65231">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="False-positives-vs-quality-filters">False positives vs quality filters<a class="anchor-link" href="#False-positives-vs-quality-filters">¶</a></h3><div style="display:flex; gap:10px; font-size:0.9em;">
+<div style="flex:1; background:#f0f2f5; border-radius:8px; padding:10px;"><strong>Variant calling results</strong><br/>true positives (polymorphisms, mutations) + <b>false positives</b>; some true variants may be missed (false negatives)</div>
+<div style="align-self:center; font-size:1.4em;">➜ filters / thresholds ➜</div>
+<div style="flex:1; background:#dafbe1; border-radius:8px; padding:10px;"><strong>Final result</strong><br/>maximum of true variants<br/>minimum of false positives</div>
+</div>
+<p><strong>The more stringent the filter, the more false positives are removed, but the higher the risk of losing true variants.</strong></p>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3426aec0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Reminder:-where-do-false-positives-come-from?">Reminder: where do false positives come from?<a class="anchor-link" href="#Reminder:-where-do-false-positives-come-from?">¶</a></h3><ul>
+<li>Artefacts from <strong>PCR cycles</strong> during library preparation</li>
+<li>Artefacts linked to the <strong>sequencing technology</strong> (PacBio, HiSeq, NextSeq...)</li>
+<li><strong>Alignment difficulties</strong> (repeated DNA regions)</li>
+<li><strong>Base-calling</strong> errors</li>
+</ul>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cadcfaa1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="GATK-Best-Practices:-hard-filters-on-INFO-metrics">GATK Best Practices: hard filters on INFO metrics<a class="anchor-link" href="#GATK-Best-Practices:-hard-filters-on-INFO-metrics">¶</a></h3><p>Recommendations based on GATK-specific metrics, <strong>different for SNVs and Indels</strong>. Values below are the thresholds a variant must <strong>pass</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Meaning</th>
+<th>SNV: keep if</th>
+<th>Indel: keep if</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>QD</strong> QualByDepth</td>
+<td>QUAL divided by the depth of the samples carrying the variant</td>
+<td>&gt; 2</td>
+<td>&gt; 2</td>
+</tr>
+<tr>
+<td><strong>FS</strong> FisherStrand</td>
+<td>Phred-scaled p-value of a Fisher exact test for <strong>strand bias</strong></td>
+<td>&lt; 60</td>
+<td>&lt; 200</td>
+</tr>
+<tr>
+<td><strong>SOR</strong> StrandOddsRatio</td>
+<td>another strand-bias score, more robust for high-depth sites</td>
+<td>&lt; 3</td>
+<td>[Parameter to verify]</td>
+</tr>
+<tr>
+<td><strong>MQ</strong> RMSMappingQuality</td>
+<td>root mean square of the mapping quality of the reads</td>
+<td>&gt; 40</td>
+<td>not used</td>
+</tr>
+<tr>
+<td><strong>MQRankSum</strong></td>
+<td>rank-sum test: mapping quality of alt vs ref reads</td>
+<td>&gt; -12.5</td>
+<td>not used</td>
+</tr>
+<tr>
+<td><strong>ReadPosRankSum</strong></td>
+<td>rank-sum test: position of the alleles along the reads</td>
+<td>&gt; -8</td>
+<td>&gt; -20</td>
+</tr>
+</tbody>
+</table>
+<p>They are starting points, not statistical decision rules: check the distributions on your own data.</p>
+</div>
+</div>
+</div>
+</div></section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dadac571">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Flag variants failing GATK hard filters </span>
+<span class="c1"># tbl: tibble with var_type (chr: "SNV"/"INDEL") and numeric QD, FS, SOR, MQ, MQRankSum, ReadPosRankSum</span>
+<span class="c1"># return tbl plus logical `hard_fail` (NA metrics never make a variant fail)</span>
+<span class="n">add_hard_filter_flag</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">tbl</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">stopifnot</span><span class="p">(</span><span class="nf">is.data.frame</span><span class="p">(</span><span class="n">tbl</span><span class="p">),</span>
+<span class="w">            </span><span class="nf">all</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"var_type"</span><span class="p">,</span><span class="w"> </span><span class="s">"QD"</span><span class="p">,</span><span class="w"> </span><span class="s">"FS"</span><span class="p">,</span><span class="w"> </span><span class="s">"SOR"</span><span class="p">,</span><span class="w"> </span><span class="s">"MQ"</span><span class="p">,</span><span class="w"> </span><span class="s">"MQRankSum"</span><span class="p">,</span><span class="w"> </span><span class="s">"ReadPosRankSum"</span><span class="p">)</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">tbl</span><span class="p">)))</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">tbl</span><span class="p">,</span><span class="w"> </span><span class="n">hard_fail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">case_when</span><span class="p">(</span>
+<span class="w">    </span><span class="n">var_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"SNV"</span><span class="w">   </span><span class="o">~</span><span class="w"> </span><span class="nf">replace_na</span><span class="p">(</span><span class="n">QD</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">FS</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">60</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">SOR</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">MQ</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">40</span><span class="w"> </span><span class="o">|</span>
+<span class="w">                                     </span><span class="n">MQRankSum</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">-12.5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ReadPosRankSum</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">-8</span><span class="p">,</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">),</span>
+<span class="w">    </span><span class="n">var_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"INDEL"</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="nf">replace_na</span><span class="p">(</span><span class="n">QD</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">FS</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">200</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ReadPosRankSum</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">-20</span><span class="p">,</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2761bb2f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Testing-the-function-on-toy-values">Testing the function on toy values<a class="anchor-link" href="#Testing-the-function-on-toy-values">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=eac2cf35">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">toy</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">tribble</span><span class="p">(</span>
+<span class="w">  </span><span class="o">~</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="n">var_type</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="n">QD</span><span class="p">,</span><span class="w">  </span><span class="o">~</span><span class="n">FS</span><span class="p">,</span><span class="w">  </span><span class="o">~</span><span class="n">SOR</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="n">MQ</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="n">MQRankSum</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="n">ReadPosRankSum</span><span class="p">,</span>
+<span class="w">  </span><span class="s">"s1"</span><span class="p">,</span><span class="w"> </span><span class="s">"SNV"</span><span class="p">,</span><span class="w">    </span><span class="m">19.1</span><span class="p">,</span><span class="w">  </span><span class="m">5.6</span><span class="p">,</span><span class="w"> </span><span class="m">0.14</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">,</span><span class="w">   </span><span class="m">0</span><span class="p">,</span><span class="w">         </span><span class="m">0.41</span><span class="p">,</span><span class="w">   </span><span class="c1"># passes</span>
+<span class="w">  </span><span class="s">"s2"</span><span class="p">,</span><span class="w"> </span><span class="s">"SNV"</span><span class="p">,</span><span class="w">     </span><span class="m">1.2</span><span class="p">,</span><span class="w">  </span><span class="m">3.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.50</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">,</span><span class="w">   </span><span class="m">0</span><span class="p">,</span><span class="w">         </span><span class="m">0.00</span><span class="p">,</span><span class="w">   </span><span class="c1"># QD too low</span>
+<span class="w">  </span><span class="s">"s3"</span><span class="p">,</span><span class="w"> </span><span class="s">"SNV"</span><span class="p">,</span><span class="w">    </span><span class="m">12.0</span><span class="p">,</span><span class="w"> </span><span class="m">75.0</span><span class="p">,</span><span class="w"> </span><span class="m">4.10</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">,</span><span class="w">  </span><span class="m">-1</span><span class="p">,</span><span class="w">         </span><span class="m">0.30</span><span class="p">,</span><span class="w">   </span><span class="c1"># strand bias (FS, SOR)</span>
+<span class="w">  </span><span class="s">"s4"</span><span class="p">,</span><span class="w"> </span><span class="s">"SNV"</span><span class="p">,</span><span class="w">    </span><span class="m">15.0</span><span class="p">,</span><span class="w">  </span><span class="m">2.0</span><span class="p">,</span><span class="w"> </span><span class="m">1.00</span><span class="p">,</span><span class="w"> </span><span class="m">32</span><span class="p">,</span><span class="w"> </span><span class="m">-13</span><span class="p">,</span><span class="w">         </span><span class="m">0.00</span><span class="p">,</span><span class="w">   </span><span class="c1"># low mapping quality</span>
+<span class="w">  </span><span class="s">"s5"</span><span class="p">,</span><span class="w"> </span><span class="s">"INDEL"</span><span class="p">,</span><span class="w">  </span><span class="m">11.0</span><span class="p">,</span><span class="m">210.0</span><span class="p">,</span><span class="w"> </span><span class="m">2.00</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">,</span><span class="w">  </span><span class="kc">NA</span><span class="p">,</span><span class="w">        </span><span class="m">-1.00</span><span class="p">,</span><span class="w">   </span><span class="c1"># strand bias (FS)</span>
+<span class="w">  </span><span class="s">"s6"</span><span class="p">,</span><span class="w"> </span><span class="s">"INDEL"</span><span class="p">,</span><span class="w">   </span><span class="m">3.0</span><span class="p">,</span><span class="w"> </span><span class="m">20.0</span><span class="p">,</span><span class="w"> </span><span class="m">6.00</span><span class="p">,</span><span class="w"> </span><span class="m">55</span><span class="p">,</span><span class="w">  </span><span class="kc">NA</span><span class="p">,</span><span class="w">        </span><span class="kc">NA</span><span class="p">)</span><span class="w">      </span><span class="c1"># NA ignored: passes</span>
+
+<span class="nf">add_hard_filter_flag</span><span class="p">(</span><span class="n">toy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 6 × 9</caption>
+<thead>
+<tr><th scope="col">id</th><th scope="col">var_type</th><th scope="col">QD</th><th scope="col">FS</th><th scope="col">SOR</th><th scope="col">MQ</th><th scope="col">MQRankSum</th><th scope="col">ReadPosRankSum</th><th scope="col">hard_fail</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;lgl&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>s1</td><td>SNV  </td><td>19.1</td><td>  5.6</td><td>0.14</td><td>60</td><td>  0</td><td> 0.41</td><td>FALSE</td></tr>
+<tr><td>s2</td><td>SNV  </td><td> 1.2</td><td>  3.0</td><td>0.50</td><td>60</td><td>  0</td><td> 0.00</td><td> TRUE</td></tr>
+<tr><td>s3</td><td>SNV  </td><td>12.0</td><td> 75.0</td><td>4.10</td><td>60</td><td> -1</td><td> 0.30</td><td> TRUE</td></tr>
+<tr><td>s4</td><td>SNV  </td><td>15.0</td><td>  2.0</td><td>1.00</td><td>32</td><td>-13</td><td> 0.00</td><td> TRUE</td></tr>
+<tr><td>s5</td><td>INDEL</td><td>11.0</td><td>210.0</td><td>2.00</td><td>60</td><td> NA</td><td>-1.00</td><td> TRUE</td></tr>
+<tr><td>s6</td><td>INDEL</td><td> 3.0</td><td> 20.0</td><td>6.00</td><td>55</td><td> NA</td><td>   NA</td><td>FALSE</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ea9c2718">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Genotype-level-filters:-depth,-GQ-and-allele-balance">Genotype-level filters: depth, GQ and allele balance<a class="anchor-link" href="#Genotype-level-filters:-depth,-GQ-and-allele-balance">¶</a></h3><p><code>QUAL</code> and the <code>INFO</code> metrics describe the <strong>variant</strong>; <code>DP</code>, <code>GQ</code> and <code>AD</code> describe <strong>one sample at one position</strong>.</p>
+<p><strong>Why a minimum depth?</strong> For a true heterozygote the number of alt reads follows a Binomial(DP, 0.5). With few reads, a heterozygote can look homozygous by chance: the probability of seeing only one allele is <code>2 * 0.5^DP</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=596237ca">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="nf">tibble</span><span class="p">(</span><span class="n">DP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">4</span><span class="p">,</span><span class="w"> </span><span class="m">8</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">p_het_looks_hom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nf">dbinom</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DP</span><span class="p">,</span><span class="w"> </span><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 5 × 2</caption>
+<thead>
+<tr><th scope="col">DP</th><th scope="col">p_het_looks_hom</th></tr>
+<tr><th scope="col">&lt;dbl&gt;</th><th scope="col">&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td> 2</td><td>5.000000e-01</td></tr>
+<tr><td> 4</td><td>1.250000e-01</td></tr>
+<tr><td> 8</td><td>7.812500e-03</td></tr>
+<tr><td>10</td><td>1.953125e-03</td></tr>
+<tr><td>20</td><td>1.907349e-06</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2d94eb4e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Allele balance</strong> = alt / (ref + alt). About 0.5 is expected for a heterozygote, close to 1 for a homozygous alternative.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aa152c9d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">gt_long</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">filter</span><span class="p">(</span><span class="n">GT</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">"0/0"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">separate</span><span class="p">(</span><span class="n">AD</span><span class="p">,</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"ad_ref"</span><span class="p">,</span><span class="w"> </span><span class="s">"ad_alt"</span><span class="p">),</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">","</span><span class="p">,</span><span class="w"> </span><span class="n">convert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">allele_balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ad_alt</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">ad_ref</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ad_alt</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">select</span><span class="p">(</span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">Indiv</span><span class="p">,</span><span class="w"> </span><span class="n">GT</span><span class="p">,</span><span class="w"> </span><span class="n">DP</span><span class="p">,</span><span class="w"> </span><span class="n">allele_balance</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 4 × 5</caption>
+<thead>
+<tr><th scope="col">POS</th><th scope="col">Indiv</th><th scope="col">GT</th><th scope="col">DP</th><th scope="col">allele_balance</th></tr>
+<tr><th scope="col">&lt;int&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;int&gt;</th><th scope="col">&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>90000329</td><td>control_41011</td><td>0/1</td><td>16</td><td>0.375</td></tr>
+<tr><td>90000329</td><td>control_41012</td><td>0/1</td><td>20</td><td>0.400</td></tr>
+<tr><td>90572569</td><td>milca_40995  </td><td>0|1</td><td>16</td><td>0.500</td></tr>
+<tr><td>90572569</td><td>milca_40998  </td><td>0|1</td><td>16</td><td>0.500</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=54bebeb8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Genotype-classes-and-segregation-with-the-phenotype">Genotype classes and segregation with the phenotype<a class="anchor-link" href="#Genotype-classes-and-segregation-with-the-phenotype">¶</a></h3><p>Genotypes may be unphased (<code>0/1</code>) or phased (<code>0|1</code>). We map them to three classes, so that the rest of the code does not depend on the separator.</p>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=215d408e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Classify biallelic diploid genotypes</span>
+<span class="c1"># gt (character vector): GT values, e.g. c("0/0", "0|1", "1/1", NA)</span>
+<span class="c1"># return character vector in {"hom_ref", "het", "hom_alt", NA}</span>
+<span class="n">classify_gt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">gt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">case_when</span><span class="p">(</span><span class="n">gt</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"0/0"</span><span class="p">,</span><span class="w"> </span><span class="s">"0|0"</span><span class="p">)</span><span class="w">                </span><span class="o">~</span><span class="w"> </span><span class="s">"hom_ref"</span><span class="p">,</span>
+<span class="w">            </span><span class="n">gt</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"0/1"</span><span class="p">,</span><span class="w"> </span><span class="s">"1/0"</span><span class="p">,</span><span class="w"> </span><span class="s">"0|1"</span><span class="p">,</span><span class="w"> </span><span class="s">"1|0"</span><span class="p">)</span><span class="w">  </span><span class="o">~</span><span class="w"> </span><span class="s">"het"</span><span class="p">,</span>
+<span class="w">            </span><span class="n">gt</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"1/1"</span><span class="p">,</span><span class="w"> </span><span class="s">"1|1"</span><span class="p">)</span><span class="w">                </span><span class="o">~</span><span class="w"> </span><span class="s">"hom_alt"</span><span class="p">,</span>
+<span class="w">            </span><span class="kc">TRUE</span><span class="w">                                    </span><span class="o">~</span><span class="w"> </span><span class="kc">NA_character_</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=22a47a14">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Selecting-the-variants-that-segregate-with-the-phenotype">Selecting the variants that segregate with the phenotype<a class="anchor-link" href="#Selecting-the-variants-that-segregate-with-the-phenotype">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=50e01da0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="c1"># Select variants segregating with the phenotype</span>
+<span class="c1"># gt_wide (tibble): var_id + one genotype-class column per sample</span>
+<span class="c1"># carriers (character vector): columns of the phenotype carriers</span>
+<span class="c1"># controls (character vector): columns of the controls</span>
+<span class="c1"># return rows of gt_wide with an alt allele in all carriers and hom_ref in all controls</span>
+<span class="n">find_segregating</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">gt_wide</span><span class="p">,</span><span class="w"> </span><span class="n">carriers</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nf">stopifnot</span><span class="p">(</span><span class="nf">is.data.frame</span><span class="p">(</span><span class="n">gt_wide</span><span class="p">),</span><span class="w"> </span><span class="nf">is.character</span><span class="p">(</span><span class="n">carriers</span><span class="p">),</span><span class="w"> </span><span class="nf">is.character</span><span class="p">(</span><span class="n">controls</span><span class="p">),</span>
+<span class="w">            </span><span class="nf">all</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">carriers</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">gt_wide</span><span class="p">)))</span>
+<span class="w">  </span><span class="nf">filter</span><span class="p">(</span><span class="n">gt_wide</span><span class="p">,</span>
+<span class="w">         </span><span class="nf">if_all</span><span class="p">(</span><span class="nf">all_of</span><span class="p">(</span><span class="n">carriers</span><span class="p">),</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">.x</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"het"</span><span class="p">,</span><span class="w"> </span><span class="s">"hom_alt"</span><span class="p">)),</span>
+<span class="w">         </span><span class="nf">if_all</span><span class="p">(</span><span class="nf">all_of</span><span class="p">(</span><span class="n">controls</span><span class="p">),</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">.x</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="s">"hom_ref"</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="n">carriers</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"milca_40995"</span><span class="p">,</span><span class="w"> </span><span class="s">"milca_40998"</span><span class="p">)</span>
+<span class="n">controls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">"control_41011"</span><span class="p">,</span><span class="w"> </span><span class="s">"control_41012"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></div></section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e808436c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="n">gt_wide</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gt_long</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">mutate</span><span class="p">(</span><span class="n">var_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">paste</span><span class="p">(</span><span class="n">CHROM</span><span class="p">,</span><span class="w"> </span><span class="n">POS</span><span class="p">,</span><span class="w"> </span><span class="n">REF</span><span class="p">,</span><span class="w"> </span><span class="n">ALT</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"_"</span><span class="p">),</span><span class="w"> </span><span class="n">gt_class</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">classify_gt</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span>
+<span class="w">  </span><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">id_cols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">var_id</span><span class="p">,</span><span class="w"> </span><span class="n">names_from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Indiv</span><span class="p">,</span><span class="w"> </span><span class="n">values_from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gt_class</span><span class="p">)</span>
+<span class="n">gt_wide</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 2 × 5</caption>
+<thead>
+<tr><th scope="col">var_id</th><th scope="col">milca_40995</th><th scope="col">milca_40998</th><th scope="col">control_41011</th><th scope="col">control_41012</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>NC_037329.1_90000329_C_A</td><td>hom_ref</td><td>hom_ref</td><td>het    </td><td>het    </td></tr>
+<tr><td>NC_037329.1_90572569_G_C</td><td>het    </td><td>het    </td><td>hom_ref</td><td>hom_ref</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=180c1add">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-r"><pre><span></span><span class="nf">find_segregating</span><span class="p">(</span><span class="n">gt_wide</span><span class="p">,</span><span class="w"> </span><span class="n">carriers</span><span class="p">,</span><span class="w"> </span><span class="n">controls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<table class="dataframe">
+<caption>A tibble: 1 × 5</caption>
+<thead>
+<tr><th scope="col">var_id</th><th scope="col">milca_40995</th><th scope="col">milca_40998</th><th scope="col">control_41011</th><th scope="col">control_41012</th></tr>
+<tr><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th><th scope="col">&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+<tr><td>NC_037329.1_90572569_G_C</td><td>het</td><td>het</td><td>hom_ref</td><td>hom_ref</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div></div><div class="fragment">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6caa9646">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The first record (<code>C&gt;A</code>, TRAK2 region) is heterozygous in the <strong>controls</strong> only, the second one (<code>G&gt;C</code>) in the <strong>milca animals</strong> only: only the second one segregates with the phenotype.</p>
+</div>
+</div>
+</div>
+</div></div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0228b771">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="IV---Practical-1:-search-for-a-mutation-in-the-milca-phenotype">IV - Practical 1: search for a mutation in the milca phenotype<a class="anchor-link" href="#IV---Practical-1:-search-for-a-mutation-in-the-milca-phenotype">¶</a></h2>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d646dde9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Through the <a href="https://www.onab.fr/">ONAB</a>, breeders reported a difference in coat colour in some Montbéliarde cattle: the <strong>milca phenotype</strong>.</p>
+<p>We have the variant calling results of <strong>4 animals</strong> (annotated multi-sample VCF), sequenced on a 1.14 Mb region of chromosome 2 (<code>NC_037329.1:90000000-91140000</code>, ARS-UCD2.0).</p>
+<table>
+<thead>
+<tr>
+<th>Sample</th>
+<th>Group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>milca_40995</td>
+<td>milca (carrier)</td>
+</tr>
+<tr>
+<td>milca_40998</td>
+<td>milca (carrier)</td>
+</tr>
+<tr>
+<td>control_41011</td>
+<td>control</td>
+</tr>
+<tr>
+<td>control_41012</td>
+<td>control</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=840d50c1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<div style="background-color: #fbefff; border-left: 6px solid #8250df; padding: 10px;">
+    ❓ <strong>Question</strong><br/>
+<ul>
+<li>Which <b>type of mutation</b> is involved in the milca phenotype in animal 40995?</li>
+<li>What is its <b>genotype</b>?</li>
+<li>On which <b>gene</b> is it located?</li>
+<li>What about the other animals?</li>
 </ul>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf686e9d-5ad1-4395-8587-e056784a612e">
+</div></section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=597cb118">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="V---Variations-structurales-(SV)-/-TP">V - Variations structurales (SV) / TP<a class="anchor-link" href="#V---Variations-structurales-(SV)-/-TP">¶</a></h2>
+<p><strong>Strategy</strong></p>
+<ol>
+<li>Read the VCF into R and convert it to a tibble (<code>vcfR</code>).</li>
+<li>Keep bi-allelic variants, build a unique variant ID, classify genotypes (using previous written functions).</li>
+<li>Apply quality filters (QUAL &lt; 30, DP &lt; 4, GQ &lt; 20 and with a classified genotypes)</li>
+<li>Parse the <code>ANN</code> field: keep <strong>protein-coding</strong> and <strong>missense</strong> annotations.</li>
+<li>Keep variants with an alternative allele in <strong>both carriers</strong> and homozygous reference in <strong>both controls</strong>.</li>
+</ol>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=77de0850-e140-4ce8-916b-3894dd4206af">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="1.-detection-de-SV-%C3%A0-partir-de-donn%C3%A9es-Illumina-short-reads">1. detection de SV à partir de données Illumina short-reads<a class="anchor-link" href="#1.-detection-de-SV-%C3%A0-partir-de-donn%C3%A9es-Illumina-short-reads">¶</a></h3><p>En premier, nous allons utiliser Delly (papier ici doi: 10.1093/bioinformatics/bts378, code là: <a href="https://github.com/dellytools/delly">https://github.com/dellytools/delly</a>). Pour commencer nous travailllons sur données short-reads.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=366c280c-5c81-4354-bf11-0d5bd7f86c3a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>delly/0.8.3
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=360a7476-0244-4cd5-a88c-7b0708b97c67">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Comment connaître la commande à utiliser pour lancer delly ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c1d2e4df-4b3d-45ac-81ff-810f5985a500">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>delly<span class="w"> </span><span class="p">|</span><span class="w"> </span>cat
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0164f7ab-9d5c-49ab-933b-71e6158cf5cc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Et plus spécifiquement, comment lancer delly pour faire du variant calling ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=48034378-c92c-4ea9-9bda-f1d689f04390">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>delly<span class="w"> </span>call<span class="p">|</span><span class="w"> </span>cat
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bffd1ff-bbca-49c3-8e6a-f812e01b72c1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="a)-Indexation">a) Indexation<a class="anchor-link" href="#a)-Indexation">¶</a></h4><p>Comme vu dans les cours précédents, nous allons commencerpar indexer  notre alignement et notre référence.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64f78d0f-be3a-4bf9-8475-8bf73a21c161">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Load samtools:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e522551a-46b8-4ee2-a148-3772b132ff10">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>samtools/1.13
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8751c36d-f0bb-4628-abb1-c2cb4758b85b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>samtools<span class="w"> </span>faidx<span class="w"> </span>Zymoseptoria_tritici.fa
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c2259a29-867a-4927-8599-8e10248e3040">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>samtools<span class="w"> </span>index<span class="w">  </span>mapping_illumina_chr10_500kb.bam
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a8d6e08c-8ab2-4ae5-842d-36835f15bccf">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Et maintenant, utilisons delly pour le variant calling:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=012a7dbf-c549-49f9-b1d0-1a86005a91c9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>delly<span class="w"> </span>call<span class="w"> </span>-g<span class="w"> </span>Zymoseptoria_tritici.fa<span class="w">  </span>-o<span class="w"> </span>SV_calling_illumina.bcf<span class="w">  </span>mapping_illumina_chr10_500kb.bam
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=43a7cfc5-6db2-43f0-98ba-a71a7cf448aa">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Si je veux regarder ce résultat:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e9e2e219-77ba-4fe3-b0ea-a33b5ec5acf2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>head<span class="w"> </span>-n3<span class="w"> </span>SV_calling_illumina.bcf<span class="w"> </span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=879ebd04-7141-4dac-b396-0fc6efdf55ab">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Ici le format n'est pas VCF mais BCF. Il faut donc le modifier.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a7783c85-3780-4d27-b383-0cfc8ed5b45d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><em>SV_calling_illumina.bcf may be a binary file.  See it anyway? n</em></p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=88a0bc5b-76f3-48df-88f1-deaf9d77838d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1"># Conversion en fichier vcf</span>
-module<span class="w"> </span>load<span class="w"> </span>bcftools/1.10.2
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4ab83a16-a48f-4abe-91d2-630843a1036f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>bcftools<span class="w"> </span>view<span class="w"> </span>SV_calling_illumina.bcf<span class="w"> </span>&gt;<span class="w"> </span>SV_calling_illumina.vcf
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=406f0a25-6947-4ef4-a445-e074e3ff3ed6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Et maintenant, nous pouvons visualiser nos variants.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d42074b9-90d6-49e6-8aff-f883a50e6582">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Etape 1: Regarder seulement le header du fichier:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2cda7d10-3eec-4451-9f0e-b681cc05dd62">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>head
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6003ff44-1365-4f0d-a4a3-2d37115d8da2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Etape 2: regarder seulement les 3 premiers variants trouvés:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=06435ae9-898e-43cf-8c0a-c55ab558953a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=928b08dd-e560-4e2f-8095-b4bfce493d54">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="b)-comptage-du-nombre-de-SVs">b) comptage du nombre de SVs<a class="anchor-link" href="#b)-comptage-du-nombre-de-SVs">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7243ce07-54cc-477a-bb91-131d9a0b6608">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants sont présents dans le fichier?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=692d227a-a80c-410b-bf9b-0e51d8212a52">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1"># Combien de variants ? </span>
-grep<span class="w"> </span>-v<span class="w"> </span>-c<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9149aaf9-0374-401d-bbd0-f011f24e9ce6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants sont de bonne qualité?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ecf67393-2593-4f1a-9eb5-e05af63bf721">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1"># Combien de variants de bonne qualité ? </span>
-grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ee0511f-664f-4a2f-96f6-467445a0aa3a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants de bonne qualité sont de type Deletion ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=145741c8-6287-4729-9d1d-f4a3f2cc62fc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"&lt;DEL&gt;"</span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b222de0b-f144-4cb0-b152-656f528873f4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants de bonne qualité sont de type Duplication ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6088771c-0440-4f7c-9ca4-916af513c03a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"&lt;DUP&gt;"</span><span class="p">|</span><span class="w"> </span>head
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1daafe5b-aac0-4308-9284-df72ecc4326a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>Combien<span class="w"> </span>de<span class="w"> </span>variants<span class="w"> </span>de<span class="w"> </span>bonne<span class="w"> </span>qualité<span class="w"> </span>sont<span class="w"> </span>de<span class="w"> </span><span class="nb">type</span><span class="w"> </span>Inversion?
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7b8519b4-c608-4259-ab1c-df0e1f4f3b6f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"INV"</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f9d50b04-4dfc-4567-bfc2-1b06cad85be7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants de bonne qualité sont de type inter chromosomique translocation ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6df7fb9-95a0-4179-9fe2-652409ecb3a7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"BND"</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c98cf4c6-758c-4b3d-9977-7f79a67fb5eb">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien de variants de bonne qualité sont de type Insertion ?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3138133e-5bf3-4ca9-8902-21b19a02931c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"&lt;INS&gt;"</span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64dff18c-fa19-4a94-ba6d-7ef578b6daa2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="c)-extraction-des-informations-des-d%C3%A9l%C3%A9tions">c) extraction des informations des délétions<a class="anchor-link" href="#c)-extraction-des-informations-des-d%C3%A9l%C3%A9tions">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3360ef7-28ab-4685-a3c8-38fa0e7f7651">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Extraire les délétions de bonne qualité:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36a84bfd-3fb6-4f8d-84a1-10877f209c0e">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w">  </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w">  </span><span class="s2">"&lt;DEL&gt;"</span><span class="w"> </span>&gt;<span class="w"> </span>SV_call.good_del.vcf
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ebd019d-e5ae-49da-97cd-c7dac489079d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Récupération du chromosome et de la position</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1bae9544-bdf3-4829-add1-057c765f4083">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1">#Récupération du start des variants</span>
-grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w"> </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"&lt;DEL&gt;"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-cut<span class="w"> </span>-f1,2<span class="w"> </span>&gt;<span class="w"> </span>delly_del_start.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fb29012f-aacc-4ef2-91cb-bdb3638f15c2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w"> </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span>head<span class="w"> </span>-1
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a1eb02a-df21-4db3-a1a8-b05be0a20055">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Récupération des autres informations</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4189a634-11ea-4846-b248-cfed4a81aa51">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1">#Récupération des autres informations</span>
-grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w"> </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"&lt;DEL&gt;"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-cut<span class="w"> </span>-f8<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">";"</span><span class="w"> </span>-f1,4,5,13<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">"s/;/\t/g"</span><span class="w"> </span>&gt;<span class="w"> </span>delly_del_info.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6fd85912-4c50-4944-bde8-e97fc7429d2e">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1"># ici exemple sans le sed (et donc pas de tabulation à la place des ;)</span>
-grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"^#"</span><span class="w"> </span>SV_calling_illumina.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">"LowQual"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"&lt;DEL&gt;"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-cut<span class="w"> </span>-f8<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">";"</span><span class="w"> </span>-f1,4,5,13<span class="w"> </span>&gt;<span class="w"> </span>delly_info_1.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>Fusion des 2 fichiers et formattage:<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ca646492-7b10-42cb-8b14-99f48b511530">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1">#Fusion des deux fichiers</span>
-paste<span class="w"> </span>-d<span class="w"> </span><span class="s1">'\t'</span><span class="w"> </span>delly_del_start.txt<span class="w"> </span>delly_del_info.txt<span class="w"> </span>&gt;<span class="w"> </span>delly_del.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d5a687fc-5cd0-4650-a3c6-04b91bfd4e1f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="c1">#Formattage et ménage</span>
-<span class="w"> </span>awk<span class="w"> </span><span class="s1">'{OFS="\t" ; print $1,$2,$4,$3,$5,$6}'</span><span class="w"> </span>delly_del.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">"s/END=//g"</span><span class="w">  </span>&gt;<span class="w"> </span>delly_del.tsv
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f1ea1247-7432-4273-b7da-0254a5ec58fc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{OFS="\t" ; print $1,$2,$4,$3,$5,$6}'</span><span class="w"> </span>delly_del.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s2">"s/END=//g"</span><span class="w">  </span>&gt;<span class="w"> </span>delly_del.tsv
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1359598e-cce2-4551-b6e6-4d150500dd02">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Nettoyage:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18d24e67-0644-4eab-b2fe-e53bed03a510">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>rm<span class="w"> </span>delly_del_info.txt<span class="w"> </span>delly_del_start.txt<span class="w"> </span>delly_del.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ba8a4260-cee5-4ae3-abc6-7b2eebbfa52b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="2.-detection-de-SV-%C3%A0-partir-de-donn%C3%A9es-MinION-long-reads">2. detection de SV à partir de données MinION long-reads<a class="anchor-link" href="#2.-detection-de-SV-%C3%A0-partir-de-donn%C3%A9es-MinION-long-reads">¶</a></h3><p>Ici pour les données long reads, nous allons utiliser un autre caller: sniffles (papier ici <a href="https://www.nature.com/articles/s41592-018-0001-7">https://www.nature.com/articles/s41592-018-0001-7</a>, code là:<a href="https://github.com/fritzsedlazeck/Sniffles">https://github.com/fritzsedlazeck/Sniffles</a>)</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8ad6e239-c9b5-46aa-844d-13519756779d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>sniffles/1.0.11
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=28e5ca5b-92af-4779-bf33-26c97da34d58">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>sniffles<span class="w"> </span>--help
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cd9bb525-4de4-4041-8cd1-2ec33766dc8e">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><em>Pas besoin de génome de référence!</em></p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=edf63b5e-0535-4138-8344-27ab448c6307">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="a)-indexation-du-bam">a) indexation du bam<a class="anchor-link" href="#a)-indexation-du-bam">¶</a></h4>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fe9550ca-0490-49e8-9094-e8d8acc6309f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>samtools<span class="w"> </span>index<span class="w"> </span>mapping_minion_chr10_500kb.bam
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a915ac8-486b-4993-838e-db759ddd48ad">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="b)-Variant-calling">b) Variant calling<a class="anchor-link" href="#b)-Variant-calling">¶</a></h4>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ff03926f-dcf2-409d-ad56-419bbf45af6b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>sniffles<span class="w"> </span>-l<span class="w"> </span><span class="m">100</span><span class="w"> </span>-m<span class="w"> </span>mapping_minion_chr10_500kb.bam<span class="w"> </span>-v<span class="w"> </span>SV_calling_minion.vcf
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b3c27cd2-3e43-4e05-9920-c0df96867e96">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>grep<span class="w"> </span><span class="s1">'^#'</span><span class="w"> </span>SV_calling_minion.vcf
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7784f0b2-2c5b-4c02-9b5a-cef7836a504d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="c)-comptage-du-nombre-de-SVs">c) comptage du nombre de SVs<a class="anchor-link" href="#c)-comptage-du-nombre-de-SVs">¶</a></h4>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=961f5a1a-b5bd-4820-8c87-48a67299e979">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>Combien<span class="w"> </span>de<span class="w"> </span>SV<span class="w"> </span>sont<span class="w"> </span>positionées<span class="w"> </span>sur<span class="w"> </span>le<span class="w"> </span>chr10?
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=081877a3-411a-4f1d-ab06-a95acf1237d6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38180b81-eb48-4d1f-bd53-0c6bb1ad6c91">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien sont des délétions?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebed41f0-661b-4ce7-bafc-6db3f296d0ec">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DEL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b9769bbc-acc1-4ae3-bfdd-9bfc045679d5">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien sont des duplications?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=94f36e47-3a6a-4c6e-b294-ab548266c4cb">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DUP"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bd375b48-26b1-4594-b0c5-3f9a95cf7f86">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien d'entre elles  sont des inversions?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7043164a-c936-4f29-8eb9-b2aaa1dffaec">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"INV"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df207d0e-e19d-4f9e-8343-1a8fc334f029">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien d'entre elles sont des translocations?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebf11c59-763c-4784-9881-d2913136fb0a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-w<span class="w"> </span><span class="s2">"TRA"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0b2b5b76-b937-4891-994c-bfecbeb4b9dc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Combien d'entre elles sont des insertions?</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7c2f37dd-1506-4a34-aa46-427f5338b859">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"INS"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8eb91209-a21c-442d-bccc-47f3b74b1d30">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="d)-extraction-des-positions-des-d%C3%A9l%C3%A9tions">d) extraction des positions des délétions<a class="anchor-link" href="#d)-extraction-des-positions-des-d%C3%A9l%C3%A9tions">¶</a></h4>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=83f86eb6-b2a0-4969-9a10-2559358178cf">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DEL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=964e7e6b-ef17-42b1-bd52-32daad36dcdf">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Extraire le chromosome et la postion de début de la délétion</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fa7189f3-9952-4d99-b424-3a33bb666d75">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DEL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-f<span class="w"> </span>-1,2<span class="w"> </span>&gt;<span class="w"> </span>sniffles_del_start.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2dbf9012-d0d7-4b83-9fbc-5d2ac41b0862">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Extraire la position de fin de la délétion</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5a6694b-a86e-4965-b238-8bc9b6400e60">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DEL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">";"</span><span class="w"> </span>-f<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">"="</span><span class="w"> </span>-f<span class="w"> </span><span class="m">2</span><span class="w"> </span>&gt;<span class="w"> </span>sniffles_del_stop.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b0eef84f-79b2-499b-bc6e-962e78c7a942">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Extraire les informations complémentaires des délétions</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bbee8d2e-aa3a-4341-a48a-beab2edaec24">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>SV_calling_minion.vcf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>^chr_10<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"DEL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-f<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s2">";"</span><span class="w"> </span>-f<span class="w"> </span><span class="m">1</span><span class="w"> </span>&gt;<span class="w"> </span>sniffles_del_infos.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9ac42546-60ad-49dc-9c7b-cb4c00a55d66">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Coller tout ensemble</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b075356f-7e33-4392-ae4b-a237335011b0">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>paste<span class="w"> </span>sniffles_del_start.txt<span class="w"> </span>sniffles_del_stop.txt<span class="w"> </span>sniffles_del_infos.txt<span class="w"> </span>&gt;<span class="w"> </span>sniffles_del.tsv
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9649ca89-d4d5-4bc4-8fbd-9ea213333436">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>rm<span class="w"> </span>sniffles_del_start.txt<span class="w"> </span>sniffles_del_stop.txt<span class="w"> </span>sniffles_del_infos.txt
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9924e640-f68b-408f-804b-d8652981b9d4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="3.-Comparaison-des-r%C3%A9sultats-de-Delly-et-Sniffles">3. Comparaison des résultats de Delly et Sniffles<a class="anchor-link" href="#3.-Comparaison-des-r%C3%A9sultats-de-Delly-et-Sniffles">¶</a></h3><p>Ici nous allons observer les résultats de Delly et de Sniffles</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3d645084-3c94-41ab-bcf1-5d0db947567d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>delly_del.tsv
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0c066780-b4fe-4ce0-9dd4-a618d302db1f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-bash"><pre><span></span>cat<span class="w"> </span>sniffles_del.tsv
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=375e94e9-48d7-42fc-8db5-404ecf178b65">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Les délétions sont elles aux mêmes positions?</p>
-</div>
-</div>
+</div></section></section>
 </div>
 </div>
 </main>
 </body>
+<script>
+require(
+    {
+      // it makes sense to wait a little bit when you are loading
+      // reveal from a cdn in a slow connection environment
+      waitSeconds: 15
+    },
+    [
+      "https://unpkg.com/reveal.js@4.0.2/dist/reveal.js",
+      "https://unpkg.com/reveal.js@4.0.2/plugin/notes/notes.js"
+    ],
+
+    function(Reveal, RevealNotes){
+        // Full list of configuration options available here: https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
+            transition: "slide",
+            slideNumber: "",
+            plugins: [RevealNotes],
+            width: 1280,
+			      height: 720,
+
+        });
+
+        var update = function(event){
+          if(MathJax.Hub.getAllJax(Reveal.getCurrentSlide())){
+            MathJax.Hub.Rerender(Reveal.getCurrentSlide());
+          }
+        };
+
+        Reveal.addEventListener('slidechanged', update);
+
+        function setScrollingSlide() {
+            var scroll = false
+            if (scroll === true) {
+              var h = $('.reveal').height() * 0.95;
+              $('section.present').find('section')
+                .filter(function() {
+                  return $(this).height() > h;
+                })
+                .css('height', 'calc(95vh)')
+                .css('overflow-y', 'scroll')
+                .css('margin-top', '20px');
+            }
+        }
+
+        // check and set the scrolling slide every time the slide change
+        Reveal.addEventListener('slidechanged', setScrollingSlide);
+    }
+);
+</script>
 </html>

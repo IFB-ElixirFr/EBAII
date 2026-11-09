@@ -1,7 +1,7 @@
 ---
-title: "ChIP-seq workshop - Hands-on Roscoff 2025"
-author: "Elodie Darbo; Stéphanie Le Gras; Pascal Martin;"
-date: "2025 November 18-20"
+title: "ChIP-seq workshop - Hands-on Roscoff 2026"
+author: "Elodie Darbo; Stéphanie Le Gras; Tao Ye;"
+date: "2026 November 17-19"
 output:
   html_document:
     fig_caption: yes
@@ -21,13 +21,13 @@ bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, root.dir="~/Documents/Formations/EBAII/2024/ebaiin1/chip-seq/hands-on")
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # - Introduction
 ## - Goal
 
-The aim is to :
+The aims are to:
 
   * understand the nature of ChIP-Seq data
   * perform a complete analysis workflow including quality check (QC), read mapping, visualization in a genome browser and peak-calling. Use command line and open source software for each step of the workflow and feel the complexity of the task
@@ -38,48 +38,52 @@ The aim is to :
 This training gives an introduction to ChIP-seq data analysis, covering the processing steps starting from the reads to the peaks. Among all possible downstream analyses, the practical aspect will focus on motif analyses. A particular emphasis will be put on deciding which downstream analyses to perform depending on the biological question. This training does not cover all methods available today. It does not aim at bringing users to a professional NGS analyst level but provides enough information to allow biologists understand what is DNA sequencing in practice and to communicate with NGS experts for more in-depth needs.
 
 ## - Dataset description
-For this training, we will use two datasets:
+For this training, we will use the RtrC ChIP-seq dataset and retain the mouse p300 dataset for the separate downstream R exercise.
 
-* a dataset produced by Myers et al [Pubmed](http://www.ncbi.nlm.nih.gov/pubmed/23818864) involved in the regulation of gene expression under anaerobic conditions in bacteria. We will focus on one factor: **FNR**. The advantage of this dataset is its small size, allowing real time execution of all steps of the dataset
-* a dataset of ChIP-seq peaks obtained in different mouse tissues for the p300 co-activator protein by Visel et al. [Pubmed](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2745234/); we will use this dataset to illustrate downstream annotation of peaks using R.
+This workshop uses the paired-end ChIP-seq dataset for the RtrC transcription factor in *Caulobacter crescentus* (also named *Caulobacter vibrioides*). The data were published by McLaughlin and colleagues [@mclaughlin2022rtrc]. GEO SuperSeries **GSE201499** contains ChIP-seq and RNA-seq experiments; we will use its ChIP-seq SubSeries **GSE201497**. The original ChIP-seq dataset comprises three anti-FLAG IP replicates and three matched Input replicates (Illumina NextSeq 2000, 2 × 151 bp). The genome used in the original ChIP-seq analysis is **CP001340.1**.
+
+The teaching exercises use **replicates 1 and 2** and their two matched Inputs; replicate 3 is not analyzed in this workshop. Each paired-end library has two FASTQ files (`_1.fastq.gz` and `_2.fastq.gz`).
 
 # - Downloading ChIP-seq reads from NCBI
-**Goal**: Identify the datasets corresponding to the studied article and retrieve the data (reads as FASTQ files) corresponding to 2 replicates of a condition and the corresponding control.
+**Goal**: Identify the datasets corresponding to the studied article and retrieve the data (reads as FASTQ files) corresponding to two replicates of RtrC ChIP-seq and their matched Input controls.
 
 ## - Obtaining an identifier for a chosen dataset
 NGS datasets are (usually) made freely accessible for other scientists, by depositing these datasets into specialized databanks. [Sequence Read Archive (SRA)](http://www.ncbi.nlm.nih.gov/sra) located in USA hosted by NCBI, and its European equivalent [European Nucleotide Archive (ENA)](http://www.ebi.ac.uk/ena) located in England hosted by EBI both contains **raw reads**.
 
 Functional genomic datasets (transcriptomics, genome-wide binding such as ChIP-seq,...) are deposited in the databases [Gene Expression Omnibus (GEO)](http://www.ncbi.nlm.nih.gov/geo/) or its European equivalent [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/).
 
-Within an article of interest, search for a sentence mentioning the deposition of the data in a database. Here, the following sentence can be found at the end of the Materials and Methods section:
-*"All genome-wide data from this publication have been deposited in NCBI’s Gene Expression Omnibus (**GSE41195**)."*
-We will thus use the **GSE41195** identifier to retrieve the dataset from the **NCBI GEO** (Gene Expression Omnibus) database.
+Within an article of interest, search for a sentence mentioning the deposition of the data in a database. The RtrC study deposited its sequencing data in GEO under **GSE201499**. We will use the ChIP-seq SubSeries **GSE201497** (rather than the RNA-seq data).
 
-## - Accessing GSE41195 from GEO
+## - Accessing GSE201499 from GEO
 1.  The GEO database hosts processed data files and many details related to the experiments. SRA (Sequence Read Archive) stores the actual raw sequence data.
-2. Search in Google **GSE41195**. Click on the first link to directly access the correct page on the GEO database.
+2. Search for **GSE201499** and open the [GEO SuperSeries](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201499).
 ![alt text][geo]
-3. This GEO entry is a mixture of expression analysis (Nimblegen Gene Expression Array), chip-chip and chip-seq. At the bottom of the page, click on the subseries related to the chip-seq datasets. (this subseries has its own identifier: **GSE41187**).
+3. Select the ChIP-seq SubSeries **GSE201497** (not the RNA-seq SubSeries).
 ![alt text][geo2]
-4. From this page, we will focus on the experiment **FNR IP ChIP-seq Anaerobic A**. At the bottom of the page, click on the link "**GSM1010219** - FNR IP ChIP-seq Anaerobic A".
-5. In the new page, go to the bottom to find the SRA identifier. This is the identifier of the raw dataset stored in the SRA database.  
+4. Open **GSM6065738**, the RtrC ChIP-seq replicate 1 sample.
+5. Follow its SRA link to identify the raw sequencing run.
 ![alt text][geo3]
-6. Click on the identifier **SRX189773**
+6. Find run **SRR18920361** and check that the library is paired-end.
 
 ## - Downloading FASTQ file from the SRA database
 SRA stores sequences in a FASTQ format.
 
-1. Click on **SRR576933** in SRA 
-2. There are statistics on the run that generated the data. 
-3. Click on FASTA/FASTQ download. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded.
+1. Click on **SRR18920361** in SRA.
+2. Inspect the sequencing run statistics and verify the paired-end layout.
+3. Click on FASTA/FASTQ download to locate the two FASTQ files (R1 and R2). For efficiency, these files have already been downloaded and renamed for the workshop.
 
+**Tip**: Repeat these steps for the other ChIP-seq replicate and the two Input controls. Each sample corresponds to **two** FASTQ files, one per mate.
 
-**tip**: To download the replicate and control datasets, we should redo the same steps starting from the GEO web page specific to the chip-seq datasets (see step 2.4) and choose **FNR IP ChIP-seq Anaerobic B** and **anaerobic INPUT DNA**. Downloaded FASTQ files are available in the data folder (SRR576934.fastq.gz and SRR576938.fastq.gz respectively)
+**Samples have been renamed to have explicit names** (each prefix is followed by `_1.fastq.gz` and `_2.fastq.gz`):
 
-**Samples have been renamed to have explicite names**:
-  * FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz (SRR576933)
-  * FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz (SRR576934)
-  * Anaerobic_INPUT_DNA.fastq.gz (SRR576938)
+| Sample prefix | GEO sample | SRA run |
+|:--|:--|:--|
+| `RtrC_ChIP_rep1` | GSM6065738 | SRR18920361 |
+| `RtrC_ChIP_rep2` | GSM6065739 | SRR18920360 |
+| `RtrC_input_rep1` | GSM6065735 | SRR18920364 |
+| `RtrC_input_rep2` | GSM6065736 | SRR18920363 |
+
+The workshop also provides the reference genome `Caulobacter_CP001340.fasta` and annotation `Caulobacter_CP001340.gtf`. For the separate download commands, see `download_data.sh`.
 
 # - Connect to the server and set up your environment
 During this training, we will work on the cluster provided by the Institut Français de Bioinformatique (IFB) using JupyterLab through the ondemand system.
@@ -89,10 +93,10 @@ During this training, we will work on the cluster provided by the Institut Fran�
 ![alt text][selectjupyterlab]
 
 3. Fill the form as such: 
-  - account: 2538_eb3i_n1_2025, 
+  - account: 2621_eb3in1_2026, 
   - CPUS: 2 
   - Amount of memory: 10G
-  - Number of hours: 7
+  - Number of hours: 8
 ![alt text][jupyterlabform]
 
 4. Once the job is running, click on Connect to Jupyter 
@@ -106,21 +110,21 @@ cd /shared/projects/<your_project>
 ```
 2. Create a directory that will contain all results of the upcoming analyses.
 ```{bash eval=FALSE}
-mkdir EBAII2025_chipseq
+mkdir EBA3I_2026_chipseq
 ```
 3. Go to the newly created directory
 ```{bash eval=FALSE}
-cd EBAII2025_chipseq
+cd EBA3I_2026_chipseq
 ```
 4. Copy the directory containing data
 
 ```{bash eval=FALSE}
-cp -r /shared/projects/2538_eb3i_n1_2025/atelier_chipseq/training_data/data .
+cp -r /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data .
 ```
 
 7. Your directory structure should be like this
  ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 ```
@@ -147,7 +151,7 @@ cd 01-QualityControl
 
 Your directory structure should be like this
 ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 │   
@@ -162,39 +166,60 @@ module load fastqc/0.11.9
 ```{bash eval=FALSE}
 fastqc --help
 ```
-5. Launch the FASTQC program on the experiment file (FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz)
+5. Launch the FASTQC program on the experiment file (RtrC_ChIP_rep1_1.fastq.gz)
   * -o: creates all output files in the specified output directory. '.' means current directory.
 ```{bash eval=FALSE}
-fastqc ../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -o .
+fastqc ../data/RtrC_ChIP_rep1_1.fastq.gz ../data/RtrC_ChIP_rep1_2.fastq.gz -o .
 ```  
-6. Wait until the analysis is finished. Check the FastQC result files.
+6. Wait until the analysis is finished. Check that the FastQC result files are generated.
 ```{bash eval=FALSE}
 ls
 ```
-> FNR_IP_ChIP-seq_Anaerobic_A_fastqc.html  FNR_IP_ChIP-seq_Anaerobic_A_fastqc.zip
+> RtrC_ChIP_rep1_1_fastqc.html  RtrC_ChIP_rep1_1_fastqc.zip  RtrC_ChIP_rep1_2_fastqc.html  RtrC_ChIP_rep1_2_fastqc.zip
 
-7. Go to the directory /shared/projects/\<your_project\>/EBAII2025_chipseq/1-QualityControl in the tree directory on the left of the jupyterhub window and double click on FNR_IP_ChIP-seq_Anaerobic_A_fastqc.html to visualize the file.
-![alt text][fastqc]
+7. Launch the FASTQC program on the second ChIP replicate (RtrC_ChIP_rep2_1.fastq.gz and RtrC_ChIP_rep2_2.fastq.gz) and on the two Input controls (both mates for each library)
 
-8. Launch the FASTQC program on the replicate (FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz) and on the control file (Anaerobic_INPUT_DNA.fastq.gz)
-
-**Analyze the result of the FASTQC program:**
-
-  * **How many reads are present in each file ? **
-  * **What is the read length ?  **
-  * **Is the overall quality good for the three samples ? **
-  * **Are there any concerns raised by the report ? If so, can you tell where the problem might come from ?**  
-
-10. Once you are done with FastQC, unload it
+8. Once you are done with FastQC, unload it
 ```{bash eval=FALSE}
 module unload fastqc/0.11.9
+```
+
+## - Combining FastQC results with MultiQC
+**Goal**: Summarize the FastQC results for all four paired-end samples in a single report, making it easier to compare read quality across ChIP and Input replicates. Each sample has two FastQC reports, one for each mate (R1 and R2).
+
+1. While still in the **01-QualityControl** directory, load MultiQC:
+```{bash eval=FALSE}
+module load multiqc/1.35
+```
+
+2. Combine the FastQC results into one report:
+```{bash eval=FALSE}
+multiqc . -o . -n multiqc_report.html
+```
+
+3. Go to the directory ```/shared/projects/<your_project>/EBA3I_2026_chipseq/01-QualityControl``` in the tree directory on the left of the jupyterhub window and left-click on **multiqc_report.html** and download it. Open it in your browser to view the report. Compare the quality metrics across all 8 FASTQ files (four samples, two mates per sample).
+![alt text][multiqcfastqc]
+
+**Questions:**
+
+  * **Are the quality profiles similar between R1 and R2?**
+  * **Do any ChIP or Input replicates show noticeably different quality metrics?**
+  * **How many reads are present in each file ?**
+  * **What is the read length ?**
+  * **Are there any concerns raised by the report ? If so, can you tell where the problem might come from ?**  
+
+
+4. Unload MultiQC and return to the working directory:
+```{bash eval=FALSE}
+module unload multiqc/1.35
+cd ..
 ```
 
 # - Mapping the reads with Bowtie
 **Goal**: Obtain the coordinates of each read to the reference genome.  
 
 ## - Choosing a mapping program
-There are multiple programs to perform the mapping step. For reads produced by an Illumina machine for ChIP-seq, the currently "standard" programs is Bowtie (versions 1 and 2)[@langmead_ultrafast_2009] [@langmead_fast_2012]. We will use **Bowtie version 2.5.1** for this exercise.
+There are multiple programs to perform the mapping step. For reads produced by an Illumina machine for ChIP-seq, widely used programs are Bowtie (versions 1 and 2)[@langmead_ultrafast_2009] [@langmead_fast_2012]. We will use **Bowtie version 2.5.1** for this exercise.
 
 ## - Bowtie
 1. Load Bowtie
@@ -211,7 +236,7 @@ This prints the help of the program. However, this is a bit difficult to read ! 
 
 4. Create a directory named **02-Mapping** in which to output mapping results
 ```{bash eval=FALSE}
-cd ..
+# you should be in the directory /shared/projects/<your_project>/EBA3I_2026_chipseq
 mkdir 02-Mapping
 ```
 5. Go to the directory you've just created
@@ -220,7 +245,7 @@ cd 02-Mapping
 ```
 
 ## - Prepare the index file
-1. To make the index file, you will need the complete genome, in FASTA format. It has already been downloaded to gain time (Escherichia_coli_K12.fasta in the course folder) (The genome was downloaded from the NCBI).
+1. To make the index file, you will need the complete genome, in FASTA format. It has already been downloaded to gain time (Caulobacter_CP001340.fasta in the course folder) (The genome was downloaded from the NCBI).
 
 2. Create a directory named **index** in which to output bowtie indexes
 ```{bash eval=FALSE}
@@ -236,8 +261,8 @@ bowtie2-build
 ```
 5. Build the index for bowtie
 ```{bash eval=FALSE}
-## Creating genome index : provide the path to the genome file and the name to give to the index (Escherichia_coli_K12)
-bowtie2-build ../../data/Escherichia_coli_K12.fasta Escherichia_coli_K12
+## Creating genome index : provide the path to the genome file and the name to give to the index (Caulobacter_CP001340)
+bowtie2-build ../../data/Caulobacter_CP001340.fasta Caulobacter_CP001340
 ```
 6. Go back to upper directory i.e 02-Mapping
 ```{bash eval=FALSE}
@@ -255,7 +280,7 @@ cd bam
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 │   
@@ -273,17 +298,14 @@ Your directory structure should be like this:
   * -3 will trim x base from the end of the read. As our last position is of low quality, we'll trim 1 base.
   * -S will output the result in SAM format
   * --mm allows many concurrent bowtie processes on the same computer to share the same memory image of the index 
-  * 2> FNR_IP_ChIP-seq_Anaerobic_A.out will output some statistics about the mapping in the file FNR_IP_ChIP-seq_Anaerobic_A.out
+  * 2> RtrC_ChIP_rep1.out will output some statistics about the mapping in the file RtrC_ChIP_rep1.out
 ```{bash eval=FALSE}  
 ## Run alignment
 ## Tip: first type bowtie command line then add quotes around and prefix it with "sbatch --cpus 10 --wrap="
 
-sbatch -p fast -o FNR_IP_ChIP-seq_Anaerobic_A.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Escherichia_coli_K12 -U ../../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -S FNR_IP_ChIP-seq_Anaerobic_A.sam"
+sbatch -p fast -o RtrC_ChIP_rep1.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_ChIP_rep1_1.fastq.gz -2 ../../data/RtrC_ChIP_rep1_2.fastq.gz -S RtrC_ChIP_rep1.sam"
 ```  
 This should take few minutes as we work with a small genome. For the human genome, we would need either more time and more resources.
-
-**Analyze the result of the mapped reads:  
-Open the file FNR_IP_ChIP-seq_Anaerobic_A.mapping.out (for example using the ` less ` command), which contains some statistics about the mapping. How many reads were mapped? How many multi-mapped reads were originally present in the sample? To quit less press 'q'**
 
 Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. The SAM format corresponds to large text files, that can be compressed ("zipped") into a BAM format. The BAM files takes up to 4 time less disk space and are usually sorted and indexed for fast access to the data it contains. The index of a given <prefix>.bam file is named <prefix>.bam.bai or <prefix>.bai file. Some tools require to have the index of the bam file to process it.
 
@@ -296,17 +318,17 @@ Bowtie output is a [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf) file. T
 ## First load samtools
 module load samtools/1.21
 ## Then run samtools
-samtools view -@ 2 -q 10 -b FNR_IP_ChIP-seq_Anaerobic_A.sam | samtools sort -@ 2 - -o FNR_IP_ChIP-seq_Anaerobic_A.bam 
+samtools view -@ 2 -q 10 -b RtrC_ChIP_rep1.sam | samtools sort -@ 2 - -o RtrC_ChIP_rep1.bam 
 ```
 
 5. Create an index for the bam file
 ```{bash eval=FALSE}
-samtools index FNR_IP_ChIP-seq_Anaerobic_A.bam
+samtools index RtrC_ChIP_rep1.bam
 ```
 
 6. Compress the .sam file (you could also delete the file)
 ```{bash eval=FALSE}
-gzip FNR_IP_ChIP-seq_Anaerobic_A.sam
+gzip RtrC_ChIP_rep1.sam
 ```
 
 7. Once it's done, unload the tools you used
@@ -314,18 +336,36 @@ gzip FNR_IP_ChIP-seq_Anaerobic_A.sam
 module unload samtools/1.21 bowtie2/2.5.1
 ```
 
-## - Map the second replicate and the control
-1. Repeat the steps above (3 -> 6 - Mapping) for the files FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz and Anaerobic_INPUT_DNA.fastq.gz in the directory named "**bam**" within the directory 02-Mapping.
+## - Map the other datasets
+1. Repeat the steps above (3 -> 6 - Mapping) for the remaining three paired-end libraries (ChIP replicate 2 and Input replicates 1 and 2) in the directory named "**bam**" within the directory 02-Mapping.
 
-**Analyze the result of the mapped reads:  
-How many reads were mapped for samples Anaerobic_INPUT_DNA and FNR_IP_ChIP-seq_Anaerobic_B?**
+## - Summarizing alignment statistics with MultiQC
+**Goal**: Compare mapping statistics across the four paired-end libraries. MultiQC can collect the Bowtie2 alignment summaries saved in the `.mapping.out` files.
+
+After all four mapping jobs have finished, return to the `02-Mapping` directory and run:
+```{bash eval=FALSE}
+cd ..
+module load multiqc/1.35
+multiqc bam -o . -n multiqc_mapping.html
+module unload multiqc/1.35
+cd bam
+```
+
+Go to the directory /shared/projects/<your_project>/EBA3I_2026_chipseq/02-Mapping in the tree directory on the left of the jupyterhub window and left-click on multiqc_mapping.html and download it. Open it in your browser to view the report. 
+
+**Compare the overall alignment rates between ChIP and Input samples.**
+
+  * **How many reads were mapped?** 
+  * **How many multi-mapped reads were originally present in the sample?**
+
+To quit less press 'q'
 
 # - Estimating the number of duplicated reads
-**Goal**: Duplicated reads i.e reads mapped at the same positions in the genome are present in ChIP-seq results. They can arise from several reasons including a biased amplification during the PCR step of the library prep, DNA fragments coming from repetitive elements of the genome, sequencing saturation or the same clusters read several times on the flowcell (i.e optical duplicates). As analyzing ChIP-Seq data consist in detecting signal enrichment, we can not keep duplicated reads for subsequent analysis. So let's detect them using [Picard](http://broadinstitute.github.io/picard/) [@broadinstitute_picard].
+**Goal**: Duplicated reads i.e reads mapped at the same positions in the genome are present in ChIP-seq results. They can arise from several reasons including a biased amplification during the PCR step of the library prep, DNA fragments coming from repetitive elements of the genome, sequencing saturation or the same clusters read several times on the flowcell (i.e optical duplicates). PCR duplicates can bias enrichment analyses; we will mark them and inspect the metrics before deciding whether to exclude them. So let's detect them using [Picard](http://broadinstitute.github.io/picard/) [@broadinstitute_picard].
 
 1. Go to the directory with alignment files
 ```{bash eval=FALSE}
-cd /shared/projects/<your_project>/EBAII2025_chipseq/02-Mapping/bam
+cd /shared/projects/<your_project>/EBA3I_2026_chipseq/02-Mapping/bam
 ```
 2. Run Picard markDuplicates to mark duplicated reads (= reads mapping at the exact same location on the genome)
   * CREATE_INDEX: Create .bai file for the result bam file with marked duplicate reads
@@ -340,24 +380,25 @@ module load picard/2.23.5
 ## Run picard
 picard MarkDuplicates \
 -CREATE_INDEX true \
--INPUT FNR_IP_ChIP-seq_Anaerobic_A.bam \
--OUTPUT Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam \
--METRICS_FILE metric
+-INPUT RtrC_ChIP_rep1.bam \
+-OUTPUT Marked_RtrC_ChIP_rep1.bam \
+-METRICS_FILE RtrC_ChIP_rep1.dup_metrics.txt
 
 ```
 
-To determine the number of duplicated reads marked by Picard, we can run the `samtools flagstat` command:
-
+## - Summarizing duplicate metrics with MultiQC
+After marking duplicates for all four libraries, generate a summary report. MultiQC recognizes Picard MarkDuplicates metrics files.
 ```{bash eval=FALSE}
-## Add samtools to your environment
-module load samtools/1.21
-## run samtools
-samtools flagstat Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam
+module load multiqc/1.35
+multiqc . -o . -n multiqc_duplicates.html
+module unload multiqc/1.35
 ```
 
-**Run picard MarkDuplicates on the 2 other samples. How many duplicates are found in each sample?**
+Download `multiqc_duplicates.html`. 
 
-Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq/)
+  * **Compare the duplication rates and the number of mapped reads between the four samples.**
+
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq/)
 ```{bash eval=FALSE}
 ## Unload picard and samtools
 module unload samtools/1.21 picard/2.23.5
@@ -389,20 +430,21 @@ module load deeptools/3.5.4
 plotFingerprint \
   -p 2 \
   --numberOfSamples 10000 \
-  -b ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-     ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-     ../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
+  -b ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
   -plot fingerprint_10000.png
 ```
 4. If plotFingerprint takes to much time to run. Take the file that has already been prepared for the training.
 ```{bash eval=FALSE}
-cp /shared/projects/2538_eb3i_n1_2025/atelier_chipseq/EBAII2025_chipseq/03-ChIPQualityControls/fingerprint_10000.png .
+cp /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/EBA3I_2026_chipseq/03-ChIPQualityControls/fingerprint_10000.png .
 ```
 5. Go find the file using the directory tree on the left of the Jupyterlab panel and click on the fingerprint_10000.png file to display it in Jupyterlab.
 
 **Look at the result files fingerprint.png (add the plot to this report). Give an explanation of the curves?**  
 
-Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 
 ```{bash eval=FALSE}
 ## Unload deepTools
@@ -420,29 +462,33 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 
 ## - Viewing the raw alignment data in IGV
 1. Download the following files from the server onto your computer
-  * data/Escherichia_coli_K12.fasta
-  * data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
-  * 02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam
-  * 02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam.bai
-  * 02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam
-  * 02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam.bai  
-  * 02-Mapping/bam/Anaerobic_INPUT_DNA.bam
-  * 02-Mapping/bam/Anaerobic_INPUT_DNA.bam.bai
+  * data/Caulobacter_CP001340.fasta
+  * data/Caulobacter_CP001340.gtf
+  * 02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam
+  * 02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam.bai
+  * 02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam
+  * 02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam.bai  
+  * 02-Mapping/bam/Marked_RtrC_input_rep1.bam
+  * 02-Mapping/bam/Marked_RtrC_input_rep1.bam.bai
+  * 02-Mapping/bam/Marked_RtrC_input_rep2.bam
+  * 02-Mapping/bam/Marked_RtrC_input_rep2.bam.bai
 2. Open IGV on your computer
 3. Load the genome
   * Genomes / Load Genome from File...
-  * Select the fasta file Escherichia_coli_K12.fasta located into the data directory
-4. Load an annotation file named Escherichia_coli_K_12_MG1655.annotation.fixed.gtf into IGV
+  * Select the fasta file Caulobacter_CP001340.fasta
+4. Load an annotation file named Caulobacter_CP001340.gtf into IGV
   * File / Load from File...
   * Select the annotation file. The positions of the genes are now loaded.
-5. Load the three bam files (FNR_IP_ChIP-seq_Anaerobic_A.bam, FNR_IP_ChIP-seq_Anaerobic_B.bam and Anaerobic_INPUT_DNA.bam) in IGV.
+5. Load the four BAM files (two ChIP replicates and two matched Inputs) in IGV.
   * File / Load from File...
   * Select the bam files. 
 ![alt text][igvbam]
 
-**Browse around in the genome. Specifically go to the following genes: pepT (geneID:b1127), ycfP (geneID:b1108). Do you see peaks (add screenshots to this report).**
+**Browse around in the genome.** 
 
-However, looking at BAM file as such does not allow to directly compare the two samples as data are not normalized. Let's generate normalized data for visualization.
+  * **Specifically go to the following genes: gene-CCNA_00388, gene-CCNA_00425, cnoX. Do you see a peak?**
+
+However, looking at BAM file as such does not allow to directly compare the two samples as data are not scaled. Let's generate normalized data for visualization.
 
 ## - Viewing scaled data
 [bamCoverage](https://deeptools.readthedocs.io/en/latest/content/tools/bamCoverage.html) from deepTools generates BigWigs out of BAM files
@@ -464,7 +510,7 @@ cd 04-Visualization
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 │   
@@ -483,39 +529,39 @@ Your directory structure should be like this:
   * --bam: BAM file to process
   * --outFileName: output file name
   * --outFileFormat: output file type
-  * --effectiveGenomeSize : size of the mappable genome
-  * --normalizeUsing : different overall normalization methods; we will use RPGC method corresponding to 1x average coverage
+  * --normalizeUsing : different overall normalization methods; we will use the CPM method
   * --skipNonCoveredRegions: skip non-covered regions
-  * --extendReads 200: Extend reads to fragment size
+  * --extendReads : Extend reads to fragment size
   * --ignoreDuplicates: reads that have the same orientation and start position will be considered only once
 ```{bash eval=FALSE}
 bamCoverage \
-  --bam ../02-Mapping/bam/Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  --outFileName FNR_IP_ChIP-seq_Anaerobic_A_nodup.bw \
+  --bam ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+  --outFileName RtrC_ChIP_rep1_nodup.bw \
   --outFileFormat bigwig \
-  --effectiveGenomeSize 4639675 \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
-  --extendReads 200 \
+  --extendReads \
   --ignoreDuplicates
 ```
 
-5. Do it for the replicate and the control.
-6. Download the three bigwig files you have just generated
-  * 04-Visualization/FNR_IP_ChIP-seq_Anaerobic_A_nodup.bw
-  * 04-Visualization/FNR_IP_ChIP-seq_Anaerobic_B_nodup.bw  
-  * 04-Visualization/Anaerobic_INPUT_DNA_nodup.bw
-7. Load the three bigwig files in IGV
+5. Repeat for the other three libraries.
+6. Download the four bigWig files you have just generated
+  * 04-Visualization/RtrC_ChIP_rep1_nodup.bw
+  * 04-Visualization/RtrC_ChIP_rep2_nodup.bw  
+  * 04-Visualization/RtrC_input_rep1_nodup.bw
+  * 04-Visualization/RtrC_input_rep2_nodup.bw
+7. Load the four bigwig files in IGV
   * File / Load from File...
-  * Select the three bigwig files.
-8. Set the visualization of the three bigwig files to be autoscaled
+  * Select the four bigwig files.
+8. Set the visualization of the four bigwig files to be autoscaled
   * Click right on the name of the tracks and select **Autoscale**
   * Click right on the name of the tracks and set the windowing function to Maximum
 
-**Go back to the genes we looked at earlier: pepT, ycfP (add screenshots to this report). Look at the shape of the signal.**  
+**Go back to the genes we looked at earlier: gene-CCNA_00388, gene-CCNA_00425, cnoX. Look at the shape of the signal.**  
+
 **Keep IGV opened.**
 
-Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
+Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 04-Visualization
 cd ..
@@ -546,30 +592,27 @@ macs2 callpeak --help
 This prints the help of the program.
 
 4. Let's see the parameters of MACS before launching the mapping:
-  * ChIP-seq tag file (-t) is the name of our experiment (treatment) mapped read file FNR_IP_ChIP-seq_Anaerobic_A.bam
-  * ChIP-seq control file (-c) is the name of our input (control) mapped read file Anaerobic_INPUT_DNA.bam
-  * --format BAM indicates the input file are in BAM format. Other formats can be specified (SAM,BED...)
-  * --gsize Effective genome size: this is the size of the genome considered "usable" for peak calling. This value is given by the MACS developers on their website. It is smaller than the complete genome because many regions are excluded (telomeres, highly repeated regions...). The default value is for human (2700000000.0), so we need to change it. As the value for E. coli is not provided, we will take the complete genome size 4639675.
-  * --name provides a prefix for the output files. We set this to FNR_Anaerobic_A, but it could be any name.
-  * --bw The bandwidth is the size of the fragment extracted from the gel electrophoresis or expected from sonication. By default, this value is 300bp. Usually, this value is indicated in the Methods section of publications. In the studied publication, a sentence mentions "400bp fragments (FNR libraries)". We thus set this value to 400.
-  * --fix-bimodal indicates that in the case where macs2 cannot find enough paired peaks between the plus strand and minus strand to build the shifting model, it can bypass this step and use a extension size of 200bp by default.
+  * ChIP-seq tag file (-t) is the name of our experiment (treatment) mapped read file RtrC_ChIP_rep1.bam
+  * ChIP-seq control file (-c) is the name of our input (control) mapped read file RtrC_input_rep1.bam
+  * --format BAMPE indicates paired-end fragments in BAM format. Other formats can be specified (SAM,BED...)
+  * --gsize: genome size supplied to MACS2. For this bacterial exercise, use the reference genome length (verify with `samtools faidx`); it is an approximation to the effective mappable genome size.
+  * --name provides a prefix for the output files. We set this to RtrC_rep1, but it could be any name.
+  * With paired-end alignments, `--format BAMPE` makes MACS2 use observed fragment coordinates; do not use single-end extension parameters (`--bw`, `--fix-bimodal`).
   * -p 1e-2 indicates that we report the peaks if their associated p-value is lower than 1e-2. This is a relaxed threshold as we want to keep a high number of false positives in our peak set to later compute the IDR analysis.
   * &> MACS.out will output the verbosity (=information) in the file MACS.out
 ```{bash eval=FALSE}
 macs2 callpeak \
-  -t ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  -c ../../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  --format BAM \
-  --gsize 4639675 \
-  --name 'FNR_Anaerobic_A' \
-  --bw 400 \
-  --fix-bimodal \
+  -t ../../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+  -c ../../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+  --format BAMPE \
+  --gsize 4042929 \
+  --name 'RtrC_rep1' \
   -p 1e-2 \
   &> repA_MACS.out
 ```
-5. Run macs2 for replicate A and replicate B.
+5. Repeat MACS2 for ChIP replicate 2, using its matched Input control.
 
-6. In a new directory called pool, run macs2 for the pooled replicates A and B by giving both bam files as input treatment files (-t).
+6. In a new directory called pool, run macs2 for both pooled ChIP replicates by giving both BAM files as input treatment files (-t).
 ```{bash eval=FALSE}
 # You should be in 05-PeakCalling
 cd ..
@@ -578,14 +621,13 @@ cd pool
 
 # Run macs2 for pooled replicates
 macs2 callpeak \
-  -t ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-     ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  -c ../../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  --format BAM \
-  --gsize 4639675 \
-  --name 'FNR_Anaerobic_pool' \
-  --bw 400 \
-  --fix-bimodal \
+  -t ../../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+     ../../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
+  -c ../../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+     ../../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
+  --format BAMPE \
+  --gsize 4042929 \
+  --name 'RtrC_pool' \
   -p 1e-2 \
   &> pool_MACS.out
 ```
@@ -594,19 +636,30 @@ macs2 callpeak \
 **Look at the files that were created by MACS. Explain the content of the result files ?**  
 **How many peaks were detected by MACS2 for each sample and in the pool of samples ?**
 
+## - Summarizing MACS2 results with MultiQC
+MultiQC can summarize MACS2 log files when its MACS2 parser recognizes their format. Run this step **after both individual peak calls and the pooled peak call have finished**:
+```{bash eval=FALSE}
+# You should be in 05-PeakCalling/pool
+cd ..
+module load multiqc/1.35
+multiqc replicates pool -o . -n multiqc_peakcalling.html
+module unload multiqc/1.35
+```
+
+Open `05-PeakCalling/multiqc_peakcalling.html` and check which MACS2 metrics were detected. **If no MACS2 section appears, inspect the three `*_MACS.out` log files directly; MultiQC cannot guarantee a report for every MACS2 log format.**
+
 ## - Calling peaks in a replicate-aware method (IDR)
 In order to take advantage of having biological replicates, we will create a combine set of peaks based on the reproducibility of each individual replicate peak calling. We will use the **Irreproducible Discovery Rate** (IDR) algorithm.
 
 1. Create a new directory to store the peak coordinates resulting after idr analysis
 ```{bash eval=FALSE}
-## You should be 05-PeakCalling
-cd ..
+## You should be in 05-PeakCalling
 mkdir idr
 cd idr
 ```
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 │   
@@ -638,20 +691,23 @@ idr --help
 * --output-file : name of the result file
 * --plot : plot additional diagnosis plot
 
-3. Run idr
+3. Compare the two biological replicates using IDR and the pooled peak list as reference.
 ```{bash eval=FALSE}
-idr \
-  --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak \
-            ../replicates/FNR_Anaerobic_B_peaks.narrowPeak \
-  --peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
-  --input-file-type narrowPeak \
-  --output-file FNR_anaerobic_idr_peaks.bed \
-  --plot
+idr --samples ../replicates/RtrC_rep1_peaks.narrowPeak \
+              ../replicates/RtrC_rep2_peaks.narrowPeak \
+    --peak-list ../pool/RtrC_pool_peaks.narrowPeak \
+    --input-file-type narrowPeak \
+    --output-file RtrC_idr_results.bed --plot
+```
+
+4. Retain peaks with a global IDR of at most 0.05 (the 12th column of the IDR output is `-log10(global IDR)`). Create a five-column BED file for the downstream exercises.
+```{bash eval=FALSE}
+awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2,$3,"RtrC_idr_peak_"NR,1000}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
 ```
 
 **Add the IDR graph to this report. How many peaks are found with the IDR method?**
 
-4. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
+5. Remove IDR and MACS2 from your environment and go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 ```{bash eval=FALSE}
 module unload macs2/2.2.7.1
 module unload idr/2.0.4.2
@@ -663,13 +719,13 @@ cd ../..
 ## - Visualize peaks into IGV
 
 1. Download the following BED files from the server into your computer to visualise in IGV :
-* 05-PeakCalling/replicates/FNR_Anaerobic_A_peaks.narrowPeak
-* 05-PeakCalling/replicates/FNR_Anaerobic_B_peaks.narrowPeak
-* 05-PeakCalling/pool/FNR_Anaerobic_pool_peaks.narrowPeak
-* 05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed
+* 05-PeakCalling/replicates/RtrC_rep1_peaks.narrowPeak
+* 05-PeakCalling/replicates/RtrC_rep2_peaks.narrowPeak
+* 05-PeakCalling/pool/RtrC_pool_peaks.narrowPeak
+* 05-PeakCalling/idr/RtrC_idr_peaks.bed
 
-**Go back again to the genes we looked at earlier: pepT, ycfP. Do you see peaks ?**
-**Navigate throught the genome to find peaks detected in the replicates (peak calling per replicate) and not found/kept with the IDR method** 
+**Go back again to the genes we looked at earlier: hfiA. Do you see peaks ?**
+**Navigate through the genome to find peaks detected in the replicates (peak calling per replicate) and not found/kept with the IDR method** 
 
 **From now on, peak set we keep is the IDR peak set.**
 
@@ -678,7 +734,7 @@ cd ../..
 
 ## - Retrieve the peak sequences corresponding to the peak coordinate file (BED)
 
-For the motif analysis, you first need to extract the sequences corresponding to the peaks. There are several ways to do this (as usual...). If you work on a UCSC-supported organism, the easiest is to use RSAT fetch-sequences or Galaxy. Here, we will use Bedtools [@bedtools], as we have the genome of interest on our computer (Escherichia_coli_K12.fasta).
+For the motif analysis, you first need to extract the sequences corresponding to the peaks. There are several ways to do this (as usual...). If you work on a UCSC-supported organism, the easiest is to use RSAT fetch-sequences or Galaxy. Here, we will use Bedtools [@bedtools], as we have the genome of interest on our computer (Caulobacter_CP001340.fasta).
 1. Create a directory named **06-MotifAnalysis** to store data needed for motif analysis
 ```{bash eval=FALSE}
 mkdir 06-MotifAnalysis
@@ -690,7 +746,7 @@ cd 06-MotifAnalysis
 
 Your directory structure should be like this:
 ```
-/shared/projects/<your_project>/EBAII2025_chipseq
+/shared/projects/<your_project>/EBA3I_2026_chipseq
 │
 └───data
 │   
@@ -714,32 +770,35 @@ Your directory structure should be like this:
 ## First load samtools
 module load samtools/1.21
 ## Create an index of the genome fasta file
-samtools faidx ../data/Escherichia_coli_K12.fasta
+samtools faidx ../data/Caulobacter_CP001340.fasta
 
 ## First load bedtools
 module load bedtools/2.30.0
 ## Extract fasta sequence from genomic coordinate of peaks
 bedtools getfasta \
-  -fi ../data/Escherichia_coli_K12.fasta \
-  -bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed \
-  -fo FNR_anaerobic_idr_peaks.fa
+  -fi ../data/Caulobacter_CP001340.fasta \
+  -bed ../05-PeakCalling/idr/RtrC_idr_peaks.bed \
+  -fo RtrC_idr_peaks.fa
 ```
-4. Download the file FNR_anaerobic_idr_peaks.fa on your computer
+4. Download the file RtrC_idr_peaks.fa on your computer
 
 ## - Motif discovery with RSAT
 1. Open a connection to a Regulatory Sequence Analysis Tools server. You can choose between various website mirrors.
   * Teaching Server  (recommended for this training) [https://rsat.eead.csic.es/plants/](https://rsat.eead.csic.es/plants/)
 2. In the left menu, click on **NGS ChIP-seq** and then click on **peak-motifs**. A new page opens, with a form
 3. The default peak-motifs web form only displays the essential options. There are only two mandatory parameters.
-  * The **title box**, which you will set as **FNR Anaerobic** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **FNR_anaerobic_idr_peaks.fa** from your computer.
+  * The **title box**, which you will set as **RtrC ChIP-seq** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **RtrC_idr_peaks.fa** from your computer.
 4. We will now modify some of the advanced options in order to fine-tune the analysis according to your data set.
   * Open the "Reduce peak sequences" title, and make sure the **Cut peak sequences: +/- ** option is set to **0** (we wish to analyze our full dataset)
   * Open the “Motif Discovery parameters” title, and check the **oligomer sizes 6 and 7** (but not 8). Check "Discover over-represented spaced word pairs **[dyad-analysis]**"
-  * Under “Compare discovered motifs with databases”, **add RegulonDB prokaryotes** (2015_08) as the studied organism is the bacteria E. coli.
+  * Under “Compare discovered motifs with databases”, **do not select the E. coli-specific RegulonDB collection**; instead use an appropriate bacterial background or run de novo motif discovery without that comparison.
 5. Click “**GO**”. 
 6. The Web page displays a link, You can already click on this link. The report will be progressively updated during the processing of the workflow.
 
 **Is there anything interesting in RSAT results? If so, which motif is of interest and why (add screenshot of the results).**
+
+
+**Dataset-specific note:** The screenshots from the previous E. coli exercise and the original R gene-symbol mapping example need to be regenerated or checked against the Caulobacter annotation. The original R gene-symbol join must be replaced or validated against the Caulobacter annotation; HOMER column names and gene IDs must be checked before attempting it. DAVID may not support this organism or its identifiers; treat the ontology section as optional until validated.
 
 # - Peak annotation
 
@@ -761,13 +820,13 @@ cd 07-PeakAnnotation
 
 [annotatePeaks.pl](http://homer.ucsd.edu/homer/ngs/annotation.html) from the Homer suite [@heinz_simple_2010] associates peaks with nearby genes.
 
-1. Create a file suitable for annotatePeaks.pl. To run the tool needs a peak bed file composed of 6 fields (chr, start, end, name, score, strand). The 5 first columns of the file ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed are good but all other colums are of no use and the strand is missing. To generate a file with a correct format, we are using the tool cut to select fields 1 to 5 of the peak file and we add a "+" to every line using awk (*this is code example that can do what we want, not the only solution to do so.*).
+1. Create a file suitable for annotatePeaks.pl. To run the tool needs a peak bed file composed of 6 fields (chr, start, end, name, score, strand). The 5 first columns of the file ../05-PeakCalling/idr/RtrC_idr_peaks.bed are good but all other colums are of no use and the strand is missing. To generate a file with a correct format, we are using the tool cut to select fields 1 to 5 of the peak file and we add a "+" to every line using awk (*this is code example that can do what we want, not the only solution to do so.*).
 ```{bash eval=FALSE}
 cut \
   -f 1-5 \
-  ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed | \
+  ../05-PeakCalling/idr/RtrC_idr_peaks.bed | \
   awk -F "\t" '{print $0"\t+"}' \
-  > FNR_anaerobic_idr_peaks.bed
+  > RtrC_idr_peaks.bed
 ```
 2. Try annotatePeaks.pl
 ```{bash eval=FALSE}
@@ -790,10 +849,10 @@ annotatePeaks.pl peak/BEDfile genome > outputfile
 3. Annotation peaks with nearby genes with Homer
 ```{bash eval=FALSE}
 annotatePeaks.pl \
-  FNR_anaerobic_idr_peaks.bed \
-  ../data/Escherichia_coli_K12.fasta \
-  -gtf ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf \
-  > FNR_anaerobic_idr_annotated_peaks.tsv
+  RtrC_idr_peaks.bed \
+  ../data/Caulobacter_CP001340.fasta \
+  -gtf ../data/Caulobacter_CP001340.gtf \
+  > RtrC_idr_annotated_peaks.tsv
 ```
 
 **Look at the file you generated. Gene symbols are not present. Let's add them with some R code.**
@@ -805,37 +864,40 @@ annotatePeaks.pl \
 ```{R eval=FALSE, include=TRUE}
 
 ## set working directory
-setwd("/shared/projects/<your_project>/EBAII2025_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/<your_project>/EBA3I_2026_chipseq/07-PeakAnnotation")
 ## Or navigate using the "Files" tab and click on "More">"Set as Working Directory"
 
 ## read the file with peaks annotated with homer
 ## data are loaded into a data frame
 ## sep="\t": this is a tab separated file
 ## header=TRUE: there is a line with headers (ie. column names)
-d <- read.table("FNR_anaerobic_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
+d <- read.table("RtrC_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
 
 ## Load a 2-columns files which contains in the first column gene IDs
 ## and in the second column gene symbols
 ## data are loaded into a data frame
 ## header=FALSE: there is no header line
-gene.symbol <- read.table("../data/Escherichia_coli_K_12_MG1655.annotation.tsv.gz", header=FALSE)
+## Dataset-specific exercise: construct a validated gene-ID to symbol table from the GFF3.
+## The former E. coli mapping table cannot be reused for Caulobacter.
+## gene.symbol <- read.table("../data/Caulobacter_CP001340.gene_symbols.tsv", header=FALSE)
 
 ## Merge the 2 data frames based on a common field
 ## by.x gives the columns name in which the common field is for the d data frame
 ## by.y gives the columns name in which the common field is for the gene.symbol data frame
 ## d contains several columns with no information. We select only interesting columns
-d.annot <- merge(d[,c(1,2,3,4,5,6,8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
+## d.annot <- merge(d[,c(1,2,3,4,5,6,8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
+d.annot <- d # provisional: retain HOMER output until gene-ID mapping has been validated
 
 ## Change column names of the resulting data frame
-colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
-colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
+## colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
+## colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
 
-## output the merged data frame to a file named "FNR_anaerobic_idr_final_peaks_annotation.tsv"
+## output the merged data frame to a file named "RtrC_idr_final_peaks_annotation.tsv"
 ## col.names=TRUE: output column names
 ## row.names=FALSE: don't output row names
 ## sep="\t": table fields are separated by tabs
 ## quote=FALSE: don't put quote around text.
-write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=TRUE, row.names=FALSE, sep="\t", quote=FALSE)
+write.table(d.annot, "RtrC_idr_final_peaks_annotation.tsv", col.names=TRUE, row.names=FALSE, sep="\t", quote=FALSE)
 
 ```
 
@@ -845,14 +907,14 @@ write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=T
 
 **What are all the possible gene features? (see in column Annotation - extract information like promoter-TSS, TSS, ...). Create a plot (pie chart, barplot...) showing the proportion of each of them (include both the plot and the code that created it in the report).**
 
-6. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBAII2025_chipseq)
+6. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 07-PeakAnnotation
 cd ..
 ```
 
 ## - Search for Biological Processes, Molecular Functions or Cellular Compartments enrichment
-Use Official gene symbols of the file FNR_anaerobic_idr_final_peaks_annotation.tsv to search for enriched gene ontologies with the tool DAVID (Database for Annotation, Visualization and Integrated Discovery). Input your gene list on the DAVID website: https://david.ncifcrf.gov/. **Use DAVID convert ID tool if needed**
+Use Official gene symbols of the file RtrC_idr_final_peaks_annotation.tsv to search for enriched gene ontologies with the tool DAVID (Database for Annotation, Visualization and Integrated Discovery). Input your gene list on the DAVID website: https://david.ncifcrf.gov/. **Use DAVID convert ID tool if needed**
 
 **Are there biological processes enriched in the list of genes associated to the peaks? Show the top results of the Functional Annotation Clustering.**
 **Are these genes enriched in some KEGG pathway? Which ones?**
@@ -866,7 +928,7 @@ Use Official gene symbols of the file FNR_anaerobic_idr_final_peaks_annotation.t
 1. We will download the already called peak files in bed format from GEO.
 Create a new folder and go in it.
 ```{bash eval=FALSE}
-cd /shared/projects/<your_project>/EBAII2025_chipseq
+cd /shared/projects/<your_project>/EBA3I_2026_chipseq
 mkdir 07-PeakAnnotation-bonus
 cd 07-PeakAnnotation-bonus
 ```
@@ -912,7 +974,7 @@ col = brewer.pal(9,'Set1')
 
 ```{r eval=FALSE, include=TRUE}
 # set the working directory to the folder in which the peaks are stored
-setwd("/shared/projects/<your_project>/EBAII2025_chipseq/07-PeakAnnotation-bonus")
+setwd("/shared/projects/<your_project>/EBA3I_2026_chipseq/07-PeakAnnotation-bonus")
 # read the peaks for each dataset
 peaks.forebrain = readPeakFile('GSM348064_p300_peaks.txt.gz')
 peaks.midbrain = readPeakFile('GSM348065_p300_peaks.txt.gz')
@@ -1058,39 +1120,7 @@ barplot(ego.forebrain,showCategory=10)
 
 ## FAQ
 ### How to download the data
-**Goal**: Identify the datasets corresponding to the studied article and retrieve the data (reads as FASTQ files) corresponding to 2 replicates of a condition and the corresponding control.
-
-#### - Obtaining an identifier for a chosen dataset
-NGS datasets are (usually) made freely accessible for other scientists, by depositing these datasets into specialized databanks. [Sequence Read Archive (SRA)](http://www.ncbi.nlm.nih.gov/sra) located in USA hosted by NCBI, and its European equivalent [European Nucleotide Archive (ENA)](http://www.ebi.ac.uk/ena) located in England hosted by EBI both contains **raw reads**.
-
-Functional genomic datasets (transcriptomics, genome-wide binding such as ChIP-seq,...) are deposited in the databases [Gene Expression Omnibus (GEO)](http://www.ncbi.nlm.nih.gov/geo/) or its European equivalent [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/).
-
-Within an article of interest, search for a sentence mentioning the deposition of the data in a database. Here, the following sentence can be found at the end of the Materials and Methods section:
-*"All genome-wide data from this publication have been deposited in NCBI’s Gene Expression Omnibus (**GSE41195**)."*
-We will thus use the **GSE41195** identifier to retrieve the dataset from the **NCBI GEO** (Gene Expression Omnibus) database.
-
-#### - Accessing GSE41195 from GEO
-1.  The GEO database hosts processed data files and many details related to the experiments. SRA (Sequence Read Archive) stores the actual raw sequence data.
-2. Search in Google **GSE41195**. Click on the first link to directly access the correct page on the GEO database.
-![alt text][geo]
-3. This GEO entry is a mixture of expression analysis (Nimblegen Gene Expression Array), chip-chip and chip-seq. At the bottom of the page, click on the subseries related to the chip-seq datasets. (this subseries has its own identifier: **GSE41187**).
-![alt text][geo2]
-4. From this page, we will focus on the experiment **FNR IP ChIP-seq Anaerobic A**. At the bottom of the page, click on the link "**GSM1010219** - FNR IP ChIP-seq Anaerobic A".
-5. In the new page, go to the bottom to find the SRA identifier. This is the identifier of the raw dataset stored in the SRA database.  
-![alt text][geo3]
-6. Copy the identifier **SRX189773** (do not click on the link that would take you to the SRA database, see below why)
-
-#### - Downloading FASTQ file from the ENA database
-Although direct access to the SRA database at the NCBI is doable, SRA does not store sequences in a FASTQ format. So, in practice, it's simpler (and quicker!!) to download datasets from the ENA database (European Nucleotide Archive) hosted by EBI (European Bioinformatics Institute) in UK. ENA encompasses the data from SRA.
-
-1. Go to the [EBI](http://www.ebi.ac.uk/) website. Paste your SRA identifier (SRX189773) and click on the button "search".
-![alt text][ebi4]
-2. Click on the first result. On the next page, there is a link to the FASTQ file. For efficiency, this file has already been downloaded and is available in the "data" folder (FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz)  
-![alt text][ebi5]
-
-**tip**: To download the replicate and control datasets, we should redo the same steps starting from the GEO web page specific to the chip-seq datasets (see step 2.4) and choose **FNR IP ChIP-seq Anaerobic B** and **anaerobic INPUT DNA**. Downloaded FASTQ files are available in the data folder (FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz and Anaerobic_INPUT_DNA.fastq.gz respectively)
-
-**At this point, you have three FASTQ files, two IPs, one control (INPUT).**
+See the GEO/ENA instructions at the beginning of the course and the separate `download_data.sh` script. The reference is CP001340.1; the ChIP-seq SubSeries is GSE201497 (within GSE201499).
 
 ### How to extract peaks from the supplementary data of a publication ?
 The processed peaks (BED file) is sometimes available on the GEO website, or in supplementary data. Unfortunately, most of the time, the peak coordinates are embedded into supplementary tables and thus not usable "as is".
@@ -1109,26 +1139,18 @@ perl -lane 'print "gi|49175990|ref|NC_000913.2|\t".($F[0]-50)."\t".($F[0]+50)."\
 > gi|49175990|ref|NC_000913.2|	34015	34115
 4. Depending on the available information, the command will be different.
 
-### - How to obtain the annotation (=Gene) GTF file for IGV?
-Annotation files can be found on genome websites, NCBI FTP server, Ensembl, ... However, IGV required GFF format, or BED format, which are often not directly available.
-Here, I downloaded the annotation from the [UCSC Table browser](http://microbes.ucsc.edu/cgi-bin/hgTables?org=Escherichia+coli+K12&db=eschColi_K12&hgsid=1465191&hgta_doMainPage=1) as "Escherichia_coli_K_12_MG1655.annotation.gtf". Then, I changed the "chr" to the name of our genome with the following PERL command:
-
-```{bash eval=FALSE}
-perl -pe 's/^chr/gi\|49175990\|ref\|NC_000913.2\|/' Escherichia_coli_K_12_MG1655.annotation.gtf > Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
-```
-This file will work directly in IGV
+### - How to obtain the annotation (=gene) GTF file for IGV?
+Use the GFF3 annotation associated with accession **CP001340.1** and convert it to GTF with `gffread`, as in `download_data.sh`. Always verify that the reference sequence identifiers match the FASTA and the BAM headers. For IGV, the original GFF3 is also useful.
 
 # References
 
 [geo]: ../images/1_GEO.png "GEO"
 [geo2]: ../images/2_GEO.png "GEO2"
 [geo3]: ../images/3_GEO.png "GEO3"
-[ebi4]: ../images/4_EBI.png "EBI"
-[ebi5]: ../images/5_EBI.png "EBI"
+[multiqcfastqc]: ../images/MultiQC_fastqc.png "MultiQC"
 [genome6]: ../images/6_Genomes.png "E. Coli K-12"
 [selectjupyterlab]: ../images/selectJupyterLab.png "Select Jupyterlab"
 [jupyterlabform]: ../images/jupyterlabForm.png "Jupyerlab Form"
 [launchjupyterlab]: ../images/launchJupyterhub.png "launch Jupyterlab"
-[fastqc]: ../images/fastqc.png "Jupyterlab FastQC"
 [igvbam]: ../images/IGVbam.png "IGV BAM files"
 [launchrstudio]: ../images/launchRstudio.png "Launch Rstudio"

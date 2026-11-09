@@ -1,237 +1,241 @@
-USERID=slegras
+#!/usr/bin/env bash
+# Commands to run step by step, in the order shown in the course.
+# Replace <your_project> with your actual project directory.
+# Wait for all SLURM mapping jobs to finish before processing SAM files.
 
-## Création de l'environnement
-cd /shared/projects/2538_eb3i_n1_2025/
-mkdir $USERID
-cd $USERID
-cp -r /shared/projects/2538_eb3i_n1_2025/training_data/data .
+cd "/shared/projects/<your_project>"
+mkdir EBA3I_2026_chipseq
+cd EBA3I_2026_chipseq
+cp -r /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data .
 
-## Controle qualité
-module load fastqc/0.12.1
-
+# FastQC
 mkdir 01-QualityControl
 cd 01-QualityControl
-fastqc ../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -o .
-fastqc ../data/FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz -o .
-fastqc ../data/Anaerobic_INPUT_DNA.fastq.gz -o .
+module load fastqc/0.11.9
+fastqc --help
+fastqc ../data/RtrC_ChIP_rep1_1.fastq.gz ../data/RtrC_ChIP_rep1_2.fastq.gz -o .
+fastqc ../data/RtrC_ChIP_rep2_1.fastq.gz ../data/RtrC_ChIP_rep2_2.fastq.gz -o .
+fastqc ../data/RtrC_input_rep1_1.fastq.gz ../data/RtrC_input_rep1_2.fastq.gz -o .
+fastqc ../data/RtrC_input_rep2_1.fastq.gz ../data/RtrC_input_rep2_2.fastq.gz -o .
+module unload fastqc/0.11.9
+module load multiqc/1.35
+multiqc . -o . -n multiqc_report.html
+module unload multiqc/1.35
 cd ..
 
-## Mapping
+# Bowtie2
 module load bowtie2/2.5.1
-
+bowtie2
 mkdir 02-Mapping
 cd 02-Mapping
 mkdir index
 cd index
-bowtie2-build ../../data/Escherichia_coli_K12.fasta Escherichia_coli_K12
+bowtie2-build
+bowtie2-build ../../data/Caulobacter_CP001340.fasta Caulobacter_CP001340
 cd ..
 mkdir bam
 cd bam
-sbatch -A 2538_eb3i_n1_2025 -p fast -o FNR_IP_ChIP-seq_Anaerobic_A.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Escherichia_coli_K12 -U ../../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -S FNR_IP_ChIP-seq_Anaerobic_A.sam"
-sbatch -A 2538_eb3i_n1_2025 -p fast -o FNR_IP_ChIP-seq_Anaerobic_B.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Escherichia_coli_K12 -U ../../data/FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz -S FNR_IP_ChIP-seq_Anaerobic_B.sam"
-sbatch -A 2538_eb3i_n1_2025 -p fast -o Anaerobic_INPUT_DNA.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Escherichia_coli_K12 -U ../../data/Anaerobic_INPUT_DNA.fastq.gz -S Anaerobic_INPUT_DNA.sam"
+sbatch -p fast -o RtrC_ChIP_rep1.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_ChIP_rep1_1.fastq.gz -2 ../../data/RtrC_ChIP_rep1_2.fastq.gz -S RtrC_ChIP_rep1.sam"
+sbatch -p fast -o RtrC_ChIP_rep2.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_ChIP_rep2_1.fastq.gz -2 ../../data/RtrC_ChIP_rep2_2.fastq.gz -S RtrC_ChIP_rep2.sam"
+sbatch -p fast -o RtrC_input_rep1.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_input_rep1_1.fastq.gz -2 ../../data/RtrC_input_rep1_2.fastq.gz -S RtrC_input_rep1.sam"
+sbatch -p fast -o RtrC_input_rep2.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_input_rep2_1.fastq.gz -2 ../../data/RtrC_input_rep2_2.fastq.gz -S RtrC_input_rep2.sam"
 
-# sbatch --cpus-per-task 10 --wrap="bowtie -p 10 ../index/Escherichia_coli_K12 ../../data/Anaerobic_INPUT_DNA.fastq.gz -v 2 -m 1 -3 1 -S 2> Anaerobic_INPUT_DNA.out > Anaerobic_INPUT_DNA.sam"
-# sbatch --cpus-per-task 10 --wrap="bowtie -p 10 ../index/Escherichia_coli_K12 ../../data/FNR_IP_ChIP-seq_Anaerobic_B.fastq.gz -v 2 -m 1 -3 1 -S 2> FNR_IP_ChIP-seq_Anaerobic_B.out > FNR_IP_ChIP-seq_Anaerobic_B.sam"
-# sbatch --cpus-per-task 10 --wrap="bowtie -p 10 ../index/Escherichia_coli_K12 ../../data/FNR_IP_ChIP-seq_Anaerobic_A.fastq.gz -v 2 -m 1 -3 1 -S 2> FNR_IP_ChIP-seq_Anaerobic_A.out > FNR_IP_ChIP-seq_Anaerobic_A.sam"
-
-# Création de fichiers sam ordonnés
+# Wait for all four jobs to complete and check mapping logs before continuing.
 module load samtools/1.21
-samtools view -@ 2 -q 10 -b FNR_IP_ChIP-seq_Anaerobic_A.sam | samtools sort -@ 2 - -o FNR_IP_ChIP-seq_Anaerobic_A.bam 
-samtools view -@ 2 -q 10 -b FNR_IP_ChIP-seq_Anaerobic_B.sam | samtools sort -@ 2 - -o FNR_IP_ChIP-seq_Anaerobic_B.bam 
-samtools view -@ 2 -q 10 -b Anaerobic_INPUT_DNA.sam | samtools sort -@ 2 - -o Anaerobic_INPUT_DNA.bam 
+samtools view -@ 2 -q 10 -b RtrC_ChIP_rep1.sam | samtools sort -@ 2 - -o RtrC_ChIP_rep1.bam
+samtools index RtrC_ChIP_rep1.bam
+gzip RtrC_ChIP_rep1.sam
+samtools view -@ 2 -q 10 -b RtrC_ChIP_rep2.sam | samtools sort -@ 2 - -o RtrC_ChIP_rep2.bam
+samtools index RtrC_ChIP_rep2.bam
+gzip RtrC_ChIP_rep2.sam
+samtools view -@ 2 -q 10 -b RtrC_input_rep1.sam | samtools sort -@ 2 - -o RtrC_input_rep1.bam
+samtools index RtrC_input_rep1.bam
+gzip RtrC_input_rep1.sam
+samtools view -@ 2 -q 10 -b RtrC_input_rep2.sam | samtools sort -@ 2 - -o RtrC_input_rep2.bam
+samtools index RtrC_input_rep2.bam
+gzip RtrC_input_rep2.sam
+module unload samtools/1.21 bowtie2/2.5.1
+cd ..
+module load multiqc/1.35
+multiqc bam -o . -n multiqc_mapping.html
+module unload multiqc/1.35
+cd bam
 
-# On index les fichiers bam
-samtools index FNR_IP_ChIP-seq_Anaerobic_B.bam
-samtools index FNR_IP_ChIP-seq_Anaerobic_A.bam
-samtools index Anaerobic_INPUT_DNA.bam
-
-# On compresse les fichiers sam
-gzip FNR_IP_ChIP-seq_Anaerobic_A.sam &
-gzip FNR_IP_ChIP-seq_Anaerobic_B.sam &
-gzip Anaerobic_INPUT_DNA.sam &
-
-# marquage des duplicats
+# Picard duplicates
 module load picard/2.23.5
-
+module load samtools/1.21
 picard MarkDuplicates \
-  -CREATE_INDEX true \
-  -INPUT FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  -OUTPUT Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  -METRICS_FILE Marked_FNR_IP_ChIP-seq_Anaerobic_A.metric &
-
+-CREATE_INDEX true \
+-INPUT RtrC_ChIP_rep1.bam \
+-OUTPUT Marked_RtrC_ChIP_rep1.bam \
+-METRICS_FILE RtrC_ChIP_rep1.dup_metrics.txt
+# samtools flagstat Marked_RtrC_ChIP_rep1.bam > Marked_RtrC_ChIP_rep1.flagstat.txt
 picard MarkDuplicates \
-  -CREATE_INDEX true \
-  -INPUT FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  -OUTPUT Marked_FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  -METRICS_FILE Marked_FNR_IP_ChIP-seq_Anaerobic_B.metric &
-
+-CREATE_INDEX true \
+-INPUT RtrC_ChIP_rep2.bam \
+-OUTPUT Marked_RtrC_ChIP_rep2.bam \
+-METRICS_FILE RtrC_ChIP_rep2.dup_metrics.txt
+# samtools flagstat Marked_RtrC_ChIP_rep2.bam > Marked_RtrC_ChIP_rep2.flagstat.txt
 picard MarkDuplicates \
-  -CREATE_INDEX true \
-  -INPUT Anaerobic_INPUT_DNA.bam \
-  -OUTPUT Marked_Anaerobic_INPUT_DNA.bam \
-  -METRICS_FILE Anaerobic_INPUT_DNA.metric &
-
+-CREATE_INDEX true \
+-INPUT RtrC_input_rep1.bam \
+-OUTPUT Marked_RtrC_input_rep1.bam \
+-METRICS_FILE RtrC_input_rep1.dup_metrics.txt
+# samtools flagstat Marked_RtrC_input_rep1.bam > Marked_RtrC_input_rep1.flagstat.txt
+picard MarkDuplicates \
+-CREATE_INDEX true \
+-INPUT RtrC_input_rep2.bam \
+-OUTPUT Marked_RtrC_input_rep2.bam \
+-METRICS_FILE RtrC_input_rep2.dup_metrics.txt
+# samtools flagstat Marked_RtrC_input_rep2.bam > Marked_RtrC_input_rep2.flagstat.txt
+module load multiqc/1.35
+multiqc . -o . -n multiqc_duplicates.html
+module unload multiqc/1.35
+module unload samtools/1.21 picard/2.23.5
 cd ../..
 
-## Control qualité
-module load deeptools/3.5.4
-
+# ChIP fingerprint
 mkdir 03-ChIPQualityControls
 cd 03-ChIPQualityControls
-
+module load deeptools/3.5.4
 plotFingerprint \
   -p 2 \
   --numberOfSamples 10000 \
-  -b ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-     ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-     ../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  -plot fingerprint_10000.png &
+  -b ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
+  -plot fingerprint_10000.png
 
-# plotFingerprint \
-#   -p 2 \
-#   -b ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-#   ../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-#   ../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-#   -plot fingerprint.png &
+plotFingerprint \
+  -p 2 \
+  -b ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+     ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
+  -plot fingerprint.png
 
+module unload deeptools/3.5.4
 cd ..
 
-## Génération de fichiers bigwig
+# BigWig
 module load deeptools/3.5.4
-
+bamCoverage --help
 mkdir 04-Visualization
-cd 04-Visualization/
+cd 04-Visualization
 bamCoverage \
-  --bam ../02-Mapping/bam/Marked_FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  --outFileName FNR_IP_ChIP-seq_Anaerobic_A_nodup.bw \
+  --bam ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
+  --outFileName RtrC_ChIP_rep1_nodup.bw \
   --outFileFormat bigwig \
-  --effectiveGenomeSize 4639675 \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
-  --extendReads 200 \
-  --ignoreDuplicates &
-
+  --extendReads \
+  --ignoreDuplicates
 bamCoverage \
-  --bam ../02-Mapping/bam/Marked_FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  --outFileName FNR_IP_ChIP-seq_Anaerobic_B_nodup.bw \
+  --bam ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
+  --outFileName RtrC_ChIP_rep2_nodup.bw \
   --outFileFormat bigwig \
-  --effectiveGenomeSize 4639675 \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
-  --extendReads 200 \
-  --ignoreDuplicates &
-
+  --extendReads \
+  --ignoreDuplicates
 bamCoverage \
-  --bam ../02-Mapping/bam/Marked_Anaerobic_INPUT_DNA.bam \
-  --outFileName Anaerobic_INPUT_DNA_nodup.bw \
+  --bam ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
+  --outFileName RtrC_input_rep1_nodup.bw \
   --outFileFormat bigwig \
-  --effectiveGenomeSize 4639675 \
   --normalizeUsing CPM \
   --skipNonCoveredRegions \
-  --extendReads 200 \
-  --ignoreDuplicates &
-
+  --extendReads \
+  --ignoreDuplicates
+bamCoverage \
+  --bam ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
+  --outFileName RtrC_input_rep2_nodup.bw \
+  --outFileFormat bigwig \
+  --normalizeUsing CPM \
+  --skipNonCoveredRegions \
+  --extendReads \
+  --ignoreDuplicates
 cd ..
+module unload deeptools/3.5.4
 
-## Peak calling
-module load macs2/2.2.7.1
-
+# MACS2
 mkdir 05-PeakCalling
-# Peak calling sur les réplicats
 mkdir 05-PeakCalling/replicates
 cd 05-PeakCalling/replicates
+module load macs2/2.2.7.1
+macs2 callpeak --help
 macs2 callpeak \
-  -t ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  -c ../../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  --format BAM \
-  --gsize 4639675 \
-  --name 'FNR_Anaerobic_A' \
-  --bw 400 \
-  --fix-bimodal \
+  -t ../../02-Mapping/bam/RtrC_ChIP_rep1.bam \
+  -c ../../02-Mapping/bam/RtrC_input_rep1.bam \
+  --format BAMPE \
+  --gsize 4042929 \
+  --name 'RtrC_rep1' \
   -p 1e-2 \
-  &> repA_MACS.out &
-
+  &> rep1_MACS.out
 macs2 callpeak \
-  -t ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  -c ../../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  --format BAM \
-  --gsize 4639675 \
-  --name 'FNR_Anaerobic_B' \
-  --bw 400 \
-  --fix-bimodal \
+  -t ../../02-Mapping/bam/RtrC_ChIP_rep2.bam \
+  -c ../../02-Mapping/bam/RtrC_input_rep2.bam \
+  --format BAMPE \
+  --gsize 4042929 \
+  --name 'RtrC_rep2' \
   -p 1e-2 \
-  &> repB_MACS.out &
+  &> rep2_MACS.out
 cd ..
-
-# Peak calling sur le pool de réplicat
 mkdir pool
 cd pool
 macs2 callpeak \
-  -t ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_A.bam \
-  ../../02-Mapping/bam/FNR_IP_ChIP-seq_Anaerobic_B.bam \
-  -c ../../02-Mapping/bam/Anaerobic_INPUT_DNA.bam \
-  --format BAM \
-  --gsize 4639675 \
-  --name 'FNR_Anaerobic_pool' \
-  --bw 400 \
-  --fix-bimodal \
+  -t ../../02-Mapping/bam/RtrC_ChIP_rep1.bam \
+     ../../02-Mapping/bam/RtrC_ChIP_rep2.bam \
+  -c ../../02-Mapping/bam/RtrC_input_rep1.bam \
+     ../../02-Mapping/bam/RtrC_input_rep2.bam \
+  --format BAMPE \
+  --gsize 4042929 \
+  --name 'RtrC_pool' \
   -p 1e-2 \
-  &> pool_MACS.out &
+  &> pool_MACS.out
 cd ..
-
-# Analyse IDR
-module load idr/2.0.4.2
+module load multiqc/1.35
+multiqc replicates pool -o . -n multiqc_peakcalling.html
+module unload multiqc/1.35
 mkdir idr
 cd idr
-idr \
-  --samples ../replicates/FNR_Anaerobic_A_peaks.narrowPeak \
-  ../replicates/FNR_Anaerobic_B_peaks.narrowPeak \
-  --peak-list ../pool/FNR_Anaerobic_pool_peaks.narrowPeak \
-  --input-file-type narrowPeak \
-  --output-file FNR_anaerobic_idr_peaks.bed \
-  --plot &
+module load idr/2.0.4.2
+idr --help
+idr --samples ../replicates/RtrC_rep1_peaks.narrowPeak \
+              ../replicates/RtrC_rep2_peaks.narrowPeak \
+    --peak-list ../pool/RtrC_pool_peaks.narrowPeak \
+    --input-file-type narrowPeak \
+    --output-file RtrC_idr_results.bed --plot
+awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2,$3,"RtrC_idr_peak_"NR,1000}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
+module unload macs2/2.2.7.1
+module unload idr/2.0.4.2
 cd ../..
 
-## Préparation des fichiers pour l'analyse de motif
-module load bedtools/2.30.0
-
+# Motif sequence extraction
 mkdir 06-MotifAnalysis
 cd 06-MotifAnalysis
-samtools faidx ../data/Escherichia_coli_K12.fasta
-bedtools getfasta -fi ../data/Escherichia_coli_K12.fasta \
-  -bed ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed -fo FNR_anaerobic_idr_peaks.fa
-
+module load samtools/1.21
+samtools faidx ../data/Caulobacter_CP001340.fasta
+module load bedtools/2.30.0
+bedtools getfasta \
+  -fi ../data/Caulobacter_CP001340.fasta \
+  -bed ../05-PeakCalling/idr/RtrC_idr_peaks.bed \
+  -fo RtrC_idr_peaks.fa
 cd ..
 
-## Annotation des pics
-module load homer/4.11
-
+# Peak annotation
 mkdir 07-PeakAnnotation
 cd 07-PeakAnnotation
-
-# On met le fichier de pics dans le bon format
-cut -f1-5 ../05-PeakCalling/idr/FNR_anaerobic_idr_peaks.bed | \
-  awk -F "\t" '{print $0"\t+"}'  > FNR_anaerobic_idr_peaks.bed
-
-# lancement de l'annotation
+cut \
+  -f 1-5 \
+  ../05-PeakCalling/idr/RtrC_idr_peaks.bed | \
+  awk -F "\t" '{print $0"\t+"}' \
+  > RtrC_idr_peaks.bed
+module load homer/4.11
+annotatePeaks.pl --help
 annotatePeaks.pl \
-  FNR_anaerobic_idr_peaks.bed \
-  ../data/Escherichia_coli_K12.fasta \
-  -gtf ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf \
-  > FNR_anaerobic_idr_annotated_peaks.tsv
-
-# # calcul de statistiques sur les résultats
-tail -n 2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
-vi FNR_anaerobic_idr_final_peaks_annotation.tsv
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $11}'
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{print $8}' | sort | uniq -c
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}'
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' | wc -l
-tail -n +2 FNR_anaerobic_idr_final_peaks_annotation.tsv | awk '{if ($8=="promoter-TSS") print $11}' > FNR_anaerobic_idr_final_peaks_annotation_officialGeneSymbols.tsv
-
-# # On compresse de nouveau les fichiers
-# gzip ../data/Escherichia_coli_K_12_MG1655.annotation.fixed.gtf
-# gzip ../data/Escherichia_coli_K12.fasta
-
+  RtrC_idr_peaks.bed \
+  ../data/Caulobacter_CP001340.fasta \
+  -gtf ../data/Caulobacter_CP001340.gtf \
+  > RtrC_idr_annotated_peaks.tsv
 cd ..
