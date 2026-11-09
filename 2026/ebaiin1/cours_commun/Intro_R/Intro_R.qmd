@@ -23,7 +23,7 @@ title-slide-attributes:
   data-background-size: cover
   data-background-repeat: no-repeat
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, echo=FALSE, include=FALSE}
@@ -107,7 +107,7 @@ A way to gain free time ?
 
 Go to [https://ondemand.cluster.france-bioinformatique.fr](https://ondemand.cluster.france-bioinformatique.fr){.external target="_blank"} and open `R_practice.qmd` script
 
-[![](img/launch_ood.png){fig-align="center"}](https://ondemand.cluster.france-bioinformatique.fr){.external target="_blank"}
+[![](img/launch_ood.png){fig-align="center" width=70%}](https://ondemand.cluster.france-bioinformatique.fr){.external target="_blank"}
 
 ## Rstudio interface
 
@@ -136,7 +136,7 @@ setwd('/shared/projects/your_project_name/intro_R')
 
 ## Files
 
-Refresh your files in Rstudio : your should see the following :
+Refresh your files in Rstudio, your should see the following :
 
 
 # Basic operations
@@ -529,6 +529,13 @@ This can be useful if you need to repeat the same computations several times, or
 
 Now it's time to manipulate some real data !
 
+
+## What's a data frame ?
+
+A two-dimensional way of storing information : the same kind of information is observed over several individuals
+
+![](img/Data-frame-example.png){fig-align="center"}
+
 ## Read the `annotation.csv` file
 
 We'll use `read.table` function. What are its arguments ?
@@ -554,6 +561,10 @@ and even specific packages :
 - `readRDS` to read R-files  
 - `load` to import a whole R environment   
 
+![](img/logos/vroom.png){.absolute top="100" left="950" width="80" }
+![](img/logos/openxlsx.png){.absolute top="200" left="950" width="80" }
+![](img/logos/readxl.png){.absolute top="300" left="950" width="80" }
+
 :::{.callout-tip}
 Do not hesitate to search "How to open ... file in R ?" 
 :::
@@ -577,6 +588,37 @@ We can also check the summarized info contained in `annotation_data`
 str(annotation_data)
 summary(annotation_data)
 ```
+
+## To go further
+
+A set of packages to simplify data handling :
+
+- **mutate** : to modify / add columns
+- **select** : extract specific columns 
+- **filter** : chose rows according to criteria
+- **merge** : compile data frames together
+- ...
+
+```{r, eval=F}
+annotation_data %>% 
+  mutate(gene_length=pos_end-pos_start) %>% 
+  select(gene_length<1200) %>% 
+  merge(count_data)
+```
+
+![](img/tidyverse.png){.absolute top="100" left="750" width="300" }
+![](img/pipe.png){.absolute bottom="45" left="700" width="200" }
+
+# Take home message
+
+R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C476"}. A lot of ressources are available on each area of research. But remember to always [**define & understand your needs**]{style="color: #E34234"} to select the best R function to help you.
+
+**Rstudio Cheatsheets  :**     
+[https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/){.external target="_blank"}
+
+**Packages from tidyverse :**   
+[https://tidyverse.org/](https://tidyverse.org/){.external target="_blank"}
+
 
 # Memos for later
 

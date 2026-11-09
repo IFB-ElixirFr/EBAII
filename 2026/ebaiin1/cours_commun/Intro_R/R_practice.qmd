@@ -1,6 +1,12 @@
 ---
 title: "R explained in 1h45 : Exercices"
-format: html
+format: 
+  html: 
+    grid:
+        sidebar-width: 150px
+        body-width: 1200px
+        margin-width: 150px
+        gutter-width: 1.5rem
 editor: visual
 ---
 
@@ -229,7 +235,7 @@ This can be useful if you need to repeat the same computations several times, or
 ### Manipulate basic objects
 
 | Symbol | Goal | Examples |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | `=` or `<-` or `->` | assign a `value` to a `variable` or an `argument` | a `<-` 10 or read.table(file `=` "file.txt") |
 | `( )` | to give `arguments` to a function | mean`(`x = c`(`10,6,8,2`))` |
 | `[ ]` | get a value from a vector | measures`[`1`]` or measures`[`2:8`]` or measures`[`c(3,6,4)`]` |
@@ -239,7 +245,7 @@ This can be useful if you need to repeat the same computations several times, or
 ### Good practices
 
 | To | Do this | Avoid this |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | Clean your environment | `rm(list = ls())` | mixing-up variables |
 | Use explicit names | expression_data, annotation, groceries_list | dat, var1, dfslkgj |
 | Use comments | with `#`, using lines, stars ... | obscure functions, 100+ lines without comment |
