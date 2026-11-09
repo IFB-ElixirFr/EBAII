@@ -31,3 +31,17 @@ From there, you can also find a link to download the whole repository with `git`
 | Annotation des pics | Elodie Darbo |
 | Workflow et conclusion | Rachel Legendre |
 
+
+### Bulk-RNAseq
+
+| Support | Lien |
+|----------------------------------|------------------|
+| Biostats (partie théorique) | [gslides](https://docs.google.com/presentation/d/1BJqLUhOqOP43Db2Wy4vBlk6YO6HEycNF/edit?usp=sharing&ouid=118119984173275330158&rtpof=true&sd=true) |
+
+
+| Cours | Intervenants |
+|----------------------------------|------------------|
+| Programme de l'atelier Bulk-RNAseq | |
+| Analyse différentielle (Cours + TP) | Elise Jacquemet |
+
+

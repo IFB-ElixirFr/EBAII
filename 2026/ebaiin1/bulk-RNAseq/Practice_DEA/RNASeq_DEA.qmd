@@ -1,0 +1,1210 @@
+---
+title: "Statistical report : pairwise comparisons of conditions with DESeq2"
+author: "Your name"
+date: today
+bibliography: bibliography.bib
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    grid:
+      sidebar-width: 300px    
+      body-width: 1100px      
+      margin-width: 200px      
+      gutter-width: 1rem        
+    echo: false
+    number-sections: true
+    theme: flatly
+    highlight: default
+    fig-align: center
+---
+
+```{r}
+#| label: config
+#| message: false
+# ############################################################################
+# Paramètres à modifier
+# ############################################################################
+
+projectName <- "projectName"                         # nom du projet (utilisé pour les
+                                                     # fichiers de sortie : <projectName>.RData)
+
+author <- "Your name"                                # auteur(e) de l'analyse / du rapport
+                                                     # (adapter aussi le champ author du YAML)
+
+targetFile <- "target.txt"                           # chemin du fichier de design/target
+rawDir <- "raw"                                      # répertoire contenant les comptages bruts
+featuresToRemove <- c("alignment_not_unique",        # noms des features à retirer
+                       "ambiguous", "no_feature",    # (spécifique HTSeq-count, rRNA, ...)
+                       "not_aligned", "too_low_aQual")  # NULL si rien à retirer
+
+varInt <- "condition"                                # facteur d'intérêt
+condRef <- "WT"                                      # condition biologique de référence
+batch <- NULL                                        # facteur de bloc : NULL (défaut) ou "batch"
+
+fitType <- "parametric"                              # relation moyenne-variance : "parametric"
+                                                     # (défaut), "local" ou "mean"
+cooksCutoff <- TRUE                                  # TRUE/FALSE : détection des outliers
+independentFiltering <- TRUE                         # TRUE/FALSE : independent filtering
+alpha <- 0.05                                        # seuil de significativité statistique
+pAdjustMethod <- "BH"                                # méthode d'ajustement des p-values :
+                                                     # "BH" (défaut) ou "BY"
+
+typeTrans <- "VST"                                   # transformation pour PCA/clustering :
+                                                     # "VST" ou "rlog"
+clusterDist <- "euclidean"                           # distance entre échantillons pour le dendrogramme :
+                                                      # "euclidean" (défaut) ou "SERE" (statistique, comptages bruts)
+locfunc <- "median"                                  # "median" (défaut) ou "shorth" pour
+                                                     # estimer les size factors
+
+shrinkLfc <- TRUE                                    # TRUE/FALSE : rétrécissement (shrinkage)
+typeShrink <- "normal"                               # des log2 fold-changes via lfcShrink()
+                                                     # "normal" (historique DESeq2)
+                                                     # ou "ashr" (recommandation récente ; nécessite
+                                                     # le package ashr)
+
+colors <- c("#f3c300", "#875692", "#f38400",         # couleurs des conditions biologiques
+             "#a1caf1", "#be0032", "#c2b280",        # sur les figures
+             "#848482", "#008856", "#e68fac",
+             "#0067a5", "#f99379", "#604e97")
+
+saveRData <- TRUE                                    # TRUE/FALSE : sauvegarder l'image de la
+                                                     # session R dans <projectName>.RData
+```
+
+```{r}
+#| label: setup
+#| include: false
+# Chargement des packages
+suppressPackageStartupMessages({
+  library(DESeq2)      # analyse differentielle
+  library(ggplot2)     # figures
+  library(scales)      # transformations d'échelles ggplot (log10_trans, trans_new, ...)
+  library(ggdendro)    # dendrogrammes ggplot
+  library(ggrepel)     # étiquettes de points qui ne se chevauchent pas
+  library(gridExtra)   # assemblage de plusieurs figures
+  library(grid)        # grobs des figures assemblées (textGrob, gpar)
+  library(kableExtra)  # mise en forme des tables du rapport
+})
+
+# répertoires de sortie (non créés s'ils existent déjà)
+if (!dir.exists("figures")) dir.create("figures")
+if (!dir.exists("tables")) dir.create("tables")
+
+# contrôles de base des paramètres
+if (!file.exists(targetFile)) stop("targetFile must be an accessible file: ", targetFile)
+if (!dir.exists(rawDir)) stop("rawDir must be an accessible directory: ", rawDir)
+
+# fonction d'estimation des size factors : "median" (défaut) ou "shorth"
+# (le package Bioconductor genefilter est nécessaire pour "shorth")
+if (!locfunc %in% c("median", "shorth"))
+  stop("locfunc must be \"median\" or \"shorth\"")
+locfuncFun <- if (locfunc == "median") stats::median else genefilter::shorth
+
+# étouffe l'avertissement interne d'obsolescence de S4Vectors (anyMissing,
+# remplacé par anyNA) : il est émis par la méthode de validité des GRanges vides
+# créés par le constructeur DESeqDataSet et n'a aucun impact sur l'analyse ;
+# tous les autres avertissements restent affichés
+quietDeprecated <- function(expr)
+  withCallingHandlers(expr, warning = function(w) {
+    if (grepl("anyMissing", conditionMessage(w))) invokeRestart("muffleWarning")
+  })
+
+# references croisées tables et figures
+emitTabsetFigures <- function(figId, figFiles, caption) {
+  cat("\n::: {#", figId, "}\n\n", sep = "")
+  cat("::: {.panel-tabset}\n")
+  for (name in names(figFiles)) {
+    cat("\n## ", gsub("_", " ", name), "\n\n")
+    cat(paste0("![](", figFiles[name], "){width=600px}\n\n"))
+  }
+  cat(":::\n\n")
+  cat(caption, "\n\n")
+  cat(":::\n\n")
+}
+
+# noms des conditions biologiques (condition de référence en premier)
+conds <- unique(as.character(read.table(targetFile, header = TRUE, sep = "\t",
+                                        na.strings = "")[[varInt]]))
+condNames <- c(condRef, setdiff(conds, condRef))
+
+# contrôle : le vecteur colors doit contenir au moins une couleur par
+# condition biologique (sinon ggplot échoue avec un message peu explicite)
+if (length(condNames) > length(colors))
+  stop("The colors vector must contain at least ", length(condNames),
+       " colors (one per biological condition)")
+```
+
+# Introduction
+
+The analyses reported in this document are part of the `r projectName` project. The aim is to find features differentially expressed between `r paste(paste(condNames[-length(condNames)],collapse=", "),condNames[length(condNames)],sep=" and ")`. The statistical analysis process includes data normalisation, graphical exploration of raw and normalised data, test for differential expression for each feature between the conditions, raw p-value adjustment and export of lists of features having a significant differential expression between the conditions. `r ifelse(!is.null(batch),paste0("In this analysis, the ",batch, " effect will be taken into account in the statistical model."),"")`
+
+The analysis is performed using the R software [@rcoreteam] and the Bioconductor framework [@Gentleman2004], in particular the DESeq2 package [@Anders2010; @Love2014]. Normalisation and differential analysis are carried out according to the DESeq2 model and package and following steps recommended in [@Varet2016]. This report comes with additional tab-delimited text files that contain lists of differentially expressed features.
+
+For more details about the DESeq2 methodology, please refer to its related publications [@Anders2010; @Love2014].
+
+# Description of raw data
+
+```{r}
+#| label: load-target
+# Lecture du fichier de design (target) : un échantillon par ligne
+target <- read.table(targetFile, header = TRUE, sep = "\t", na.strings = "")
+
+# contrôles de base sur le design
+if (!varInt %in% names(target)) stop("The factor of interest ", varInt, " is not in the target file")
+if (!is.null(batch) && !batch %in% names(target)) stop("The batch effect ", batch, " is not in the target file")
+if (!condRef %in% as.character(target[, varInt])) stop("The reference level ", condRef, " is not a level of the factor of interest")
+if (min(table(target[, varInt])) < 2) stop("The factor of interest ", varInt, " has a level without replicates")
+
+# facteur d'intérêt, avec la condition de référence en premier niveau
+target[, varInt] <- as.factor(target[, varInt])
+lev <- c(condRef, unique(as.character(target[, varInt])))
+lev <- lev[!duplicated(lev)]
+target[, varInt] <- factor(target[, varInt], levels = lev)
+
+# facteur de bloc (si renseigné) : factorisation + contrôle de non-confusion
+# avec le facteur d'intérêt (le design ~ batch + condition doit être de rang plein,
+# sinon l'effet batch ne peut pas être séparé de l'effet biologique)
+if (!is.null(batch)) {
+  target[, batch] <- as.factor(target[, batch])
+  mm <- model.matrix(formula(paste("~", batch, "+", varInt)), data = target)
+  if (qr(mm)$rank < ncol(mm)) stop("The batch effect ", batch, " is confounded with ",
+    "the factor of interest ", varInt, ": no batch correction is possible")
+}
+
+# tri des lignes par condition (la référence en premier)
+target <- target[order(target[, varInt]), ]
+rownames(target) <- as.character(target[, 1])
+```
+
+The count data files and associated biological conditions are listed in the following table.
+
+```{r}
+#| label: tbl-target
+#| results: asis
+#| tbl-cap: "Data files and associated biological conditions."
+# Table 1 : design de l'expérience
+kable_styling(kable(target, row.names = FALSE,
+                    format = "html"),
+              c("striped", "bordered", "responsive"), font_size = 12)
+```
+
+```{r}
+#| label: batch-design-table
+#| results: asis
+# Tableau croisé condition x batch 
+# (affiché uniquement si un facteur de bloc est pris en compte)
+# permet de vérifier que le plan d'expérience est bien complet
+if (!is.null(batch)) {
+  cat("When a batch effect is taken into account, @tbl-batch-design shows the number of samples for each crossing of the biological condition and the batch. One can check on this table that no level of the batch contains samples of a single biological condition: in that case the two effects would be confounded and no batch correction would be possible.\n\n")
+  cat("::: {#tbl-batch-design}\n\n")
+  print(kable_styling(kable(table(Condition = target[, varInt], Batch = target[, batch]),
+                            row.names = TRUE, format = "html"),
+                      c("striped", "bordered", "responsive"), font_size = 12))
+  cat("\n\nNumber of samples for each crossing of the biological condition and the batch.\n\n")
+  cat(":::\n\n")
+}
+```
+
+```{r}
+#| label: load-counts
+# Lecture des fichiers de comptages bruts et assemblage en une matrice
+# (une ligne par gène, une colonne par échantillon)
+labels <- as.character(target[, 1])
+files <- as.character(target[, 2])
+
+# détection automatique du format : salmon (fichiers de quantification
+# quant.sf, comptages récupérés via tximport), featureCounts (comptages en
+# colonne 7) ou HTSeq-count (comptages en colonne 2)
+first.line <- readLines(file.path(rawDir, files[1]), n = 1)
+is.salmon <- grepl("EffectiveLength", first.line, fixed = TRUE) &&
+             grepl("NumReads", first.line, fixed = TRUE)
+
+cat("Loading files:\n")
+if (is.salmon) {
+  # salmon : import des quantifications via tximport, au niveau des
+  # transcrits (txOut = TRUE : aucune correspondance transcrits -> gènes
+  # n'est nécessaire) ; les comptages "lengthScaledTPM", corrigés des
+  # longueurs effectives, sont arrondis en entiers comme DESeq2 l'exige.
+  # NB : pour une analyse au niveau des gènes, fournir à tximport une table
+  # tx2gene (correspondance transcrits -> gènes) et remplacer txOut = TRUE
+  # par tx2gene = <table>
+  cat("Importing salmon quantification files with tximport (lengthScaledTPM)\n")
+  suppressPackageStartupMessages(library(tximport))
+  files.tx <- setNames(file.path(rawDir, files), labels)
+  txi <- suppressMessages(tximport(files.tx, type = "salmon", txOut = TRUE,
+                                   countsFromAbundance = "lengthScaledTPM"))
+  counts <- round(txi$counts, 0)
+  storage.mode(counts) <- "integer"
+  counts <- counts[order(rownames(counts)), ]
+  for (i in seq_along(files))
+    cat(files[i], ": ", nrow(counts), " rows and ",
+        sum(counts[, i] == 0), " null count(s)\n", sep = "")
+} else {
+  # featureCounts ou HTSeq-count : lecture du premier fichier, puis des
+  # suivants, fusion par Id de gène
+  f1 <- read.table(file.path(rawDir, files[1]), sep = "\t", quote = "\"",
+                   header = FALSE, skip = 5, nrows = 5, stringsAsFactors = FALSE)
+  if (ncol(f1) >= 7 && is.numeric(f1[, 7])) {
+    header <- TRUE; countsCol <- 7        # featureCounts
+  } else if (ncol(f1) >= 2 && is.numeric(f1[, 2])) {
+    header <- FALSE; countsCol <- 2      # HTSeq-count
+  } else stop("Can't determine if count files come from HTSeq-count, featureCounts or salmon")
+  rawCounts <- read.table(file.path(rawDir, files[1]), sep = "\t", quote = "\"",
+                          header = header, stringsAsFactors = FALSE)[, c(1, countsCol)]
+  colnames(rawCounts) <- c("Id", labels[1])
+  cat(files[1], ": ", nrow(rawCounts), " rows and ",
+      sum(rawCounts[, 2] == 0), " null count(s)\n", sep = "")
+  for (i in 2:length(files)) {
+    tmp <- read.table(file.path(rawDir, files[i]), sep = "\t", quote = "\"",
+                      header = header, stringsAsFactors = FALSE)[, c(1, countsCol)]
+    colnames(tmp) <- c("Id", labels[i])
+    rawCounts <- merge(rawCounts, tmp, by = "Id", all = TRUE)
+    cat(files[i], ": ", nrow(tmp), " rows and ", sum(tmp[, 2] == 0), " null count(s)\n", sep = "")
+  }
+
+  # conversion en matrice numérique (les Ids manquants deviennent 0), tri par Id
+  rawCounts[is.na(rawCounts)] <- 0
+  counts <- as.matrix(rawCounts[, -1])
+  rownames(counts) <- rawCounts[, 1]
+  counts <- counts[order(rownames(counts)), ]
+}
+
+# contrôles communs (tous formats)
+if (any(counts %% 1 != 0)) stop("Input counts are not integer values as required by DESeq2")
+if (anyDuplicated(rownames(counts)) > 0) stop("Duplicated feature names in the count files")
+
+# suppression des features indésirables (stats HTSeq-count, rRNA, ...)
+cat("Features removed:", length(unlist(sapply(setdiff(featuresToRemove, ""),
+                                              function(f) grep(f, rownames(counts))))), "\n")
+for (f in setdiff(featuresToRemove, "")) {
+  match <- grep(f, rownames(counts))
+  if (length(match) > 0) counts <- counts[-match, ]
+}
+```
+
+After loading the data we first have a look at the raw data table itself. The data table contains one row per annotated feature and one column per sequenced sample. Row names of this table are feature IDs (unique identifiers). The table contains raw count values representing the number of reads that map onto the features. For this project, there are `r nrow(counts)` features in the count data table.
+
+```{r}
+#| label: tbl-counts-head
+#| results: asis
+#| tbl-cap: "Partial view of the count data table."
+# Table 2 : aperçu de la table de comptages
+kable_styling(kable(head(counts[, 1:min(ncol(counts), 10)]), row.names = TRUE, digits = 0,
+                    format = "html"),
+              c("striped", "bordered", "responsive"), font_size = 12)
+```
+
+Looking at the summary of the count table provides a basic description of these raw counts (min and max values, median, etc).
+
+```{r}
+#| label: tbl-counts-summary
+#| results: asis
+#| tbl-cap: "Summary of the raw counts."
+# Table 3 : résumé des comptages bruts par échantillon
+fun_summary <- function(x) {
+  out <- c(quantile(x, c(0, 0.25, 0.5), type = 1), mean(x), quantile(x, c(0.75, 1), type = 1))
+  names(out) <- c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
+  return(round(out, 0))
+}
+kable_styling(kable(t(apply(counts, 2, fun_summary)), row.names = TRUE, digits = 0,
+                    format = "html"),
+              c("striped", "bordered", "responsive"), font_size = 12)
+# nombre de gènes sans aucun compte dans tous les échantillons (utilisé plus bas)
+nbNull <- sum(rowSums(counts) == 0)
+```
+
+@fig-barplot-total shows the total number of mapped and counted reads for each sample. We expect total read counts to be similar within conditions, they may be different across conditions. Total counts sometimes vary widely between replicates. This may happen for several reasons, including:
+
+- different rRNA contamination levels between samples (even between biological replicates);
+
+- slight differences between library concentrations, since they may be difficult to measure with high precision.
+
+```{r}
+#| label: fig-barplot-total
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: "Number of mapped reads per sample. Colors refer to the biological condition of the sample."
+# Figure 1 : nombre total de reads comptés par échantillon
+d <- data.frame(tc = colSums(counts) / 1e6,
+                sample = factor(colnames(counts), levels = colnames(counts)),
+                group = target[, varInt])
+p <- ggplot(d, aes(x = sample, y = tc, fill = group)) +
+  geom_bar(stat = "identity", show.legend = TRUE) + labs(fill = "") +
+  scale_fill_manual(values = colors) + xlab("Samples") +
+  ylab("Total read count (million)") +
+  ggtitle("Total read count per sample (million)") + theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.05)))
+png("figures/barplotTotal.png",
+    width = min(3600, 1800 + 800 * ncol(counts) / 10), height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/barplotTotal.png")
+```
+
+@fig-barplot-null shows the percentage of features with no read count in each sample. We expect this percentage to be similar within conditions. Features with null read counts in the `r ncol(counts)` samples are left in the data but are not taken into account for the analysis with DESeq2. Here, `r nbNull` features (`r round(100 * nbNull / nrow(counts), 2)`%) are in this situation (dashed line). Results for those features (fold-change and p-values) are set to NA in the results files.
+
+```{r}
+#| label: fig-barplot-null
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: "Percentage of features with null read counts in each sample."
+# Figure 2 : pourcentage de gènes sans compte par échantillon
+percentage <- apply(counts, 2, function(x) sum(x == 0)) * 100 / nrow(counts)
+percentage.allNull <- nbNull * 100 / nrow(counts)   # % de gènes nuls dans TOUS les échantillons
+d <- data.frame(percentage = percentage,
+                sample = factor(names(percentage), levels = names(percentage)),
+                group = target[, varInt])
+p <- ggplot(d, aes(x = sample, y = percentage, fill = group)) +
+  geom_bar(stat = "identity", show.legend = TRUE) + labs(fill = "") +
+  scale_fill_manual(values = colors) + xlab("Samples") +
+  ylab("Percentage of null counts") +
+  ggtitle("Percentage of null counts per sample") + theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+  geom_hline(yintercept = percentage.allNull, linetype = "dashed", color = "black", linewidth = 1)
+png("figures/barplotNull.png",
+    width = min(3600, 1800 + 800 * ncol(counts) / 10), height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/barplotNull.png")
+```
+
+@fig-densplot shows the distribution of read counts for each sample (on a log scale to improve readability). Again we expect replicates to have similar distributions. In addition, this figure shows if read counts are preferably low, medium or high. This depends on the organisms as well as the biological conditions under consideration.
+
+```{r}
+#| label: fig-densplot
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: "Density distribution of read counts."
+# Figure 3 : densité des comptages (échelle log)
+nz <- counts[rowSums(counts) > 0, ]        # on retire les gènes sans aucun compte
+d <- stack(data.frame(nz))
+d$group <- rep(target[, varInt], each = nrow(nz))
+p <- ggplot(d, aes(x = values + 1)) +
+  stat_density(aes(group = ind, color = group), position = "identity",
+               geom = "line", show.legend = TRUE) +
+  scale_x_continuous(trans = log10_trans(),
+                     breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format(~10^.x))) +
+  labs(color = "") + scale_colour_manual(values = colors) +
+  xlab("Raw counts") + ylab("Density") +
+  ggtitle("Density of counts distribution") + theme_light()
+png("figures/densplot.png", width = 2000, height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/densplot.png")
+```
+
+It may happen that one or a few features capture a high proportion of reads (up to 20% or more). This phenomenon should not influence the normalisation process. The DESeq2 normalisation has proved to be robust to this situation [@Dillies2012]. In any case, we expect these high count features to be the same across replicates. They are not necessarily the same across conditions. @fig-maj-seq and @tbl-maj-seq illustrate the possible presence of such high count features in the data set.
+
+```{r}
+#| label: fig-maj-seq
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: "Percentage of reads associated with the sequence having the highest count (provided in each box on the graph) for each sample."
+# Figure 4 : gènes les plus exprimés (les 3 premiers par échantillon)
+nTop <- 3
+seqnames <- apply(counts, 2, function(x) { x <- sort(x, decreasing = TRUE); names(x)[1:nTop] })
+seqnames <- unique(unlist(as.character(seqnames)))
+tot <- apply(counts, 2, sum)
+top <- counts[seqnames, ]
+tot <- matrix(tot, nrow(top), ncol(top), byrow = TRUE)
+majSequences <- round(100 * top / tot, digits = 3)   # % des reads par gène et échantillon
+maj <- apply(majSequences, 2, max)                   # % du gène majoritaire par échantillon
+seqname <- rownames(majSequences)[apply(majSequences, 2, which.max)]
+d <- data.frame(maj = maj, sample = factor(names(maj), levels = names(maj)),
+                group = target[, varInt], seqname = seqname)
+p <- ggplot(d, aes(x = sample, y = maj, fill = group)) +
+  geom_bar(stat = "identity", show.legend = TRUE) + labs(fill = "") +
+  scale_fill_manual(values = colors) + xlab("Samples") + ylab("Percentage of reads") +
+  ggtitle("Percentage of reads from most expressed sequence") + theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+  geom_text(aes(y = 0.8 * maj, label = seqname), color = "black", size = 2.5,
+            angle = 90, fontface = "bold")
+png("figures/majSeq.png",
+    width = min(3600, 1800 + 800 * ncol(counts) / 10), height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/majSeq.png")
+```
+
+```{r}
+#| label: tbl-maj-seq
+#| results: asis
+#| tbl-cap: "Percentage of reads associated with the sequences having the highest counts."
+# Table 4 : pourcentage de reads portés par les gènes les plus exprimés
+kable_styling(kable(t(as.matrix(majSequences))[, 1:min(10, nrow(majSequences))],
+                    row.names = TRUE, digits = 2,
+                    format = "html"),
+              c("striped", "bordered", "responsive"), font_size = 12)
+```
+
+We may wish to assess the similarity between samples across conditions. `r ifelse(ncol(counts) <= 12, "A pairwise scatter plot is produced (@fig-pairwise) to show how replicates and samples from different biological conditions are similar or different (using a log scale).", paste0("A pairwise scatter plot would show how replicates and samples from different biological conditions are similar or different (using a log scale), but it is not produced here: with ", ncol(counts), " samples it would be unreadable."))` Moreover, as the Pearson correlation has been shown not to be relevant to measure the similarity between replicates, the SERE statistic has been proposed as a similarity index between RNA-Seq samples [@Schulze2012]. It measures whether the variability between samples is random Poisson variability or higher. `r ifelse(ncol(counts) <= 12, "Pairwise SERE values are printed in the lower triangle of the pairwise scatter plot.", "Pairwise SERE values are not shown here; the SERE statistic is nevertheless used to cluster the samples when clusterDist = \"SERE\" (see the sample clustering figure).")` The value of the SERE statistic is:
+
+- 0 when samples are identical (no variability at all: this may happen in the case of a sample duplication);
+
+- 1 for technical replicates (technical variability follows a Poisson distribution);
+
+- greater than 1 for biological replicates and samples from different biological conditions (biological variability is higher than technical one, data are over-dispersed with respect to Poisson). The higher the SERE value, the lower the similarity. It is expected to be lower between biological replicates than between samples of different biological conditions. Hence, the SERE statistic can be used to detect inversions between samples.
+
+```{r}
+#| label: fig-pairwise
+#| message: false
+#| warning: false
+#| out-width: "100%"
+#| fig-cap: "Pairwise comparison of samples (not produced when more than 12 samples)."
+# Figure 5 : comparaisons par paires (heatmap de densité + statistique SERE)
+
+# statistique SERE : 0 = échantillons identiques, 1 = réplicats techniques,
+# > 1 = variabilité biologique (plus c'est grand, moins c'est similaire)
+SERE <- function(observed) {
+  laneTotals <- colSums(observed)
+  total <- sum(laneTotals)
+  fullObserved <- observed[rowSums(observed) > 0, ]
+  fullLambda <- rowSums(fullObserved) / total
+  fullLhat <- fullLambda > 0
+  fullExpected <- outer(fullLambda, laneTotals)
+  fullKeep <- which(fullExpected > 0)
+  oeFull <- (fullObserved[fullKeep] - fullExpected[fullKeep])^2 / fullExpected[fullKeep]
+  dfFull <- length(fullKeep) - sum(fullLhat != 0)
+  sqrt(sum(oeFull) / dfFull)
+}
+
+nc <- ncol(counts)
+if (nc <= 12) {
+  d <- data.frame(counts + 1)
+  p <- list()
+  layout_matrix <- matrix(NA, ncol = nc, nrow = nc)
+  k <- 1
+  for (i in 1:nc) {
+    for (j in 1:nc) {
+      if (i == j) next
+      if (i > j) {   # panneau triangulaire supérieur : scatter plot (densité des comptages)
+        p[[k]] <- ggplot(data = cbind(d, z = 1),
+                         aes(x = .data[[names(d)[i]]], y = .data[[names(d)[j]]], z = .data[["z"]])) +
+          stat_summary_2d(fun = function(z) log(sum(z)), bins = 60, show.legend = FALSE) +
+          scale_x_continuous(trans = log10_trans(),
+                             breaks = trans_breaks("log10", function(x) 10^x),
+                             labels = trans_format("log10", math_format(~10^.x))) +
+          scale_y_continuous(trans = log10_trans(),
+                             breaks = trans_breaks("log10", function(x) 10^x),
+                             labels = trans_format("log10", math_format(~10^.x))) +
+          xlab(names(d)[i]) + ylab(names(d)[j]) +
+          geom_abline(slope = 1, intercept = 0, linetype = "dashed", col = "lightgrey") +
+          theme_light()
+      } else {       # triangle inférieur : valeur de la statistique SERE
+        text <- as.character(round(SERE(counts[, c(i, j)]), digits = 2))
+        p[[k]] <- ggplot() + annotate("text", x = 4, y = 25, size = 10, label = text) +
+          theme_bw() + xlab(names(d)[i]) + ylab(names(d)[j]) +
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+                axis.text.y = element_blank(), axis.ticks.y = element_blank())
+      }
+      layout_matrix[j, i] <- k
+      k <- k + 1
+    }
+  }
+  png("figures/pairwiseScatter.png", width = 850 * nc, height = 700 * nc, res = 300)
+  grid.arrange(grobs = p, ncol = nc, nrow = nc, layout_matrix = layout_matrix,
+              top = textGrob("Pairwise scatter plot", x = 0.01, just = "left",
+                             gp = gpar(fontsize = 20)))
+  invisible(dev.off())
+  knitr::include_graphics("figures/pairwiseScatter.png")
+} else {
+  # pas de figure si trop d'échantillons (> 12) : elle serait illisible ;
+  # le texte ci-dessus n'émet alors aucune référence croisée vers elle
+}
+```
+
+# Variability within the experiment: data exploration
+
+The main variability within the experiment is expected to come from biological differences between the samples. This can be checked in two ways. The first one is to perform a hierarchical clustering of the whole sample set. This is performed after a transformation of the count data which can be either a Variance Stabilizing Transformation (VST) or a regularized log transformation (rlog) [@Anders2010; @Love2014].
+
+A VST is a transformation of the data that makes them homoscedastic, meaning that the variance is then independent of the mean. It is performed in two steps: (i) a mean-variance relationship is estimated from the data with the same function that is used to normalize count data and (ii) from this relationship, a transformation of the data is performed in order to get a dataset in which the variance is independent of the mean. The homoscedasticity is a prerequisite for the use of some data analysis methods, such as hierarchical clustering or Principal Component Analysis (PCA). The regularized log transformation is based on a GLM (Generalized Linear Model) on the counts and has the same goal as a VST but is more robust in the case when the size factors vary widely.
+
+```{r}
+#| label: deseq-dataset
+#| message: false
+# Création du jeu de données DESeq2 (comptages + design) et estimation
+# des size factors de normalisation : nécessaires pour transformer les données.
+# Ces étapes sont détaillées dans les sections "normalisation" et "Differential analysis".
+dds <- quietDeprecated(
+  DESeqDataSetFromMatrix(countData = counts, colData = target,
+                         design = formula(paste("~",
+                           ifelse(!is.null(batch), paste(batch, "+"), ""), varInt))))
+dds <- estimateSizeFactors(dds, locfunc = locfuncFun)
+
+# transformation des comptages (homoscédastique) pour le clustering et la PCA
+if (typeTrans == "VST") {
+  counts.trans <- assay(varianceStabilizingTransformation(dds))
+} else {
+  counts.trans <- assay(rlogTransformation(dds))
+}
+```
+
+@fig-cluster shows the dendrogram obtained from the distances between samples, computed either on `r typeTrans`-transformed data (Euclidean distance) or on raw counts (SERE statistic), depending on the `clusterDist` parameter (`r clusterDist` here). The dendrogram is built upon the Ward criterion. We expect this dendrogram to group replicates and separate biological conditions.
+
+```{r}
+#| label: fig-cluster
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: !expr ifelse(clusterDist == "SERE", "Sample clustering based on SERE distances between raw counts.", "Sample clustering based on normalised data.")
+# Figure 6 : clustering hiérarchique des échantillons (critère de Ward) ; distance
+# au choix dans la config : euclidienne (comptages transformés) ou SERE (bruts)
+if (!clusterDist %in% c("euclidean", "SERE"))
+  stop("clusterDist must be \"euclidean\" or \"SERE\"")
+if (clusterDist == "SERE") {
+  # matrice des distances SERE entre paires d'échantillons (fonction définie
+  # dans la section "Description of raw data") : 0 = échantillons identiques,
+  # 1 = réplicats techniques, > 1 = variabilité biologique
+  ns <- ncol(counts)
+  sereDist <- matrix(0, ns, ns, dimnames = list(colnames(counts), colnames(counts)))
+  for (i in 1:(ns - 1)) for (j in (i + 1):ns)
+    sereDist[i, j] <- sereDist[j, i] <- SERE(counts[, c(i, j)])
+  distSam <- as.dist(sereDist)
+} else {
+  distSam <- dist(t(counts.trans))
+}
+hc <- hclust(distSam, method = "ward.D")
+p <- ggdendrogram(hc, theme_dendro = FALSE) +
+  xlab("Samples") + ylab("Height") +
+  ggtitle(paste0("Cluster dendrogram\n",
+                 ifelse(clusterDist == "SERE", "SERE statistic", "Euclidean distance"),
+                 ", Ward criterion")) +
+  theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(angle = 0)) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.05)))
+png("figures/cluster.png", width = 1800, height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/cluster.png")
+```
+
+Another way of visualizing the experiment variability is to look at the first principal components of the PCA, as shown on @fig-pca. On this figure, the first principal component (PC1) is expected to separate samples from the different biological conditions, meaning that the biological variability is the main source of variance in the data.
+
+```{r}
+#| label: fig-pca
+#| message: false
+#| warning: false
+#| out-width: "1200px"
+#| fig-cap: "First two components of a Principal Component Analysis, with percentages of variance associated with each axis."
+# Figure 7 : PCA sur les 500 gènes les plus variables (PC1-PC2 et PC1-PC3)
+n <- min(500, nrow(counts.trans))
+rv <- apply(counts.trans, 1, var, na.rm = TRUE)
+pca <- prcomp(t(counts.trans[order(rv, decreasing = TRUE), ][1:n, ]))
+prp <- round(pca$sdev^2 * 100 / sum(pca$sdev^2), 2)[1:3]   # % de variance par axe
+pcaPanel <- function(axes = c(1, 2), groupVar = target[, varInt]) {
+  d <- data.frame(x = pca$x[, axes[1]], y = pca$x[, axes[2]],
+                  group = groupVar,
+                  sample = factor(rownames(pca$x), levels = rownames(pca$x)))
+  ggplot(d, aes(x = x, y = y, color = group, label = sample)) +
+    geom_point(show.legend = TRUE, size = 3) + labs(color = "") +
+    scale_colour_manual(values = colors) +
+    geom_text_repel(show.legend = FALSE, size = 5, point.padding = 0.2) +
+    xlab(paste0("PC", axes[1], " (", prp[axes[1]], "%)")) +
+    ylab(paste0("PC", axes[2], " (", prp[axes[2]], "%)")) + theme_light()
+}
+png("figures/PCA.png", width = 2 * 1900, height = 1800, res = 300)
+grid.arrange(pcaPanel(c(1, 2)), pcaPanel(c(1, 3)), nrow = 1, ncol = 2,
+             top = textGrob("Principal Component Analysis", x = 0.01, hjust = 0,
+                            gp = gpar(fontsize = 15)))
+invisible(dev.off())
+knitr::include_graphics("figures/PCA.png")
+```
+
+```{r}
+#| label: batch-note
+#| results: asis
+# Note sur l'effet batch (texte affiché uniquement si un facteur de bloc est pris en compte)
+if (!is.null(batch)) {
+  design.char <- paste(as.character(design(dds)), collapse = " ")
+  cat("For this analysis, we need to take into account the effect of the ", batch,
+      " parameter, which is a known source of technical variability in the data. ",
+      "The PCA on @fig-pca-batch is the same as on @fig-pca, except that samples are ",
+      "colored according to their batch instead of their biological condition. If samples ",
+      "tend to cluster according to the batch, irrespective of their biological condition, ",
+      "the batch effect is a real source of variability which has to be corrected: the ",
+      "design formula used for the statistical analysis is ", design.char, ", and the ",
+      "log2 fold-changes are then estimated after removal of the batch effect, so that ",
+      "the comparisons between conditions are no longer biased by it.\n")
+}
+```
+
+```{r}
+#| label: fig-pca-batch
+#| message: false
+#| warning: false
+#| out-width: "1200px"
+#| fig-cap: "First components of the Principal Component Analysis, with samples colored according to the batch."
+# Figure : PCA colorée par batch (produite uniquement si un facteur de bloc est pris en compte)
+if (!is.null(batch)) {
+  png("figures/PCA_batch.png", width = 2 * 1900, height = 1800, res = 300)
+  grid.arrange(pcaPanel(c(1, 2), groupVar = target[, batch]),
+               pcaPanel(c(1, 3), groupVar = target[, batch]), nrow = 1, ncol = 2,
+               top = textGrob("Principal Component Analysis (batch effect)", x = 0.01, hjust = 0,
+                              gp = gpar(fontsize = 15)))
+  invisible(dev.off())
+  knitr::include_graphics("figures/PCA_batch.png")
+}
+```
+
+# Normalisation
+
+Normalisation aims at correcting systematic technical biases in the data, in order to make read counts comparable across samples. The normalisation proposed by DESeq2 relies on the hypothesis that most features are not differentially expressed. It computes a scaling factor for each sample. Normalised read counts are obtained by dividing raw read counts by the scaling factor associated with the sample they belong to. Scaling factors around 1 mean (almost) no normalisation is performed. Scaling factors lower than 1 will produce normalised counts higher than raw ones, and the other way around. Two options are available to compute scaling factors: locfunc="median" (default) or locfunc="shorth". Here, the normalisation was performed with locfunc="`r locfunc`".
+
+```{r}
+#| label: tbl-size-factors
+#| results: asis
+#| tbl-cap: "Normalisation factors."
+# Table 5 : facteurs de normalisation (size factors) par échantillon
+kable_styling(kable(t(matrix(sizeFactors(dds), dimnames = list(target$label, "Size factor"))),
+                    row.names = TRUE, digits = 2,
+                    format = "html"),
+              c("striped", "bordered", "responsive"), font_size = 12)
+```
+
+The histograms (@fig-diag-sf-hist) can help to validate the choice of the normalisation parameter ("median" or "shorth"). Under the hypothesis that most features are not differentially expressed, each size factor represented by a red line is expected to be close to the mode of the distribution of the counts divided by their geometric means across samples.
+
+```{r}
+#| label: fig-diag-sf-hist
+#| message: false
+#| warning: false
+#| out-width: "100%"
+#| fig-cap: "Diagnostic of the estimation of the size factors."
+# Figure 8 : diagnostic de l'estimation des size factors
+# (distribution des comptages/geometric mean ; trait rouge = size factor estimée)
+geomeans <- exp(rowMeans(log(DESeq2::counts(dds))))
+counts.trans.sf <- log2(DESeq2::counts(dds) / geomeans)
+counts.trans.sf <- counts.trans.sf[which(!is.na(apply(counts.trans.sf, 1, sum))), ]
+samples <- colnames(DESeq2::counts(dds))
+p <- list()
+for (j in seq_len(ncol(dds))) {
+  d <- data.frame(x = counts.trans.sf[, j])
+  p[[j]] <- ggplot(data = d, aes(x = x)) + geom_histogram(bins = 100) +
+    scale_y_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+    xlab(expression(log[2] ~ (counts / geometric ~ mean))) + ylab("") +
+    ggtitle(paste0("Size factor diagnostic - ", samples[j])) +
+    geom_vline(xintercept = log2(sizeFactors(dds)[j]), linetype = "dashed",
+               color = "red", linewidth = 1) + theme_light()
+}
+png("figures/diagSizeFactorsHist.png",
+    width = 1400 * 2, height = 1400 * ceiling(ncol(dds) / 2), res = 300)
+do.call(grid.arrange, c(p, nrow = ceiling(ncol(dds) / 2), ncol = 2))
+invisible(dev.off())
+knitr::include_graphics("figures/diagSizeFactorsHist.png")
+```
+
+@fig-diag-sf-tc shows that the scaling factors of DESeq2 and the total count normalisation factors may not perform similarly.
+
+```{r}
+#| label: fig-diag-sf-tc
+#| message: false
+#| warning: false
+#| out-width: "600px"
+#| fig-cap: "Plot of the estimated size factors and the total number of reads per sample."
+# Figure 9 : size factors vs nombre total de reads
+d <- data.frame(sf = sizeFactors(dds),
+                libsize = colSums(DESeq2::counts(dds)) / 1e6,
+                group = target[, varInt],
+                sample = factor(colnames(DESeq2::counts(dds)),
+                                levels = colnames(DESeq2::counts(dds))))
+p <- ggplot(data = d, aes(x = sf, y = libsize, color = group, label = sample)) +
+  geom_point(show.legend = TRUE, size = 3) + scale_colour_manual(values = colors) +
+  labs(color = "") + geom_text_repel(show.legend = FALSE, size = 5, point.padding = 0.2) +
+  xlab("Size factors") + ylab("Total number of reads (millions)") +
+  ggtitle("Diagnostic: size factors vs total number of reads") +
+  geom_abline(slope = coefficients(lm(libsize ~ sf + 0, data = d)), intercept = 0,
+              show.legend = FALSE, linetype = "dashed", color = "grey") + theme_light()
+png("figures/diagSizeFactorsTC.png", width = 2000, height = 1800, res = 300)
+print(p)
+invisible(dev.off())
+knitr::include_graphics("figures/diagSizeFactorsTC.png")
+```
+
+Boxplots are often used as a qualitative measure of the quality of the normalisation process, as they show how distributions are globally affected during this process. We expect normalisation to stabilize distributions across samples. @fig-boxplots shows boxplots of raw (left) and normalised (right) data respectively.
+
+```{r}
+#| label: fig-boxplots
+#| message: false
+#| warning: false
+#| out-width: "1200px"
+#| fig-cap: "Boxplots of raw (left) and normalised (right) read counts."
+# Figure 10 : boxplots des comptages bruts (gauche) et normalisés (droite)
+raw <- DESeq2::counts(dds)
+raw <- raw[rowSums(raw) > 0, ]
+norm <- DESeq2::counts(dds, normalized = TRUE)
+norm <- norm[rowSums(norm) > 0, ]
+d1 <- stack(as.data.frame(raw))
+d1$group <- rep(target[, varInt], each = nrow(raw))
+p1 <- ggplot(d1) +
+  geom_boxplot(aes(x = ind, y = values + 1, fill = group), show.legend = TRUE) +
+  labs(fill = "") + scale_fill_manual(values = colors) +
+  xlab("Samples") + ylab("Raw counts") + ggtitle("Raw counts distribution") +
+  theme_light() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format(~10^.x)))
+d2 <- stack(as.data.frame(norm))
+d2$group <- rep(target[, varInt], each = nrow(norm))
+p2 <- ggplot(d2) +
+  geom_boxplot(aes(x = ind, y = values + 1, fill = group), show.legend = TRUE) +
+  labs(fill = "") + scale_fill_manual(values = colors) +
+  xlab("Samples") + ylab("normalised counts") + ggtitle("normalised counts distribution") +
+  theme_light() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format(~10^.x)))
+png("figures/countsBoxplots.png",
+    width = 2 * min(2200, 1800 + 800 * ncol(norm) / 10), height = 1800, res = 300)
+grid.arrange(p1, p2, nrow = 1, ncol = 2)
+invisible(dev.off())
+knitr::include_graphics("figures/countsBoxplots.png")
+```
+
+# Differential analysis
+
+## Modelisation
+
+DESeq2 aims at fitting one linear model per feature. For this project, the design used is counts `r paste(as.character(design(dds)),collapse=" ")` and the goal is to estimate the models' coefficients which can be interpreted as $\log_2(\texttt{FC})$. These coefficients will then be tested to get p-values and adjusted p-values.
+
+```{r}
+#| label: deseq2-run
+#| message: false
+# Étape 2 : estimation des dispersions (relation moyenne-variance)
+dds <- estimateDispersions(dds, fitType = fitType)
+# Étape 3 : test de Wald (un modèle linéaire généralisé par gène), sans rétrécissement
+dds <- nbinomWaldTest(dds, betaPrior = FALSE)
+# Étape 4 : test pour chaque paire de conditions + rétrécissement séparé des log2FC
+# (shrinkage via lfcShrink, recommandation actuelle de DESeq2 ; l'option historique
+#  betaPrior=TRUE de SARTools est dépréciée)
+resultsList <- list()
+for (comp in combn(nlevels(target[, varInt]), 2, simplify = FALSE)) {
+  levelRef <- levels(target[, varInt])[comp[1]]
+  levelTest <- levels(target[, varInt])[comp[2]]
+  res <- results(dds, contrast = c(varInt, levelTest, levelRef),
+                 pAdjustMethod = pAdjustMethod, cooksCutoff = cooksCutoff,
+                 independentFiltering = independentFiltering, alpha = alpha)
+  if (shrinkLfc) {
+    resShrunk <- lfcShrink(dds, contrast = c(varInt, levelTest, levelRef),
+                           res = res, type = typeShrink)
+    res$log2FoldChange <- resShrunk$log2FoldChange   # log2FC rétréci ; p-values inchangées
+  }
+  resultsList[[paste0(levelTest, "_vs_", levelRef)]] <- res
+  cat(paste("Comparison", levelTest, "vs", levelRef, "done\n"))
+}
+```
+
+## Outlier detection
+
+Model outliers are features for which at least one sample seems unrelated to the experimental or study design. For every feature and for every sample, the Cook's distance [@cook1977] reflects how the sample matches the model. A large value of the Cook's distance indicates an outlier count and p-values are not computed for the corresponding feature. `r ifelse(!cooksCutoff,"For this project, the detection of model outliers have been turned off by setting the cut-off to the infinite.","")`
+
+## Dispersions estimation
+
+The DESeq2 model assumes that the count data follow a negative binomial distribution which is a robust alternative to the Poisson law when data are over-dispersed (the variance is higher than the mean). The first step of the statistical procedure is to estimate the dispersion of the data. Its purpose is to determine the shape of the mean-variance relationship. The default is to apply a GLM (Generalized Linear Model) based method (fitType="parametric"), which can handle complex designs but may not converge in some cases. The alternative is to use fitType="local" as described in the original paper [@Anders2010] or fitType="mean". The parameter used for this project is fitType="`r fitType`". Then, DESeq2 imposes a Cox Reid-adjusted profile likelihood maximization [@cox1897; @McCarthy2012] and uses the maximum _a posteriori_ (MAP) of the dispersion [@Wu2013].
+
+```{r}
+#| label: fig-dispersions
+#| message: false
+#| warning: false
+#| out-width: "1200px"
+#| fig-cap: "Dispersion estimates (left) and diagnostic of log-normality (right)."
+# Figure 11 : dispersions estimées + diagnostic de log-normalité
+d <- as.data.frame(mcols(dds)[, c("baseMean", "dispGeneEst", "dispFit", "dispersion")])
+d <- d[which(d$baseMean > 0), ]
+d <- data.frame(baseMean = rep(d$baseMean, 3),
+                value = c(d$dispGeneEst, d$dispersion, d$dispFit),
+                variable = factor(rep(c("dispGeneEst", "dispersion", "dispFit"), each = nrow(d)),
+                                  levels = c("dispGeneEst", "dispersion", "dispFit")))
+p1 <- ggplot(d, aes(x = baseMean, y = value, colour = variable)) +
+  geom_point(size = 0.1) +
+  scale_x_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format())) +
+  scale_y_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format())) +
+  ylab("Dispersion") + xlab("Mean of normalised counts") +
+  scale_colour_manual(values = c("Black", "#377eb8", "#e41a1c"),
+                       breaks = c("dispGeneEst", "dispersion", "dispFit"),
+                       labels = c("Estimate", "Final", "Fit"), name = "") +
+  guides(colour = guide_legend(override.aes = list(size = 2))) +
+  ggtitle("Dispersions") + theme_light()
+disp <- mcols(dds)$dispGeneEst
+disp <- disp[!is.na(disp)]
+disp <- disp[disp > 1e-08]
+d <- data.frame(disp)
+p2 <- ggplot(data = d, aes(x = disp)) + geom_histogram(bins = 80, aes(y = after_stat(density))) +
+  scale_x_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                     labels = trans_format("log10", math_format())) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+  xlab("Feature dispersion estimate") + ylab("Density") +
+  ggtitle("log-normality dispersion diagnostic") +
+  stat_function(fun = function(x, ...) dnorm(log10(x), ...),
+                args = list(mean = mean(log10(disp), na.rm = TRUE),
+                            sd = sd(log10(disp), na.rm = TRUE))) + theme_light()
+png("figures/dispersionsPlot.png", width = 3600, height = 1800, res = 300)
+grid.arrange(p1, p2, layout_matrix = matrix(c(1, 1, 1, 1, 1, 2, 2, 2, 2), nrow = 1))
+invisible(dev.off())
+knitr::include_graphics("figures/dispersionsPlot.png")
+```
+
+The left panel on @fig-dispersions shows the result of the dispersion estimation step. The x- and y-axes represent the mean count value and the estimated dispersion respectively. Black dots represent empirical dispersion estimates for each feature (from the observed counts). The red dots show the mean-variance relationship function (fitted dispersion value) as estimated by the model. The blue dots are the final estimates from the maximum _a posteriori_ and are used to perform the statistical test. Blue circles (if any) point out dispersion outliers. These are features with a very high empirical variance (computed from observed counts). These high dispersion values fall far from the model estimation. For these features, the statistical test is based on the empirical variance in order to be more conservative than with the MAP dispersion. These features will have low chance to be declared significant. The figure on the right panel allows to check the hypothesis of log-normality of the dispersions.
+
+## Statistical test for differential expression
+
+Once the dispersion estimation and the model fitting have been done, DESeq2 can perform the statistical testing. We first assemble the complete results table for each comparison (raw and normalised counts, base mean, means of normalised counts per condition, fold-change, p-values), which will also be used for the figures and exported in the "Final results" section.
+
+```{r}
+#| label: build-complete
+#| message: false
+# Construction des tables de résultats complètes (une par comparaison)
+
+# colonnes communes : Id, comptages bruts, comptages normalisés, baseMean,
+# puis moyenne (arrondie) des comptages normalisés par condition
+base <- data.frame(Id = rownames(DESeq2::counts(dds)), DESeq2::counts(dds),
+                   round(DESeq2::counts(dds, normalized = TRUE)))
+colnames(base) <- c("Id", colnames(DESeq2::counts(dds)),
+                    paste0("norm.", colnames(DESeq2::counts(dds))))
+base <- merge(base, data.frame(Id = rownames(resultsList[[1]]),
+                               baseMean = round(resultsList[[1]][, "baseMean"], 2)),
+              by = "Id", all = TRUE)
+normCols <- paste("norm", colnames(DESeq2::counts(dds)), sep = ".")
+for (cond in levels(target[, varInt])) {
+  base[, cond] <- round(apply(as.data.frame(base[, normCols][, target[, varInt] == cond]), 1, mean), 0)
+}
+
+# colonnes spécifiques par comparaison : FoldChange, log2FoldChange, stat, pvalue, padj
+complete <- list()
+for (name in names(resultsList)) {
+  res.name <- data.frame(Id = rownames(resultsList[[name]]),
+                         FoldChange = round(2^(resultsList[[name]][, "log2FoldChange"]), 3),
+                         log2FoldChange = round(resultsList[[name]][, "log2FoldChange"], 3),
+                         stat = round(resultsList[[name]][, "stat"], 3),
+                         pvalue = resultsList[[name]][, "pvalue"],
+                         padj = resultsList[[name]][, "padj"])
+  complete[[name]] <- merge(base, res.name, by = "Id", all = TRUE)
+}
+```
+
+@fig-rawp-hist shows the distributions of raw p-values computed by the statistical test for the comparison(s) done. This distribution is expected to be a mixture of a uniform distribution on $[0,1]$ and a peak around 0 corresponding to the differentially expressed features. When several comparisons are performed, tabs make it possible to switch from one to another.
+
+```{r}
+#| label: fig-rawp-hist
+#| message: false
+#| warning: false
+#| results: asis
+# Figure 12 : distribution des p-values brutes par comparaison
+# (une image par comparaison, présentées dans des onglets)
+figFiles <- character()
+for (name in names(complete)) {
+  complete.name <- complete[[name]]
+  complete.name <- complete.name[which(!is.na(complete.name$pvalue)), ]
+  p <- ggplot(data = complete.name, aes(x = pvalue)) +
+    geom_histogram(color = "white", breaks = seq(0, 1, by = 0.025)) +
+    scale_y_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+    xlab("Raw p-value") + ylab("Frequency") +
+    ggtitle(paste0("Distribution of raw p-values - ", gsub("_", " ", name))) + theme_light()
+  figFiles[name] <- paste0("figures/rawpHist_", name, ".png")
+  png(figFiles[name], width = 1800, height = 1800, res = 300)
+  print(p)
+  invisible(dev.off())
+}
+emitTabsetFigures("fig-rawp-hist", figFiles,
+                  "Distribution(s) of raw p-values.")
+```
+
+## Independent filtering
+
+DESeq2 can perform an independent filtering to increase the detection power of differentially expressed features at the same experiment-wide type I error. Since features with very low counts are not likely to see significant differences typically due to high dispersion, it defines a threshold on the mean of the normalised counts irrespective of the biological condition. This procedure is independent because the information about the variables in the design formula is not used [@Love2014].
+
+```{r}
+#| label: tbl-indep-filtering
+#| results: asis
+#| tbl-cap: "Number of features discarded by the independent filtering for each comparison."
+# Seuil de l'independent filtering et nombre de gènes écartés par comparaison
+if (independentFiltering) {
+  cat("@tbl-indep-filtering reports the thresholds used for each comparison and the number of features discarded by the independent filtering. Adjusted p-values of discarded features are then set to NA.\n")
+  tabIndepFiltering <- matrix(NA, ncol = 3, nrow = length(names(resultsList)),
+    dimnames = list(names(resultsList), c("Test vs Ref", "BaseMean Threshold", "# discarded")))
+  for (name in names(resultsList)) {
+    threshold <- metadata(resultsList[[name]])$filterThreshold
+    tabIndepFiltering[name, 2] <- round(threshold, 2)
+    use <- resultsList[[name]]$baseMean > threshold
+    tabIndepFiltering[name, 3] <- ifelse(is.na(table(use)["FALSE"]), 0, table(use)["FALSE"])
+  }
+  tabIndepFiltering[, 1] <- gsub("_", " ", rownames(tabIndepFiltering))
+  rownames(tabIndepFiltering) <- NULL
+  kable_styling(kable(tabIndepFiltering, row.names = FALSE, digits = 2,
+    format = "html"), c("striped", "bordered", "responsive"), font_size = 12)
+} else {
+  cat("For this project, no independent filtering has been performed.")
+}
+```
+
+## Final results
+
+A p-value adjustment is performed to take into account multiple testing and control the false positive rate to a chosen level $\alpha$. For this analysis, a `r pAdjustMethod` p-value adjustment was performed [@BH1995; @BY2001] and the level of controlled false positive rate was set to `r alpha`.
+
+```{r}
+#| label: export-results
+# Ajout des colonnes de dispersions / convergence / Cook, puis export
+# des tables dans tables/ : TestVsRef.complete.txt / .up.txt / .down.txt
+mcols.add <- data.frame(Id = rownames(DESeq2::counts(dds)),
+                        dispGeneEst = round(mcols(dds)$dispGeneEst, 4),
+                        dispFit = round(mcols(dds)$dispFit, 4),
+                        dispMAP = round(mcols(dds)$dispMAP, 4),
+                        dispersion = round(mcols(dds)$dispersion, 4),
+                        betaConv = mcols(dds)$betaConv,
+                        maxCooks = round(mcols(dds)$maxCooks, 4))
+for (name in names(complete)) {
+  complete[[name]] <- merge(complete[[name]], mcols.add, by = "Id", all = TRUE)
+  up <- complete[[name]][which(complete[[name]]$padj <= alpha & complete[[name]]$betaConv &
+                               complete[[name]]$log2FoldChange >= 0), ]
+  up <- up[order(up$padj), ]
+  down <- complete[[name]][which(complete[[name]]$padj <= alpha & complete[[name]]$betaConv &
+                                 complete[[name]]$log2FoldChange <= 0), ]
+  down <- down[order(down$padj), ]
+  file <- gsub("_", "", name)
+  write.table(complete[[name]], file = paste0("tables/", file, ".complete.txt"),
+              sep = "\t", row.names = FALSE, dec = ".", quote = FALSE)
+  write.table(up, file = paste0("tables/", file, ".up.txt"),
+              sep = "\t", row.names = FALSE, dec = ".", quote = FALSE)
+  write.table(down, file = paste0("tables/", file, ".down.txt"),
+              sep = "\t", row.names = FALSE, dec = ".", quote = FALSE)
+}
+```
+
+```{r}
+#| label: tbl-ndiff
+#| results: asis
+#| tbl-cap: "Number of up-, down- and total number of differentially expressed features for each comparison."
+# Nombre de gènes surexprimés / sous-exprimés / total par comparaison
+nDiffTotal <- matrix(NA, ncol = 4, nrow = length(complete),
+  dimnames = list(names(complete), c("Test vs Ref", "# down", "# up", "# total")))
+for (name in names(complete)) {
+  nDiffTotal[name, 2:3] <- c(
+    nrow(complete[[name]][which(complete[[name]]$padj <= alpha & complete[[name]]$betaConv &
+                                 complete[[name]]$log2FoldChange <= 0), ]),
+    nrow(complete[[name]][which(complete[[name]]$padj <= alpha & complete[[name]]$betaConv &
+                                 complete[[name]]$log2FoldChange >= 0), ]))
+}
+nDiffTotal[, 4] <- nDiffTotal[, 2] + nDiffTotal[, 3]
+nDiffTotal[, 1] <- gsub("_", " ", rownames(nDiffTotal))
+rownames(nDiffTotal) <- NULL
+kable_styling(kable(nDiffTotal, row.names = FALSE, digits = 0,
+  format = "html"), c("striped", "bordered", "responsive"), font_size = 12)
+```
+
+@fig-ma-plot represents the MA-plot of the data for the comparisons done, where differentially expressed features are highlighted in red. A MA-plot represents the log ratio of differential expression as a function of the mean intensity for each feature. Triangles correspond to features having a too low/high $\log_2(\text{FC})$ to be displayed on the plot. 
+
+```{r}
+#| label: fig-ma-plot
+#| message: false
+#| warning: false
+#| results: asis
+# Figure 13 : MA-plot par comparaison
+# (une image par comparaison, présentées dans des onglets)
+figFiles <- character()
+for (name in names(complete)) {
+  complete.name <- complete[[name]]
+  complete.name <- complete.name[which(complete.name$baseMean > 0), ]
+  complete.name$padj <- ifelse(is.na(complete.name$padj), 1, complete.name$padj)
+  complete.name$DE <- factor(ifelse(complete.name$padj <= alpha, "yes", "no"),
+                              levels = c("no", "yes"))
+  py <- complete.name$log2FoldChange
+  ymax <- quantile(abs(py[is.finite(py)]), probs = 0.99)  # bornes de l'axe y (triangles sinon)
+  complete.name$log2FoldChange[which(py > ymax)] <- ymax
+  complete.name$log2FoldChange[which(py < -ymax)] <- -ymax
+  complete.name$outfield <- factor(ifelse(py > ymax, "top",
+                                 ifelse(py < -ymax, "bottom", "in")),
+                                   levels = c("bottom", "in", "top"))
+  p <- ggplot(data = complete.name,
+                      aes(x = baseMean, y = log2FoldChange, color = DE, fill = DE, shape = outfield)) +
+    scale_x_continuous(trans = log10_trans(), breaks = trans_breaks("log10", function(x) 10^x),
+                       labels = trans_format("log10", math_format(~10^.x))) +
+    geom_point(show.legend = FALSE, alpha = 0.5, size = 1.8, stroke = 0) +
+    scale_fill_manual(values = c(no = "black", yes = "red"), drop = FALSE) +
+    scale_colour_manual(values = c(no = "black", yes = "red"), drop = FALSE) +
+    scale_shape_manual(values = c(bottom = 25, `in` = 21, top = 24), drop = FALSE) +
+    scale_y_continuous(expand = expansion(mult = c(0.03, 0.03))) +
+    xlab("Mean of normalised counts") + ylab(expression(log[2] ~ fold ~ change)) +
+    ggtitle(paste0("MA-plot - ", gsub("_", " ", name))) + theme_light()
+  figFiles[name] <- paste0("figures/MAPlot_", name, ".png")
+  png(figFiles[name], width = 1800, height = 1800, res = 300)
+  print(p)
+  invisible(dev.off())
+}
+emitTabsetFigures("fig-ma-plot", figFiles,
+                  "MA-plot(s) of each comparison. Red dots represent significantly differentially expressed features.")
+```
+
+@fig-volcano shows the volcano plots for the comparisons performed and differentially expressed features are still highlighted in red. A volcano plot represents the log of the adjusted P value as a function of the log ratio of differential expression.
+
+```{r}
+#| label: fig-volcano
+#| message: false
+#| warning: false
+#| results: asis
+# Figure 14 : volcano plot par comparaison
+# (une image par comparaison, présentées dans des onglets)
+# transformation "log inverse" pour l'axe des p-values ajustées
+reverselog_trans <- function(base = exp(1)) {
+  trans <- function(x) -log(x, base)
+  inv <- function(x) base^(-x)
+  trans_new(paste0("reverselog-", format(base)), trans, inv, log_breaks(base = base),
+            domain = c(.Machine$double.xmin, Inf))
+}
+figFiles <- character()
+for (name in names(complete)) {
+  complete.name <- complete[[name]]
+  complete.name$padj[which(complete.name$padj == 0)] <- .Machine$double.xmin
+  complete.name <- complete.name[which(!is.na(complete.name$padj)), ]
+  complete.name$DE <- factor(ifelse(complete.name$padj <= alpha, "yes", "no"),
+                              levels = c("no", "yes"))
+  padjlim.name <- quantile(complete.name$padj, probs = 0.01, na.rm = TRUE)
+  complete.name$outfield <- factor(ifelse(complete.name$padj < padjlim.name, "top", "in"),
+                                   levels = c("in", "top"))
+  complete.name$padj[which(complete.name$padj < padjlim.name)] <- padjlim.name
+  p <- ggplot(data = complete.name,
+                      aes(x = log2FoldChange, y = padj, color = DE, shape = outfield)) +
+    geom_point(show.legend = FALSE, alpha = 0.5) +
+    scale_y_continuous(trans = reverselog_trans(10),
+                       breaks = trans_breaks("log10", function(x) 10^x),
+                       labels = trans_format("log10", math_format(~10^.x))) +
+    scale_colour_manual(values = c(no = "black", yes = "red"), drop = FALSE) +
+    scale_shape_manual(values = c(`in` = 16, top = 17), drop = FALSE) +
+    xlab(expression(log[2] ~ fold ~ change)) + ylab("Adjusted P-value") +
+    ggtitle(paste0("Volcano plot - ", gsub("_", " ", name))) + theme_light()
+  figFiles[name] <- paste0("figures/volcanoPlot_", name, ".png")
+  png(figFiles[name], width = 1800, height = 1800, res = 300)
+  print(p)
+  invisible(dev.off())
+}
+emitTabsetFigures("fig-volcano", figFiles,
+                  "Volcano plot(s) of each comparison. Red dots represent significantly differentially expressed features.")
+```
+
+Full results as well as lists of differentially expressed features are provided in the following text files which can be easily read in a spreadsheet. For each comparison:
+
+- TestVsRef.complete.txt contains results for all the features;
+
+- TestVsRef.up.txt contains results for significantly up-regulated features. Features are ordered from the most significant adjusted p-value to the less significant one;
+
+- TestVsRef.down.txt contains results for significantly down-regulated features. Features are ordered from the most significant adjusted p-value to the less significant one.
+
+These files contain the following columns:
+
+- Id: unique feature identifier;
+
+- sampleName: raw counts per sample;
+
+- norm.sampleName: rounded normalised counts per sample;
+
+- baseMean: base mean over all samples;
+
+- `r paste(paste(levels(target[,varInt])[-nlevels(target[,varInt])],collapse=", "),levels(target[,varInt])[nlevels(target[,varInt])],sep=" and ")`: means (rounded) of normalised counts of the biological conditions;
+
+- FoldChange: fold change of expression, calculated as $2^{\log_2(\text{FC})}$;
+
+- log2FoldChange: $\log_2(\text{FC})$ as estimated by the GLM model. `r if (shrinkLfc) paste0("For this analysis, the estimates are shrunken using the DESeq2 function lfcShrink() (type=\"", typeShrink, "\"). ")`It reflects the differential expression between Test and Ref and can be interpreted as $\log_2(\frac{\text{Test}}{\text{Ref}})$. If this value is:
+
+    + around 0: the feature expression is similar in both conditions;
+
+    + positive: the feature is up-regulated ($\text{Test} > \text{Ref}$);
+
+    + negative: the feature is down-regulated ($\text{Test} < \text{Ref}$);
+
+- stat: Wald statistic for the coefficient tested;
+
+- pvalue: raw p-value from the statistical test;
+
+- padj: adjusted p-value on which the cut-off $\alpha$ is applied;
+
+- dispGeneEst: dispersion parameter estimated from feature counts (i.e. black dots on @fig-dispersions);
+
+- dispFit: dispersion parameter estimated from the model (i.e. red dots on @fig-dispersions);
+
+- dispMAP: dispersion parameter estimated from the Maximum _A Posteriori_ model;
+
+- dispersion: final dispersion parameter used to perform the test (i.e. blue dots and circles on @fig-dispersions);
+
+- betaConv: convergence of the coefficients of the model (TRUE or FALSE);
+
+- maxCooks: maximum Cook's distance of the feature.
+
+```{r}
+#| label: save-rdata
+# Sauvegarde de l'image de la session R dans <projectName>.RData
+# (équivalent de la ligne save.image() du script DEA historique)
+if (saveRData) save.image(file = paste0(projectName, ".RData"))
+```
+
+# Bibliography {.unnumbered}
+
+::: {#refs}
+:::
+
+# R session information and parameters {.unnumbered}
+
+::: {.session-info}
+The versions of the R software and Bioconductor packages used for this analysis are listed below. It is important to save them if one wants to re-perform the analysis in the same conditions.
+
+```{r}
+#| label: session-info
+#| results: asis
+# Versions des logiciels et packages utilisés
+si <- as.character(toLatex(sessionInfo()))
+si <- si[-c(1,length(si))]
+si <- gsub("(\\\\verb)|(\\|)", "", si)
+si <- gsub("~", " ", si)
+si <- paste(si, collapse=" ")
+si <- unlist(strsplit(si, "\\\\item"))
+cat(paste(si, collapse="\n -"), "\n")
+```
+
+Parameter values used for this analysis are:
+
+- projectName: `r projectName`
+
+- author: `r author`
+
+- targetFile: `r targetFile`
+
+- rawDir: `r rawDir`
+
+- featuresToRemove: `r ifelse(is.null(featuresToRemove),"NULL",paste(featuresToRemove,collapse=", "))`
+
+- varInt: `r varInt`
+
+- condRef: `r condRef`
+
+- batch: `r ifelse(is.null(batch),"NULL",batch)`
+
+- fitType: `r fitType`
+
+- cooksCutoff: `r cooksCutoff`
+
+- independentFiltering: `r independentFiltering`
+
+- alpha: `r alpha`
+
+- pAdjustMethod: `r pAdjustMethod`
+
+- typeTrans: `r typeTrans`
+
+- clusterDist: `r clusterDist`
+
+- locfunc: `r locfunc`
+
+- shrinkLfc: `r shrinkLfc`
+
+- typeShrink: `r typeShrink`
+
+- colors: `r colors`
+:::
