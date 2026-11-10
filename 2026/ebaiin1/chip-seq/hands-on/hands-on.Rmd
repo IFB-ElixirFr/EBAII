@@ -702,7 +702,9 @@ idr --samples ../replicates/RtrC_rep1_peaks.narrowPeak \
 
 4. Retain peaks with a global IDR of at most 0.05 (the 12th column of the IDR output is `-log10(global IDR)`). Create a five-column BED file for the downstream exercises.
 ```{bash eval=FALSE}
-awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2,$3,"RtrC_idr_peak_"NR,1000}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
+
+# center peaks and trim +- 250bp around to prepare input for motif analysis
+awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2+$10-250,$2+$10+250,"RtrC_idr_peak_"NR,$12}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
 ```
 
 **Add the IDR graph to this report. How many peaks are found with the IDR method?**
@@ -734,7 +736,7 @@ cd ../..
 
 ## - Retrieve the peak sequences corresponding to the peak coordinate file (BED)
 
-For the motif analysis, you first need to extract the sequences corresponding to the peaks. There are several ways to do this (as usual...). If you work on a UCSC-supported organism, the easiest is to use RSAT fetch-sequences or Galaxy. Here, we will use Bedtools [@bedtools], as we have the genome of interest on our computer (Caulobacter_CP001340.fasta).
+For the motif analysis, you first need to extract the sequences corresponding to the peaks. There are several ways to do this (as usual...). Here, we will use Bedtools [@bedtools], as we have the genome of interest on our computer (Caulobacter_CP001340.fasta).
 1. Create a directory named **06-MotifAnalysis** to store data needed for motif analysis
 ```{bash eval=FALSE}
 mkdir 06-MotifAnalysis
@@ -782,23 +784,31 @@ bedtools getfasta \
 ```
 4. Download the file RtrC_idr_peaks.fa on your computer
 
-## - Motif discovery with RSAT
-1. Open a connection to a Regulatory Sequence Analysis Tools server. You can choose between various website mirrors.
-  * Teaching Server  (recommended for this training) [https://rsat.eead.csic.es/plants/](https://rsat.eead.csic.es/plants/)
-2. In the left menu, click on **NGS ChIP-seq** and then click on **peak-motifs**. A new page opens, with a form
-3. The default peak-motifs web form only displays the essential options. There are only two mandatory parameters.
-  * The **title box**, which you will set as **RtrC ChIP-seq** . The **sequences**, that you will **upload from your computer**, by clicking on the button Choose file, and select the file **RtrC_idr_peaks.fa** from your computer.
-4. We will now modify some of the advanced options in order to fine-tune the analysis according to your data set.
-  * Open the "Reduce peak sequences" title, and make sure the **Cut peak sequences: +/- ** option is set to **0** (we wish to analyze our full dataset)
-  * Open the “Motif Discovery parameters” title, and check the **oligomer sizes 6 and 7** (but not 8). Check "Discover over-represented spaced word pairs **[dyad-analysis]**"
-  * Under “Compare discovered motifs with databases”, **do not select the E. coli-specific RegulonDB collection**; instead use an appropriate bacterial background or run de novo motif discovery without that comparison.
-5. Click “**GO**”. 
-6. The Web page displays a link, You can already click on this link. The report will be progressively updated during the processing of the workflow.
+## - Motif discovery with MEME-ChIP
 
-**Is there anything interesting in RSAT results? If so, which motif is of interest and why (add screenshot of the results).**
+![alt text][MEMEform]
 
+0. Connect to MEME server [https://meme-suite.org/meme](https://meme-suite.org/meme)
+1. In the left menu, click on **Motif Discovery** and then click on **MEME-ChIP**. A new page opens, with the **Data Submission Form**
 
-**Dataset-specific note:** The screenshots from the previous E. coli exercise and the original R gene-symbol mapping example need to be regenerated or checked against the Caulobacter annotation. The original R gene-symbol join must be replaced or validated against the Caulobacter annotation; HOMER column names and gene IDs must be checked before attempting it. DAVID may not support this organism or its identifiers; treat the ontology section as optional until validated.
+The firsts options correspond to the general workflow settings. **Note**: Explanation of each parameter option can be displayed by clicking on the orange question mark at the end of the parameter section. 
+  
+2. Upload the sequences by clicking on **Parcourir ...** and select the file **RtrC_idr_peaks.fa** from your computer.
+
+3. Select the database containing the known motifs for **Prokaryote DNA**, choose **Combined Prokaryotes**
+
+4. We will now have a look at the advanced options. We will use default parameters.
+  * Open the "Universal options", "MEME options", "STREME options", and "CentriMo options" tabs. 
+  
+5. Click “**Start Search**”. 
+
+6. The report will be progressively updated during the processing of the workflow. 
+  * The section "Status Messages" is updated with the command line corresponding to the step being computed with the time of execution.
+  * Once completed, several hyperlinks are available, open "MEME-ChIP HTML output". Note that you can download the whole output in your computer as a compressed folder (Gzipped TAR file of all output).
+
+**Is there anything interesting in MEME-ChIP results? If so, which motif is of interest and why ?.**
+
+<!-- **Dataset-specific note:** The screenshots from the previous E. coli exercise and the original R gene-symbol mapping example need to be regenerated or checked against the Caulobacter annotation. The original R gene-symbol join must be replaced or validated against the Caulobacter annotation; HOMER column names and gene IDs must be checked before attempting it. DAVID may not support this organism or its identifiers; treat the ontology section as optional until validated. -->
 
 # - Peak annotation
 
@@ -851,16 +861,16 @@ annotatePeaks.pl peak/BEDfile genome > outputfile
 annotatePeaks.pl \
   RtrC_idr_peaks.bed \
   ../data/Caulobacter_CP001340.fasta \
-  -gtf ../data/Caulobacter_CP001340.gtf \
+  -gtf ../data/Caulobacter_CP001340_with_gene_name.gtf \
   > RtrC_idr_annotated_peaks.tsv
 ```
 
-**Look at the file you generated. Gene symbols are not present. Let's add them with some R code.**
+**Look at the file you generated using R.**
 
 4. Launch Rstudio in [ondemand](https://ondemand.cluster.france-bioinformatique.fr/)
 ![alt text][launchrstudio]
 
-5. Add gene symbol annotation using R with Rstudio
+5. Extract the gene names associated with peaks.
 ```{R eval=FALSE, include=TRUE}
 
 ## set working directory
@@ -871,34 +881,7 @@ setwd("/shared/projects/<your_project>/EBA3I_2026_chipseq/07-PeakAnnotation")
 ## data are loaded into a data frame
 ## sep="\t": this is a tab separated file
 ## header=TRUE: there is a line with headers (ie. column names)
-d <- read.table("RtrC_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
-
-## Load a 2-columns files which contains in the first column gene IDs
-## and in the second column gene symbols
-## data are loaded into a data frame
-## header=FALSE: there is no header line
-## Dataset-specific exercise: construct a validated gene-ID to symbol table from the GFF3.
-## The former E. coli mapping table cannot be reused for Caulobacter.
-## gene.symbol <- read.table("../data/Caulobacter_CP001340.gene_symbols.tsv", header=FALSE)
-
-## Merge the 2 data frames based on a common field
-## by.x gives the columns name in which the common field is for the d data frame
-## by.y gives the columns name in which the common field is for the gene.symbol data frame
-## d contains several columns with no information. We select only interesting columns
-## d.annot <- merge(d[,c(1,2,3,4,5,6,8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
-d.annot <- d # provisional: retain HOMER output until gene-ID mapping has been validated
-
-## Change column names of the resulting data frame
-## colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
-## colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
-
-## output the merged data frame to a file named "RtrC_idr_final_peaks_annotation.tsv"
-## col.names=TRUE: output column names
-## row.names=FALSE: don't output row names
-## sep="\t": table fields are separated by tabs
-## quote=FALSE: don't put quote around text.
-write.table(d.annot, "RtrC_idr_final_peaks_annotation.tsv", col.names=TRUE, row.names=FALSE, sep="\t", quote=FALSE)
-
+peaks_annotated <- read.table("RtrC_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
 ```
 
 **What information is listed in each column of the file? (print column names and explain them)**
@@ -907,6 +890,21 @@ write.table(d.annot, "RtrC_idr_final_peaks_annotation.tsv", col.names=TRUE, row.
 
 **What are all the possible gene features? (see in column Annotation - extract information like promoter-TSS, TSS, ...). Create a plot (pie chart, barplot...) showing the proportion of each of them (include both the plot and the code that created it in the report).**
 
+```{R eval=FALSE, include=TRUE}
+## select the peaks associated with a gene feature
+peaks_w_genes <- peaks_annotated$Annotation != "Intergenic"
+peaks_annotated_genes <- peaks_annotated[peaks_w_genes,]
+
+## extract the column containing the gene name
+selected_genes <- unique(peaks_annotated_genes$Gene.Name)
+length(selected_genes) # how many genes are selected ?
+
+## Save the list in a text file
+writeLines(selected_genes,"genes_associated_rtrc.txt")
+```
+
+
+
 6. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 07-PeakAnnotation
@@ -914,10 +912,19 @@ cd ..
 ```
 
 ## - Search for Biological Processes, Molecular Functions or Cellular Compartments enrichment
-Use Official gene symbols of the file RtrC_idr_final_peaks_annotation.tsv to search for enriched gene ontologies with the tool DAVID (Database for Annotation, Visualization and Integrated Discovery). Input your gene list on the DAVID website: https://david.ncifcrf.gov/. **Use DAVID convert ID tool if needed**
+Use Official gene symbols of the file *genes_associated_rtrc.txt* to search for enriched gene ontologies with STRING database. *The STRING database [https://string-db.org/](https://string-db.org/) systematically collects and integrates protein–protein interactions—both physical interactions as well as functional associations. The data originate from a number of sources: automated text mining of the scientific literature, computational interaction predictions from co-expression, conserved genomic context, databases of interaction experiments and known complexes/pathways from curated sources.* (Abstract from [this paper](https://doi-org.docelec.u-bordeaux.fr/10.1093/nar/gkac1000)). STRING db offers facilities for functional enrichment analysis covering more than 10 000 organisms. 
 
-**Are there biological processes enriched in the list of genes associated to the peaks? Show the top results of the Functional Annotation Clustering.**
-**Are these genes enriched in some KEGG pathway? Which ones?**
+![alt text][STRINGform]
+
+0. Go to the STRINGdb website: https://string-db.org/. 
+1. Select **Multiple proteins** in the left bar menu
+2. Upload the gene list to be analysed (*genes_associated_rtrc.txt*) from your computer
+3. Select the appropriate organism (*Caulobacter vibrioides CB15*)
+
+And let's go, click on the **Search** button !
+
+**Are there biological processes enriched in the list of genes associated to the peaks?**
+
 
 # - Bonus: Annotation of ChIP-peaks using R tools
 
@@ -940,7 +947,7 @@ You should now have downloaded 3 files:
 > GSM348065_p300_peaks.txt.gz  (Midbrain)
 > GSM348066_p300_peaks.txt.gz  (limb)
 
-```{bash eval=TRUE, include=FALSE}
+```{bash eval=FALSE, include=FALSE}
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348064/suppl/GSM348064_p300_peaks.txt.gz
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348065/suppl/GSM348065_p300_peaks.txt.gz
 curl -O https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM348nnn/GSM348066/suppl/GSM348066_p300_peaks.txt.gz
@@ -1154,3 +1161,6 @@ Use the GFF3 annotation associated with accession **CP001340.1** and convert it 
 [launchjupyterlab]: ../images/launchJupyterhub.png "launch Jupyterlab"
 [igvbam]: ../images/IGVbam.png "IGV BAM files"
 [launchrstudio]: ../images/launchRstudio.png "Launch Rstudio"
+[STRINGform]: ../images/launchSTRING.png "STRING form"
+[MEMEform]: ../images/MEMEform.png "MEME form"
+

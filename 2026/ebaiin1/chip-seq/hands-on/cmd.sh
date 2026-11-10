@@ -206,7 +206,10 @@ idr --samples ../replicates/RtrC_rep1_peaks.narrowPeak \
     --peak-list ../pool/RtrC_pool_peaks.narrowPeak \
     --input-file-type narrowPeak \
     --output-file RtrC_idr_results.bed --plot
-awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2,$3,"RtrC_idr_peak_"NR,1000}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
+
+# center peaks and trim +- 250bp around to prepare input for motif analysis
+awk 'BEGIN{OFS="\t"} $12 >= 1.30103 {print $1,$2+$10-250,$2+$10+250,"RtrC_idr_peak_"NR,$12}' RtrC_idr_results.bed > RtrC_idr_peaks.bed
+
 module unload macs2/2.2.7.1
 module unload idr/2.0.4.2
 cd ../..
@@ -236,6 +239,6 @@ annotatePeaks.pl --help
 annotatePeaks.pl \
   RtrC_idr_peaks.bed \
   ../data/Caulobacter_CP001340.fasta \
-  -gtf ../data/Caulobacter_CP001340.gtf \
+  -gtf ../data/Caulobacter_CP001340_with_gene_name.gtf \
   > RtrC_idr_annotated_peaks.tsv
 cd ..
