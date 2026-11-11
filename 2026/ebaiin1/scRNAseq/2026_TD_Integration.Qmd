@@ -1,6 +1,6 @@
 ---
-title: "EB3I n1 2026 scRNAseq<br><br>[Integration]{.mark}<br><i>Integrate multiple samples</i><br> <br>"
-date: "November 15–20, 2026"
+title: "EB3I n1 2026 scRNAseq<br><br>[Integration]{.mark}<br><i>Gather multiple samples</i><br> <br>"
+date: "2026-11-18"
 author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
   - name: "<i>Bastien JOB</i>"
@@ -164,20 +164,30 @@ As the purpose is to **integrate** both samples into a single analytical entity,
 
 ## Setting global parameters
 
--   We set the **common parameters** we will use throughout this session :
+We set the **common parameters** we will use throughout this session.
+
+First, **your** project name :
+
+```{r}
+#| label: setparam_projname
+#| filename: setparam_projname
+
+## Setting the project name
+project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project !!
+```
+
+<br>
+
+Then, parameters specific to the current session :
 
 ```{r}
 #| label: setparam
 #| filename: setparam
 
-## Setting the project name
-project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project !!
-
-## Seed for the RNG (our sole parameter for this session)
+## RNG SEED
 my_seed <- 1337L
 
-## Some gene markers of cell types of interest
-# cell_markers <- c('Il2ra', 'Cd4', 'Cd5', 'Cdc6', 'Lyz2')
+## MARKER GENES (cell types of interest)
 cell_markers <- c('Rag1', 'Bcat2', 
                   'Ccnd3', 'Ifngr1', 
                   'Cd5', 'Cd2', 
@@ -190,31 +200,34 @@ cell_markers <- c('Rag1', 'Bcat2',
                   'Itgae',
                   'Cd4', 'Cdc6', 'Lyz2')
 
-## Features reduction
+## SCALING
+
+### HVGs
 hvgs <- 3000
 
-## Variables to regress
+### COVARIATES TO REGRESS
 vars_to_reg <- c('percent_rb', 'CC_Seurat_SmG2M.Score', 'nCount_RNA')
 
 ## PCA
 pca_dims <- 50
 
-## Clustering
-### Algorithm
-clust_algo <- 4  ## Leiden
-### Resolution
-clust_res <- .6
+## CLUSTERING
 
-## Just an environment variable to fix contextual bugs that may happen when our Seurat objects get really big
-# options(future.globals.maxSize = 1E+09)
+### ALGORITHM
+clust_algo <- 4   ## Leiden
+
+### RESOLUTION
+clust_res <- .6
 ```
 
 <br>
 <br>
 
-## Loading outside functions
+## Sourcing external functions
 
-First, the function to copy input data in our working directory
+<br>
+
+First, the function to **copy input data** in our working directory
 
 ```{r}
 #| label: source_fetch_funcs
@@ -230,7 +243,7 @@ source(file = fetch_script, echo = TRUE)
 
 <br>
 
-Second, a function we'll use to visualize the weight of covariates on our topology
+Second, a function we'll use to **visualize the weight of covariates** on our topology
 
 ```{r}
 #| label: source_acov_func
@@ -246,7 +259,7 @@ source(file = acov_script, echo = TRUE)
 
 <br>
 
-Third, the function to save the final `SeuratObject`
+Third, the function to **save** the final `SeuratObject` on disk
 
 ```{r}
 #| label: source_save_func
@@ -307,19 +320,19 @@ if (dir.exists(project_dir)) {
 ```
 
 <br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
 <br>
-
-------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
 <br>
 
 # Load input data
 
 <br>
 
-The data consists in a **pair of `SeuratObject`s** saved as RDS, one per sample.
+The data consists in a **pair** of `SeuratObject`s saved as `RDS`, one per sample.
 
 <br>
 
@@ -337,15 +350,15 @@ We can retrieve the input data :
 
 ## Copy the requested files from a local backup, return their user-based local paths
 
-### The TD3A SeuratObject
-TD3A_rds <- backup_get_data(
-  backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/RDS/TD3A_Filtered_12508.4038.RDS",
-  local_path = input_dir,
-  force = TRUE)
-
 ### The TDCT SeuratObject
 TDCT_rds <- backup_get_data(
   backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/RDS/TDCT_Filtered_12254.3671.RDS",
+  local_path = input_dir,
+  force = TRUE)
+
+### The TD3A SeuratObject
+TD3A_rds <- backup_get_data(
+  backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/RDS/TD3A_Filtered_12508.4038.RDS",
   local_path = input_dir,
   force = TRUE)
 ```
@@ -369,17 +382,37 @@ TDCT_so <- readRDS(file = TDCT_rds)
 ```
 
 <br>
+
+## Check content
+
+<br>
+
+```{r}
+#| label: rds_check
+#| filename: rds_checl
+
+## Check TD3A
+TD3A_so
+
+## Check TDCT
+TDCT_so
+
+```
+
 <br>
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
+<br>
 <br>
 
 # Merge datasets
 
--   We simply merge the two objects into a single one :
+<br>
+
+We simply merge the two objects into a single one :
 
 ```{r}
 #| label: integr_merge
@@ -394,7 +427,7 @@ TDCT_TD3A_merged <- base::merge(
 
 1.  First object to merge
 2.  Second object to merge
-3.  Keep track of sample of origin for cells (optional)
+3.  Keep track of sample of origin for cells (optional).<br>!! KEEP IT SYNCHED WITH YOUR (x, y) INPUTS !!
 4.  Add a new project name (optional but recommended)
 
 <br>
@@ -426,151 +459,6 @@ MULTIMERGE <- base::merge(
 6.  The new project name
 :::
 
-```{r eval = FALSE, echo=FALSE}
-## GOOD
-# hvgs <- 3000
-# vars_to_reg <- c('percent_rb', 'CC_Seurat_SmG2M.Score', 'nCount_RNA')
-# pca_dims_use <- 20
-# cluster_res <- .6
-
-## TEST PROCESS
-hvgs <- 3000
-# vars_to_reg <- c('percent_rb', 'percent_mt', 'CC_Seurat_SmG2M.Score', 'nCount_RNA')
-vars_to_reg <- c('percent_rb', 'CC_Seurat_SmG2M.Score', 'nCount_RNA')
-pca_dims <- 50
-pca_dims_use <- 20
-cluster_algo <- 4
-cluster_res <- .6
-
-## PROC
-TDCT_TD3A_merged <- Seurat::NormalizeData(
-  object = TDCT_TD3A_merged, 
-  verbose = FALSE)
-TDCT_TD3A_merged <- Seurat::FindVariableFeatures(
-  object = TDCT_TD3A_merged, 
-  nfeatures = hvgs, 
-  verbose = FALSE)
-TDCT_TD3A_merged <- Seurat::ScaleData(
-  object = TDCT_TD3A_merged, 
-  vars.to.regress = vars_to_reg, 
-  verbose = FALSE)
-TDCT_TD3A_merged <- Seurat::RunPCA(
-  object = TDCT_TD3A_merged, 
-  npcs = pca_dims, 
-  verbose = FALSE)
-
-## HARMONY
-set.seed(my_seed)
-TDCT_TD3A_merged <- harmony:::RunHarmony.Seurat(
-  object = TDCT_TD3A_merged,
-  reduction.use = 'pca',
-  dims.use = 1:pca_dims_use,
-  group.by.vars = 'orig.ident',
-  reduction.save = "harmony",
-  verbose = TRUE)
-
-## CLUSTERING
-TDCT_TD3A_merged <- Seurat::FindNeighbors(
-  object = TDCT_TD3A_merged, 
-  reduction = "harmony", 
-  dims = 1:pca_dims_use, 
-  graph.name = "snn_harm")
-TDCT_TD3A_merged <- Seurat::FindClusters(
-  object = TDCT_TD3A_merged,
-  graph.name = "snn_harm",
-  resolution = cluster_res, 
-  algorithm = cluster_algo,
-  random.seed = my_seed)
-table(TDCT_TD3A_merged$seurat_clusters, TDCT_TD3A_merged$orig.ident)
-
-## CLUSTIFYR ====
-# immgen_rds <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/ImmGenData.RDS"
-# immgen <- readRDS(file = immgen_rds)
-### Prep ref
-ref_expr <- SummarizedExperiment::assay(immgen, "logcounts")
-ref_labels <- as.character(immgen$label.fine)
-ref_mat <- clustifyr::average_clusters(mat = ref_expr, metadata = ref_labels, if_log = TRUE)
-### Annotate
-TDCT_TD3A_merged$immgen_CF_clusters_labels <- clustifyr::clustify(
-  input = SeuratObject::JoinLayers(object = TDCT_TD3A_merged, assay = Seurat::DefaultAssay(TDCT_TD3A_merged)),
-  ref_mat = ref_mat,
-  cluster_col = "seurat_clusters",
-  obj_out = TRUE
-)$type
-
-## COMPUTE UMAP ====
-TDCT_TD3A_merged <- Seurat::RunUMAP(
-  object = TDCT_TD3A_merged, 
-  reduction = "harmony", 
-  dims = 1:pca_dims_use, 
-  seed = my_seed,
-  reduction.name = "umap_harmony",
-  verbose = FALSE)
-
-## Plot UMAP
-### SAMPLES
-Seurat::DimPlot(
-  object = TDCT_TD3A_merged, 
-  reduction = "umap_harmony",
-  group.by = "orig.ident", 
-  shuffle = TRUE,
-  seed = my_seed)+
-ggplot2::ggtitle("Samples")+
-Seurat::DarkTheme()
-### CLUSTERS
-data("Light24", package = "Polychrome")
-cluster_cols <- setNames(
-  object = Light24[seq_len(nlevels(TDCT_TD3A_merged$seurat_clusters))],   nm = levels(TDCT_TD3A_merged$seurat_clusters))
-# cluster_cols <- setNames(
-#   object = Polychrome::palette36.colors(nlevels(TDCT_TD3A_merged$seurat_clusters)),   nm = levels(TDCT_TD3A_merged$seurat_clusters))
-Seurat::DimPlot(
-  object = TDCT_TD3A_merged, 
-  reduction = "umap_harmony",
-  group.by = "seurat_clusters", 
-  shuffle = TRUE,
-  cols = cluster_cols,
-  seed = my_seed)+
-ggplot2::ggtitle("Clusters")+
-Seurat::DarkTheme()
-### IMMGEN (clustifyr)
-Seurat::DimPlot(
-  object = TDCT_TD3A_merged, 
-  reduction = "umap_harmony",
-  group.by = "immgen_CF_clusters_labels", 
-  shuffle = TRUE,
-  seed = my_seed)+
-ggplot2::ggtitle("Clustifyr")+
-Seurat::DarkTheme()
-
-## MARKERS
-all_markers <- Seurat::FindAllMarkers(
-  object = SeuratObject::JoinLayers(
-    object = TDCT_TD3A_merged, 
-    assay = Seurat::DefaultAssay(TDCT_TD3A_merged)),
-  only.pos = TRUE,
-  min.pct = 0.25,
-  logfc.threshold = 0.25,
-  random.seed = my_seed)
-top10_markers <- as.data.frame(all_markers |> dplyr::group_by(cluster) |> dplyr::top_n(n = 10, wt = avg_log2FC))
-
-### HEATMAP
-Seurat::DoHeatmap(object = TDCT_TD3A_merged, features = top10_markers$gene) + Seurat::NoLegend()
-
-### DOTPLOT
-Seurat::DotPlot(object = TDCT_TD3A_merged, 
-                features = unique(top10_markers$gene)) +
-  ggplot2::scale_colour_gradient2(low = "red",
-                                  mid = "lightgrey",
-                                  high = "blue",
-                                  midpoint = 0) +
-  ## Just aesthetics
-  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, 
-                                                     vjust = 1,
-                                                     size = 8, 
-                                                     hjust = 1)) 
-```
-
-
 <br>
 
 ::: {.callout-note}
@@ -601,15 +489,11 @@ TDCT_TD3A_merged
 What can you guess from the dimensions of `TDCT_TD3A_merged` on **the way it was merged** ?
 :::
 
-<br>
-
 ::: {.callout-note icon="false" collapse="true"}
 ## A HINT ?
 
 To get to the answer, you'll have to **compare** its dimensions to those of the individual objects.
 :::
-
-<br>
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 1A
@@ -645,8 +529,6 @@ One can see that the **numbers of cells add up**, but **not those of features** 
 
 Thus, What can you actually guess **what happened for features** ?
 :::
-
-<br>
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 1B
@@ -694,8 +576,6 @@ This would remain true for **any number** of individual objects to merge !
 
 Now a bit of cleaning :
 
-<br>
-
 ```{r}
 #| label: merge_clean
 #| filename: merge_clean
@@ -709,6 +589,8 @@ rm(TD3A_so, TDCT_so, feats_common, TD3A_specific, TDCT_specific)
 
 ## Process the merged dataset
 
+<br>
+
 In order to visualize the data in a 2-D space, one needs to process it the way we learnt :
 
 ```{r}
@@ -716,18 +598,18 @@ In order to visualize the data in a 2-D space, one needs to process it the way w
 #| filename: merge_proc
 #| attr.output: '.details summary="Show output"'
 
-## Log-normalization
+## NORMALIZATION (LN)
 TDCT_TD3A_merged <- Seurat::NormalizeData(
   object = TDCT_TD3A_merged, 
   verbose = FALSE)
 
-## Idenfication of HVGs
+## HVGs
 TDCT_TD3A_merged <- Seurat::FindVariableFeatures(
   object = TDCT_TD3A_merged, 
   nfeatures = hvgs, 
   verbose = FALSE)
 
-## Scaling
+## SCALING + COVARIATES REGRESSION
 TDCT_TD3A_merged <- Seurat::ScaleData(
   object = TDCT_TD3A_merged, 
   vars.to.regress = vars_to_reg, 
@@ -740,6 +622,8 @@ TDCT_TD3A_merged <- Seurat::RunPCA(
   verbose = FALSE)
 ```
 
+<br>
+
 We keep a backup of this merged, processed object for later work :
 
 ```{r}
@@ -749,6 +633,9 @@ We keep a backup of this merged, processed object for later work :
 TDCT_TD3A_bak <- TDCT_TD3A_merged
 ```
 
+<br>
+
+Elbow plot :
 
 ```{r}
 #| label: merge_elbow
@@ -770,10 +657,18 @@ We decide to keep the first **`20`** PCs.
 dims_kept <- 20
 ```
 
+<br>
 
 ## Visualization of the batch effect
 
-### At the covariates level
+<br>
+
+### Covariates level
+
+Here we will **assess** the **weight of covariates** on the first PCs, represented by :
+
+-   Their absolute **Spearman correlation** score, for continuous covariates (like `percent_mt`, or marker genes expression), or :
+-   The score of a [**Kruskal-Wallis**](https://fr.wikipedia.org/wiki/Test_de_Kruskal-Wallis) statistical test, for categorical covariates (like predicted cell cycle phases, by ex.).
 
 ```{r}
 #| label: merge_acov
@@ -783,7 +678,7 @@ dims_kept <- 20
 #| fig-align: "center"
 #| fig-cap: "Covariates weight on PCs (pre-post regression)"
 
-## Assessing un-regressed data (unscaled as proxy)
+## Assessing un-regressed data ("data" layer as proxy)
 AC1 <- assess_covar(
   mat = as.matrix(SeuratObject::LayerData(
     object = SeuratObject::JoinLayers(TDCT_TD3A_merged, assay = "RNA"),
@@ -816,11 +711,38 @@ AC2 <- assess_covar(
   return.plot = TRUE)
 
 ## Stack plots
-cowplot::plot_grid(grid::grid.grabExpr(ComplexHeatmap::draw(AC1)), grid::grid.grabExpr(ComplexHeatmap::draw(AC2)), ncol = 1, align = "v")
+cowplot::plot_grid(
+  grid::grid.grabExpr(ComplexHeatmap::draw(AC1)),
+  grid::grid.grabExpr(ComplexHeatmap::draw(AC2)), 
+  ncol = 1, 
+  align = "v")
 ```
 
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 2
 
-### At the PCA reduction level
+What can you observe and guess from these heatmaps ?
+
+Namely, on the consequences of the covariates regression on the weight of themselves, others, markers ?
+:::
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 2
+
+Solely based on these heatmaps, one can observe that the regression of covariates :
+
+-   **Reduced their weight** on the PCA space for the **very first components** (but slightly increased in later ones)
+
+-   Did **not annihilate** the weight of **marker genes** expression, even seems to have **globally increased** it, and more especially for some specific genes (Pbk, Esco2, Trbv29, C1qa, Lyz2)
+:::
+
+<br>
+
+### PCA reduction level
+
+<br>
+
+How do our sample pair cells mix up in the PCA space ?
 
 ```{r}
 #| label: merge_pca_dp
@@ -841,19 +763,24 @@ Seurat::DarkTheme()
 ```
 
 ::: {.callout-note icon="false" style="background: lightblue"}
-## QUESTION 2
+## QUESTION 3
 
 Give your interpretation of this plot !
 :::
 
 <br>
 
-### At the UMAP reduction level
+### UMAP reduction level
+
+<br>
+
+Same, in the UMAP space :
 
 ```{r}
 #| label: merge_umap
 #| filename: merge_umap
 
+## Computing the UMAP space
 TDCT_TD3A_merged <- Seurat::RunUMAP(
   object = TDCT_TD3A_merged, 
   seed = my_seed, 
@@ -867,8 +794,7 @@ TDCT_TD3A_merged <- Seurat::RunUMAP(
 #| fig-align: "center"
 #| fig-cap: "Samples in UMAP space (merged data)"
 
-## Assessing un-regressed data (unscaled as proxy)
-
+## Plotting our samples in the UMAP space
 Merged_dp <- Seurat::DimPlot(
   object = TDCT_TD3A_merged, 
   reduction = "umap",
@@ -886,7 +812,7 @@ print(Merged_dp)
 <br>
 
 ::: {.callout-note icon="false" style="background: lightblue"}
-## QUESTION 3
+## QUESTION 4
 
 Give your interpretation of this plot : Do you consider the samples as perfectly integrated ? And why ?
 :::
@@ -903,30 +829,40 @@ Give your interpretation of this plot : Do you consider the samples as perfectly
 
 # Sample-aware regression
 
-May one use the sample of origin as a covariate to regress ?
+<br>
+
+If covariate regression allows to reduce sources of bias, why wouldn't we consider the **sample of origin as** one of these **adversarial covariates**  ?
+
+Let's try !
+
+<br>
+
+## Reprocessing
+
+<br>
 
 ::: {.callout-note icon="false" style="background: pink"}
 ## DEMO
 
-Processing, adding the sample name as a new covariate to regress :
+Re-processing, this time adding the **sample name** as a **new covariate** to regress :
 
 ```{r}
 #| label: sample_regr_proc
 #| filename: sample_regr_proc
 #| attr.output: '.details summary="Show output"'
 
-## Log-normalization
+## NORMALIZATION (LN)
 TDCT_TD3A_sreg <- Seurat::NormalizeData(
   object = TDCT_TD3A_bak, 
   verbose = FALSE)
 
-## Idenfication of HVGs
+## HVGs
 TDCT_TD3A_sreg <- Seurat::FindVariableFeatures(
   object = TDCT_TD3A_sreg, 
   nfeatures = hvgs, 
   verbose = FALSE)
 
-## Scaling
+## SCALING + COVARIATES REGRESSION
 TDCT_TD3A_sreg <- Seurat::ScaleData(
   object = TDCT_TD3A_sreg, 
   vars.to.regress = unique(c('orig.ident', vars_to_reg)),       # <1>
@@ -955,8 +891,20 @@ Seurat::ElbowPlot(object = TDCT_TD3A_sreg,
                   ndims = pca_dims, 
                   reduction = "pca")
 ```
+:::
 
-Assessing the remaining weight of covariates :
+<br>
+
+## Effect of the regression
+
+### Covariates level
+
+<br>
+
+We can observe the remaining weight of covariates after this special regression :
+
+::: {.callout-note icon="false" style="background: pink"}
+## DEMO
 
 ```{r}
 #| label: sample_regr_acov
@@ -965,8 +913,6 @@ Assessing the remaining weight of covariates :
 #| fig-height: 8
 #| fig-align: "center"
 #| fig-cap: "Covariates weight on PCs (w, w/o sample regression)"
-
-## Assessing un-regressed data (unscaled as proxy)
 
 ## Assessing the covariates weight after regression
 AC3 <- assess_covar(
@@ -985,10 +931,24 @@ AC3 <- assess_covar(
   return.plot = TRUE)
 
 ## Comparison to the simple merge
-cowplot::plot_grid(grid::grid.grabExpr(ComplexHeatmap::draw(AC2)), grid::grid.grabExpr(ComplexHeatmap::draw(AC3)), ncol = 1, align = "v")
+cowplot::plot_grid(
+  grid::grid.grabExpr(ComplexHeatmap::draw(AC2)),
+  grid::grid.grabExpr(ComplexHeatmap::draw(AC3)), 
+  ncol = 1, 
+  align = "v")
 ```
+:::
 
-Visualizing the PCA space :
+<br>
+
+### PCA reduction level
+
+<br>
+
+How do our sample pair cells mix up in the PCA space ?
+
+::: {.callout-note icon="false" style="background: pink"}
+## DEMO
 
 ```{r}
 #| label: sample_regr_pca
@@ -1007,8 +967,18 @@ Seurat::DimPlot(
 ggplot2::ggtitle("Sample-regressed : PCA")+
 Seurat::DarkTheme()
 ```
+:::
 
-Visualizing the UMAP space :
+<br>
+
+### UMAP reduction level
+
+<br>
+
+Same, in the UMAP space :
+
+::: {.callout-note icon="false" style="background: pink"}
+## DEMO
 
 ```{r}
 #| label: sample_regr_umap
@@ -1038,15 +1008,16 @@ print(SampReg_dp)
 :::
 
 ::: {.callout-note icon="false" style="background: lightblue"}
-## QUESTION 3
+## QUESTION 5
 
 Give your interpretation of this plot : Do you consider the samples as well integrated ? And why ?
 :::
 
 <br>
 <br>
+<br>
 
-**Regressing the sample of origin as a covariate is not a good idea ...***
+**Regressing the sample of origin as a covariate is not a good idea ...**
 
 <br>
 
@@ -1080,7 +1051,10 @@ We will perform integration using multiple methods.
 
 We will use the [CCA](https://satijalab.org/seurat/reference/ccaintegration) method.
 
-Integration
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
+**Integration**
 
 ```{r}
 #| label: integr_s_cca
@@ -1099,7 +1073,7 @@ TDCT_TD3A_merged <- Seurat::IntegrateLayers(
   verbose = FALSE)
 ```
 
-Clustering
+**Clustering**
 
 ```{r}
 #| label: s_cca_clust
@@ -1122,7 +1096,7 @@ TDCT_TD3A_merged <- Seurat::FindClusters(
   verbose = FALSE)
 ```
 
-UMAP
+**UMAP**
 
 ```{r}
 #| label: s_cca_umap
@@ -1176,12 +1150,16 @@ S.CCA_dp <- Seurat::DimPlot(object = TDCT_TD3A_merged,
 
 S.CCA_samp_dp + S.CCA_dp + patchwork::plot_layout(ncol = 2)
 ```
+:::
 
 ### Seurat : RPCA
 
 We will now use the [RPCA](https://satijalab.org/seurat/articles/integration_rpca) method.
 
-Integration
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
+**Integration**
 
 ```{r}
 #| label: integr_s_rpca
@@ -1198,7 +1176,7 @@ TDCT_TD3A_merged <- Seurat::IntegrateLayers(
   verbose = FALSE)
 ```
 
-Clustering
+**Clustering**
 
 ```{r}
 #| label: s_rpca_clust
@@ -1221,7 +1199,7 @@ TDCT_TD3A_merged <- Seurat::FindClusters(
   verbose = FALSE)
 ```
 
-UMAP
+**UMAP**
 
 ```{r}
 #| label: s_rpca_umap
@@ -1275,12 +1253,17 @@ S.RPCA_dp <- Seurat::DimPlot(object = TDCT_TD3A_merged,
 
 S.RPCA_samp_dp + S.RPCA_dp + patchwork::plot_layout(ncol = 2)
 ```
+:::
+
 
 ### Seurat : Harmony
 
 We will now use a wrapper to [Harmony](https://satijalab.org/seurat/reference/harmonyintegration).
 
-Integration
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
+**Integration**
 
 ```{r}
 #| label: integr_s_harmony
@@ -1300,7 +1283,7 @@ TDCT_TD3A_merged <- Seurat::IntegrateLayers(
   verbose = FALSE)
 ```
 
-Clustering
+**Clustering**
 
 ```{r}
 #| label: s_harmony_clust
@@ -1323,7 +1306,7 @@ TDCT_TD3A_merged <- Seurat::FindClusters(
   verbose = FALSE)
 ```
 
-UMAP
+**UMAP**
 
 ```{r}
 #| label: s_harmony_umap
@@ -1377,12 +1360,13 @@ S.Harmony_dp <- Seurat::DimPlot(object = TDCT_TD3A_merged,
 
 S.Harmony_samp_dp + S.Harmony_dp + patchwork::plot_layout(ncol = 2)
 ```
+:::
 
 ### Harmony (Seurat Object)
 
 Here we run Harmony as a standalone function, on our Seurat Object.
 
-Integration
+**Integration**
 
 ```{r}
 #| label: integr_harmony_so
@@ -1401,10 +1385,10 @@ TDCT_TD3A_harmony <- harmony:::RunHarmony.Seurat(
   reduction.save = "harmony",
   verbose = FALSE)
 
-rm(TD3A_TDCT_bak)
+rm(TDCT_TD3A_bak)
 ```
 
-Clustering
+**Clustering**
 
 ```{r}
 #| label: harmony_so_clust
@@ -1427,7 +1411,7 @@ TDCT_TD3A_harmony <- Seurat::FindClusters(
   verbose = FALSE)
 ```
 
-UMAP
+**UMAP**
 
 ```{r}
 #| label: harmony_so_umap
@@ -1491,7 +1475,9 @@ This is useful when not working with a `SeuratObject`.
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
-Integration
+<br>
+
+**Integration**
 
 ```{r}
 #| label: integr_harmony_pca
@@ -1520,7 +1506,7 @@ TDCT_TD3A_merged[["harmony_pca"]] <- Seurat::CreateDimReducObject(
 rm(HS1)
 ```
 
-Clustering
+**Clustering**
 
 ```{r}
 #| label: harmony_pca_clust
@@ -1543,7 +1529,7 @@ TDCT_TD3A_merged <- Seurat::FindClusters(
   verbose = FALSE)
 ```
 
-UMAP
+**UMAP**
 
 ```{r}
 #| label: harmony_pca_umap
@@ -1601,6 +1587,9 @@ HarmonyPCA_samp_dp + HarmonyPCA_dp + patchwork::plot_layout(ncol = 2)
 
 :::
 
+
+<br>
+
 ## Unified plot
 
 ### Samples
@@ -1619,6 +1608,45 @@ Merged_dp + SampReg_dp +
   patchwork::plot_layout(ncol = 3)
 ```
 
+<br>
+
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 6
+
+Based on the observation and comparison of these UMAPs, which method would you choose, and why ?
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 6
+
+What we can observe for each (kinda a summary), for this experiment
+
+-   Simple merging provides insufficient quality of integration (numerous parts of the topology seem to be mirrored in both samples).
+
+-   Regressing the sample of origin as a covariate provides a slightly better integration, but gives a strange topology inside putative clusters, where both samples do not mix well.
+
+-   At first glance, Seurat CCA seems to perform way better than these two first naive approaches. However, their is still some awkwardness in the topology/mixture of samples, and clusters do not seem as well defined as other methods.
+
+-   Seurat RPCA seems to provide an other level of mixing of the pair of samples.. maybe a bit *too much* of a mixture in this case : with the exception of the soutern cluster, almost all other structures seemed relatively balanced across both samples. We may be in a case of *over-fitting*.
+
+-   Seurat's Harmony wrapper results show a topology with apparently well-defined clusters, some of which exhibit clear sample-specificity.
+
+-   Harmony run as standalone also shows well-defined clusters, some of which are clearly sample-specific.
+
+<br>
+
+**However** :
+
+-   These observations are limited to the outline of the topology in an (extremely) reduced space, and without taking into account neither of the sub-levels of this topology (*clusters*, answered below) nor any **biological knowledge** (expected cell populations and their sample specificity, answered in the next training session)
+
+-   Without these other observations / pieces of knowledge, it is hard to distinguish between sample-specificity or lack of fitting, as well as between true community or over-fitting.
+
+:::
+
+<br>
+
 ### Clusters
 
 ```{r}
@@ -1636,11 +1664,44 @@ S.CCA_dp + S.RPCA_dp +
 
 <br>
 
+::: {.callout-note icon="false" style="background: lightblue"}
+## QUESTION 7
+
+Adding these observations to the former ones, which method would you actualy choose, and why ?
+:::
+
+<br>
+
+::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
+## ANSWER 7
+
+-   Harmony standalone space seems to provide the most well-defined Leiden clusters of all (no split, quite clean outline, not too much outliers).
+
+-   Harmony through Seurat is close, with a bit of noise above clusters 1, 5 and 3.
+
+-   Seurat RPCA clusters seem roughly fine, with a bit of noise.
+
+-   Seurat CCA clusters are the worst of the batch, with cluster 10 split into two parts, and with outliers quite everywhere.
+
+<br>
+
+**However** :
+
+-   The same resolution was used for all spaces : the value was probably not optimal for all of them.
+
+-   Remember that the UMAP space is an extreme approximation of a much more complex space : its 2-D topology may not perfectly reflect the intrinsic biology !
+
+- In conclusion, we really need additional information, this time provided by biological knowledge. This will be treated in the next training session !
+:::
+
+<br>
+<br>
+
 ::: {.callout-note}
 
 **Why are there differences between Harmony called by Seurat and standalone ?**
 
-This is a question of **different default parameters**
+This is a question of **different default parameters**.
 
 :::: {.columns .with-divider}
 
@@ -1674,7 +1735,7 @@ Seurat::HarmonyIntegration(
 :::
 
 ::: {.column width="50%"}
-And here is the same for Harmony standalone
+And here is the same for Harmony standalone :
 
 ```
 harmony::RunHarmony(
