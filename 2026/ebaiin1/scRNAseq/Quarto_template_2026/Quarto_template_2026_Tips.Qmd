@@ -1,5 +1,6 @@
 ---
 title: "EB3I n1 2026 scRNAseq<br><br>[Quarto Template]{.mark}<br><i>Guidelines and examples for teachers</i><br> <br>"
+date: "2026-11-16"
 author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
   - name: "<i>Bastien JOB</i>"
@@ -40,6 +41,7 @@ filters:
  - foldablecodeblock.lua  ## LUA code for foldable code output
 ---
 
+
 <!-- ADDITIONAL CODES / HACKS -->
 
 <!-- CSS code to center the QMD title -->
@@ -67,7 +69,18 @@ filters:
 }
 </style>
 
+<!-- CSS code to add a column separator when using Quarto column syntax -->
+<!-- It works by using it this way ; :::: {.columns .with-divider} -->
+<style>
+.with-divider > .column:first-child {
+  border-right: 1px solid #888;
+  padding-right: 1em;
+}
 
+.with-divider > .column + .column {
+  padding-left: 1em;
+}
+</style>
 
 <!-- HTML code to force table borders -->
 ```{=html}
@@ -80,9 +93,7 @@ td, th {
 ```
 
 
-
 <!-- BODY -->
-
 
 <br>
 
@@ -90,13 +101,16 @@ td, th {
 
 ------------------------------------------------------------------------
 
+<!-- For real training sessions : -->
+<!-- ![](imgs/eb3i_banner.png){.center-image} -->
+
 ![](eb3i_banner.png){.center-image}
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-
+<br>
 <br>
 
 # Preamble for authors
@@ -128,6 +142,12 @@ This QMD script is a template/example. Among its characteristics :
 -   In this template, R chunks always include the QMD `#| label:` and `#| filename:` with the **same text value**. This is a trick used to display the chunk name in the output, as a header for each evaluated chunk. This is useful to use as anchors to help trainees keep in synch between the projected output and the QMD source on their own screen. While using this trick is not mandatory, it is highly recommended.
 
 :::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
 
 <br>
 <br>
@@ -168,6 +188,39 @@ Thus, we will write/use a certain amount of **lines of code**, some of which of 
 As this is a template, most chunks here will not be evaluated. They will be
 only where their output matters for the following chunks.
 :::
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+<br>
+
+# Connection to RstudioServer
+
+To access RstudioServer on the remote HPC which we will work on, one must first connect to OpenOnDemand [here](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} using the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/getting_started/){target="_blank"}.
+
+Once connected, the application to select is **Rstudio Server: Core**.
+
+To create and/or join an Rstudio Server App, one can use the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/starting_rstudio_server/){target="_blank"}, with some modifications specific in the form to our training session :
+
+-   **R version** : `4.5.2`
+-   **Reservation** : `2621_eb3in1_2026`
+-   **Account** : `2621_eb3in1_2026`
+-   **Number of CPUs** : `2`
+-   **Amount of memory** : `30G`    **Do not forget the "G" !**
+
+Creation of the App will take a few seconds / minutes depending on the HPC workload.
+
+Once create, the App will stay on as long as its dedicated time (`Number of hours`, **12** by default, and current maximum) are not over, and even if its browser tab is closed.
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
 
 <br>
 <br>
@@ -417,6 +470,7 @@ Here is a summary of expected callout types and parameters, depending on their p
 | Additional question | `warning` | "false" | **"true"** | [**yellow**]{style="color:yellow"} | "OPTIONAL QUESTION X" | Yes |
 | Additional answer | `warning` | "false" | **"true"** | [**orange**]{style="color:orange"} | "OPTIONAL ANSWER X" | Yes |
 
+<br>
 <br>
 
 ------------------------------------------------------------------------
@@ -959,7 +1013,6 @@ These RDS are only available in the cluster backup as of now !
 | `Preproc 2` | `arabidopsis_thaliana_cribo_symbols_20261012.rds` | mito genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_cribo_symbols_20261012.rds` |
 | `Preproc 2` | `arabidopsis_thaliana_mito_symbols_20261012.rds` | riboprot genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_mito_symbols_20261012.rds` |
 | `Preproc 3` | `arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` | Seurat cell cycle genes (At) | `Resource` | *NA* | `RESOURCES/GENELISTS/arabidopsis_thaliana_Seurat_cc.genes_20261012.rds` |
-
 
 <br>
 
