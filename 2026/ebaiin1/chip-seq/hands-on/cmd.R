@@ -1,17 +1,23 @@
 ## - Associate peaks to closest genes
 # 5. Add gene symbol annotation using R with Rstudio
 
-setwd("/shared/projects/2538_eb3i_n1_2025/atelier_chipseq/EBAII2025_chipseq/07-PeakAnnotation")
+setwd("/shared/projects/2621_eb3in1_2026/atelier_chipseq/elo_test/07-PeakAnnotation")
 
-d <- read.table("FNR_anaerobic_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
+peaks_annotated <- read.table("RtrC_idr_annotated_peaks.tsv", sep="\t", header=TRUE)
 
-gene.symbol <- read.table("../data/Escherichia_coli_K_12_MG1655.annotation.tsv.gz", header=FALSE)
 
-d.annot <- merge(d[,c(1,2,3,4,5,6,8,10,11)], gene.symbol, by.x="Nearest.PromoterID", by.y="V1")
 
-colnames(d.annot)[2] <- "PeakID"  # name the 2d column of the new file "PeakID"
-colnames(d.annot)[dim(d.annot)[2]] <- "Gene.Symbol"
-write.table(d.annot, "FNR_anaerobic_idr_final_peaks_annotation.tsv", col.names=TRUE, row.names=FALSE, sep="\t", quote=FALSE)
+## select the peaks associated with a gene feature
+peaks_w_genes <- peaks_annotated$Annotation != "Intergenic"
+peaks_annotated_genes <- peaks_annotated[peaks_w_genes,]
+
+## extract the column containing the gene name
+selected_genes <- unique(peaks_annotated_genes$Gene.Name)
+length(selected_genes) # how many genes are selected ?
+
+## Save the list in a text file
+writeLines(selected_genes,"genes_associated_rtrc.txt")
+
 
 ## - Performing a first evaluation of peak sets using R
 # 1. Go to Rstudio and execute the R code below (show results in the report)
