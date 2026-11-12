@@ -52,7 +52,7 @@ R is a **programming language** developed to :
 -   Compute **statistical analyses**, from basic to complex ones : descriptive, exploration, modelling, machine learning ...\
 -   Create nice **visualisations**, reports ...
 
-[[R is free, cross-platform, open-source & collaborative !]{.smallcaps}]{style="color: #74C476"}
+[R is free, cross-platform, open-source & collaborative !]{.smallcaps} style="color: #74C476"}
 
 ## R [Pros]{style="color: #74C476"} & [Cons]{style="color: #E34234"}
 
@@ -141,9 +141,12 @@ Refresh your files in Rstudio, your should see the following :
 
 # Basic operations
 
+:::{.r-fit-text}
 R can be used as a giant calculator, to compute mathematical operations
+::: 
+```{r}
+#| eval: false
 
-```{r, eval=F}
 2 + 3
 
 4 * 5
@@ -161,54 +164,138 @@ Execute line by line with `ctrl` + `enter`
 
 ## Basic operations
 
+:::{.r-fit-text}
 R can be used as a giant calculator, to compute mathematical operations
+::: 
 
 ```{r}
-#| code-line-numbers: false
-#| eval: true
-
-2 + 3
-```
-
-::: {.fragment}
-```{r}
-#| code-line-numbers: false
-#| eval: true
-
-4 * 5
-```
-:::
-
-::: {.fragment}
-```{r}
-#| code-line-numbers: false
-#| eval: true
-
-6 / 4
-```
-:::
-
-
-::: {.fragment}
-```{r}
-#| code-line-numbers: false
+#| code-line-numbers: "1"
+#| echo: true
+#| results: false
 #| eval: false
 
+2 + 3
+
+4 * 5
+
+6 / 4
+
 1,2
-``` 
-
-[Error : Unexpected ',' in "1,"]{style="color: #E34234;"}
-
-:::
-
-::: {.fragment}
-```{r}
-#| code-line-numbers: false
-#| eval: true
 
 1.2
 ```
-:::
+
+```{r}
+#| echo: false
+2+3
+```
+
+## Basic operations
+
+:::{.r-fit-text}
+R can be used as a giant calculator, to compute mathematical operations
+::: 
+```{r}
+#| code-line-numbers: "3"
+#| echo: true
+#| results: false
+#| eval: false
+
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+```{r}
+#| echo: false
+4*5
+```
+
+## Basic operations
+
+:::{.r-fit-text}
+R can be used as a giant calculator, to compute mathematical operations
+::: 
+```{r}
+#| code-line-numbers: "5"
+#| echo: true
+#| results: false
+#| eval: false
+
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+```{r}
+#| echo: false
+6/4
+```
+
+## Basic operations
+
+:::{.r-fit-text}
+R can be used as a giant calculator, to compute mathematical operations
+::: 
+```{r}
+#| code-line-numbers: "7"
+#| echo: true
+#| results: false
+#| eval: false
+
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+
+[Error : unexpected ',' in "1,"]{.smallcaps style="color: #E34234; font-size: 20pt;"}
+
+
+## Basic operations
+
+:::{.r-fit-text}
+R can be used as a giant calculator, to compute mathematical operations
+::: 
+```{r}
+#| code-line-numbers: "9"
+#| echo: true
+#| results: false
+#| eval: false
+
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+```{r}
+#| echo: false
+1.2
+```
 
 # Objects & variables
 
@@ -236,10 +323,14 @@ You can use either `<-` or `=` to assign values to variables ...
 ... but we usually prefer `<-` to avoid confusion with `==`, used to test if two variables are equal
 :::
 
+::: {.fragment .fade-in}
+Notice the variables appear in the `Environment` window :
+![](img/env_a.png){fig-align="center"}
+:::
+
 ## Numerical values
 
 Now, create a second variable named `b` with a value of 3. Test if it is equal to a.
-
 ::: {.fragment .fade-in}
 ```{r}
 b <- 3		# create a second variable named b, equals to 3
@@ -250,6 +341,10 @@ Several tests are available to compare variables : `==` ; `!=` ; `>` ; `<`\
 They all return a *boolean* value, either **TRUE** or **FALSE**
 :::
 
+::: {.fragment .fade-in}
+And again, b appeared in the `Environment` :
+![](img/env_b.png){fig-align="center"}
+:::
 ## Numerical values
 
 Store the result of a + b in a new variable. What happens if we change a's value to 7 ?
@@ -281,15 +376,21 @@ integers <-  1:10		   # One vector with all integer values from 1 to 10
 ducks <-  c("riri", "fifi", "loulou")    # A vector containing character strings
 ```
 
-::: {.fragment .fade-in}
-But it can only contain **one type** of object :
+::: {.fragment .fade-in .r-fit-text}
+The type and number of objects is displayed in the `Environment` :   
+![](img/env_vectors.png){fig-align="center"}
+:::
 
+## Vectors
+
+Vectors can only contain **one type** of object !  If we try :
 ```{r}
 test <-  c("riri", 1, 4:6)
 class(test)
 ```
-
-all numerical values where converted to text !
+::: {.fragment .fade-in}
+all numerical values are converted to text !
+![](img/env_test.png){fig-align="center"}
 :::
 
 ## Vectors
@@ -298,22 +399,59 @@ We can compute mathematical operations on vectors :
 
 ```{r, eval=F}
 measures + a 		# sum of a vector and a numerical value
-measures
 integers / 2		# dividing a whole vector
-integers
+ducks / 2		    # does this work ?
 ```
 
-But does this work ?
+
+## Vectors
+
+We can compute mathematical operations on vectors :
 
 ```{r, eval=F}
-ducks / 2		
+#| code-line-numbers: "1"
+
+measures + a 		# sum of a vector and a numerical value
+integers / 2		# dividing a whole vector
+ducks / 2		    # does this work ?
 ```
 
-::: {.fragment .fade-in}
-[Error in ducks/2 : non-numerical argument given for a binary operator]{style="color: #E34234;"}
+```{r, echo=F}
+measures + a 	
+```
 
-Be careful with the class of objects stored in vectors
-:::
+## Vectors
+
+We can compute mathematical operations on vectors :
+
+```{r, eval=F}
+#| code-line-numbers: "2"
+
+measures + a 		# sum of a vector and a numerical value
+integers / 2		# dividing a whole vector
+ducks / 2		    # does this work ?
+```
+
+```{r, echo=F}
+integers / 2
+```
+
+## Vectors
+
+We can compute mathematical operations on vectors :
+
+```{r, eval=F}
+#| code-line-numbers: "3"
+
+measures + a 		# sum of a vector and a numerical value
+integers / 2		# dividing a whole vector
+ducks / 2		    # does this work ?
+```
+
+[Error in ducks/2 : non-numerical argument given for a binary operator]{.smallcaps style="color: #E34234; font-size: 20pt;"}
+
+Be careful with the type of objects stored in vectors !
+
 
 ## Vectors
 
@@ -340,6 +478,7 @@ Using `c()`, we can add new values to a vector :
 
 ```{r}
 measures <- c(measures, 9, 8)
+measures
 ```
 
 `c` means `concatenate`
@@ -361,7 +500,7 @@ Objects with missing values might raise unexpected behaviors
 
 ## Lists
 
-Lists are another way to store values : they can be created using `list()` function :
+Lists are another way to store values. They can be created using `list()` function :
 
 ```{r}
 empty <- list()  # Create an empty list
@@ -370,18 +509,34 @@ unnamed <- list(2,5,8) # a list of unnamed numbers
 vrac <- list("A"=1:4,"B"=c(0,1),"C"="hey") # a list with multiple class of objects !
 ```
 
-:::{.fragment}
+::: {.fragment .fade-in}   
+![](img/env_lists_folded.png)  
+:::
+
+## Lists
+
+Lists are another way to store values. They can be created using `list()` function :
+
+```{r}
+empty <- list()  # Create an empty list
+groceries <- list("banana"=2,"apple"=5,"kiwi"=8) # a list of fruits
+unnamed <- list(2,5,8) # a list of unnamed numbers
+vrac <- list("A"=1:4,"B"=c(0,1),"C"="hey") # a list with multiple class of objects !
+```
+
+::::: {.columns}
+:::: {.column width="40%"}
+![](img/env_lists_unfolded.png){width="400" }
+::::
+:::: {.column width="60%"}
+:::{style="font-size: 23pt;"}
 -   They contain several objects called `elements`
-:::
-:::{.fragment}
--   Those elements can have different classes of objects : numerical values, vectors, characters, other lists ...
-:::
-:::{.fragment}
--   Elements are a combination of a `name`, called a key, and a `value`
-:::
-:::{.fragment}
+-   Those elements can have different classes of objects : numerical values, vectors, characters, other lists...
+-   Elements are a combination of a name, called a `key`, and a `value`
 -   Names can be empty
 :::
+::::
+:::::
 
 ## Lists
 
@@ -392,7 +547,7 @@ groceries[["banana"]] # Access the value stored under banana name
 groceries[[1]]  # Access the value of the first groceries element (banana)
 ```
 
-::: {.fragment .fade-in}
+::: {.fragment .fade-in .r-fit-text}
 If an element is already named, you can use `$` to access it directly :
 
 ```{r}
@@ -401,21 +556,22 @@ groceries$banana          # Access the value stored under banana name
 :::
 
 ## Lists
-
+:::{.r-fit-text}
 Try to access an element of the list `unnamed` with `$` : what happens ?
-
+:::
 ::: {.fragment .fade-in}
-```{r, eval=F}
-unnamed$
+```{r}
+unnamed$a
 ```
+![](img/no-matches.png){width="280"}  
+:::
 
 ::::{.callout-tip} 
 R auto completion will help you select the right element
 ::::
-:::
-
 ## Lists
 
+::::{style="font-size: 25pt;"}
 Use `[[ ]]` to add a named element to the list `empty`
 
 ::: {.fragment .fade-in fragment-index="1"}
@@ -431,8 +587,11 @@ Use `[[ ]]` to add an unnamed element in the 4th position of the list `empty`
 empty[[4]] <- 10 	# add an unnamed element to the 4th position
 ```
 
-Notice that the list now contains a 2nd and a 3rd element as well : they are unnamed and hold the value `NULL`
+Notice that the list now contains a 2nd and a 3rd element as well : they are unnamed and hold the value `NULL`   
+![](img/env_empty_list.png)  
 :::
+
+::::
 
 # Functions
 
@@ -485,8 +644,8 @@ mean(x = measures, na.rm = TRUE)
 ## Functions
 
 Arguments can be  :  
-- named =\> they can be written in any order   
-- unnamed =\> R will expect them in their appearing order  
+- *named* : they can be written in any order   
+- *unnamed* : R will expect them in their appearing order  
 
 ```{r, eval=F}
 mean(x=measures, trim=0, na.rm=TRUE) # OK
@@ -495,6 +654,26 @@ mean(measures, 0, TRUE)  # OK
 mean(TRUE, measures)  # NOT OK !
 mean(measures, TRUE)  # NOT OK !
 ```
+
+## Functions
+
+Arguments can be  :  
+- *named* : they can be written in any order   
+- *unnamed* : R will expect them in their appearing order  
+
+```{r, eval=F}
+#| code-line-numbers: "4-5"
+
+mean(x=measures, trim=0, na.rm=TRUE) # OK
+mean(na.rm=TRUE, x=measures, trim=0) # OK
+mean(measures, 0, TRUE)  # OK
+mean(TRUE, measures)  # NOT OK !
+mean(measures, TRUE)  # NOT OK !
+```
+
+[Erreur dans mean.default(measures, TRUE) :    
+'trim' doit être une valeur numérique de longueur un]{.smallcaps style="color: #E34234; font-size: 20pt;"}
+
 
 ## Functions
 
@@ -540,12 +719,23 @@ A two-dimensional way of storing information : the same kind of information is o
 
 We'll use `read.table` function. What are its arguments ?
 
-:::{.fragment}
+::::{.fragment}
+![](img/help_read.table.png)
+
+:::{.callout-tip}
+Look at the annotation file first to know what to give to the `read.table` function
+:::
+
+::::
+
+## Read the `annotation.csv` file
+
+We'll use `read.table` function. What are its arguments ?
+
 ```{r, eval=F}
 annotation_data <- read.table(file = "annotation.csv", header = TRUE, 
                               sep = ",", dec = ".")
 ```
-:::
 
 :::{.callout-tip}
 Look at the annotation file first to know what to give to the `read.table` function
