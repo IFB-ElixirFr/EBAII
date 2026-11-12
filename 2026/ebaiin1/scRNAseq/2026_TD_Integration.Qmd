@@ -135,21 +135,31 @@ While we focused on the **KO sample `TD3a`** until now, we will integrate it wit
 As the purpose is to **integrate** both samples into a single analytical entity, the objects we will use as input are `SeuratObjects` synced up to barcodes **filtering (bad quality, doublets)** (thus, there are no *dimension reduction* data in these objects)
 
 <br>
-<br>
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
 <br>
+<br>
 
-# Start Rstudio
+# Connection to RstudioServer
 
--   Using the [OpenOnDemand cheat
-    sheet](https://ifb-elixirfr.github.io/EBAII/2023/ebaiin1/SingleCell/2024_TD_OpenOnDemand.html),
-    connect to the [OpenOnDemand
-    portal](https://ondemand.cluster.france-bioinformatique.fr) and
-    **create a Rstudio session** with the right resource requirements.
+To access RstudioServer on the remote HPC which we will work on, one must first connect to OpenOnDemand [here](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} using the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/getting_started/){target="_blank"}.
+
+Once connected, the application to select is **Rstudio Server: Core**.
+
+To create and/or join an Rstudio Server App, one can use the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/starting_rstudio_server/){target="_blank"}, with some modifications specific in the form to our training session :
+
+-   **R version** : `4.5.2`
+-   **Reservation** : `2621_eb3in1_2026`
+-   **Account** : `2621_eb3in1_2026`
+-   **Number of CPUs** : `2`
+-   **Amount of memory** : `30G`    **Do not forget the "G" !**
+
+Creation of the App will take a few seconds / minutes depending on the HPC workload.
+
+Once create, the App will stay on as long as its dedicated time (`Number of hours`, **12** by default, and current maximum) are not over, and even if its browser tab is closed.
 
 <br>
 
