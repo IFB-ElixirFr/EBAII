@@ -1,5 +1,5 @@
 ---
-title: "EB3I n1 2026 scRNAseq<br><br>[Integration]{.mark}<br><i>Gather multiple samples</i><br> <br>"
+title: "EB3I n1 2026 scRNAseq<br><br>[INTEGRATION]{.mark}<br><i>Gather multiple samples</i><br> <br>"
 date: "2026-11-18"
 author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
