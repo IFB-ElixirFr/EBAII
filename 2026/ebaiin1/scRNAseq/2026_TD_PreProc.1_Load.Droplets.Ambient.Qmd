@@ -1,5 +1,6 @@
 ---
 title: "EB3I n1 2026 scRNAseq<br><br>[PRE-PROCESSING (I)]{.mark}<br><i>Load a count matrix, empty droplets & ambient RNA filtering</i><br> <br>"
+date: "2026-11-17"
 author:
   - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
   - name: "<i>Bastien JOB</i>"
@@ -319,12 +320,23 @@ As these are *additional* content, we will **NOT** support questions related to 
 <br>
 <br>
 
-# Start RstudioServer
+# Connection to RstudioServer
 
-<br>
+To access RstudioServer on the remote HPC which we will work on, one must first connect to OpenOnDemand [here](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} using the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/getting_started/){target="_blank"}.
 
-Using the [OpenOnDemand/Rstudio cheat sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"}, connect to the [OpenOnDemand portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"}
-and **create a Rstudio session** with the right resource requirements.
+Once connected, the application to select is **Rstudio Server: Core**.
+
+To create and/or join an Rstudio Server App, one can use the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/starting_rstudio_server/){target="_blank"}, with some modifications specific in the form to our training session :
+
+-   **R version** : `4.5.2`
+-   **Reservation** : `2621_eb3in1_2026`
+-   **Account** : `2621_eb3in1_2026`
+-   **Number of CPUs** : `2`
+-   **Amount of memory** : `30G`    **Do not forget the "G" !**
+
+Creation of the App will take a few seconds / minutes depending on the HPC workload.
+
+Once create, the App will stay on as long as its dedicated time (`Number of hours`, **12** by default, and current maximum) are not over, and even if its browser tab is closed.
 
 <br>
 
