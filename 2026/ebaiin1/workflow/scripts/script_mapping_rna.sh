@@ -11,7 +11,7 @@ module load star/2.7.11a
 OUT_DIR="/path/to/my/project/TP_rnaseq/workflow/star_res"
 mkdir -p $OUT_DIR
 
-DATA_DIR="/shared/projects/2422_ebaii_n1/atelier_rnaseq/04-Workflow/data/"
+DATA_DIR="/shared/projects/2621_eb3in1_2026/atelier_rnaseq/TP_workflow/data/"
 STAR_INDEX="/shared/bank/arabidopsis_thaliana/TAIR10.1/star-2.7.9a/"
 GTF="/shared/bank/arabidopsis_thaliana/TAIR10.1/gtf/GCF_000001735.4_TAIR10.1_genomic.gtf"
 
