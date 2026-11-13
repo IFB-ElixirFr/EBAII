@@ -5,7 +5,6 @@ author:
   - name: "<i>Lijiao NING</i>"
     email: "lijiao.ning@cnrs.fr"
   - name: "Contributors: Bastien JOB, Léa BELLENGER, Sébastien MELLA, Lilia YOUNSI, Nathalie LEHMANN"
-    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr; lea.bellenger@univ-nantes.fr;"
 lightbox:
   match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots by click
 format:
@@ -246,7 +245,7 @@ source(
 )
 
 ## Folder of the backup of all intermediate Seurat objects
-backup_dir <- paste0(source_dir, "/DATA_BACKUP/INTERMEDIATE_NEW")
+backup_dir <- paste0(source_dir, "/DATA_BACKUP/INTERMEDIATE")
 
 ```
 
