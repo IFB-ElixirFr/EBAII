@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --account=2538_eb3i_n1_2025
+#SBATCH --account=2621_eb3in1_2026
 #SBATCH --job-name=bwa_align
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=20GB

@@ -2,7 +2,7 @@
 
 #SBATCH --partition=fast
 #SBATCH --job-name=my_fastqc
-#SBATCH --account=2538_eb3i_n1_2025  # Modifier en fonction du projet
+#SBATCH --account=2621_eb3in1_2026  # Modifier en fonction du projet
 #SBATCH --cpus-per-task=1        # Modifier en fonction des besoins
 #SBATCH --mem=4GB                # Idem
   
