@@ -1,0 +1,190 @@
+---
+title: "Analyse différentielle des comptes bulk RNAseq"
+subtitle: "Exploration des tables générées par RNASeq_DEA.qmd" 
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Naviguer dans les résultats sous R
+
+On peut charger tous les résultats de l'analyse et les différents objets R d'un coup grâce à la sauvegarde de l'image :
+
+```{r}
+#| label: load image
+
+
+load(file = "projectName.RData")
+```
+
+Ou bien lire directement un fichier particulier :
+
+```{r}
+#| label: load KO vs WT results
+
+
+resultats <- read.table("tables/KOvsWT.complete.txt", header = T)
+```
+
+Ces résultats peuvent être filtrés, re-travaillés, fusionnés avec d'autres informations complémentaires (annotation, gènes d'intérêt, ...)
+
+```{r}
+#| label: filter significant results
+
+
+library(dplyr)
+
+KO_vs_WT <- resultats %>% filter(padj<0.05)
+
+```
+
+# Visualiser les résultats
+
+## Heatmap globale
+
+Commencer par filtrer pour pas avoir trop de gènes à représenter :\
+- selon des informations complémentaires : annotation, pathway, gènes d'intérêts...   
+- ou simplement sur les tailles d'effets (log2FC) et le résultat du test (padj)  
+
+On représente en général les comptes transformés, normalisés, TPM ... ou directement les logFC (si plusieurs comparaisons)
+
+Récupération des comptes normalisés ou VST depuis l'objet de DESeq2 : `dds`
+
+```{r}
+#| label: get counts
+
+
+library(DESeq2)
+counts.norm <- counts(dds, normalized=TRUE) # comptes normalisés
+counts.VST <- assay(varianceStabilizingTransformation(dds)) # comptes transformés (VST)
+```
+
+### Heatmap changements KO vs WT 
+
+Selection des gènes DE avec les plus grosses différences d'expression entre KO et WT : 
+
+```{r}
+#| label: select genes
+
+
+selected_genes <- KO_vs_WT %>% 
+  filter(abs(log2FoldChange)>3)
+```
+
+Heatmaps des gènes les plus différentiellement exprimés entre KO et WT : 
+
+```{r}
+#| label: Heatmaps DE genes
+
+
+library(ComplexHeatmap) # fonction à utiliser : Heatmap()
+library(RColorBrewer) ; library(circlize) # pour les couleurs
+
+colors.VST = colorRamp2(seq(min(counts.VST), max(counts.VST), length.out=100), 
+                              colorRampPalette(brewer.pal(n = 7, name = "Blues"))(100))
+max_abs_effect <- max(abs(KO_vs_WT$log2FoldChange))
+colors.logFC = colorRamp2(seq(-max_abs_effect,max_abs_effect, length.out=100), 
+                              colorRampPalette(brewer.pal(n = 7, name = "PiYG"))(100))
+
+
+Heatmap(counts.VST[selected_genes$Id,],
+        column_title="VST counts", 
+        col= colors.VST,
+        right_annotation = rowAnnotation(logFC=selected_genes$log2FoldChange, 
+                                          col=list(logFC=colors.logFC)))
+
+```
+
+
+### Heatmap des 30 gènes les plus exprimés
+
+Selection des 30 gènes DE les plus exprimés en moyenne :  
+
+```{r}
+#| label: select most exp. genes
+
+
+selected_genes <- KO_vs_WT %>% 
+  filter(abs(log2FoldChange)>2) %>% 
+  arrange(desc(baseMean)) %>% 
+  top_n(30)
+```
+
+Heatmaps des 30 gènes DE les plus exprimés : 
+
+```{r}
+#| label: Heatmap most exp. genes
+
+
+library(ComplexHeatmap) # fonction à utiliser : Heatmap()
+library(RColorBrewer) ; library(circlize) # pour les couleurs
+
+colors.VST = colorRamp2(seq(min(counts.VST), max(counts.VST), length.out=100), 
+                              colorRampPalette(brewer.pal(n = 7, name = "Blues"))(100))
+max_abs_effect <- max(abs(KO_vs_WT$log2FoldChange))
+colors.logFC = colorRamp2(seq(-max_abs_effect,max_abs_effect, length.out=100), 
+                              colorRampPalette(brewer.pal(n = 7, name = "PiYG"))(100))
+
+
+Heatmap(counts.VST[selected_genes$Id,],
+        column_title="VST counts", 
+        col= colors.VST,
+        right_annotation = rowAnnotation(logFC=selected_genes$log2FoldChange, 
+                                          col=list(logFC=colors.logFC)))
+
+```
+
+## Diagramme de venn
+
+Idéal pour visualiser des gènes communs entre plusieurs comparaisons, ou plusieurs listes de gènes, par exemple. Ici on veut comparer les gènes DE les plus exprimés dans WT et KO.
+
+Selection des 25% des gènes plus exprimés dans WT et KO :
+
+```{r}
+#| label: select genes in Wt and KO
+
+
+# seuil = 4e quantile à 75%
+seuil <- quantile(KO_vs_WT$baseMean, 0.75)
+
+genes_WT <- KO_vs_WT[KO_vs_WT$WT>seuil,]
+genes_KO <- KO_vs_WT[KO_vs_WT$KO>seuil,]
+```
+
+Diagram de Venn (combien de gènes parmis les 25% les plus exprimés le sont uniquement chez WT, uniquemet chez KO ou chez les deux)
+
+```{r}
+#| label: venn diagram
+
+library(eulerr)
+
+plot(euler(combinations =list("WT"=genes_WT$Id,"KO"=genes_KO$Id)),quantities = TRUE)
+```
+
+## Volcano plot
+
+On reprend ici les résulats non filtrés (gènes DE et non DE)  
+
+```{r}
+#| label: volcano plot
+
+seuil = 3
+
+data_volcano <- resultats %>% 
+  mutate(test = padj<0.05,
+         group = if_else((padj<0.05) & (abs(log2FoldChange)>seuil), "indianred", "black")) %>% 
+  mutate(label=if_else(group=="indianred", Id, ""))
+
+library(ggplot2)
+library(ggrepel)
+
+ggplot(data_volcano, aes(x=log2FoldChange, y=-log2(padj), color=group))+
+  geom_vline(xintercept = c(-seuil,seuil), linetype= "dashed")+
+  geom_text_repel(aes(label = label))+
+  geom_point(alpha=.8)+
+  scale_color_manual(values=c("black", "indianred"))
+```
+
+
+
