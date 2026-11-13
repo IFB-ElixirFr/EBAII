@@ -1,5 +1,5 @@
 ---
-title: "<CENTER>EB3I n1 2025 scRNAseq<BR>-<BR> \n\n\nR/Rstudio : theory</B><BR>-<BR></CENTER>"
+title: "<CENTER>EB3I n1 2026 scRNAseq<BR>-<BR> \n\n\nR/Rstudio : theory</B><BR>-<BR></CENTER>"
 date: "2026-11-11"
 author:
   - name: "<i>EBAII n1 scRNAseq Team</i>"
@@ -150,7 +150,7 @@ This is where you write your R scripts. This also accepts other
 languages (e.g. bash, python, …), but R Studio shines for its R
 integration.
 
-<center>![](example_scripts.png)</center>
+<center>![](example_script.png)</center>
 
 <br> 
 
@@ -162,16 +162,6 @@ it, edit it, comment it, etc.
 
 <br> 
 
-::: {.callout-note}  
-Info: There is a syntax coloration, there is a good autocompletion and parameter suggestion. If I ever see anyone writing down a complete command without typing the tabulation key, then I’ll have to steal their dessert. And I’m always hungry enough for desserts.
-:::
-
-<center>![](autocompletion.png)</center>
-
-<center>![](parameter_suggestion.png)</center>
-
-
-<br>
 
 ## Console Pane (D + E)
 
@@ -204,6 +194,18 @@ Between these parenthesis, we enter **arguments.**
 This function tries to print on screen everything provided between parenthesis ( and ). In this
 particular case, we gave the character string "Hello World", and the
 function *print* successfully printed it on screen !
+
+<br>
+
+
+::: {.callout-note}  
+Info: There is a syntax coloration, there is a good autocompletion and parameter suggestion. If I ever see anyone writing down a complete command without typing the tabulation key, then I’ll have to steal their dessert. And I’m always hungry enough for desserts.
+:::
+
+<center>![](autocompletion.png)</center>
+
+<center>![](parameter_suggestion.png)</center>
+
 
 <br>
 
@@ -927,7 +929,7 @@ n_vector <- c( 1,   2,   3,   3 )
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## Answer 1
-```{r}
+```{r class.source="fold-hide" , attr.output='.details summary="Output"'}
 #| label: is.equal
 #| filename: is.equal
 
@@ -1042,8 +1044,6 @@ print(dataframe_numbers[1, ])
 
 # Select a column by its name
 print(dataframe_numbers[, "Col_1_3"])
-# Or 
-print(dataframe_numbers$Col_1_3)
 ```
 
 ```{r class.source="fold-hide", attr.output='.details summary="Output"'}
@@ -1082,7 +1082,7 @@ Trust me. 99%. Remember, an error is never a problem in informatics
 In R, list is a collection of others data structures.
 They are commonly used to represent and group the results of analyses. 
 
-```{r class.source="fold-hide"}
+```{r class.source="fold-hide" , attr.output='.details summary="Output"'}
 #| label: example_list
 #| filename: example_list
 
@@ -1098,7 +1098,7 @@ mylist <- list(genome = c("S.cerevisae", "A.thaliana", "H.sapiens"), # vector
 ::: {.callout-note icon="false" collapse="true" style="background: yellow"}
 # Example using list
 
-```{r class.source="fold-hide"}
+```{r class.source="fold-hide" , attr.output='.details summary="Output"'}
 #| label: example_using_list
 #| filename: example_using_list
 
@@ -1114,7 +1114,7 @@ mylist[c("genome", "chromo.type")]
 # Get the matrix row 2 column1
 mylist$matrix.show[2, 1]
 ```
-
+:::
 
 <br>
 <br>
@@ -1378,6 +1378,7 @@ Many functions are built to perform specific and optimized tasks:
 -   Vectorise functions
 
 `ifelse(condition, value_if_true, value_if_false)`
+
 *  Applies a condition to each element of a vector.
 *  Returns a vector of the same length as the input.
 *  Avoids the need for explicit loops or individual if/else statements.
@@ -1409,10 +1410,11 @@ if (score >= 10) {
 These functions apply another function to multiple elements without explicitly writing a for loop.
 
 `lapply(X, FUN)`
+
 *  Iterates over each element of X.
 *  Always returns a list, regardless of the output of FUN.
 
-```{r }
+```{r class.source="fold-hide", attr.output='.details summary="Output"'}
 #| label: iterative_function_lapply
 #| filename: iterative_function_lapply
 
@@ -1424,11 +1426,12 @@ print(result_lapply)
 <br> 
 
 `sapply(X, FUN)`
+
 *  Works like lapply().
 *  Automatically tries to simplify the result.
 *  Can return a vector, matrix or list.
 
-```{r }
+```{r class.source="fold-hide", attr.output='.details summary="Output"'}
 #| label: iterative_function_sapply
 #| filename: iterative_function_sapply
 
@@ -1439,11 +1442,12 @@ print(result_sapply)
 <br>
 
 `apply(X, MARGIN, FUN)`
+
 *  Mainly used with matrices and arrays.
 *  MARGIN = 1: applies the function to rows.
 *  MARGIN = 2: applies the function to columns.
 
-```{r}
+```{r class.source="fold-hide", attr.output='.details summary="Output"'}
 #| label: iterative_function_apply
 #| filename: iterative_function_apply
 
@@ -1460,10 +1464,11 @@ print(col_means)
 -   Functional functions
 
 `Filter(FUN, x)`
+
 *  Keeps only the elements for which the function returns TRUE.
 *  Returns a subset of the original data.
 
-```{r }
+```{r class.source="fold-hide", attr.output='.details summary="Output"'}
 #| label: even_numbers
 #| filename: even_numbers
 
@@ -1479,9 +1484,10 @@ print(even_numbers)
 <br>
 
 `Map(FUN, ...)`
+
 *  Applies a function simultaneously to corresponding elements of multiple lists or vectors.
 *  Always returns a list.
-```{r }
+```{r class.source="fold-hide", attr.output='.details summary="Output"'}
 #| label: map
 #| filename: map
 
@@ -1525,10 +1531,11 @@ the function `saveRDS()`:
 saveRDS(object = example_table, file = "example_table.RDS")
 ```
 
+<br>
 
 ### Load
 
-<br>
+
 
 You can also load a RDS into a variable. This is useful when you receive
 a RDS from a coworker, or you’d like to keep going your work from a
