@@ -239,6 +239,6 @@ annotatePeaks.pl --help
 annotatePeaks.pl \
   RtrC_idr_peaks.bed \
   ../data/Caulobacter_CP001340.fasta \
-  -gtf ../data/Caulobacter_CP001340_with_gene_name.gtf \
+  -gtf ../data/Caulobacter_CP001340.gtf \
   > RtrC_idr_annotated_peaks.tsv
 cd ..
