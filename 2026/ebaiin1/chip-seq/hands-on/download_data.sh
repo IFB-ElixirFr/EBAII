@@ -69,8 +69,28 @@ sleep 1 # NCBI limits requests to 3/s without an API key
 curl -fLsS --retry 3 "${EUTILS}&rettype=gff3" -o data/Caulobacter_CP001340.gff3 || exit 1
 grep -q '^>CP001340.1' data/Caulobacter_CP001340.fasta || { echo "Invalid FASTA" >&2; exit 1; }
 grep -q '^##gff-version' data/Caulobacter_CP001340.gff3 || { echo "Invalid GFF3" >&2; exit 1; }
-module load gffread samtools 2>/dev/null || true
-gffread data/Caulobacter_CP001340.gff3 -T -o data/Caulobacter_CP001340.gtf
+module load samtools 2>/dev/null || true
+# Build data/Caulobacter_CP001340.gtf from the GFF3: one record per 'gene' feature,
+# written in 9-column (GFF-style) format with feature type 'exon'.
+# This format is deliberate: HOMER (parseGTF.pl, called by annotatePeaks.pl -gtf) only
+# keeps records whose feature type is 'exon' (by default), and a plain 'gffread -T'
+# conversion of this NCBI GFF3 emits only 212 'exon' records (the tRNA/rRNA/ncRNA genes),
+# which silently degrades HOMER peak annotation. One 'exon' record per gene (4,097 records)
+# is read completely by HOMER and also displays with gene names in IGV.
+awk -F'\t' 'BEGIN{OFS="\t"} NF==9 && $3=="gene"{
+  id=""; lt=""; nm=""; bt=""
+  if(match($9,/ID=[^;]+/))           id=substr($9,RSTART+3,RLENGTH-3)
+  if(match($9,/locus_tag=[^;]+/))    lt=substr($9,RSTART+10,RLENGTH-10)
+  if(match($9,/Name=[^;]+/))         nm=substr($9,RSTART+5,RLENGTH-5)
+  if(match($9,/gene_biotype=[^;]+/)) bt=substr($9,RSTART+13,RLENGTH-13)
+  if(id=="") id=lt
+  if(nm=="") nm=(lt!=""?lt:id)
+  tid=id; sub(/^(gene|ncRNA|pseudogene|protein_coding|tRNA|rRNA)-/,"rna-",tid)
+  gid=id; sub(/^rna-/,"gene-",gid)
+  print $1,"Genbank","exon",$4,$5,".",$7,".", \
+        "transcript_id \"" tid "\"; gene_id \"" gid "\"; gene_name \"" nm "\"; gene_biotype \"" bt "\";"
+}' data/Caulobacter_CP001340.gff3 | sort -k1,1 -k4,4n > data/Caulobacter_CP001340.gtf
+echo "GTF records (one per gene, expect 4097):"; wc -l < data/Caulobacter_CP001340.gtf
 samtools faidx data/Caulobacter_CP001340.fasta
 # Inspect the first sequence name in FASTA and GTF before using HOMER/IGV.
 echo 'Reference length:'; awk '{s+=$2} END{print s}' data/Caulobacter_CP001340.fasta.fai
