@@ -182,9 +182,11 @@ First, **your** project name :
 #| label: setparam_projname
 #| filename: setparam_projname
 
-## Setting the project name
-project_name <- "ebaii_sc_teachers"  # Do not copy-paste this ! It's MY project !!
+## Setting the project name. DO NOT COPY-PASTE ! USER YOURS !!
+project_name <- "ebaii_sc_teachers"  # <1>
 ```
+
+1. Replace with your own project name (and check the spelling !)
 
 <br>
 
@@ -195,9 +197,9 @@ Then, parameters specific to the current session :
 #| filename: setparam
 
 ## RNG SEED
-my_seed <- 1337L
+my_seed <- 1337L # <1>
 
-## MARKER GENES (cell types of interest)
+## MARKER GENES (cell types of interest) # <2>
 cell_markers <- c('Rag1', 'Bcat2', 
                   'Ccnd3', 'Ifngr1', 
                   'Cd5', 'Cd2', 
@@ -213,22 +215,30 @@ cell_markers <- c('Rag1', 'Bcat2',
 ## SCALING
 
 ### HVGs
-hvgs <- 3000
+hvgs <- 3000 # <3>
 
 ### COVARIATES TO REGRESS
-vars_to_reg <- c('percent_rb', 'CC_Seurat_SmG2M.Score', 'nCount_RNA')
+vars_to_reg <- c('percent_rb', 'CC_Seurat_SmG2M.Score', 'nCount_RNA') # <4>
 
 ## PCA
-pca_dims <- 50
+pca_dims <- 50 # <5>
 
 ## CLUSTERING
 
 ### ALGORITHM
-clust_algo <- 4   ## Leiden
+clust_algo <- 4 # <6>
 
 ### RESOLUTION
-clust_res <- .6
+clust_res <- .6 # <7>
 ```
+
+1. The seed to feed the RNG. With a fixed value, results should be identical
+2. Marker genes we know, which describe different cell populations we expect to see
+3. The number of top HVGs (highly variable genes) we want to keep for the scaling step
+4. The technical and biological covariates we want to regress during scaling
+5. The number of PCA dimensions to compute
+6. The clustering algorithm. **4** corresponds to the Leiden algorithm
+7. The resolution parameter for the clustering
 
 <br>
 <br>
@@ -303,31 +313,39 @@ We will do as usual, just editing the session name
 #| filename: create_struc
 
 ## PROJECT directory path
-project_dir <- paste0("/shared/projects/", project_name)
+project_dir <- paste0("/shared/projects/", project_name) # <1>
 
 ## Test on PROJECT directory
 if (dir.exists(project_dir)) {
   
   ## TD directory path
-  TD_dir <- paste0(project_dir, "/SC_TD")
+  TD_dir <- paste0(project_dir, "/SC_TD") # <2>
   
   ## SESSION directory path
-  session_dir <- paste0(TD_dir, "/06_Integration")
+  session_dir <- paste0(TD_dir, "/06_Integration") # <3>
   
   ##INPUT data directory path
-  input_dir <- paste0(session_dir, "/DATA")
+  input_dir <- paste0(session_dir, "/DATA") # <4>
   
   ## OUTPUT data directory path
-  output_dir <- paste0(session_dir, "/RESULTS")
+  output_dir <- paste0(session_dir, "/RESULTS") # <5>
   
   ## Creating the required directores
-  dir.create(path = input_dir, recursive = TRUE, showWarnings = TRUE)
-  dir.create(path = output_dir, recursive = TRUE, showWarnings = TRUE)
+  dir.create(path = input_dir, recursive = TRUE, showWarnings = TRUE) # <6>
+  dir.create(path = output_dir, recursive = TRUE, showWarnings = TRUE) # <7>
   
 } else {
   warning("Provided project directory [", project_dir, "] does not exist !")
 }
 ```
+
+1. Complete path to your project directory
+2. Complete path to the training global working directory
+3. Complete path to the current session of the training directory
+4. Complete path to the input data directory (where we will read/load our input data)
+5. Complete path to the output data directory (where we write/save the data we will generate)
+6. Creation of the input data directory (former steps were just generating the path as a character chain)
+7. Creation of the output data directory
 
 <br>
 
@@ -383,13 +401,16 @@ TD3A_rds <- backup_get_data(
 #| label: rds_load
 #| filename: rds_load
 
-## Loading TD3A
-TD3A_so <- readRDS(file = TD3A_rds)
-
 ## Loading TDCT
-TDCT_so <- readRDS(file = TDCT_rds)
+TDCT_so <- readRDS(file = TDCT_rds) # <1>
+
+## Loading TD3A
+TD3A_so <- readRDS(file = TD3A_rds) # <2>
 
 ```
+
+1. A pre-processed (empty droplets, low quality barcodes, doublets) and qualified (%mito, %ribo, %stress, cell cycle phase) `SeuratObject` prepared ahead of time for the `KO` sample
+2. A pre-processed (empty droplets, low quality barcodes, doublets) and qualified (%mito, %ribo, %stress, cell cycle phase) `SeuratObject` prepared ahead of time for the `Control` sample
 
 <br>
 
@@ -402,10 +423,10 @@ TDCT_so <- readRDS(file = TDCT_rds)
 #| filename: rds_checl
 
 ## Check TD3A
-TD3A_so
+base::print(TD3A_so)
 
 ## Check TDCT
-TDCT_so
+base::print(TDCT_so)
 
 ```
 
@@ -488,7 +509,7 @@ We can get a quick summary of the merged `SeuratObject` :
 #| filename: merged_smry
 
 ## A summary of the merged object
-TDCT_TD3A_merged
+print(TDCT_TD3A_merged)
 ```
 
 <br>
@@ -550,19 +571,19 @@ We can compare the features in the individual and merged objects :
 #| filename: featnames_comp
 
 ### Common features
-feats_common <- intersect(
+feats_common <- base::intersect(
   SeuratObject::Features(TDCT_so), 
   SeuratObject::Features(TD3A_so))
 message("Common features : ", length(feats_common))
 
 ### TD3A only
-TD3A_specific <- setdiff(
+TD3A_specific <- base::setdiff(
   SeuratObject::Features(TD3A_so), 
   SeuratObject::Features(TDCT_so))
 message("TD3A-specific : ", length(TD3A_specific))
 
 ### TDCT only
-TDCT_specific <- setdiff(
+TDCT_specific <- base::setdiff(
   SeuratObject::Features(TDCT_so), 
   SeuratObject::Features(TD3A_so))
 message("TDCT-specific : ", length(TDCT_specific))
@@ -609,28 +630,33 @@ In order to visualize the data in a 2-D space, one needs to process it the way w
 #| attr.output: '.details summary="Show output"'
 
 ## NORMALIZATION (LN)
-TDCT_TD3A_merged <- Seurat::NormalizeData(
+TDCT_TD3A_merged <- Seurat::NormalizeData( # <1>
   object = TDCT_TD3A_merged, 
   verbose = FALSE)
 
 ## HVGs
-TDCT_TD3A_merged <- Seurat::FindVariableFeatures(
+TDCT_TD3A_merged <- Seurat::FindVariableFeatures( # <2>
   object = TDCT_TD3A_merged, 
   nfeatures = hvgs, 
   verbose = FALSE)
 
 ## SCALING + COVARIATES REGRESSION
-TDCT_TD3A_merged <- Seurat::ScaleData(
+TDCT_TD3A_merged <- Seurat::ScaleData( # <3>
   object = TDCT_TD3A_merged, 
   vars.to.regress = vars_to_reg, 
   verbose = FALSE)
 
 ## PCA
-TDCT_TD3A_merged <- Seurat::RunPCA(
+TDCT_TD3A_merged <- Seurat::RunPCA( # <4>
   object = TDCT_TD3A_merged, 
   npcs = pca_dims, 
   verbose = FALSE)
 ```
+
+1. Default normalization (`Seurat::LogNormalize`)
+2. Identification of the top `r hvgs` HVGs (highly variable genes)
+3. Covariates regression and data scaling
+4. Generation of the `r pca_dims` PCA dimensions
 
 <br>
 
@@ -690,19 +716,19 @@ Here we will **assess** the **weight of covariates** on the first PCs, represent
 
 ## Assessing un-regressed data ("data" layer as proxy)
 AC1 <- assess_covar(
-  mat = as.matrix(SeuratObject::LayerData(
+  mat = as.matrix(SeuratObject::LayerData( # <1>
     object = SeuratObject::JoinLayers(TDCT_TD3A_merged, assay = "RNA"),
     assay = "RNA",
     layer = "data")),
-  covar.df = TDCT_TD3A_merged[[]], 
-  markers = cell_markers, 
-  ndim = 10L, 
-  center = TRUE, 
-  scale = TRUE, 
-  plot = FALSE, 
-  title = "Normalized", 
-  return.weights = FALSE, 
-  return.plot = TRUE)
+  covar.df = TDCT_TD3A_merged[[]],  # <2>
+  markers = cell_markers,  # <3>
+  ndim = 10L,  # <4>
+  center = TRUE,  # <5>
+  scale = TRUE,  # <6>
+  plot = FALSE,  # <7>
+  title = "Normalized", # <8> 
+  return.weights = FALSE,  # <9>
+  return.plot = TRUE) # <10>
 
 ## Assessing regressed data (scaled)
 AC2 <- assess_covar(
@@ -727,6 +753,18 @@ cowplot::plot_grid(
   ncol = 1, 
   align = "v")
 ```
+
+1. The expression matrix to assess. *Here, the PCA loadings matrix (barcodes x PCs)*
+2. The metadata of our `SeuratObject`, that contains covariates and expression values for markers to assess
+3. The symbols of our marker genes
+4. The number of PCs to assess (the first 10 are enough)
+5. Centering the matrix ? *(not needed for our PCA loadings)*
+6. Scaling the matrix ? *(not needed for our PCA loadings)*
+7. Should a plot object of the weight matrix be generated ?
+8. A title to show on the plot
+9. Should the function return the weight matrix ?
+10. Should the function return the plot object instead ?
+
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 2
@@ -885,7 +923,7 @@ TDCT_TD3A_sreg <- Seurat::RunPCA(
   verbose = FALSE)
 ```
 
-1.  Here we add the sample name (`orig.ident`) as a new covariate to regress
+1.  Here we add the sample name (`orig.ident`) as **a new covariate** to regress
 
 <br>
 
@@ -901,6 +939,11 @@ Seurat::ElbowPlot(object = TDCT_TD3A_sreg,
                   ndims = pca_dims, 
                   reduction = "pca")
 ```
+
+<br>
+
+The elbow plot does not differ too much : we still keep **20** PCs.
+
 :::
 
 <br>
@@ -924,7 +967,7 @@ We can observe the remaining weight of covariates after this special regression 
 #| fig-align: "center"
 #| fig-cap: "Covariates weight on PCs (w, w/o sample regression)"
 
-## Assessing the covariates weight after regression
+## Assessing the covariates weight after regression # <1>
 AC3 <- assess_covar(
   mat = SeuratObject::LayerData(
     object = TDCT_TD3A_sreg, 
@@ -940,7 +983,7 @@ AC3 <- assess_covar(
   return.weights = FALSE, 
   return.plot = TRUE)
 
-## Comparison to the simple merge
+## Comparison to the simple merge # <2>
 cowplot::plot_grid(
   grid::grid.grabExpr(ComplexHeatmap::draw(AC2)),
   grid::grid.grabExpr(ComplexHeatmap::draw(AC3)), 
@@ -948,6 +991,9 @@ cowplot::plot_grid(
   align = "v")
 ```
 :::
+
+1. We generate the plot of the weight matrix object, for the data regressed including the sample effect
+2. We stack the plot objects whith and without the inclusion of the sample-effect in the regression using `cowplot::plot_grid`
 
 <br>
 
@@ -1071,15 +1117,15 @@ We will use the [CCA](https://satijalab.org/seurat/reference/ccaintegration) met
 #| filename: integr_s_cca
 #| attr.output: '.details summary="Show output"'
 
-TDCT_TD3A_merged <- Seurat::IntegrateLayers(
-  object = TDCT_TD3A_merged, 
-  orig.reduction = "pca",
-  assay = "RNA",
-  method = "CCAIntegration", 
-  new.reduction = "seurat.cca", 
-  normalization.method = "LogNormalize",
-  preserve.order = TRUE,
-  dims = 1:dims_kept,
+TDCT_TD3A_merged <- Seurat::IntegrateLayers( # <1>
+  object = TDCT_TD3A_merged,  # <2>
+  orig.reduction = "pca", # <3>
+  assay = "RNA", # <4>
+  method = "CCAIntegration", # <5> 
+  new.reduction = "seurat.cca",  # <6>
+  normalization.method = "LogNormalize", # <7>
+  preserve.order = TRUE, # <8>
+  dims = 1:dims_kept, # <9>
   verbose = FALSE)
 ```
 
@@ -1813,7 +1859,8 @@ save_step(
   object = TDCT_TD3A_harmony, 
   step_number = 11, 
   step_name = "Integrated", 
-  output_dir = output_dir)
+  output_dir = output_dir,
+  compress = "bzip2")
 ```
 
 
