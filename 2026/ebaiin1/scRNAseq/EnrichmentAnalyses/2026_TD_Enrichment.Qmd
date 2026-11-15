@@ -100,7 +100,7 @@ td, th {
 
 ------------------------------------------------------------------------
 
-![](/shared/projects/ebaii_sc_teachers/SC_TD/Resources/eb3i_banner.png){.center-image}
+![](../imgs/eb3i_banner.png){.center-image}
 
 ------------------------------------------------------------------------
 
@@ -569,9 +569,10 @@ Here there are `r nrow(ora)` enriched gene sets. If we want to try to summarise 
 ```{r}
 #| label: treeplot_ora
 #| filename: treeplot_ora
+#| fig-width: 10
 
 ora_pairwise <- enrichplot::pairwise_termsim(ora)
-enrichplot::treeplot(ora_pairwise, showCategory= 30)
+enrichplot::treeplot(ora_pairwise, showCategory= 30, hexpand = 5, fontsize_tiplab = 2, fontsize_cladelab = 0, cladelab_offset = 0, tiplab_offset = 1)
 ```
 
 ------------------------------------------------------------------------
@@ -772,6 +773,7 @@ dotplot(gsea, showCategory = 10, split = ".sign") + facet_grid(.sign ~ ., scales
 ```{r}
 #| label: enrichlot_gsea
 #| filename: enrichplot_gsea
+#| fig-width: 15
 
 enrichplot::gseaplot2(gsea, geneSetID = 1:2, pvalue_table = T, pvalue_table_columns = c("p.adjust", "NES"))
 ```
@@ -804,7 +806,7 @@ The two methods are not mutually exclusive, and reporting both is common. They a
 # To go further : Cell specific enrichment (AUCell)
 
 We saw how to run enrichment analyses directly on DEA. It is also possible to run it directly on cells, without performing DEA.
-AUCell only need an expression matrix with genes in row and cells in column, not normalized.
+[AUCell](https://www.bioconductor.org/packages//3.18/bioc/vignettes/AUCell/inst/doc/AUCell.html) only need an expression matrix with genes in row and cells in column, not normalized.
 
 ```{r}
 #| label: gene_list_aucell
