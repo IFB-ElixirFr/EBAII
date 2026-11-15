@@ -97,7 +97,7 @@ td, th {
 
 ------------------------------------------------------------------------
 
-![](/shared/projects/ebaii_sc_teachers/SC_TD/Resources/eb3i_banner.png){.center-image}
+![](../imgs/eb3i_banner.png){.center-image}
 
 ------------------------------------------------------------------------
 
@@ -240,6 +240,9 @@ source(
 
 ## Folder of the backup of all intermediate Seurat objects
 backup_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE"
+
+## Folder of the ressources
+ressource_dir <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS"
 
 ```
 
@@ -396,7 +399,7 @@ sobj_VIZ_pre <- Seurat::RunUMAP(object = sobj_VIZ_pre, dims = c(1:20), verbose =
 ## Cell space visualization
 dp_pre <- Seurat::DimPlot(
   object = sobj_VIZ_pre, 
-  reduction = 'umap')
+  reduction = 'umap') + DarkTheme()
 print(dp_pre)
 
 ## Remove temporary object
@@ -420,7 +423,7 @@ sobj_VIZ_post <- Seurat::RunUMAP(object = sobj_VIZ_post, dims = c(1:20), verbose
 ## Cell space visualization
 dp_post <- Seurat::DimPlot(
   object = sobj_VIZ_post, 
-  reduction = 'umap')
+  reduction = 'umap') + DarkTheme()
 print(dp_post)
 
 ## Remove temporary object
@@ -508,7 +511,7 @@ sobj_VIZ <- Seurat::RunUMAP(object = sobj_VIZ, dims = c(1:20), verbose = FALSE)
 ## Cell space visualization
 dp_VIZ <- Seurat::DimPlot(
   object = sobj_VIZ, 
-  reduction = 'umap')
+  reduction = 'umap') + DarkTheme()
 print(dp_VIZ)
 
 ## Discard the temp object
@@ -542,7 +545,7 @@ Do you see any difference when comparing before vs after cells filtering ?
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ### ANSWER
 
-No huge changes (again, x-axis switch) but some small clusters mooved and the big seems more defined.
+No huge changes (again, x-axis switch and also y-axis switch) but some small clusters mooved and the big seems more defined.
 :::
 
 <br>
@@ -590,14 +593,19 @@ We will directly download data from Zenodo :
 #| label: cc_load
 #| filename: cc_load
 
-## Copy the file into the DATA directory
-sobj_file <- "mus_musculus_Seurat_cc.genes_20191031.rds"
-sobj_path <- paste0(TD_dir, "/03_Preproc.3/DATA/", sobj_file)  # <1>
+## Copy the file into the RESSOURCES directory
+cc_list_file <- "mus_musculus_Seurat_cc.genes_20191031.rds"
+cc_list_path <- paste0(TD_dir, "/03_Preproc.3/DATA/", cc_list_file)
 
-zenodo_get_data(file_name = sobj_file, zenodo_id = "14101506", local_path = input_dir)
+## If it does not exist, copy it from the backup
+if (!file.exists(cc_list_path)) {
+  cc_list_path <- backup_get_data(
+    backup_file = paste0(ressource_dir, "/", cc_list_file),
+    local_path = input_dir)
+}
 
 ## Load the file
-cc_genes <- readRDS(file = sobj_path)
+cc_genes <- readRDS(file = cc_list_path)
 cc_genes
 
 ```
@@ -749,10 +757,17 @@ sobj_VIZ_cc <- Seurat::RunPCA(object = sobj_VIZ_cc, npcs = 21, verbose = FALSE)
 sobj_VIZ_cc <- Seurat::RunUMAP(object = sobj_VIZ_cc, dims = c(1:20), verbose = FALSE)
 
 ## Cell cycle phase feature plot
+data("Light24", package = "Polychrome")
+cc_cols <- setNames(
+  object = Light24[seq_len(nlevels(sobj_VIZ_cc$CC_Seurat_Phase))],   nm = levels(sobj_VIZ_cc$CC_Seurat_Phase))
+
 dp_ccp <- Seurat::DimPlot(
   object = sobj_VIZ_cc, 
   reduction = 'umap', 
-  group.by = 'CC_Seurat_Phase')
+  group.by = 'CC_Seurat_Phase',
+  shuffle = TRUE,
+  cols = cc_cols,
+  seed = my_seed) + DarkTheme()
 print(dp_ccp)
 
 ```
@@ -853,7 +868,6 @@ sce_obj <- Seurat::as.SingleCellExperiment(sobj, assay = "RNA")
 sce_obj
 ```
 
-::: {.panel-tabset}
 ### `scds`
 
 Let’s perform the doublet prediction using `scds` package and its `cxds_bcds_hybrid` function.
@@ -955,7 +969,6 @@ sobj[[]][rownames(scDblFinder_results), "doublet_scDblFinder"] <- scDblFinder_re
 table(sobj$doublet_scDblFinder)
 
 ```
-:::
 
 ------------------------------------------------------------------------
 
@@ -1085,10 +1098,17 @@ sobj_VIZ_dbl <- Seurat::RunPCA(object = sobj_VIZ_dbl, npcs = 21, verbose = FALSE
 sobj_VIZ_dbl <- Seurat::RunUMAP(object = sobj_VIZ_dbl, dims = c(1:20), verbose = FALSE)
 
 ## Doublets visualization
+data("Light24", package = "Polychrome")
+dbl_cols <- setNames(
+  object = Light24[seq_len(nlevels(sobj_VIZ_dbl$doublet_viz))],   nm = levels(sobj_VIZ_dbl$doublet_viz))
+
 dp_dbl <- Seurat::DimPlot(
   object = sobj_VIZ_dbl, 
   reduction = 'umap',
-  group.by = 'doublet_viz')
+  group.by = 'doublet_viz',
+  shuffle = TRUE,
+  cols = dbl_cols,
+  seed = my_seed) + DarkTheme()
 
 ## Plot
 print(dp_dbl)
@@ -1120,7 +1140,10 @@ sobj_VIZ_dbl <- Seurat::RunUMAP(object = sobj_VIZ_dbl, dims = c(1:20), verbose =
 dp_dblf <- Seurat::DimPlot(
   object = sobj_VIZ_dbl, 
   reduction = 'umap',
-  group.by = 'doublet_viz')
+  group.by = 'doublet_viz',
+  shuffle = TRUE,
+  cols = dbl_cols,
+  seed = my_seed) + DarkTheme()
 
 ## Plot
 print(dp_dblf)
@@ -1132,7 +1155,7 @@ rm(sobj_VIZ_dbl)
 
 Merge plots for ease of use :
 
-```{r dbl_umaps, fig.width = 12, fig.height = 6, class.source = "notrun", class.output="notruno"}
+```{r}
 #| label: dbl_umaps
 #| filename: dbl_umaps
 
@@ -1162,6 +1185,10 @@ Actually not that much !
 This is due to the fact that this dataset did not contain a lot of heterotypic doublets
 
 When a dataset is heavily contaminated with lots of heterotypic doublets, their removal can drastically remodel the topology.
+:::
+
+::: callout-warning
+Do not get used to this UMAP. It is used to help you understand the impact of cells and genes removal on your data but the representation is not optimized. You will see that in the next sessions.
 :::
 
 <br>
