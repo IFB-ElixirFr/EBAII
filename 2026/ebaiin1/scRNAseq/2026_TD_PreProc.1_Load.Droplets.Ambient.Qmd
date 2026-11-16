@@ -562,7 +562,7 @@ result, so creating this **`RESULTS`** folder was just for practice purpose.
 Now, the we have everything needed to :
 
 -   **load** data (`input_dir` : ``r input_dir``)
--   **save** the results we will generate (`output_dir` : `r output_dir`).
+-   **save** the results we will generate (`output_dir` : ``r output_dir``).
 
 <br>
 
@@ -589,7 +589,7 @@ The experiment was performed with the **3' capture kit v3**.
 
 The analysis was performed with **`Cell Ranger v3`**, mapping on the **`GRCh38-2020-A`** manufacturer reference.
 
-The data consists into the typical 10x 3-files structure :
+The data consists into the typical 10X's 3-files structure :
 
 -   `barcodes.tsv.gz` : the list of putative droplet **barcodes**
 -   `features.tsv.gz` : the list of **features** (genes)
@@ -643,17 +643,23 @@ matrix_mtx_file <- backup_get_data(
   local_path = input_dir,  # <2>
   force = TRUE) # <3>
 
+print(matrix_mtx_file)
+
 ### The 10X features metadata
 features_file <- backup_get_data(
   backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/10X/features.tsv.gz", 
   local_path = input_dir, 
   force = TRUE)
 
+print(features_file)
+
 ### The 10X barcodes metadata
 barcodes_file <- backup_get_data(
   backup_file = "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/INPUT/10X/barcodes.tsv.gz", 
   local_path = input_dir, 
   force = TRUE)
+
+print(barcodes_file)
 
 ```
 
@@ -724,7 +730,6 @@ We can apply it to **our** data :
 ## Loading unfiltered 10X matrix
 scmat <- Seurat::Read10X(data.dir = input_dir)
 ```
-
 :::
 
 <br>
