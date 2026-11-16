@@ -18,6 +18,11 @@ length(selected_genes) # how many genes are selected ?
 ## Save the list in a text file
 writeLines(selected_genes,"genes_associated_rtrc.txt")
 
+## STRING does not recognise NCBI locus tags (CCNA_...): keep only formal gene symbols
+gene_symbols <- selected_genes[!grepl("^CCNA_", selected_genes)]
+length(gene_symbols)
+writeLines(gene_symbols,"genes_associated_rtrc_symbols.txt")
+
 
 ## - Performing a first evaluation of peak sets using R
 # 1. Go to Rstudio and execute the R code below (show results in the report)

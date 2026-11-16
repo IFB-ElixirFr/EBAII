@@ -1,6 +1,6 @@
 ---
 title: "<CENTER>EB3I n1 2026 scRNAseq<BR>-<BR> <B>PRE-PROCESSING (II)</B><BR>-<BR>Quality control : Counts & metrics</CENTER>"
-date: "2026-11-05"
+date: "2026-11-12"
 author:
   - name: "EB3I n1 scRNAseq Team"
   - name: "Marine VERNIER"
@@ -117,55 +117,17 @@ a single cell dataset, based on (per cell) :
 <br>
 <br>
 
-## What to run ?
+## What to run ? {#what-to-run}
 
-<br>
+You are **not intended** to run all of the chunks. We use a **color code**:
 
-This training presentation, written in _Quarto_, contains **many** chunks ( = code blocks)
-
-You **do not have to** run them all !
-
-Chunks follow a **color code** :
-
-<br>
-
-### Chunks you **ARE** expected to run :
-
-<br>
-
-```{r}
-#| label: chunk_run
-#| filename: chunk_run
-
-## Example of a chunk to run
-getwd()
-
-```
-
-<br>
-
-### Chunks you **ARE NOT** expected to run
-
-<br>
-
-Hopefully, we will _demo_ them. You may run it by yourself, young
-padawan, but if you get late, lost or worst, break something, *you*'ll be the
-one to blame !
-
-
-::: {.callout-important icon="false" style="background: pink"}
-
-This is a demonstration, you are ***NOT*** expected to run the following chunks !
-
-```{r}
-#| label: notrun_si
-#| filename: notrun_si
-#| attr.output: '.details summary="Show output"'
-
-## Example of a chunk to NOT run (session info)
-utils::sessionInfo()
-```
-:::
+| What you see | What it means |
+|:----------|:----------|
+| A regular code chunk | **Run it** |
+| A [**lightblue**]{style="color:lightblue"} "QUESTION" callout | Think about it before unfolding the answer |
+| A [**lightgreen**]{style="color:lightgreen"} "ANSWER" callout | Folded by default |
+| A [**yellow**]{style="color:yellow"} / [**orange**]{style="color:orange"} "OPTIONAL" callout | Extra content if you are ahead, not supported during the session |
+| A [**pink**]{style="color:pink"} "DEMO" callout | Shown by the teacher, **do not run** |
 
 <br>
 
@@ -177,11 +139,21 @@ utils::sessionInfo()
 
 # Start Rstudio
 
--   Using the [OpenOnDemand/Rstudio cheat
-    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html){target="_blank"},
-    connect to the [OpenOnDemand
-    portal](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} and
-    **create a Rstudio session** with the right resource requirements, thanks to the cheat sheet.
+To access RstudioServer on the remote HPC which we will work on, one must first connect to OpenOnDemand [here](https://ondemand.cluster.france-bioinformatique.fr){target="_blank"} using the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/getting_started/){target="_blank"}.
+
+Once connected, the application to select is **Rstudio Server: Core**.
+
+To create and/or join an Rstudio Server App, one can use the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/starting_rstudio_server/){target="_blank"}, with some modifications specific in the form to our training session :
+
+-   **R version** : `4.5.2`
+-   **Reservation** : `2621_eb3in1_2026`
+-   **Account** : `2621_eb3in1_2026`
+-   **Number of CPUs** : `2`
+-   **Amount of memory** : `30G`    **Do not forget the "G" !**
+
+Creation of the App will take a few seconds / minutes depending on the HPC workload.
+
+Once create, the App will stay on as long as its dedicated time (`Number of hours`, **12** by default, and current maximum) are not over, and even if its browser tab is closed.
 
 <br>
 
@@ -191,7 +163,28 @@ utils::sessionInfo()
 
 <br>
 
-# Warm-up
+# Warm up
+
+## Environment
+
+<br>
+
+We load the packages of interest:
+
+```{r}
+#| label: packages
+#| filename: packages
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(Seurat)
+
+```
+
+<br>
+
+## Common paramters 
 
 <br>
 
@@ -292,9 +285,9 @@ source(
 
 <br>
 
-### Actual data fetching
+## Actual data fetching
 
-#### Input data
+### Input data
 
 First the input data : *GSM4861194_gex_2_raw_gene_expression.tsv.gz* is the matrix containing genes counts for each cell. 
 
@@ -312,7 +305,7 @@ scmat_file <- backup_get_data(
 
 ```
 
-#### GeneList
+### GeneList
 
 Then the gene lists for QC metrics :
 
@@ -326,19 +319,19 @@ Then the gene lists for QC metrics :
 mito_source <- "mus_musculus_mito_symbols_20191015.rds"
 mito_file <- backup_get_data(
   backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", mito_source), 
-  local_path = input_dir, 
+  local_path = glist_dir, 
   force = TRUE)
 
 ribo_source <- "mus_musculus_cribo_symbols_20191015.rds"
 ribo_file <- backup_get_data(
   backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", ribo_source), 
-  local_path = input_dir, 
+  local_path = glist_dir, 
   force = TRUE)
 
 stress_source <- "mus_musculus_stress_symbols_20200224.rds"
 stress_file <- backup_get_data(
   backup_file = paste0("/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/DATA_BACKUP/RESOURCES/GENELISTS/", stress_source), 
-  local_path = input_dir, 
+  local_path = glist_dir, 
   force = TRUE)
 
 ```
@@ -416,23 +409,6 @@ This matrix has already been **filtered for empty droplets**.
 <br>
 
 
-# Environment
-<br>
-
-We load the packages of interest:
-
-```{r}
-#| label: packages
-#| filename: packages
-#| message: false
-#| warning: false
-
-library(ggplot2)
-library(Seurat)
-
-```
-
-<br>
 
 # Data
 <br>
@@ -709,12 +685,15 @@ summary(sobj@meta.data)
 
 <br>
 
-To quickly choose the metrics' thresholds, we look at their distribution with a violin plot. We will then be able to look more closely at the metrics and adjust the thresholds. 
+To quickly choose the metrics' thresholds, we look at their distribution with a violin plot. We will then be able to look more closely at the metrics and adjust the thresholds.
+
+::: {.callout-DEMO icon="false" style="background: pink"}
 
 ```{r}
 #| label: metrics_distribution
 #| filename: metrics_distribution
 #| warning: false
+#| message: false
 
 qc <- c(
   "nCount_RNA",
@@ -725,13 +704,51 @@ qc <- c(
   "percent_st"
 )
 
-p_violin <- Seurat::VlnPlot(object = sobj, features = qc, ncol = 3 ) +
-  theme( axis.title.x = element_blank(),
-    legend.position = "none" )
+# Générer un graphique par métrique
+p_list <- Seurat::VlnPlot(
+  object = sobj,
+  features = qc,
+  ncol = 3,
+  combine = FALSE
+) 
 
-p_violin
+# Définir les seuils inférieurs et supérieurs
+qc_ranges <- list(
+  nCount_RNA = c(1000, max(sobj$nCount_RNA, na.rm = TRUE)),
+  nFeature_RNA = c(750, max(sobj$nFeature_RNA, na.rm = TRUE)),
+  log10_nCount_RNA = c(
+    log10(1000),
+    log10(max(sobj$nCount_RNA, na.rm = TRUE))
+  ),
+  percent_mt = c(0, 5),
+  percent_rb = c(0, 20),
+  percent_st = c(0, 6)
+)
+
+# Ajouter les seuils sur chaque violon
+for (i in seq_along(qc)) {
+
+  feature <- qc[i]
+  range <- qc_ranges[[feature]]
+
+  p_list[[i]] <- p_list[[i]] +
+    geom_hline(
+      yintercept = range,
+      linetype = "dashed",
+      color = "red"
+    ) +
+    scale_y_continuous( expand = expansion(mult = 0.05)) +
+    theme(
+      axis.title.x = element_blank(),
+      legend.position = "none"
+    )
+}
+
+# Afficher les graphiques
+patchwork::wrap_plots(p_list, ncol = 3)
 ```
 
+:::
 
 We set the filtering range based on those violin plot.
 Adjust them as necessary based on the figures.
@@ -968,22 +985,6 @@ print_1_qc_metric = function(object = sobj,
 
 ### Number of UMI
 
-#### Check the function
-
-This function should directly work for `log10_nCount_RNA`, as it is set for this metric by default (`qc = "log10_nCount_RNA"`) :
-
-```{r, fig.width = 18, fig.height = 4}
-#| label: check1_log10_nCount_RNA
-#| filename: check1_log10_nCount_RNA
-#| warning: false
-#| message: false
-
-print_1_qc_metric(object = sobj_tmp)
-
-```
-
-Of course, it will work the same by expliciting all of the parameters value:
-
 ```{r, fig.width = 18, fig.height = 4}
 #| label: check2_log10_nCount_RNA
 #| filename: check2_log10_nCount_RNA
@@ -997,7 +998,6 @@ print_1_qc_metric(object = sobj_tmp,
 
 ```
 
-So we can copy-paste only this chunk for the next QC metrics !
 
 ### Number of expressed genes
 
@@ -1181,8 +1181,10 @@ This Seurat object would then be loaded as the input for further analyses.
 # R session
 <br>
 
-This is a good practice to show the version of the packages used in this notebook.
+For reproducibility and context, it is recommended to include in the Quart/Rmarkdown the list of loaded packages and their version.
 
+::: {.callout-important icon="false" style="background: pink"}
+## Session Info
 ```{r, class.source = "fold-hide"}
 #| label: rsession
 #| filename: rsession
@@ -1191,3 +1193,4 @@ sessionInfo()
 
 ```
 
+:::

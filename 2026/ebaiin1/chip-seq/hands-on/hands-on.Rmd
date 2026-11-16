@@ -129,6 +129,14 @@ cp -r /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data .
 └───data
 ```
 
+The **data** directory contains:
+
+| File | Content |
+|:--|:--|
+| `RtrC_ChIP_rep1_[12].fastq.gz`, `RtrC_ChIP_rep2_[12].fastq.gz`, `RtrC_input_rep1_[12].fastq.gz`, `RtrC_input_rep2_[12].fastq.gz` | the 4 paired-end libraries used in the workshop (8 FASTQ files) |
+| `Caulobacter_CP001340.fasta` | reference genome: *C. crescentus* NA1000, accession CP001340.1, 4,042,929 bp |
+| `Caulobacter_CP001340.gtf` | gene annotation: one record per gene (4,097), used in IGV and by HOMER (`annotatePeaks.pl -gtf`) |
+
 If you wish, you can check your directory structure:
 ```{bash eval=FALSE}
  tree
@@ -358,8 +366,6 @@ Go to the directory /shared/projects/<your_project>/EBA3I_2026_chipseq/02-Mappin
   * **How many reads were mapped?** 
   * **How many multi-mapped reads were originally present in the sample?**
 
-To quit less press 'q'
-
 # - Estimating the number of duplicated reads
 **Goal**: Duplicated reads i.e reads mapped at the same positions in the genome are present in ChIP-seq results. They can arise from several reasons including a biased amplification during the PCR step of the library prep, DNA fragments coming from repetitive elements of the genome, sequencing saturation or the same clusters read several times on the flowcell (i.e optical duplicates). PCR duplicates can bias enrichment analyses; we will mark them and inspect the metrics before deciding whether to exclude them. So let's detect them using [Picard](http://broadinstitute.github.io/picard/) [@broadinstitute_picard].
 
@@ -486,7 +492,7 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
 
 **Browse around in the genome.** 
 
-  * **Specifically go to the following genes: gene-CCNA_00388, gene-CCNA_00425, cnoX. Do you see a peak?**
+  * **Specifically go to the following genes: gene-CCNA_00388, gene-CCNA_00425, cnoX, hfiA. Do you see a peak?**
 
 However, looking at BAM file as such does not allow to directly compare the two samples as data are not scaled. Let's generate normalized data for visualization.
 
@@ -557,7 +563,7 @@ bamCoverage \
   * Click right on the name of the tracks and select **Autoscale**
   * Click right on the name of the tracks and set the windowing function to Maximum
 
-**Go back to the genes we looked at earlier: gene-CCNA_00388, gene-CCNA_00425, cnoX. Look at the shape of the signal.**  
+**Go back to the genes we looked at earlier: gene-CCNA_00388, gene-CCNA_00425, cnoX, hfiA. Look at the shape of the signal.**  
 
 **Keep IGV opened.**
 
@@ -608,7 +614,7 @@ macs2 callpeak \
   --gsize 4042929 \
   --name 'RtrC_rep1' \
   -p 1e-2 \
-  &> repA_MACS.out
+  &> rep1_MACS.out
 ```
 5. Repeat MACS2 for ChIP replicate 2, using its matched Input control.
 
@@ -726,7 +732,7 @@ cd ../..
 * 05-PeakCalling/pool/RtrC_pool_peaks.narrowPeak
 * 05-PeakCalling/idr/RtrC_idr_peaks.bed
 
-**Go back again to the genes we looked at earlier: hfiA. Do you see peaks ?**
+**Go back again to the genes we looked at earlier: cnoX, CCNA_00388, CCNA_00425 and hfiA. Do you see peaks ?**
 **Navigate through the genome to find peaks detected in the replicates (peak calling per replicate) and not found/kept with the IDR method** 
 
 **From now on, peak set we keep is the IDR peak set.**
@@ -808,6 +814,35 @@ The firsts options correspond to the general workflow settings. **Note**: Explan
 
 **Is there anything interesting in MEME-ChIP results? If so, which motif is of interest and why ?.**
 
+<details>
+<summary><b>Fallback: run MEME-ChIP locally with Singularity (if the MEME web server is unavailable)</b></summary>
+
+If the MEME web server is down or too slow, MEME-ChIP can be run on the cluster with the provided Singularity image
+(`memesuite_5.5.9.sif`) and motif databases (COLLECTION OF TRANSCRIPTION FACTORS, REGULAR TRANSBASE, PRODORIC 2021.9),
+all located in `/shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data/`.
+Run this from inside the **06-MotifAnalysis** directory (where `RtrC_idr_peaks.fa` is):
+
+```{bash eval=FALSE}
+singularity run -B ./:/home/meme \
+  /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data/memesuite_5.5.9.sif \
+  meme-chip -oc meme-chip559_rtrc \
+  -db /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data/collectf.meme \
+  -db /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data/regtransbase.meme \
+  -db /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/data/prodoric_2021.9.meme \
+  RtrC_idr_peaks.fa \
+  -meme-nmotifs 3
+```
+
+The report is written to the `meme-chip559_rtrc` folder created in the current directory; open
+`meme-chip559_rtrc/meme-chip.html` (same report layout as the website version). To download it in JupyterLab,
+first pack the folder (right-click the tar file -> Download):
+
+```{bash eval=FALSE}
+tar czf meme-chip559_rtrc.tar.gz meme-chip559_rtrc
+```
+
+</details>
+
 <!-- **Dataset-specific note:** The screenshots from the previous E. coli exercise and the original R gene-symbol mapping example need to be regenerated or checked against the Caulobacter annotation. The original R gene-symbol join must be replaced or validated against the Caulobacter annotation; HOMER column names and gene IDs must be checked before attempting it. DAVID may not support this organism or its identifiers; treat the ontology section as optional until validated. -->
 
 # - Peak annotation
@@ -861,7 +896,7 @@ annotatePeaks.pl peak/BEDfile genome > outputfile
 annotatePeaks.pl \
   RtrC_idr_peaks.bed \
   ../data/Caulobacter_CP001340.fasta \
-  -gtf ../data/Caulobacter_CP001340_with_gene_name.gtf \
+  -gtf ../data/Caulobacter_CP001340.gtf \
   > RtrC_idr_annotated_peaks.tsv
 ```
 
@@ -902,23 +937,36 @@ length(selected_genes) # how many genes are selected ?
 ## Save the list in a text file
 writeLines(selected_genes,"genes_associated_rtrc.txt")
 ```
+Note: with the workshop annotation, the 'Gene Name' column reports the gene whose TSS is closest to the peak. Genes that have no formal name in the NCBI annotation are reported with their locus tag (e.g. `CCNA_00388`).
+
+6. Filter the gene list before the ontology analysis: STRING does not recognize NCBI locus tags (`CCNA_...`), so keep only the genes with a formal symbol.
+```{R eval=FALSE, include=TRUE}
+## keep only formal gene symbols
+gene_symbols <- selected_genes[!grepl("^CCNA_", selected_genes)]
+length(gene_symbols) # how many genes are left ?
+
+## Save the filtered list in a text file
+writeLines(gene_symbols,"genes_associated_rtrc_symbols.txt")
+```
+
+**Note the number of genes remaining: most peak-proximal genes have no formal symbol, so this filtered list is small. This is a limitation of the current Caulobacter annotation, not of your data.**
 
 
 
-6. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
+7. Go back to working home directory (i.e /shared/projects/\<your_project\>/EBA3I_2026_chipseq)
 ```{bash eval=FALSE}
 ## If you are in 07-PeakAnnotation
 cd ..
 ```
 
 ## - Search for Biological Processes, Molecular Functions or Cellular Compartments enrichment
-Use Official gene symbols of the file *genes_associated_rtrc.txt* to search for enriched gene ontologies with STRING database. *The STRING database [https://string-db.org/](https://string-db.org/) systematically collects and integrates protein–protein interactions—both physical interactions as well as functional associations. The data originate from a number of sources: automated text mining of the scientific literature, computational interaction predictions from co-expression, conserved genomic context, databases of interaction experiments and known complexes/pathways from curated sources.* (Abstract from [this paper](https://doi-org.docelec.u-bordeaux.fr/10.1093/nar/gkac1000)). STRING db offers facilities for functional enrichment analysis covering more than 10 000 organisms. 
+Use the official gene symbols of the file *genes_associated_rtrc_symbols.txt* (the locus tags `CCNA_...` were removed in the previous step because STRING does not recognize them) to search for enriched gene ontologies with STRING database. *The STRING database [https://string-db.org/](https://string-db.org/) systematically collects and integrates protein–protein interactions—both physical interactions as well as functional associations. The data originate from a number of sources: automated text mining of the scientific literature, computational interaction predictions from co-expression, conserved genomic context, databases of interaction experiments and known complexes/pathways from curated sources.* (Abstract from [this paper](https://doi-org.docelec.u-bordeaux.fr/10.1093/nar/gkac1000)). STRING db offers facilities for functional enrichment analysis covering more than 10 000 organisms. 
 
 ![alt text][STRINGform]
 
 0. Go to the STRINGdb website: https://string-db.org/. 
 1. Select **Multiple proteins** in the left bar menu
-2. Upload the gene list to be analysed (*genes_associated_rtrc.txt*) from your computer
+2. Upload the gene list to be analysed (*genes_associated_rtrc_symbols.txt*) from your computer
 3. Select the appropriate organism (*Caulobacter vibrioides CB15*)
 
 And let's go, click on the **Search** button !
@@ -1146,8 +1194,8 @@ perl -lane 'print "gi|49175990|ref|NC_000913.2|\t".($F[0]-50)."\t".($F[0]+50)."\
 > gi|49175990|ref|NC_000913.2|	34015	34115
 4. Depending on the available information, the command will be different.
 
-### - How to obtain the annotation (=gene) GTF file for IGV?
-Use the GFF3 annotation associated with accession **CP001340.1** and convert it to GTF with `gffread`, as in `download_data.sh`. Always verify that the reference sequence identifiers match the FASTA and the BAM headers. For IGV, the original GFF3 is also useful.
+### - How to obtain the annotation (=gene) GTF file for IGV and HOMER?
+Use the GFF3 annotation associated with accession **CP001340.1** (already in `data/`). `download_data.sh` converts it to `Caulobacter_CP001340.gtf` by keeping one record per `gene` feature, formatted as 9-column records with feature type `exon`. This specific format is deliberate: HOMER (`annotatePeaks.pl -gtf`, via `parseGTF.pl`) only uses records whose feature type is `exon`, so a plain `gffread -T` conversion of this NCBI GFF3 — which emits only 212 `exon` records, all tRNA/rRNA/ncRNA genes — silently degrades the HOMER annotation. The workshop GTF has one record per gene (4,097): HOMER reads all of them, and IGV displays the genes with their names. Always verify that the reference sequence identifiers match the FASTA and the BAM headers.
 
 # References
 
@@ -1155,7 +1203,6 @@ Use the GFF3 annotation associated with accession **CP001340.1** and convert it 
 [geo2]: ../images/2_GEO.png "GEO2"
 [geo3]: ../images/3_GEO.png "GEO3"
 [multiqcfastqc]: ../images/MultiQC_fastqc.png "MultiQC"
-[genome6]: ../images/6_Genomes.png "E. Coli K-12"
 [selectjupyterlab]: ../images/selectJupyterLab.png "Select Jupyterlab"
 [jupyterlabform]: ../images/jupyterlabForm.png "Jupyerlab Form"
 [launchjupyterlab]: ../images/launchJupyterhub.png "launch Jupyterlab"
