@@ -217,3 +217,24 @@ Other enrichment tests exist and could also be used depending on the input data 
 - Not all the organisms have the same level of knowledge
 - A lot of genes are not studied
 :::
+
+## References
+
+**Tools** :
+
+- [ClusterProfiler](https://yulab-smu.top/biomedical-knowledge-mining-book/index.html)
+- [AUCell](https://www.bioconductor.org/packages//3.18/bioc/vignettes/AUCell/inst/doc/AUCell.html)
+
+**Enrichment Test** :
+
+- [ORA](https://doi.org/10.1186/1471-2105-14-128)
+- [GSEA](https://www.pnas.org/doi/full/10.1073/pnas.0506580102)
+- [Interpreting omics data with pathway enrichment analysis](https://www.cell.com/trends/genetics/fulltext/S0168-9525(23)00018-5)
+- [Robustness and applicability of transcription factor and pathway analysis tools on single-cell RNA-seq data](https://pmc.ncbi.nlm.nih.gov/articles/PMC7017576/)
+
+## References
+
+**Best practices**:
+
+- [hbc training](https://hbctraining.github.io/Pseudobulk-for-scRNAseq/lessons/07_functional_analysis_pseudobulk.html)
+- [single-cell best practices](https://www.sc-best-practices.org/conditions/gsea-pathway/)
