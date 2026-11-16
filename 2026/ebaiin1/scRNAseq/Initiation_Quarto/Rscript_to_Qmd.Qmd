@@ -1,0 +1,338 @@
+---
+title: "EB3I n1 2026 scRNAseq<br><br>[From R to Quarto]{.mark}<br><i>Tips to convert R scripts to Quarto scripts</i><br> <br>"
+date: "2026-11-17"
+author:
+  - name: "<i>EB3I n1 scRNAseq Team 2026</i>"
+  - name: "<i>Bastien JOB</i>"
+    email: "bastien.job@inserm.fr,bastien.job@gustaveroussy.fr"
+  - name: "<i>Audrey ONFROY</i>"
+lightbox: 
+  match: auto  ## Quarto internal functionality to display a screen maxed-out version of images and plots
+format:
+  html:
+    fig-width: 8
+    fig-height: 6
+    fig-align: center
+    embed-fonts: true
+    number-sections: true  ## Adds number to headers (sections)
+    embed-resources: true  ## Make a self-contained HTML
+    anchor-sections: true  ## Create HTML anchors for all section titles
+    theme: zephyr  ## CSS theme for the HTML page
+    syntax-highlighting: tango  ## Theme for the code chunks
+    toc: true  ## Add a table of content
+    toc-location: left  ## Position of TOC on the left side
+    collapsed: true  ## By default, the TOC is folded
+    grid:
+      body-width: 1600px  ## Extends the main body to fill the right space up to 1600px
+      margin-width: 0px
+    smooth-scroll: true ## Smooth scroll of the HTML page
+    code-fold: show  ## Show (unfold) code by default 
+    code-tools:
+      source: true  ## Show the upper-right "Code" button to allow downloading this source
+      toggle: true
+    code-block-bg: true  ## Use a (default grey) background for code chunks
+    code-block-border-left: "#31BAE9"  ## Use a (here electric blue) left boarder for code chunks
+    code-overflow: wrap  ## Wrap long code lines (should not be in use due to the high grid:body-width value, but just in case it is deactivated)
+    code-line-numbers: true  ## Add line number to the left
+    code-copy: true  ## Adds a button to copy chunk code to clipboard
+    code-annotations: hover  ## For code annotation, show values in mouseover
+    html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
+    echo: true
+---
+
+
+<!-- ADDITIONAL CODES / HACKS -->
+
+<!-- CSS code to center the QMD title -->
+<style>
+#title-block-header .title {
+  text-align: center;
+}
+</style>
+
+
+<!-- CSS code to center the imported images -->
+<style>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+<!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+<style>
+.code-with-filename .code-copy-button {
+  right: 2.5rem !important;
+}
+</style>
+
+<!-- CSS code to add a column separator when using Quarto column syntax -->
+<!-- It works by using it this way ; :::: {.columns .with-divider} -->
+<style>
+.with-divider > .column:first-child {
+  border-right: 1px solid #888;
+  padding-right: 1em;
+}
+
+.with-divider > .column + .column {
+  padding-left: 1em;
+}
+</style>
+
+<!-- HTML code to force table borders -->
+```{=html}
+<style>
+td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+```
+
+
+<!-- BODY -->
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+![](../imgs/eb3i_banner.png){.center-image}
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+<br>
+
+
+This document presents usual steps to **convert a R script** to a **Quarto** (Qmd) document.
+
+<br>
+<br>
+
+## Training preparation
+
+Create and open a Rstudio Server Core session.
+
+From it :
+
+- Go to your project
+- Create a new `Initiation_Quarto` directory
+- Enter it
+
+```{r}
+#| label: setwd
+#| filename: setwd
+
+project_name <- "ebaii_sc_teachers"
+
+if (dir.exists(paths = paste0("/shared/projects/", project_name))) {
+  
+  iq_dir <- paste0("/shared/projects/", project_name, "/Initiation_Quarto")
+  dir.create(path = iq_dir, recursive = TRUE)
+  setwd(iq_dir)
+
+} else message("Project name [", project_name, "] not found !!")
+
+```
+
+Then :
+
+- Synch your `Files` browser *(grey arrow)*
+- Upload *(button that represents a sheet with an orange disc, with an "up" white arrow)* :
+  - `basic_analysis.R`
+  - `sobj.rds`
+
+Now you're fine to start.
+
+We'll pretend you just finished an analysis contained in the `basic_analysis.R` script.
+
+## Open your R script
+
+It may contain :
+
+- calls to libraries (`library()`)
+- comments (`## blah blah`)
+- codelines to :
+  - load data
+  - transform data
+  - plot
+  - *etc ...*
+
+## Create a brand new Quarto script
+
+... using `File` > `New File` > `R Quarto document`
+
+You can name it **whatever you want** *(as long as its extension remains `.Qmd`)*
+
+::: {.callout-note}
+Two options :
+
+- Create an **empty document** to start from scratch, save it as `Qmd`
+- Use a Quarto **template**, customize and save it.
+  - This is what happens when creating a Quarto document form the Rstudio menu
+  - This is the most practical way
+  - One can create and use its own template(s)
+  - This is how the current document was created !
+:::
+
+A Quarto document is structured with :
+
+- A **header** : many options are possible to customize style
+
+- Code **chunks** to write with **programming language**
+
+- **Empty space** between chunks to write in **natural language**
+
+::: {.callout-note}
+To insert a code chunk in Rstudio (Server), you can use :
+
+- The **menu** : `Code` > `Insert chunk`
+- A keyboard **shortcut** :
+  - For Linux/Win : `<CTRL>` + `<ALT>` + `<I>`
+  - For Mac : `<OPTION>` + `<COMMAND>` + `<I>`
+
+It should create something like that in your Qmd :
+
+```{{r}}
+
+```
+
+:::
+
+## First layer : basics
+
+### Filling
+
+The easiest way to start is to :
+
+- **Create a chunk** in your newly created Qmd document
+- Copy-paste **all** of your R script content inside
+- **Render** it : `::> Knit`
+- Wait for the magic to happen !
+
+::: {.callout-note}
+In the end, a new file named as your `.Qmd` script but with a `.html` extension has been created (along the Quarto script)
+:::
+
+::: {.callout-warning}
+If a `.html` file with the same name already existed, **it would be overwritten without warning** !!
+:::
+
+### Observations
+
+This way, you :
+
+- Added a pinch of **traceability** :
+  - You generated a first **static** output (the `.html`) that you won't edit.
+- Have your code, comments and outputs **alltogether** ! These outputs include :
+  - Functions textual output (messages, warnings, ...)
+  - Plots
+- One single output file that can be easily **shared**
+
+
+## Second layer : slicing
+
+### Code splitting
+
+You can now **split** your unique chunk in multiple, smaller, well delimited and structured chunks 
+
+To do so, you can either :
+
+- Create iteratively new chunks after the main one, cut & paste the parts you want to extract.
+- Position the cursor where you would like to split your main chunk and use the `<CTRL>` + `<ALT>` + `<I>` (or `<OPTION>` + `<COMMAND>` + `<I>` if you like apples).
+  - It is the easiest way, according to me :)
+
+### Free text extraction
+
+Once all smaller chunks are created, one can **extract free text** (comments, conclusions, etc ...) from the chunks to "inter-chunks" regions.
+
+Then, knit !
+
+### Observations
+
+This time you added a pinch of **structure** to your document :
+
+- Spliting the unique blob of chunk to specific commands/blocs
+- Separating code and free text in different sections
+
+## Third layer : beautification
+
+### Chunks
+
+(Technical) comments can be added in chunks when needed.
+
+Chunks can be shaped with many, many [parameters](https://quarto.org/docs/computations/execution-options.html). These control :
+
+- Their appearance in the output document
+- Their inclusion in the output document
+- Same for their console output (text, plot)
+- etc ...
+
+::: {.callout-note}
+It is recommended to **name** your chunks. It way easier for debugging when knitting : the rendering engine (knitr/pandoc) tells the chunk name that contains an error.
+
+Here is an example where the chunk is named (`#| label: `), and a trick to make this name appear in the HTML output (`#| filename: `).
+
+```{{r}}
+#| label: my_chunk_is_named
+#| filename: my_chunk_is_named
+
+## Where am I on the cluster instance ?
+getwd()
+```
+:::
+
+### Free text
+
+It can be shaped, finely structured. It can be formatted in the [**markdown**](https://www.markdownguide.org/basic-syntax/) syntax.
+
+By example :
+
+- add titles using `#` (first level), subtitles using `##` (second level) etc ..., up to 6 !
+- format the text
+  - italic : \**italic text*\* or (\__italic text_\_)
+  - bold : \*\***bold text**\*\*
+  - and [much more](https://www.markdownguide.org/cheat-sheet/) !
+- one can create panels, columns ...
+
+## Forth layer : good practice
+
+Our document is rich, beautiful to read.
+Now, we may add stuff that can be useful to others (our future-self included)
+
+In order of appearance :
+
+- Header :
+  - A **meaningful title**
+  - The **author** name(s) and mail contact
+  - The **current date** : ie, the *knitting* date, to remember when the analysis + rendering was done
+
+- Free text :
+  - **Explained purpose** of the document
+  - Add **links** to resources of interest (papers, documentation)
+
+- Special chunks, each dedicated to :
+  - Citing the location of the `R` library(ies) used, thanks the `**.libPaths()**` function
+  - Loading libraries (I recommend using explicit call to functions with `packagename::function()`)
+  - Setting **global parameters**
+    - paths
+    - RNG seed
+    - variables that have an impact throughout the analysis
+    - etc ...
+  - **Sourcing** outside code (code stored in other R scripts)
+  - Loading **input data**
+  - Citing the **packages** that were loaded throughout the analysis with `utils::sessionInfo()` (usually at the very end of the document)
+
+## In practice
+
+In practice, when a report is needed or an added value, we usually start with a Quarto **template**, add/fill header, code chunks, comments and formatting **while progressing** in the analysis, rather than post-processing a script.
+
+::: {.callout-important}
+Applying programming best pratices should never be done while working, nor at the end, but from scratch...
+:::
