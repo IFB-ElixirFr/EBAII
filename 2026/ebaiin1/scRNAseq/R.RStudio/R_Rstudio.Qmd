@@ -209,29 +209,6 @@ Info: There is a syntax coloration, there is a good autocompletion and parameter
 
 <br>
 
-
-Now click on Session -\> *Save Workspace as* and save the current work
-space. 
-
-<center>![](save_workspace2.png)</center>
-
-
-What happened in the R console pane? 
-
-<center>![](save_workspace.png)</center>
-
-You saw it! A command has
-been automatically written. For me, it is:
-
-```{r}
-#| label: save_workspace_as
-#| filename: save_workspace_as
-
-save.image("~/test_TD_eb3I/SingleCell.RData")
-```
-
-<br>
-
 ## Environment/History/Connection/Tutorial (F + G + H + I + J)
 
 <br>
@@ -288,6 +265,29 @@ its content:
 
 
 <center>![](view_table.png)</center>
+
+<br>
+
+
+Now click on Session -\> *Save Workspace as* and save the current work
+space. 
+
+<center>![](save_workspace2.png)</center>
+
+
+What happened in the R console pane? 
+
+<center>![](save_workspace.png)</center>
+
+You saw it! A command has
+been automatically written. For me, it is:
+
+```{r}
+#| label: save_workspace_as
+#| filename: save_workspace_as
+
+save.image("~/test_TD_eb3I/SingleCell.RData")
+```
 
 <br>
 
@@ -978,6 +978,19 @@ mat[2,3]
 **Array** is a table in 3 and more dimension.
 
 Basically, in 3D, your have a cube, in nD, your have a hypercube.
+
+```{r  class.source="fold-hide", attr.output='.details summary="Output"'}
+#| label: array
+#| filename: array
+
+thisarray <- c(1:24)
+multiarray <- array(thisarray, dim = c(4, 3, 2))
+print(multiarray)
+
+multiarray[2, 3, 2] 
+
+```
+
 
 The advantage of matrices and arrays is that you can apply
 transformations to them.
