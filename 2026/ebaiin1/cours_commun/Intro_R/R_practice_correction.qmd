@@ -1,0 +1,607 @@
+---
+title: "R explained in 1h45 : Exercices"
+format: 
+  html: 
+    grid:
+        sidebar-width: 150px
+        body-width: 1200px
+        margin-width: 150px
+        gutter-width: 1.5rem
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Reminders
+
+### What is R ?
+
+R is a **programming language** developed to :
+
+- Manage data : import, transform, clean, process, export ...\
+- Compute **statistical analyses**, from basic to complex ones : descriptive, exploration, modelling, machine learning ...\
+- Create nice **visualisations**, reports ...
+
+[[R is free, cross-platform, open-source & collaborative !]{.smallcaps}]{style="color: #74C476"}
+
+### How to use
+
+You can use it directly in command line using `R` to start a session or `Rscript` to launch a full script at once. Scripts are saved with `.R` extension file.\
+For reporting, statistical analyses ... it's advised to use notebooks documents, like this one, to allow you mix notes & formatting along with your code. You can use quarto `.qmd` files or Rmarkdown `.Rmd` files.
+
+Using Rstudio allows you to navigate through files, packages and all variables stored in your environment.
+
+## Basic operations
+
+```{r, eval=F}
+2 + 3
+
+4 * 5
+
+6 / 4
+
+1,2
+
+1.2
+```
+
+## Objects & variables
+
+R manipulates several kind of **objects**, that can be stored in **variables** with given names, so that they can be used later\
+[[Be careful to **never** use those as variable names :]{.smallcaps}]{style="color : #E39E4F;"} TRUE, FALSE, T, F, c, t, pi, data, LETTERS, letters, ...
+
+### Numerical values
+
+```{r}
+a <- 2    # create a variable named "a" and assign its value to 2
+print(a)  # displays a
+a == 2    # Test if a is equal to 2  
+```
+
+Now, create a second variable named `b` with a value of 3. Test if it is equal to a.
+
+```{r}
+b <- 3		# create a second variable named b, equals to 3
+b == a  	# a is still in R's memory, so we can compare it to b
+```
+
+Store the result of a + b in a new variable. What happens if we change a's value to 7 ?
+
+```{r}
+a_plus_b <- a + b		# always use explicit names !
+a_plus_b
+
+a <- 7 # change a's value
+a_plus_b
+
+a_plus_b <- a + b 	# compute the sum to take into account a's changes
+print(a_plus_b)
+```
+
+### Vectors
+
+Several values can be stored in a vector :
+
+```{r}
+measures <-  c(1,10,a,b)    # One vector containing 1, 10 and the values contained in a and b
+integers <-  1:10		   # One vector with all integer values from 1 to 10
+ducks <-  c("riri", "fifi", "loulou")    # A vector containing character strings
+```
+
+Does this work ?
+
+```{r, eval=F}
+test <-  c("riri", 1, 4:6)
+```
+
+We can compute mathematical operations on vectors :
+
+```{r, eval=F}
+measures + a 		# sum of a vector and a numerical value
+integers / 2		# dividing a whole vector
+```
+
+Does this work ?
+
+```{r, eval=F}
+ducks / 2		
+```
+
+`[ ]` can be used to access elements of a vector, using *indexes* :
+
+```{r}
+integers[8]		
+```
+
+Can you change the first value of `measures` to *12* ?
+
+```{r}
+measures[1] <- 12
+measures
+```
+
+### Lists
+
+Lists are another way to store values : they can be created using `list()` function :
+
+```{r}
+empty <- list()  # Create an empty list
+groceries <- list("banana"=2,"apple"=5,"kiwi"=8) # a list of fruits
+unnamed <- list(2,5,8) # a list of unnamed numbers
+vrac <- list("A"=1:4,"B"=c(0,1),"C"="hey") # a list with multiple class of objects !
+```
+
+- They contain several objects called `elements`
+- Those elements can have different classes of objects : numerical values, vectors, characters, other lists ...
+- Elements are a combination of a `name`, called a key, and a `value`
+- Names can be empty
+
+To access an `element` of a list, this time use `[[ ]]` and either its index (position of the element in the list) or its name :
+
+```{r}
+groceries[["banana"]]     # Access the value stored under banana name  
+groceries[[1]]            # Access the value of the first grocerires element (banana)
+```
+
+If an element is already named, you can use `$` to access it directly :
+
+```{r}
+groceries$banana          # Access the value stored under banana name 
+```
+
+Try to access an element of the list `unnamed` with `$` : what happens ?
+
+```{r, eval=F}
+unnamed$a
+```
+
+[[TIP:]{.smallcaps}]{style="color: #1155cc"} R auto completion will help you select the right element
+
+Use `[[ ]]` to add a named element to the list `empty`
+
+```{r}
+empty[["key"]] <- "value" 	# add a named element to the empty list
+```
+
+Use `[[ ]]` to add an unnamed element in the 4th position of the list `empty`
+
+```{r}
+empty[[4]] <- 10 	# add an unnamed element to the 4th position
+```
+
+What does this list contain now ?
+
+```{r}
+str(empty)
+```
+
+Using `c()`, we can add new values to a vector :
+
+```{r}
+measures <- c(measures, 9, 8)
+```
+
+Some values can be empty : R will use `NA` as their value
+
+```{r}
+measures[4] <- NA
+measures
+```
+
+[[warning :]{.smallcaps}]{style="color: #E39E4F"} Objects with missing values might raise unexpected behaviors
+
+### Functions
+
+A function has :
+
+- A `name`, to execute the function or look for help\
+- One or more `arguments` : some are necessary for the function to run, others have default values
+- An `output` : the result of the computations on the given arguments. With complex functions, this will often be a list
+
+Look at the function `mean` help :
+
+```{r}
+?mean
+```
+
+We use `( )` to give the function its `arguments` before running : for mean, a vector of numerical values. How can you compute the mean of measures ?
+
+```{r}
+mean(measures) # compute the mean of measures
+mean(x = measures) # same
+```
+
+If any of the values is missing, `mean` will return a missing value `NA`. We can use the argument `na.rm` to ignore them :
+
+```{r}
+mean(x = measures, na.rm = TRUE)
+```
+
+Arguments can be :\
+- named =\> they can be written in any order\
+- unnamed =\> R will expect them in their appearing order
+
+We can store the output of a function in a variable as well :
+
+```{r}
+mean_measures <- mean(x=measures, na.rm=TRUE)
+```
+
+**Variable != Arguments**\
+`mean_measures` is now stored in the environment, but `x` and `na.rm` are not : they where only given to the mean function
+
+Finally, you can create your own functions by defining its name, arguments, output and the list of operations needed to compute the results you want
+
+```{r}
+square <- function(x) {
+  # as many lines as you want here !
+  output = x * x
+  return(output)
+}
+```
+
+This can be useful if you need to repeat the same computations several times, or if you need to modify some existing functions
+
+## Data manipulation : data frames
+
+Most biology data are **tabular** : one row per observation (a gene, sample ...) and one column per feature (position, group, measured expression, ...).  
+In R, the `data frame` structure allows to manipulate tabular data, using vectors to store each column (with only one type of objects within) while mixing different kind of columns (text, numbers, etc.).
+
+### Our example
+
+We'll use the file `annot_GRCH38_reduced.csv`, an extract of 2000 rows from Ensembl human genome (GRCh38). One row describes a gene :
+
+| Column name   | What's inside                                                        |
+|---------------|----------------------------------------------------------------------|
+| `ensgene`     | Ensembl ID (eg `ENSG00000149489`), identifies a gene                 |
+| `entrez`      | NCBI Entrez Gene ID (sometimes missing, sometimes several are given) |
+| `symbol`      | official gene symbok (eg. `ROM1`), sometimes missing                 |
+| `chr`         | chromosom (or contig / patch)                                        |
+| `start`, `end`| end and start position within the chromosome (base pairs)            |
+| `strand`      | chromosome strand : `1` (+) or `-1` (−)                              |
+| `biotype`     | type of gene (`protein_coding`, `lncRNA`, `miRNA`, pseudogene…)      |
+| `description` | a short description of the gene (text)                               |
+
+Be careful to have the .csv file in the same folder as this script !
+
+### Import & inspect
+
+We'll use `read.table` function : look at the annotation file first to know what areguments to give to the function :
+
+```{r import}
+annotation_data <- read.table(file = "annot_GRCH38_reduced.csv", header = TRUE, 
+                              sep = ",", dec = ".", quote='"')
+```
+
+All the content from the annotation file is now in a data-frame. Try the following functions :
+
+```{r inspect}
+dim(annotation_data)      # rows x columns
+nrow(annotation_data)     # number of genes
+ncol(annotation_data)     # number of features
+names(annotation_data)    # column names
+```
+
+`str()` is the first function to use on a new dataset : it'll give you the name and type of each column, along with an overview of the values within.
+
+```{r str}
+str(annotation_data)
+```
+
+Functions `head` and `tail` also exist in R ! 
+
+```{r head}
+head(annotation_data)         # 6 first rows
+tail(annotation_data, n = 3)  # 3 last rows
+View(annotation_data)         # interactive view
+```
+
+In RStudio, you cans also open an interactive view with `View(annotation_data)` or by clicking on the object in your environment, or directly on the file.
+
+Lastly, the `summary` function will make a quick summary of each column :
+
+```{r summary}
+summary(annotation_data)
+```
+
+Notice that `entrez` column has some missing values `NA`.   
+`chr` is imported as text (`character`) while chromosomes are numbers : why ?   
+`strand` is imported as numeric, but it's not a quantity : we'll have to correct that later.
+
+#### Access data within data frames
+
+Since columns are vectors, and the data frames contain several of them, we can access data the same ways we did vectors and list ! 
+
+```{r col, eval=F}
+# getting a column by name
+annotation_data$symbol
+annotation_data[["biotype"]]
+annotation_data[, "start"]
+```
+
+The general syntax is `data[rows, columns]`.
+
+```{r cells}
+# get first row (gene ROM1)
+annotation_data[1, ]
+
+# get the symbol of ROM1
+annotation_data[1, "symbol"]
+
+# a bloc : get 3 first rows of both symbol and chr
+annotation_data[1:3, c("symbol", "chr")]
+```
+
+Rows actually have names : by default it's their number
+
+```{r rownames}
+head(rownames(annotation_data))
+```
+
+We could replace row names by a more explicit value : this requires some unique identifier (no duplicates, no missing values)
+
+Since each column is a vector, you can apply regular vector functions on them : 
+
+```{r vec}
+mean(annotation_data$end - annotation_data$start)
+range(annotation_data$start)
+length(unique(annotation_data$biotype))
+```
+
+#### Column types & factors
+
+Earlier we noticed `strand` contained `1` or `-1`, but calculate its mean does not make biological sense, it's a category ! In R, this specific type is called a `factor` :
+
+```{r strand}
+annotation_data$strand <- factor(annotation_data$strand, levels = c(1, -1), labels = c("+", "-"))
+table(annotation_data$strand)
+str(annotation_data)
+```
+
+What other columns should be converted to factors ? Do it below : 
+
+```{r}
+annotation_data$biotype <- factor(annotation_data$biotype)
+nlevels(annotation_data$biotype)
+```
+
+#### Add new columns
+
+We can create a new column with `<-` by giving it a name and affecting a value, to all rows at once.  
+For example, how could we compute gene length ?  
+
+```{r newcol}
+annotation_data$length <- annotation_data$end - annotation_data$start + 1   # locus length (bp)
+annotation_data$log10_length <- log10(annotation_data$length)
+
+head(annotation_data[, c("symbol", "start", "end", "length")])
+summary(annotation_data$length)
+```
+
+### Filtering rows
+
+The haRd way : we build a mask (= a vector of `TRUE`/`FALSE` values, one per row) and use it with `[ , ]` to select rows with `TRUE` values :
+
+```{r filter1}
+head(annotation_data$biotype == "protein_coding", 10)   # overview : one TRUE/FALSE per gene
+```
+
+```{r filter2}
+coding <- annotation_data[annotation_data$biotype == "protein_coding", ]
+nrow(coding)
+```
+
+Select genes from chromosome 17. How many are they ?  
+
+```{r chr17}
+chr17 <- annotation_data[annotation_data$chr == "17", ]
+nrow(chr17)
+```
+
+Logical operators can be used : `&` (and), `|` (or), `!` (negate), `%in%` (exist in).
+
+```{r filter3}
+# coding genes for all chromosomes except 21
+annotation_data[annotation_data$biotype == "protein_coding" & annotation_data$chr !=21,
+      c("symbol", "start", "end", "length")][1:8, ]
+```
+
+```{r filter4}
+# non-coding small RNA
+small_rna <- annotation_data[annotation_data$biotype %in% c("miRNA", "snRNA", "snoRNA"), ]
+table(droplevels(small_rna$biotype))
+```
+
+`droplevels()` removes factor levels that became empty after filtering
+
+#### Text search : `grepl()`
+
+`grepl(pattern, string)` returns `TRUE` of a pattern is detected within a given string (character)
+
+```{r grepl}
+# protein coding kinases
+kinases <- annotation_data[grepl("kinase", annotation_data$description) & annotation_data$biotype == "protein_coding", c("symbol", "chr", "description")]
+nrow(kinases)
+head(kinases, 8)
+```
+
+#### Using `subset`
+
+to avoid repeating `annotation_data$` every time we can use `subset`
+
+```{r subset}
+subset(annotation_data, 
+       biotype == "protein_coding" & length > 400000, 
+       select = c(symbol, chr, length, description))
+```
+
+### Missing values & empty strings
+
+Biological are rarely complete. Empty cells are often : 
+
+1. Missing values `NA` : like in `entrez` column  
+2. Empty strings `""` : for example in `symbol`  
+3. Something else : sometimes we see  `"N/A"`, `"missing"` ...   
+
+R does not recognise 2 & 3 as `NA` !
+
+```{r na1}
+sum(is.na(annotation_data$entrez))      # number of NA in entrez column
+sum(annotation_data$symbol == "")       # number of missing symbols
+colSums(is.na(annotation_data))         # NA per column
+```
+
+It's usually best to convert all true missing data to true NA values : 
+
+```{r na2}
+annotation_data$symbol[annotation_data$symbol == ""] <- NA
+colSums(is.na(annotation_data))
+```
+
+Only a few coding genes have missing symbols : 
+
+```{r na3}
+annotation_data[annotation_data$biotype == "protein_coding" & is.na(annotation_data$entrez),
+      c("ensgene", "symbol", "description")]
+```
+
+### Ordering values
+
+`order()` will return the indexes (row number) of rows according to a given condition :
+
+```{r order1}
+# Top 5 longest coding genes
+coding <- annotation_data[annotation_data$biotype == "protein_coding", ]
+top5 <- coding[order(coding$length, decreasing = TRUE), ]
+top5[1:5, c("symbol", "chr", "length", "description")]
+```
+
+Try to get the 5 first genes of chromosome 1 : 
+
+```{r order2}
+chr1 <- annotation_data[annotation_data$chr == "1", ]
+chr1 <- chr1[order(chr1$start), ]
+chr1[1:5, c("symbol", "start", "end", "strand")]
+```
+
+### Visualisation
+
+```{r table}
+coding_nuc <- annotation_data[annotation_data$biotype == "protein_coding", ]
+n_per_chr <- table(coding_nuc$chr)
+
+barplot(n_per_chr, las = 2, col = "steelblue", main = "Coding genes per chromosome (2000 genes sample)", ylab = "Number of genes de gènes")
+```
+
+```{r boxplot}
+main_types <- c("protein_coding", "lncRNA", "processed_pseudogene", "miRNA", "snRNA")
+sel <- droplevels(annotation_data[annotation_data$biotype %in% main_types, ])
+
+boxplot(log10_length ~ biotype, data = sel, las = 2,
+        col = "lightgrey", xlab = "", ylab = "log10(length in bp)",
+        main = "Gene length according to biotype")
+```
+
+`droplevels()` deletes factor levels that became empty after filtering. Without this line, the 33 other biotypes would appear on the plot, as as empty boxes.
+
+## Take home message
+
+R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C476"}. A lot of ressources are available on each area of research. But remember to always [**define & understand your needs**]{style="color: #E34234"} to select the best R function to help you.
+
+**Rstudio Cheatsheets  :**     
+[https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/){.external target="_blank"}
+
+**Packages from tidyverse :**   
+[https://tidyverse.org/](https://tidyverse.org/){.external target="_blank"}
+
+### To go further
+
+Tidyverse contains a set of packages to simplify data handling :
+
+- **mutate** : to modify / add columns
+- **select** : extract specific columns 
+- **filter** : chose rows according to criteria
+- **merge** : compile data frames together
+- ...
+
+```{r, eval=F}
+annotation_data %>% 
+  mutate(gene_length=pos_end-pos_start) %>% 
+  select(gene_length<1200) %>% 
+  merge(count_data)
+```
+
+A **lot** of different functions to import data from files : read.table, read.csv, read.csv2, read.tsv, read.delim ...
+
+and even specific packages :   
+- `vroom` to import big data faster    
+- `readxl`, `openxlsx` to read excel files  
+- `readRDS` to read R-files  
+- `load` to import a whole R environment   
+
+Do not hesitate to search "How to open ... file in R ?" 
+
+## Memos for later
+
+### Manipulate basic objects
+
+| Symbol | Goal | Examples |
+|------------------------|------------------------|------------------------|
+| `=` or `<-` or `->` | assign a `value` to a `variable` or an `argument` | a `<-` 10 or read.table(file `=` "file.txt") |
+| `( )` | to give `arguments` to a function | mean`(`x = c`(`10,6,8,2`))` |
+| `[ ]` | get a value from a vector | measures`[`1`]` or measures`[`2:8`]` or measures`[`c(3,6,4)`]` |
+| `[[ ]]` or `$` | get an element from a list | groceries`$`banana or groceries`[[`"banana"`]]` or groceries`[[`1`]]` |
+| `[ , ]` ou `$` | extract elements from a data-frame | annotation`$`geneID or annotation`[`1:5`,`geneID`]` |
+
+### Good practices
+
+| To | Do this | Avoid this |
+|------------------------|------------------------|------------------------|
+| Clean your environment | `rm(list = ls())` | mixing-up variables |
+| Use explicit names | expression_data, annotation, groceries_list | dat, var1, dfslkgj |
+| Use comments | with `#`, using lines, stars ... | obscure functions, 100+ lines without comment |
+|  | use spaces, skip lines, add blocks ... | all commands in one block |
+
+[Tidyverse guidelines](https://style.tidyverse.org/syntax.html){.external target="_blank"}
+
+### Logical operators
+
+| Operator | Description      | Example        | Result  |
+|----------|------------------|----------------|---------|
+| `==`     | Equal to         | `5 == 3`       | `FALSE` |
+| `!=`     | Not equal to     | `5 != 3`       | `TRUE`  |
+| `>`      | Greater than     | `5 > 3`        | `TRUE`  |
+| `<`      | Less than        | `5 < 3`        | `FALSE` |
+| `>=`     | Greater or equal | `5 >= 5`       | `TRUE`  |
+| `<=`     | Less or equal    | `5 <= 3`       | `FALSE` |
+| `&`      | Element-wise AND | `TRUE & FALSE` | `FALSE` |
+| `|`      | Element-wise OR  | `TRUE | FALSE` | `TRUE`  |
+| `!`      | NOT              | `!TRUE`        | `FALSE` |
+
+### Aritmetic operators
+
+| Operator | Description      | Example   | Result |
+|----------|------------------|-----------|--------|
+| `+`      | Addition         | `5 + 3`   | `8`    |
+| `-`      | Subtraction      | `5 - 3`   | `2`    |
+| `*`      | Multiplication   | `5 * 3`   | `15`   |
+| `/`      | Division         | `5 / 2`   | `2.5`  |
+| `^`      | Exponentiation   | `2 ^ 3`   | `8`    |
+| `%%`     | Modulus          | `5 %% 2`  | `1`    |
+| `%/%`    | Integer Division | `5 %/% 2` | `2`    |
+
+## Data frames
+
+| What I want to do                | Example                                               |
+|----------------------------------|-------------------------------------------------------|
+| import a .csv file               | `read.csv("fichier.csv")`                             |
+| inspect                          | `str()`, `head()`, `summary()`, `dim()`               |
+| get a column                     | `df$col`, `df[["col"]]`                               |
+| row / columns                    | `df[row, col]`                                        |
+| new column                       | `df$new <- ...`                                       |
+| filter                           | `df[condition, ]`, `subset()`                         |
+| order                            | `df[order(df$col), ]`                                 |
+| count                            | `table()`                                             |
+| mising valuesntes                | `is.na()`                                             |
+| duplicated values                | `duplicated()`, `unique()`                            |
+| export                           | `write.csv(df, "out.csv", row.names = FALSE)`         |

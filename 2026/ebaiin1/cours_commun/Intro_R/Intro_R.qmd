@@ -17,7 +17,6 @@ format:
     controls-layout: bottom-right
     controls-tutorial: true
     slide-number: true
-css: style.css
 title-slide-attributes:
   data-background-image: "img/backgrounds/roscoff.svg"
   data-background-size: cover
@@ -52,7 +51,7 @@ R is a **programming language** developed to :
 -   Compute **statistical analyses**, from basic to complex ones : descriptive, exploration, modelling, machine learning ...\
 -   Create nice **visualisations**, reports ...
 
-[R is free, cross-platform, open-source & collaborative !]{.smallcaps} style="color: #74C476"}
+[R is free, cross-platform, open-source & collaborative !]{.smallcaps style="color: #74C476"}
 
 ## R [Pros]{style="color: #74C476"} & [Cons]{style="color: #E34234"}
 
@@ -115,11 +114,14 @@ Go to [https://ondemand.cluster.france-bioinformatique.fr](https://ondemand.clus
 
 ## Get the materials
 
-In the **terminal**, go to your project space and copy `intro_R` folder from the common project space using `cp`
+In the **terminal**, go to your project space and copy `TP_R` folder from the common project space using `cp`
 
 ```{bash, eval=F}
-cp -r /shared/projects/ebaii_n1_2026/common_core/intro_R/ .
+cd /shared/projects/your_project_name/
+cp -r /shared/projects/2621_eb3in1_2026/cours_commun/TP_R/ .
 ```
+
+![](img/terminal.png)
 
 ## Working directory
 
@@ -131,13 +133,14 @@ getwd()
 
 Set your working directory to the `intro_R` folder in your project space
 ```{r, eval=F}
-setwd('/shared/projects/your_project_name/intro_R')
+setwd('/shared/projects/your_project_name/TP_R')
 ```
 
 ## Files
 
 Refresh your files in Rstudio, your should see the following :
 
+![](img/files.png){.absolute width=800}
 
 # Basic operations
 
@@ -330,7 +333,8 @@ Notice the variables appear in the `Environment` window :
 
 ## Numerical values
 
-Now, create a second variable named `b` with a value of 3. Test if it is equal to a.
+Now, create a second variable named `b` with a value of 3. Test if it is equal to a.  
+
 ::: {.fragment .fade-in}
 ```{r}
 b <- 3		# create a second variable named b, equals to 3
@@ -708,76 +712,386 @@ This can be useful if you need to repeat the same computations several times, or
 
 Now it's time to manipulate some real data !
 
-
 ## What's a data frame ?
 
-A two-dimensional way of storing information : the same kind of information is observed over several individuals
+A two-dimensional way of storing information : 
 
 ![](img/Data-frame-example.png){fig-align="center"}
 
-## Read the `annotation.csv` file
+:::{.r-fit-text}
+Most biology data are **tabular** : one row per observation (a gene, sample ...) and one column per feature (position, group, measured expression, ...).   
+:::
+
+## Our example   
+
+:::{style="font-size: 22pt;"}
+We'll use the file `annot_GRCH38_reduced.csv`, an extract of 2000 rows from Ensembl human genome (GRCh38). One row describes a gene :
+:::
+
+:::{.r-fit-text}
+| Column name   | What's inside                                                        |
+|---------------|----------------------------------------------------------------------|
+| `ensgene`     | Ensembl ID (eg `ENSG00000149489`), identifies a gene                 |
+| `entrez`      | NCBI Entrez Gene ID (sometimes missing, sometimes several are given) |
+| `symbol`      | official gene symbok (eg. `ROM1`), sometimes missing                 |
+| `chr`         | chromosom (or contig / patch)                                        |
+| `start`, `end`| end and start position within the chromosome (base pairs)            |
+| `strand`      | chromosome strand : `1` (+) or `-1` (−)                              |
+| `biotype`     | type of gene (`protein_coding`, `lncRNA`, `miRNA`, pseudogene…)      |
+| `description` | a short description of the gene (text)                               |
+:::
+
+## Import the annotation file
 
 We'll use `read.table` function. What are its arguments ?
 
-::::{.fragment}
+:::{.fragment}
 ![](img/help_read.table.png)
-
-:::{.callout-tip}
-Look at the annotation file first to know what to give to the `read.table` function
 :::
 
-::::
-
-## Read the `annotation.csv` file
+## Import the annotation file
 
 We'll use `read.table` function. What are its arguments ?
 
-```{r, eval=F}
-annotation_data <- read.table(file = "annotation.csv", header = TRUE, 
-                              sep = ",", dec = ".")
+```{r}
+annotation_data <- read.table(file = "annot_GRCH38_reduced.csv", header = TRUE, 
+                              sep = ",", dec = ".", quote='"')
 ```
 
 :::{.callout-tip}
 Look at the annotation file first to know what to give to the `read.table` function
 :::
 
-## Ways to import files
+## Inspect `annotation_data` 
 
-A **lot** of different functions to import data from files : read.table, read.csv, read.csv2, read.tsv, read.delim ...
+All the content from the annotation file is now in a data-frame. Try the following functions :
 
-and even specific packages :   
-- `vroom` to import big data faster    
-- `readxl`, `openxlsx` to read excel files  
-- `readRDS` to read R-files  
-- `load` to import a whole R environment   
-
-![](img/logos/vroom.png){.absolute top="100" left="950" width="80" }
-![](img/logos/openxlsx.png){.absolute top="200" left="950" width="80" }
-![](img/logos/readxl.png){.absolute top="300" left="950" width="80" }
-
-:::{.callout-tip}
-Do not hesitate to search "How to open ... file in R ?" 
-:::
-
-## Explore `annotation_data` 
-
-All the content from the `annotation` file is now in a data-frame. Try the following functions :
-
-```{r, eval=F}
-print(annotation_data)
-head(annotation_data)
-tail(annotation_data, n=20)
-View(annotation_data)
+```{r}
+dim(annotation_data)      # rows x columns
+nrow(annotation_data)     # number of genes
+ncol(annotation_data)     # number of features
+names(annotation_data)    # column names
 ```
 
-## Explore `annotation_data`
+## Inspect `annotation_data`
 
-We can also check the summarized info contained in `annotation_data`  
+`str()` is the first function to use on a new dataset : it'll give you the name and type of each column, along with an overview of the values within.
 
-```{r, eval=F}
+```{r str}
 str(annotation_data)
+```
+
+## Inspect `annotation_data`
+
+Functions `head()` and `tail()` also exist in R ! 
+
+```{r head, eval=F}
+head(annotation_data)         # 6 first rows
+tail(annotation_data, n = 3)  # 3 last rows
+```
+
+In RStudio, you cans also open an interactive view with `View(annotation_data)` or by clicking on the object in your environment, or directly on the file.
+
+![](img/view_file.png){.absolute width="600"}
+
+## Inspect `annotation_data`
+
+:::{.r-fit-text}
+Lastly, the `summary` function will make a quick summary of each column :
+:::
+
+```{r summary}
 summary(annotation_data)
 ```
+
+## Access data within data frames
+
+:::{style="font-size: 24pt;"}
+Since columns are vectors, and the data frames contain several of them, we can access data the same ways we did vectors and list ! How would you extract a column ?
+:::
+
+:::{.fragment}
+```{r col, eval=F}
+# getting a column by name
+annotation_data$symbol       
+annotation_data[["biotype"]]
+annotation_data[, "start"]  
+```
+:::
+
+## Access data within data frames
+
+[The general syntax is **`data[rows, columns]`**]{style="font-size:24pt;"}
+
+[get first row (gene ROM1)]{.smallcaps style="color: #74C476; font-size:24pt;"} 
+
+:::{.fragment}
+```{r}
+annotation_data[1, ]  
+```
+:::
+
+[get the symbol of ROM1]{.smallcaps style="color: #74C476; font-size:24pt;"}  
+
+:::{.fragment}
+```{r}
+annotation_data[1, "symbol"]    
+```
+:::
+
+[a bloc : get 3 first rows of both symbol and chr]{.smallcaps style="color: #74C476; font-size:24pt;"}  
+
+:::{.fragment}
+```{r}
+annotation_data[1:3, c("symbol", "chr")]     
+```
+:::
+
+## Access data within data frames
+
+Rows actually have names : by default it's their number
+
+```{r rownames}
+head(rownames(annotation_data))
+annotation_data["1", c("ensgene", "symbol", "description")]   # using row name " "
+```
+
+:::{.callout-tip}
+We could replace row names by a more explicit value : this requires some unique identifier (no duplicates, no missing values)
+:::
+
+## Access data within data frames
+
+Since each column is a vector, you can apply regular vector functions on them : 
+
+```{r vec}
+mean(annotation_data$end - annotation_data$start)
+range(annotation_data$start)
+length(unique(annotation_data$biotype))
+```
+
+## Column types & factors
+
+:::{style="font-size: 23pt;"}
+Earlier we noticed `strand` contained `1` or `-1`, but calculate its mean does not make biological sense, it's a category ! In R, this specific type is called a `factor`:
+:::
+
+```{r strand}
+annotation_data$strand <- factor(annotation_data$strand, levels = c(1, -1), labels = c("+", "-"))
+```
+
+:::{.fragment}
+```{r}
+#| code-line-numbers: "|13"
+
+table(annotation_data$strand)
+str(annotation_data)
+```
+:::
+
+## Column types & factors
+
+What other columns should be converted to factors ? 
+
+:::{.fragment}
+```{r}
+annotation_data$biotype <- factor(annotation_data$biotype)
+nlevels(annotation_data$biotype)
+```
+:::
+
+## Add new columns
+
+We can create a new column with `<-` by giving it a name and affecting a value, to all rows at once. For example, how could we compute **gene length** ?  
+
+:::{.fragment}
+```{r newcol}
+annotation_data$length <- annotation_data$end - annotation_data$start + 1   # locus length (bp)
+annotation_data$log10_length <- log10(annotation_data$length)
+
+head(annotation_data[, c("symbol", "start", "end", "length")])
+summary(annotation_data$length)
+```
+:::
+
+## Filtering rows
+
+:::{style="font-size: 24pt;"}
+The haRd way : we build a mask (= a vector of `TRUE`/`FALSE` values, one per row) and use it with `[ , ]` to select rows with `TRUE` values :
+:::
+
+```{r}
+head(annotation_data$biotype == "protein_coding", 10)   # overview : one TRUE/FALSE per gene
+```
+
+:::{.fragment}
+```{r filter2}
+coding <- annotation_data[annotation_data$biotype == "protein_coding", ]
+nrow(coding)
+```
+::: 
+
+## Filtering rows
+
+Select genes from chromosome 17. How many are they ?  
+
+:::{.fragment}
+```{r chr17}
+chr17 <- annotation_data[annotation_data$chr == "17", ]
+nrow(chr17)
+```
+:::
+
+## Filtering rows
+
+:::{style="font-size: 24pt;"}
+Logical operators can be used : `&` (and), `|` (or), `!` (negate), `%in%` (exist in).
+:::
+
+:::{.fragment}
+```{r}
+# coding genes for all chromosomes except 21
+annotation_data[annotation_data$biotype == "protein_coding" & annotation_data$chr !=21,
+      c("symbol", "start", "end", "length")][1:8, ]
+```
+:::
+
+:::{.fragment}
+```{r}
+# petits ARN non codants
+small_rna <- annotation_data[annotation_data$biotype %in% c("miRNA", "snRNA", "snoRNA"), ]
+table(droplevels(small_rna$biotype))
+```
+
+`droplevels()` removes factor levels that became empty after filtering
+:::
+
+## Text search : `grepl()`
+
+`grepl(pattern, string)` returns `TRUE` of a pattern is detected within a given string (character)
+
+```{r grepl}
+# protein coding kinases
+kinases <- annotation_data[grepl("kinase", annotation_data$description) & annotation_data$biotype == "protein_coding", c("symbol", "chr", "description")]
+nrow(kinases)
+head(kinases, 8)
+```
+
+
+## Using `subset`
+
+:::{.r-fit-text}
+to avoid repeating `annotation_data$` every time we can use `subset`
+:::
+
+```{r subset}
+subset(annotation_data, 
+       biotype == "protein_coding" & length > 400000, 
+       select = c(symbol, chr, length, description))
+```
+
+## Missing values & empty strings
+
+Biological are rarely complete. Empty cells are often : 
+
+:::{style="font-size: 26pt;"}
+[1. Missing values `NA` : like in `entrez` column]{style="color: #000000;"}     
+[2. Empty strings `""` : for example in `symbol`]{style="color: #000000;"}      
+[3. Something else : sometimes we see  `"N/A"`, `"missing"` ...]{style="color: #000000;"}     
+:::
+
+## Missing values & empty strings
+
+Biological are rarely complete. Empty cells are often :   
+
+:::{style="font-size: 26pt;"}
+[1. Missing values `NA` : like in `entrez` column  ]{style="color: #74C476;"}    
+[2. Empty strings `""` : for example in `symbol`  ]{style="color: #E34234;"}    
+[3. Something else : sometimes we see  `"N/A"`, `"missing"` ...  ]{style="color: #E34234;"}   
+:::  
+
+[R does not recognise them as `NA` !]{.smallcaps style="color: #E34234;"}
+
+```{r na1}
+sum(is.na(annotation_data$entrez))      # number of NA in entrez column
+sum(annotation_data$symbol == "")       # number of missing symbols
+colSums(is.na(annotation_data))         # NA per column
+```
+
+## Missing values & empty strings
+:::{.r-fit-text}
+It's usually best to convert all true missing data to true NA values : 
+:::
+```{r na2}
+annotation_data$symbol[annotation_data$symbol == ""] <- NA
+colSums(is.na(annotation_data))
+```
+:::{.r-fit-text}
+Now we can see how many coding genes have missing symbols : 
+:::
+```{r na3}
+annotation_data[annotation_data$biotype == "protein_coding" & is.na(annotation_data$entrez),
+      c("ensgene", "symbol", "description")]
+```
+
+## Ordering values
+
+`order()` will return the indexes (row number) of rows according to a given condition :
+
+```{r order1}
+# Top 5 longest coding genes
+coding <- annotation_data[annotation_data$biotype == "protein_coding", ]
+top5 <- coding[order(coding$length, decreasing = TRUE), ]
+top5[1:5, c("symbol", "chr", "length", "description")]
+```
+
+## Ordering values
+
+Try to get the 5 first genes of chromosome 1 : 
+
+:::{.fragment fragment-index="3"}
+```{r order2}
+chr1 <- annotation_data[annotation_data$chr == "1", ]
+chr1 <- chr1[order(chr1$start), ]
+chr1[1:5, c("symbol", "start", "end", "strand")]
+```
+::: 
+
+:::{.fragment .callout-tip fragment-index="2"}
+filter chr1 then order by starting position, then select top 5
+:::
+
+
+## Visualisation
+
+```{r table}
+coding_nuc <- annotation_data[annotation_data$biotype == "protein_coding", ]
+n_per_chr <- table(coding_nuc$chr)
+
+barplot(n_per_chr, las = 2, col = "steelblue", main = "Coding genes per chromosome (2000 genes sample)", ylab = "Number of genes de gènes")
+```
+
+## Visualisation
+
+```{r boxplot}
+main_types <- c("protein_coding", "lncRNA", "processed_pseudogene", "miRNA", "snRNA")
+sel <- droplevels(annotation_data[annotation_data$biotype %in% main_types, ])
+
+boxplot(log10_length ~ biotype, data = sel, las = 2,
+        col = "lightgrey", xlab = "", ylab = "log10(length in bp)",
+        main = "Gene length according to biotype")
+```
+
+# Take home message
+
+R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C476"}. A lot of ressources are available on each area of research. But remember to always [**define & understand your needs**]{style="color: #E34234"} to select the best R function to help you.
+
+**Rstudio Cheatsheets  :**     
+[https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/){.external target="_blank"}
+
+**Packages from tidyverse :**   
+[https://tidyverse.org/](https://tidyverse.org/){.external target="_blank"}
+
 
 ## To go further
 
@@ -799,21 +1113,29 @@ annotation_data %>%
 ![](img/tidyverse.png){.absolute top="100" left="750" width="300" }
 ![](img/pipe.png){.absolute bottom="45" left="700" width="200" }
 
-# Take home message
+## Ways to import files
 
-R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C476"}. A lot of ressources are available on each area of research. But remember to always [**define & understand your needs**]{style="color: #E34234"} to select the best R function to help you.
+A **lot** of different functions to import data from files : read.table, read.csv, read.csv2, read.tsv, read.delim ...
 
-**Rstudio Cheatsheets  :**     
-[https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/){.external target="_blank"}
+and even specific packages :   
+- `vroom` to import big data faster    
+- `readxl`, `openxlsx` to read excel files  
+- `readRDS` to read R-files  
+- `load` to import a whole R environment   
 
-**Packages from tidyverse :**   
-[https://tidyverse.org/](https://tidyverse.org/){.external target="_blank"}
+![](img/logos/vroom.png){.absolute top="100" left="950" width="80" }
+![](img/logos/openxlsx.png){.absolute top="200" left="950" width="80" }
+![](img/logos/readxl.png){.absolute top="300" left="950" width="80" }
 
+:::{.callout-tip}
+Do not hesitate to search "How to open ... file in R ?" 
+:::
 
 # Memos for later
 
 ## Manipulate basic objects 
 
+:::{.r-fit-text}
 | Symbol    | Goal                  | Examples       |
 |-----------|-----------------------|----------------|
 | `=` or `<-` or `->` | assign a `value` to a `variable` or an `argument` | a `<-` 10 or read.table(file `=` "file.txt") |
@@ -821,20 +1143,24 @@ R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C
 | `[ ]`     | get a value from a vector | measures`[`1`]` or measures`[`2:8`]` or measures`[`c(3,6,4)`]` |
 | `[[ ]]` or `$` |  get an element from a list | groceries`$`banana or groceries`[[`"banana"`]]` or groceries`[[`1`]]` | 
 | `[ , ]` ou `$` | extract elements from a data-frame | annotation`$`geneID or annotation`[`1:5`,`geneID`]` |
+:::
 
 ## Good practices
 
-| To                      | Do this              | Avoid this         |
-|-------------------------|----------------------|--------------------|
-| Clean your environment  | `rm(list = ls())`    | mixing-up variables| 
-| Use explicit names      | expression_data, annotation, groceries_list | dat, var1, dfslkgj  |
-| Use comments            | with `#`, using lines, stars ...       | obscure functions, 100+ lines without comment |
-|                         | use spaces, skip lines, add blocks ... | all commands in one block  |
-
+:::{.r-fit-text}
+| To                        | Do this              | Avoid this         |
+|-------------------------  |----------------------|--------------------|
+| Clean your environment    | `rm(list = ls())`    | mixing-up variables| 
+| Use explicit names        | expression_data, annotation, groceries_list | dat, var1, dfslkgj  |
+| Use NA values when needed | empty cells in data files to get `NA` | "missing", "N/A", ...  |
+| Use comments              | with `#`, using lines, stars ...       | obscure functions, 100+ lines without comment |
+| Have readable scripts     | use spaces, skip lines, add blocks ... | all commands in one block  |
+:::
 [Tidyverse guidelines](https://style.tidyverse.org/syntax.html){.external target="_blank"}
 
 ## Logical operators
 
+:::{style="font-size:26pt;"}  
 | Operator | Description           | Example        | Result    |
 |----------|-----------------------|----------------|-----------|
 | `==`     | Equal to              | `5 == 3`       | `FALSE`   |
@@ -845,11 +1171,12 @@ R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C
 | `<=`     | Less or equal         | `5 <= 3`       | `FALSE`   |
 | `&`      | Element-wise AND      | `TRUE & FALSE` | `FALSE`   |
 | `|`      | Element-wise OR       | `TRUE | FALSE` | `TRUE`    |
-| `!`      | NOT                   | `!TRUE`        | `FALSE`   |
+| `!`      | NOT                   | `!TRUE`        | `FALSE`   |  
+:::
 
+## Aritmetic operators  
 
-## Aritmetic operators
-
+:::{style="font-size:28pt;"}  
 | Operator | Description     | Example   | Result |
 |----------|-----------------|-----------|--------|
 | `+`      | Addition         | `5 + 3`   | `8`    |
@@ -858,5 +1185,23 @@ R is a great tool with (almost) [**limitless possibilities**]{style="color: #74C
 | `/`      | Division         | `5 / 2`   | `2.5`  |
 | `^`      | Exponentiation   | `2 ^ 3`   | `8`    |
 | `%%`     | Modulus          | `5 %% 2`  | `1`    |
-| `%/%`    | Integer Division | `5 %/% 2` | `2`    |
+| `%/%`    | Integer Division | `5 %/% 2` | `2`    |   
+:::  
 
+## Data frames
+
+:::{style="font-size:20pt;"}  
+| What I want to do                | Example                                               |  
+|----------------------------------|-------------------------------------------------------|  
+| import a .csv file               | `read.csv("fichier.csv")`                             |  
+| inspect                          | `str()`, `head()`, `summary()`, `dim()`               |  
+| get a column                     | `df$col`, `df[["col"]]`                               |  
+| row / columns                    | `df[row, col]`                                        |  
+| new column                       | `df$new <- ...`                                       |  
+| filter                           | `df[condition, ]`, `subset()`                         |  
+| order                            | `df[order(df$col), ]`                                 |  
+| count                            | `table()`                                             |  
+| mising valuesntes                | `is.na()`                                             |  
+| duplicated values                | `duplicated()`, `unique()`                            |  
+| export                           | `write.csv(df, "out.csv", row.names = FALSE)`         |   
+:::
