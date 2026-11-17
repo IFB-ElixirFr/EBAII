@@ -465,7 +465,8 @@ There are several options for genome browsers, divided between the local browser
 If the data are on your computer, to prevent data transfer, it's easier to visualize the data locally (IGV). Note that if you're working on a non-model organism, the local viewer will be the only choice. If the aim is to share the results with your collaborators, view many tracks in the context of many existing annotations, then the online genome browsers are more suitable.
 
 ## - Viewing the raw alignment data in IGV
-1. Download the following files from the server onto your computer
+1. Open IGV in openOnDemand by running a Desktop session and launching IGV. The genome used in this workshop is not available in the IGV genome list, so you will need to load it from a FASTA file.
+2. You will need to load the following files:
   * data/Caulobacter_CP001340.fasta
   * data/Caulobacter_CP001340.gtf
   * 02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam
@@ -476,7 +477,6 @@ If the data are on your computer, to prevent data transfer, it's easier to visua
   * 02-Mapping/bam/Marked_RtrC_input_rep1.bam.bai
   * 02-Mapping/bam/Marked_RtrC_input_rep2.bam
   * 02-Mapping/bam/Marked_RtrC_input_rep2.bam.bai
-2. Open IGV on your computer
 3. Load the genome
   * Genomes / Load Genome from File...
   * Select the fasta file Caulobacter_CP001340.fasta
