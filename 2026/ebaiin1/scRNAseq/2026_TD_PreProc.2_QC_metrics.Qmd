@@ -515,6 +515,21 @@ rm(scmat)
 
 ```
 
+
+```{r}
+#| label: exploration_sobj
+#| filename: exploration_sobj
+
+dim(sobj)
+Project(sobj)
+Assays(sobj)
+DefaultAssay(sobj)
+Layers(sobj[["RNA"]])
+head(Cells(sobj))
+head(Features(sobj))
+```
+
+
 We define a nice palette to visualize the QC metrics:
 
 ```{r}
@@ -618,6 +633,15 @@ summary(sobj@meta.data)
 We compute the percentage of UMI related to each of the three list of genes.
 
 First, we compute the proportion of transcripts related to mitochondrial genes, per cell.
+
+```{r}
+#| label: PercentageFeatureSet
+#| filename: PercentageFeatureSet
+
+?Seurat::PercentageFeatureSet
+```
+
+<br>
 
 ```{r}
 #| label: percent_mt
