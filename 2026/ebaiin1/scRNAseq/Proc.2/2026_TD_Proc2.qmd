@@ -38,23 +38,27 @@ format:
     code-annotations: hover  ## For code annotation, show values in mouseover
     html-table-processing: none  ## Do not apply Quarto-specific rendering schemes for HTML tables
     echo: true
-    eval: false
+    eval: true
     fig-align: center
 filters: 
- - ../Quarto_template_2026/foldablecodeblock.lua  ## LUA code for foldable code output
+ - ../Resources/foldablecodeblock.lua  ## LUA code for foldable code output
 ---
 
 <!-- ADDITIONAL CODES / HACKS -->
 
 <!-- CSS code to center the QMD title -->
+
+```{=html}
 <style>
 #title-block-header .title {
   text-align: center;
 }
 </style>
-
+```
 
 <!-- CSS code to center the imported images -->
+
+```{=html}
 <style>
 .center-image {
   display: block;
@@ -62,18 +66,20 @@ filters:
   margin-right: auto;
 }
 </style>
-
+```
 
 <!-- CSS code to displace the clipboard copy button slightly to the left so that it does not overlap code annotations -->
+
+```{=html}
 <style>
 .code-with-filename .code-copy-button {
   right: 2.5rem !important;
 }
 </style>
-
-
+```
 
 <!-- HTML code to force table borders -->
+
 ```{=html}
 <style>
 td, th {
@@ -89,7 +95,7 @@ td, th {
 
 ------------------------------------------------------------------------
 
-<center>![](eb3i_banner.png)</center>
+<center>![](../Resources/eb3i_banner.png)</center>
 
 ------------------------------------------------------------------------
 
@@ -115,15 +121,28 @@ This file describes the different steps to perform **fifth** part of the data pr
 
 # Start Rstudio
 
--   Using the [OpenOnDemand/Rstudio cheat
-    sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html),
-    connect to the [OpenOnDemand
-    portal](https://ondemand.cluster.france-bioinformatique.fr) and
-    **create a Rstudio session** with the right resource requirements.
+-   Using the [OpenOnDemand/Rstudio cheat sheet](https://moodle.france-bioinformatique.fr/pluginfile.php/1475/mod_folder/content/0/OoD_R_Rstudio.html), connect to the [OpenOnDemand portal](https://ondemand.cluster.france-bioinformatique.fr) and **create a Rstudio session** with the right resource requirements.
 
 # Warm-up
 
--   We set **common parameters** we will use throughout this session :
+-   Import custom functions needed for our analysis :
+
+```{r source_scripts}
+
+## Name of the script to source
+fetch_script <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/fetch_functions.R"
+
+## Sourcing
+source(file = fetch_script, echo = TRUE)
+
+## Name of the script to source
+save_script <- "/shared/projects/2621_eb3in1_2026/atelier_scrnaseq/SOURCES/save_step.R"
+
+## Sourcing
+source(file = save_script, echo = TRUE)
+```
+
+-   We set common parameters we will use throughout this session :
 
 ```{r setparam}
 # setparam
@@ -140,9 +159,7 @@ cat('PATH CHECK : ', dir.exists(paste0('/shared/projects/', project_name)))
 ## Seed for the RNG
 my_seed <- 1337L
 
-## Known marker genes for TD3A
 td3a_markers <- c("Apoe", "Birc5", "Plac8", "Itm2a", "Ptcra", "Trbv29", "Isg15", "Cldn10")
-
 ```
 
 ------------------------------------------------------------------------
@@ -151,64 +168,38 @@ td3a_markers <- c("Apoe", "Birc5", "Plac8", "Itm2a", "Ptcra", "Trbv29", "Isg15",
 
 # Prepare the data structure
 
-We will do the same as for former steps, just changing the session name
-:
+We will do the same as for former steps, just changing the session name :
 
 ## Main directory
 
-```{r maindir, fold.output = FALSE}
+```{r maindir}
 #maindir
 
-## Preparing the path
-TD_dir <- paste0("/shared/projects/", project_name, "/SC_TD")
+## PROJECT directory path
+project_dir <- paste0("/shared/projects/", project_name)
 
-## Creating the root directory
-# dir.create(path = TD_dir, recursive = TRUE)
-
-## Print the root directory on-screen
-print(TD_dir)
-
-```
-
-## Current session
-
-```{r sessiondir, fold.output = FALSE}
-# sessiondir
-
-## Creating the session (Preproc.2) directory
-session_dir <- paste0(TD_dir, "/05_Proc.2")
-dir.create(path = session_dir, recursive = TRUE)
-
-## Print the session directory on-screen
-print(session_dir)
-
-```
-
-## Input directory
-
-```{r indir, fold.output = FALSE}
-#indir
-
-## Creating the INPUT data directory
-input_dir <- paste0(session_dir, "/DATA")
-dir.create(path = input_dir, recursive = TRUE)
-
-## Print the input directory on-screen
-print(input_dir)
-
-```
-
-## Output directory
-
-```{r outdir, fold.output = FALSE}
-#outdir
-
-## Creating the OUTPUT data directory
-output_dir <- paste0(session_dir, "/RESULTS")
-dir.create(path = output_dir, recursive = TRUE)
-
-## Print the output directory on-screen
-print(output_dir)
+## Test on PROJECT directory
+if (dir.exists(project_dir)) {
+  
+  ## TD directory path
+  TD_dir <- paste0(project_dir, "/SC_TD")
+  
+  ## SESSION directory path
+  session_dir <- paste0(TD_dir, "/05_Proc.2")
+  
+  ##INPUT data directory path
+  input_dir <- paste0(session_dir, "/DATA")
+  
+  ## OUTPUT data directory path
+  output_dir <- paste0(session_dir, "/RESULTS")
+  
+  ## Creating the required directores
+  dir.create(path = input_dir, recursive = TRUE, showWarnings = TRUE)
+  dir.create(path = output_dir, recursive = TRUE, showWarnings = TRUE)
+  
+} else {
+  warning("Provided project directory [", project_dir, "] does not exist !")
+}
 
 ```
 
@@ -220,24 +211,34 @@ print(output_dir)
 
 -   We can reload the object we saved at the former step
 
+Where do you want to retrieve your data ?
+
+-   From Zenodo : `force <- TRUE` and `local <- FALSE`
+-   From our local backup ? : `force <- FALSE` and `local <- TRUE`
+-   From your results ? `force <- FALSE` and `local <- FALSE`
+
+```{r which_output}
+force <- FALSE  ## To force a re-download of a Zenodo-hosted backup
+local <- FALSE  ## To force a loading from a local backup
+```
+
+Let's retrieve it !
+
 ```{r dataload}
 ##  dataload
 
-
 ## This is the path to the current EB3I backup
-sessionid <- '2538_eb3i_n1_2025'
+sessionid <- '2621_eb3in1_2026'
 
 
 ## The latest Seurat object saved as RDS (name)
-sobj_file <- "08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4035.RDS"
+
+sobj_file <- "08_TD3A_S5_Scaled.2k_Reg.PCrb_12508.4033.RDS"
 
 ## The latest Seurat object saved as RDS (full path)
 sobj_path <- paste0(TD_dir, 
                     "/04_Proc.1/RESULTS/",
                     sobj_file)
-
-force <- FALSE  ## To force a re-download of a Zenodo-hosted backup
-local <- FALSE  ## To force a loading from a local backup
 
 ## In case of error/lost data : force a reload from a Zenodo backup repository
 if(force) {
@@ -256,7 +257,7 @@ if(force) {
 ## In case of error/lost data : force a reload from a local backup repository
 if(local) {
   sobj_path <- paste0(
-    "/shared/projects/", sessionid, "/atelier_scrnaseq/TD/BACKUP/RDS/",
+    "/shared/projects/", sessionid, "/atelier_scrnaseq/DATA_BACKUP/INTERMEDIATE/",
     sobj_file)
 }
 
@@ -278,16 +279,16 @@ This step originates from the observation that we do not want nor need to charac
     -   For **interpretation**
 
     -   For **computations**
-    
+
 -   Increase the quality of information contained in the data
 
     -   **Enriching** "good" biological **signals**
-    
+
     -   **Discarding noise** / cell-specific signals
 
 There is a **multitude of methods** for dimension reduction
-<center>![](dimred_tree.png)</center>
 
+<center>![](_imgs/dimred_tree.png)</center>
 
 ## Principal Component Analysis (PCA)
 
@@ -316,7 +317,6 @@ The answer is 50 (npcs parameter)
 We will use this default value.
 
 Warning : in some (rare) contexts, this may not be enough !
-
 :::
 
 ::: {.callout-note icon="false" style="background: lightblue"}
@@ -330,21 +330,15 @@ Which data type (ie, which Seurat object layer) will be used to generate the com
 
 Data from the scale.data layer will be used
 
-This is unfortunately not really explicit
-from the `Seurat::RunPCA` help page ! (see the "features"
-part)
+This is unfortunately not really explicit from the `Seurat::RunPCA` help page ! (see the "features" part)
 
-Web search : "which slot is used by RunPCA"
-##"
-When run on a Seurat object without `@scale.data` layer :
+Web search : "which slot is used by RunPCA" \##" When run on a Seurat object without `@scale.data` layer :
 
-```r
+``` r
 "Error in GetAssayData(object, assay.type = assay.type, slot = "scale.data") : 
 Object@scale.data has not been set. Run ScaleData() and then retry."
 ```
-
 :::
-
 
 Perform PCA on our data
 
@@ -360,14 +354,11 @@ sobj <- Seurat::RunPCA(
 
 ```
 
-
 ::: {.callout-note icon="false"}
 ## DESCRIPTION
 
-Please, focus on the "reductions" slot
-`View(sobj)`
-
-::: 
+Please, focus on the "reductions" slot `View(sobj)`
+:::
 
 Visualization of the very first **two components**, with cells coloring according to the estimated **cell cycle phase** :
 
@@ -384,8 +375,95 @@ Seurat::DimPlot(
   ## Data to use
   reduction = 'pca')
 
+## Scatter plot along dimensions
+Seurat::FeaturePlot(
+  object = sobj, 
+  ## First two components
+  dims = c(1,2), 
+  ## Color dots per cell phase groups
+  feature = 'percent_rb', 
+  ## Data to use
+  reduction = 'pca')
+
+Seurat::FeaturePlot(
+  object = sobj, 
+  ## First two components
+  dims = c(4,6), 
+  ## Color dots per cell phase groups
+  feature = 'percent_rb', 
+  ## Data to use
+  reduction = 'pca')
 ```
 
+```{r regressCC}
+
+sobj <- Seurat::ScaleData(
+  sobj,
+  vars.to.regress = c('percent_rb', 'CC_Seurat_SmG2M.Score')
+)
+
+sobj <- Seurat::RunPCA(
+  object = sobj, 
+  assay = 'RNA', 
+  seed.use = my_seed, 
+  verbose = FALSE)
+```
+
+```{r PCAplotregressed}
+# PCAplot
+
+## Scatter plot along dimensions
+Seurat::DimPlot(
+  object = sobj, 
+  ## First two components
+  dims = c(1,2), 
+  ## Color dots per cell phase groups
+  group.by = 'CC_Seurat_Phase', 
+  ## Data to use
+  reduction = 'pca')
+
+## Scatter plot along dimensions
+Seurat::FeaturePlot(
+  object = sobj, 
+  ## First two components
+  dims = c(1,2), 
+  ## Color dots per cell phase groups
+  feature = 'percent_rb', 
+  ## Data to use
+  reduction = 'pca')
+
+Seurat::FeaturePlot(
+  object = sobj, 
+  ## First two components
+  dims = c(4,6), 
+  ## Color dots per cell phase groups
+  feature = 'percent_rb', 
+  ## Data to use
+  reduction = 'pca')
+```
+
+```{r saverds0, fold.output = FALSE}
+# saverds0
+
+## Save our Seurat object (rich naming)
+out_name <- paste0(
+          output_dir, "/", paste(
+            c("08bis", Seurat::Project(sobj), "S5", 
+              "Scaled.2k_Reg.PCrbCC", paste(
+                dim(sobj), 
+                collapse = '.'
+              )
+            ), collapse = "_"),
+            ".RDS")
+
+## Check
+print(out_name)
+
+## Write on disk
+saveRDS(object = sobj, 
+        file = out_name)
+
+```
 
 ## Questions
 
@@ -401,8 +479,7 @@ Give us your interpretation / feelings from this plot !
 Should we limit ourselves to using 2 dimensions to interpret our data ?
 :::
 
-
--   Maybe we shoud **reduce** information a tad **more**, just for the sake of ... 
+-   Maybe we shoud **reduce** information a tad **more**, just for the sake of ...
 
     -   ... understanding our data ...
 
@@ -423,7 +500,6 @@ Should we limit ourselves to using 2 dimensions to interpret our data ?
 ##
 ```
 
-
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -437,15 +513,14 @@ We will use the [**UMAP**](https://en.wikipedia.org/wiki/UMAP){target="_blank"} 
 ## Uniform Manifold Approximation and Projection (UMAP)
 
 ::: {.callout-important icon="false" style="background: pink"}
-## How ? 
+## How ?
 
 `?Seurat::RunUMAP()`
-
-::: 
+:::
 
 ### Select dimensions
 
-We generated **50 PCA components** from our ~12 K features
+We generated **50 PCA components** from our \~12 K features
 
 -   These 50 dimensions may **not all** contain **valuable** information
 
@@ -453,7 +528,7 @@ We generated **50 PCA components** from our ~12 K features
 
 -   But **how many** should we keep ?
 
--   **Question** : 
+-   **Question** :
 
     ::: {.callout-note icon="false" style="background: lightblue"}
     ## QUESTION 5
@@ -465,14 +540,11 @@ We generated **50 PCA components** from our ~12 K features
     ## ANSWER 5
 
     Impossible to guess with our current knowledge.
-    
+
     But we can get some help from the PCA data itself
-    
-    If you said a value above the 50 components we generated for our PCA, you should wear the
-    cone of shame !
 
+    If you said a value above the 50 components we generated for our PCA, you should wear the cone of shame !
     :::
-
 
 There are **several** methods to help us choose.
 
@@ -480,15 +552,13 @@ Several, but **none perfect**.
 
 We will use a very **simple, graphical** method : the observation of the amount of global variance explained by each component, through the `elbow-plot`.
 
-
-<center>![](elbow_knee_ELBOW.png)</center>
+<center>![](_imgs/elbow_knee_ELBOW.png)</center>
 
 ::: {.callout-important icon="false" style="background: pink"}
-## How ? 
+## How ?
 
 `?Seurat::ElbowPlot()`
-::: 
-
+:::
 
 Apply on our data :
 
@@ -503,9 +573,7 @@ Seurat::ElbowPlot(
 
 ```
 
-
-
-**Question** : 
+**Question** :
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 6
@@ -516,27 +584,24 @@ Any more precise idea, now ?
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 6
 
-The contribution to the variance (sd²) seems
-greatly reduced after 30 PCs.
+The contribution to the variance (sd²) seems greatly reduced after 30 PCs.
 
-Maybe something between ~15 and ~30 should do
-the trick ?
-
+Maybe something between \~15 and \~30 should do the trick ?
 :::
 
 ### Assess dimensions
 
 To demonstrate the **effect** of the number of PC dimensions used as input to the UMAP generation, we will perform a comparison using `6` different amounts of retained PCs :
 
+<CENTER>
 
-<CENTER>**TeAmWoRk TiMe !**
+**TeAmWoRk TiMe !**
 
-![](a2mibleufraise50.jpg)
+![](_imgs/a2mibleufraise50.jpg)
+
 </CENTER>
 
-
-We will dispatch the assessment of each amount of dimensions to groups 
-of trainees.
+We will dispatch the assessment of each amount of dimensions to groups of trainees.
 
 ```{r dim_sel, fig.width = 24, fig.height = 12}
 # dim_sel
@@ -582,8 +647,6 @@ patchwork::wrap_plots(pca_eval_res, nrow = 2)
 
 ```
 
-
-
 **Question**
 
 ::: {.callout-note icon="false" style="background: lightblue"}
@@ -595,21 +658,14 @@ Any more precise idea, now, FOR REAL ?
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 7
 
-A limited amount of PCs is not able to capture
-enough information (variation) to build a sufficiently defined topology.
+A limited amount of PCs is not able to capture enough information (variation) to build a sufficiently defined topology.
 
-The differences in the global topology is
-is quite limited between the higher PCs versions.
+The differences in the global topology is is quite limited between the higher PCs versions.
 
-This may imply that the additional
-components above 20~25 do not add more 
-information (neither more noise, in this case).
-
+This may imply that the additional components above 20\~25 do not add more information (neither more noise, in this case).
 :::
 
 We can now perform the final UMAP with the PC dimensions of your choice.
-
-
 
 ### Create the UMAP
 
@@ -637,8 +693,6 @@ print(umap2d)
 
 ```
 
-
-
 ## Bonus : 3D UMAP (DEMO)
 
 While by default `Seurat::RunUMAP` will produce 2-dimension reductions, the method can generate further components.
@@ -647,7 +701,7 @@ Despite our limited brain, this is sometimes interesting and useful to attempt a
 
 We can generate a UMAP with 3 components, from the 20 PCs :
 
-::: {.callout-important icon="false" style="background: pink"}
+::::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
 ```{r eval=FALSE}
@@ -679,7 +733,7 @@ print(umap3d)
 
 ```
 
-**Question** : 
+**Question** :
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 8
@@ -690,13 +744,9 @@ Isn't there something striking ?
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 8
 
-The plot is not the same as when
-using 25 PCs when requesting 3 UMAP
-components instead of 2 !
+The plot is not the same as when using 25 PCs when requesting 3 UMAP components instead of 2 !
 
-The 2 components of a 2D UMAP are not
-the same as the two first components
-of a dim>2 UMAP.
+The 2 components of a 2D UMAP are not the same as the two first components of a dim\>2 UMAP.
 :::
 
 ```{r eval=FALSE}
@@ -731,41 +781,27 @@ rm(sobj_U3D)
 
 ```
 
-<center>![](td3a_umap3d.png)</center>
-
-:::
-
+<center>![](_imgs/td3a_umap3d.png)</center>
+:::::
 
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
-
-
 
 # Save the Seurat object
 
-We will save our Seurat object that now contains PCA and UMAP reductions  :
+We will save our Seurat object that now contains PCA and UMAP reductions :
 
 ```{r saverds1, fold.output = FALSE}
 # saverds1
 
 ## Save our Seurat object (rich naming)
-out_name <- paste0(
-          output_dir, "/", paste(
-            c("09", Seurat::Project(sobj), "S5", 
-              "DimRed.PCA", paste(
-                dim(sobj), 
-                collapse = '.'
-              )
-            ), collapse = "_"),
-            ".RDS")
-
-## Check
-print(out_name)
-
-## Write on disk
-saveRDS(object = sobj, 
-        file = out_name)
+save_step(
+  object = sobj, 
+  step_number = 10, 
+  step_name = "DimRed.PCA", 
+  output_dir = output_dir
+)
 
 ```
 
@@ -777,41 +813,29 @@ saveRDS(object = sobj,
 
 We can now attempt to determine how cells **are organized** in an **unsupervised** manner in this space
 
-We will use the graph-based clustering method [Louvain](https://en.wikipedia.org/wiki/Louvain_method){target="_blank"}
+We will use the graph-based clustering method [Leiden](https://en.wikipedia.org/wiki/Leiden_algorithm)
 
-Clustering will be performed on the **`PCA`** dimension reduction, 
-**NOT** on the `UMAP` one !
+Clustering will be performed on the **`PCA`** dimension reduction, **NOT** on the `UMAP` one !
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 9
 
 Any idea why ?
-
 :::
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 9
 
-UMAP is a strong APPROXIMATION of the multidimensional space
-which single purpose is to HELP us understand more easily the
-hidden structure of our dataset.
+UMAP is a strong APPROXIMATION of the multidimensional space which single purpose is to HELP us understand more easily the hidden structure of our dataset.
 
-The PCA component (or any reduction method used directly from our
-normalized/scaled data, like MDS or ICA, ...) contains the "real" 
-information, just distributed differently.
+The PCA component (or any reduction method used directly from our normalized/scaled data, like MDS or ICA, ...) contains the "real" information, just distributed differently.
 
-If one uses the "second reduced space" used for visualization (UMAP,
-tSNE, DM, ...) as the basis for clustering, one may obtain pretty plots
-with well-defined clusters. The latter being based on wrong data, thus
-leading to wrong interpretation `:(`
-
+If one uses the "second reduced space" used for visualization (UMAP, tSNE, DM, ...) as the basis for clustering, one may obtain pretty plots with well-defined clusters. The latter being based on wrong data, thus leading to wrong interpretation `:(`
 :::
-
-
 
 ## Find neighbors
 
-Before running the Louvain method, a first pass method is used to generate a "K-Nearest Neighbour" graph (see more details [here](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html){target="_blank"}).
+Before running the Leiden method, a first pass method is used to generate a "K-Nearest Neighbour" graph (see more details [here](https://satijalab.org/seurat/articles/pbmc3k_tutorial.html){target="_blank"}).
 
 ```{r fnn20}
 # fnn20
@@ -824,37 +848,38 @@ sobj <- Seurat::FindNeighbors(
 
 ```
 
-## Louvain clustering
+## Leiden clustering
 
 -   We will test multiple different resolutions
 
--   The Seurat function to perform clustering can be called with 
-    multiple resolutions at once (less to code, lucky us !).
-    
+-   The Seurat function to perform clustering can be called with multiple resolutions at once (less to code, lucky us !).
 
-<CENTER>**TeAmWoRk TiMe !**
+<CENTER>
 
-![](a2mibleufraise50.jpg)
+**TeAmWoRk TiMe !**
+
+![](_imgs/a2mibleufraise50.jpg)
+
 </CENTER>
-
 
 We wil dispatch the different clustering resolution values to groups of trainees.
 
 ```{r clustL20}
 # clustL20
 
-## Louvain resolutions to test
+## Leiden resolutions to test
 resol <- c(.3, .6, .9, 1.2, 1.5, 1.8)
+resol <- seq(from = 0.2, to = 1.8, by = 0.2)
 
 ## Clustering
 sobj <- Seurat::FindClusters(
   object = sobj, 
   resolution = resol,
+  algorithm = 4,             #choose leiden algorithm
+  random.seed = my_seed,
   verbose = FALSE)
 
 ```
-
-
 
 **Question**
 
@@ -862,23 +887,15 @@ sobj <- Seurat::FindClusters(
 ## QUESTION 10
 
 Could you tell us what changed in our object ?
-
 :::
 
 ::: {.callout-note icon="false" collapse="true" style="background: lightgreen"}
 ## ANSWER 10
 
-New entries in the barcodes metadata :
-The results of our clusterings
-'seurat_clusters' which corresponds to the 
-last version we ran
+New entries in the barcodes metadata : The results of our clusterings 'seurat_clusters' which corresponds to the last version we ran
 
-This 'seurat_clusters' annotation will be the
-one used by default by Seurat for any further
-analysis
-
+This 'seurat_clusters' annotation will be the one used by default by Seurat for any further analysis
 :::
-
 
 ## Assess resolutions
 
@@ -904,24 +921,19 @@ Seurat::DimPlot(
 
 ```
 
-
-
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 11
 
-- Could you briefly compare the different versions ?
-- Would you consider that some results are under/over-clustered ?
-- Are all clusters well-defined ?
-
+-   Could you briefly compare the different versions ?
+-   Would you consider that some results are under/over-clustered ?
+-   Are all clusters well-defined ?
 :::
 
-
-
 -   Something that might help (a bit) : `splitting` the clustering results :
-    
+
     ```{r clust_dimplot_split, fig.width=18, fig.height=4}
     # clust_dimplot_split
-    
+
     ## Looping on resolutions
     for (my_grp in resol_names) {
       ## DimPlot
@@ -935,29 +947,27 @@ Seurat::DimPlot(
       print(p)
     }
     ```
-    
 
+-   Something other : assessing clusters **stability** across resolutions, thanks to `clustree` (DEMO) :
 
--   Something other : assessing clusters **stability** across resolutions,
-    thanks to `clustree` (DEMO) :
-    
     ::: {.callout-important icon="false" style="background: pink"}
     ## DEMO
 
     ```{r eval=FALSE}
     # clustree_demo
-    
+
     ## Full loading of clustree is needed here...
     library(clustree)
-    
+
     ## Running clustree
-    clustree::clustree(x = sobj, prefix = 'RNA_snn_res.')
-    
+    clustree::clustree(
+      x = sobj,
+      prefix = 'RNA_snn_res.')
+
     ## Unloading the clustree package
     detach('package:clustree', unload = TRUE)
-    
-    ```
 
+    ```
     :::
 
 #### Cell-type markers
@@ -972,10 +982,7 @@ Seurat::FeaturePlot(object = sobj,
                     features = td3a_markers) + 
   patchwork::plot_layout(nrow = 3, 
                          ncol = 3)
-
 ```
-
-
 
 Just for "fun" : what would have been seen on a PCA ? (DEMO)
 
@@ -994,8 +1001,6 @@ Seurat::FeaturePlot(object = sobj,
 ```
 :::
 
-
-
 ### Cluster-specific markers
 
 A practical way to characterize our clustering results is to get back to a level of knowledge you are confident in : marker genes.
@@ -1008,11 +1013,11 @@ Seurat has a handy function to :
 
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
+
 ```{r eval = FALSE}
 ?Seurat::FindAllMarkers
 ```
-::: 
-
+:::
 
 ```{r dhm_prep, fig.width=24, fig.height=8}
 # dhm_prep
@@ -1057,22 +1062,18 @@ patchwork::wrap_plots(fam_all) + patchwork::plot_layout(nrow = 2)
 
 ```
 
-
-
 **Questions** : Comparing the heatmaps :
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 12
 
 Which resolution would you choose, and why ?
-
 :::
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 13
 
 Is there a single one and only answer to the former question ?
-
 :::
 
 ### Clusters contingencies and proportions
@@ -1095,30 +1096,26 @@ for (x in resol_names) {
 }
 
 ```
-
 :::
-
-
-
 
 ## Selection
 
-For the downstream analyses, we will use the resolution **`0.8`**.
+For the downstream analyses, we will use the resolution **`0.6`**.
 
-We will fix the clustering results for this resolution as the default one
-Seurat will use for any further analyses / plots, using the `Seurat::Idents()`
-function.
+We will fix the clustering results for this resolution as the default one Seurat will use for any further analyses / plots, using the `Seurat::Idents()` function.
 
 ```{r sel_res, fig.height=6, fig.width=6}
 # sel_res
 
 ## Fixing l_res
-l_res <- .8
+l_res <- .6
 
-## Performing Louvain clustering at the selected resolution
+## Performing Leiden clustering at the selected resolution
 sobj <- Seurat::FindClusters(
   object = sobj, 
   resolution = l_res,
+  algorithm = 4,
+  random.seed = my_seed,
   verbose = FALSE)
 
 ## Check on default "Idents"
@@ -1138,59 +1135,39 @@ Seurat::DimPlot(
 
 ```
 
-
-
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
-
-
 
 # Save the Seurat object
 
-We will save our Seurat object that now contains our clustering results  :
+We will save our Seurat object that now contains our clustering results :
 
 ```{r saverds2, fold.output = FALSE}
 # saverds2
 
 ## Save our Seurat object (rich naming)
-out_name <- paste0(
-          output_dir, "/", paste(
-            c("10", Seurat::Project(sobj), "S5", 
-              paste0(
-                "Clustered.",
-                l_res), 
-              paste(
-                dim(sobj), 
-                collapse = '.'
-              )
-            ), collapse = "_"),
-            ".RDS")
-
-## Check
-print(out_name)
-
-## Write on disk
-saveRDS(object = sobj, 
-        file = out_name)
+save_step(
+  object = sobj, 
+  step_number = 10, 
+  step_name = paste0("Clustered.", l_res), 
+  output_dir = output_dir
+)
 ```
 
-
-
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
-
-
 
 # Rsession
 
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
+
 ```{r rsession, class.source="notrun", class.output="notruno"}
 # rsession
 
 utils::sessionInfo()
 
 ```
-::: 
+:::
