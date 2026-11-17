@@ -302,16 +302,15 @@ Your directory structure should be like this:
 
 3. Let's see the parameters of bowtie before launching the mapping:
   * -x to specify genome index prefix 
-  * -U to specify file with reads to be mapped
-  * -3 will trim x base from the end of the read. As our last position is of low quality, we'll trim 1 base.
+  * -1 and -2 to specify input fastq files (reads 1 and 2 respectively) with reads to be mapped
   * -S will output the result in SAM format
   * --mm allows many concurrent bowtie processes on the same computer to share the same memory image of the index 
-  * 2> RtrC_ChIP_rep1.out will output some statistics about the mapping in the file RtrC_ChIP_rep1.out
+  * -p to specify the number of threads to use (10 in this case)
 ```{bash eval=FALSE}  
 ## Run alignment
 ## Tip: first type bowtie command line then add quotes around and prefix it with "sbatch --cpus 10 --wrap="
 
-sbatch -p fast -o RtrC_ChIP_rep1.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -3 1 -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_ChIP_rep1_1.fastq.gz -2 ../../data/RtrC_ChIP_rep1_2.fastq.gz -S RtrC_ChIP_rep1.sam"
+sbatch -p fast -o RtrC_ChIP_rep1.mapping.out --cpus-per-task 10 --wrap="bowtie2 -p 10 --mm -x ../index/Caulobacter_CP001340 -1 ../../data/RtrC_ChIP_rep1_1.fastq.gz -2 ../../data/RtrC_ChIP_rep1_2.fastq.gz -S RtrC_ChIP_rep1.sam"
 ```  
 This should take few minutes as we work with a small genome. For the human genome, we would need either more time and more resources.
 
@@ -378,7 +377,6 @@ cd /shared/projects/<your_project>/EBA3I_2026_chipseq/02-Mapping/bam
   * INPUT: input file name to mark for duplicate reads
   * OUTPUT: output file name
   * METRICS: file with duplicates marking statistics
-  * VALIDATION_STRINGENCY: Validation stringency for all SAM files read by picard.
 ```{bash eval=FALSE}
 ## Load picard
 module load picard/2.23.5
@@ -427,7 +425,7 @@ cd 03-ChIPQualityControls
 3. Run Deeptools [plotFingerprint](http://deeptools.readthedocs.io/en/latest/content/tools/plotFingerprint.html) [@ramirez_deeptools2:_2016] to draw the Lorenz curve
   * -b: List of indexed BAM files
   * -plot: File name of the output figure (extension can be either “png”, “eps”, “pdf” or “svg”)
-  * --numberOfSamples: how many regions are used to plot the graph
+  * --numberOfSamples: sample of regions that are used to plot the graph
   * -p: Number of processors to use (2 processors)
 ```{bash eval=FALSE}
 ## Load deeptools in your environment
@@ -435,18 +433,18 @@ module load deeptools/3.5.4
 ## Run deeptools fingerprint
 plotFingerprint \
   -p 2 \
-  --numberOfSamples 10000 \
+  --numberOfSamples 2000 \
   -b ../02-Mapping/bam/Marked_RtrC_ChIP_rep1.bam \
      ../02-Mapping/bam/Marked_RtrC_ChIP_rep2.bam \
      ../02-Mapping/bam/Marked_RtrC_input_rep1.bam \
      ../02-Mapping/bam/Marked_RtrC_input_rep2.bam \
-  -plot fingerprint_10000.png
+  -plot fingerprint_2000.png
 ```
 4. If plotFingerprint takes to much time to run. Take the file that has already been prepared for the training.
 ```{bash eval=FALSE}
-cp /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/EBA3I_2026_chipseq/03-ChIPQualityControls/fingerprint_10000.png .
+cp /shared/projects/2621_eb3in1_2026/atelier_chipseq/training/EBA3I_2026_chipseq/03-ChIPQualityControls/fingerprint_2000.png .
 ```
-5. Go find the file using the directory tree on the left of the Jupyterlab panel and click on the fingerprint_10000.png file to display it in Jupyterlab.
+5. Go find the file using the directory tree on the left of the Jupyterlab panel and click on the fingerprint_2000.png file to display it in Jupyterlab.
 
 **Look at the result files fingerprint.png (add the plot to this report). Give an explanation of the curves?**  
 
