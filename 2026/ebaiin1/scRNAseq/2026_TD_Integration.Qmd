@@ -152,7 +152,7 @@ Once connected, the application to select is **Rstudio Server: Core**.
 To create and/or join an Rstudio Server App, one can use the documentation [here](https://doc.cluster.france-bioinformatique.fr/software/openondemand/starting_rstudio_server/){target="_blank"}, with some modifications specific in the form to our training session :
 
 -   **R version** : `4.5.2`
--   **Reservation** : `2621_eb3in1_2026`
+-   **Reservation** : `EB3IN1_2026`
 -   **Account** : `2621_eb3in1_2026`
 -   **Number of CPUs** : `2`
 -   **Amount of memory** : `30G`    **Do not forget the "G" !**
@@ -706,6 +706,9 @@ Here we will **assess** the **weight of covariates** on the first PCs, represent
 -   Their absolute **Spearman correlation** score, for continuous covariates (like `percent_mt`, or marker genes expression), or :
 -   The score of a [**Kruskal-Wallis**](https://fr.wikipedia.org/wiki/Test_de_Kruskal-Wallis) statistical test, for categorical covariates (like predicted cell cycle phases, by ex.).
 
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
 ```{r}
 #| label: merge_acov
 #| filename: merge_acov
@@ -765,6 +768,7 @@ cowplot::plot_grid(
 9. Should the function return the weight matrix ?
 10. Should the function return the plot object instead ?
 
+:::
 
 ::: {.callout-note icon="false" style="background: lightblue"}
 ## QUESTION 2
@@ -889,7 +893,7 @@ Let's try !
 
 <br>
 
-::: {.callout-note icon="false" style="background: pink"}
+::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
 Re-processing, this time adding the **sample name** as a **new covariate** to regress :
@@ -956,7 +960,7 @@ The elbow plot does not differ too much : we still keep **20** PCs.
 
 We can observe the remaining weight of covariates after this special regression :
 
-::: {.callout-note icon="false" style="background: pink"}
+::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
 ```{r}
@@ -1003,7 +1007,7 @@ cowplot::plot_grid(
 
 How do our sample pair cells mix up in the PCA space ?
 
-::: {.callout-note icon="false" style="background: pink"}
+::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
 ```{r}
@@ -1033,7 +1037,7 @@ Seurat::DarkTheme()
 
 Same, in the UMAP space :
 
-::: {.callout-note icon="false" style="background: pink"}
+::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
 ```{r}
@@ -1079,13 +1083,16 @@ Give your interpretation of this plot : Do you consider the samples as well inte
 
 Now a bit of cleaning :
 
+::: {.callout-important icon="false" style="background: pink"}
+## DEMO
+
 ```{r}
 #| label: sreg_clean
 #| filename: sreg_clean
 
 rm(TDCT_TD3A_sreg)
 ```
-
+:::
 
 <br>
 
