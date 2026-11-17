@@ -1,0 +1,74 @@
+/* Titre : Remonté tout en haut */
+.title-slide {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 0 5%;
+    box-sizing: border-box;
+}
+
+h1 {
+    margin-top: 0; /* Supprime l'espace au-dessus */
+    text-align: center;
+}
+
+.text {
+    font-size: 2rem;
+}
+
+foreignObject {
+    font-size: 1rem;
+    align-items: center;
+}
+
+/* Taille réduite pour les auteurs */
+.reduced_text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+}
+
+/* Ligne des métadonnées (Auteurs / Date) */
+.meta-row {
+    display: flex;
+    justify-content: space-between; /* Ecarte les colonnes */
+    width: 100%;
+    margin: 0; /* Supprime les marges verticales */
+    align-items: flex-start; /* Alignement en haut (Labels alignés) */
+}
+
+.col-left {
+    text-align: left;
+    flex: 1;
+}
+
+.col-right {
+    text-align: right;
+    padding-top: 0;
+}
+
+/* SEULE LA BALISE LABEL A UNE COULEUR PERSONNALISÉE */
+.label {
+    font-size: 0.85rem;
+    color: #6c757d; /* Couleur personnalisée pour le label */
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Image en bas */
+.image {
+    margin-top: auto; /* Pousse l'image vers le bas */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.image img {
+    max-width: 80%;
+    max-height: 15vh; /* Limite la hauteur de l'image */
+}
+
+svg {
+    background-color: white;
+}

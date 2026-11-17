@@ -1,0 +1,140 @@
+/*-- scss:defaults --*/
+
+// 1. Définition des variables du thème Zephyr
+// Basé sur les fichiers `_variables.scss` fournis
+
+$zephyr-font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$zephyr-font-family-monospace: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+$zephyr-white:    #fff !default;
+$zephyr-black:    #000 !default;
+$zephyr-gray-100: #f8f9fa !default;
+$zephyr-gray-200: #e9ecef !default;
+$zephyr-gray-300: #dee2e6 !default;
+$zephyr-gray-400: #ced4da !default;
+$zephyr-gray-500: #adb5bd !default;
+$zephyr-gray-600: #6c757d !default;
+$zephyr-gray-700: #495057 !default;
+$zephyr-gray-900: #212529 !default;
+
+$zephyr-blue:    #3459e6 !default;
+$zephyr-indigo:  #6610f2 !default;
+$zephyr-purple:  #6f42c1 !default;
+$zephyr-pink:    #d63384 !default;
+$zephyr-red:     #da292e !default;
+$zephyr-orange:  #f8765f !default;
+$zephyr-yellow:  #f4bd61 !default;
+$zephyr-green:   #2fb380 !default;
+$zephyr-teal:    #20c997 !default;
+$zephyr-cyan:    #287bb5 !default;
+
+// Configuration Bootstrap Zephyr
+$primary:       $zephyr-blue !default;
+$secondary:     $zephyr-white !default;
+$success:       $zephyr-green !default;
+$info:          $zephyr-cyan !default;
+$warning:       $zephyr-yellow !default;
+$danger:        $zephyr-red !default;
+$light:         $zephyr-gray-100 !default;
+$dark:          $zephyr-gray-900 !default;
+
+// Typographie et corps
+$body-color:                $zephyr-gray-700 !default;
+$body-bg:                   $zephyr-white !default;
+$headings-color:            var(--bs-primary-color) !default; // Hérite de la variable CSS Bootstrap
+$font-size-base:            1rem !default;
+$line-height-base:          1.5 !default;
+
+// Composants spécifiques Zephyr (Ombres douces, Bords arrondis)
+$box-shadow:                0 1px 2px rgba($zephyr-black, .05) !default;
+$box-shadow-lg:             0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06) !default;
+$border-radius:             0.375rem !default;
+
+// Police Import
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/*-- scss:rules --*/
+
+/* 2. Application des règles de style au thème Reveal.js */
+
+.reveal {
+  font-family: $zephyr-font-family-sans-serif;
+  color: $body-color;
+  background-color: $body-bg;
+
+  /* --- Titres --- */
+  h1, h2, h3, h4, h5, h6 {
+    color: $headings-color;
+    font-weight: 700;
+    margin-bottom: 0.5em;
+    text-transform: none; /* Zephyr utilise une police sans-serif moderne */
+  }
+
+  /* --- Code (Zephyr style) --- */
+  pre {
+    background-color: $zephyr-gray-100;
+    border: 1px solid $zephyr-gray-300;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    padding: 1em;
+    
+    code {
+      font-family: $zephyr-font-family-monospace;
+      color: $zephyr-gray-900;
+      background-color: transparent;
+    }
+  }
+
+  /* --- Blocs Citation / Aside --- */
+  aside {
+    background-color: $zephyr-gray-100;
+    border-left: 4px solid $primary;
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: $border-radius;
+  }
+
+  /* --- Tables (Style doux de Zephyr) --- */
+  table {
+    box-shadow: $box-shadow-lg;
+    border-collapse: collapse;
+    width: 100%;
+    
+    th, td {
+      border: 1px solid $zephyr-gray-300;
+      padding: 1rem;
+    }
+    th {
+      background-color: $zephyr-gray-100;
+      font-weight: 600;
+    }
+  }
+
+  /* --- Boutons (Si utilisés dans le HTML) --- */
+  .button {
+    background-color: $primary;
+    color: white;
+    border: none;
+    border-radius: $border-radius;
+    padding: 0.5em 1em;
+    font-weight: 600;
+    box-shadow: $box-shadow;
+    
+    &:hover {
+      background-color: darken($primary, 10%);
+      box-shadow: $box-shadow-lg;
+    }
+  }
+  
+  /* --- Images --- */
+  img {
+    border-radius: $border-radius;
+    box-shadow: $box-shadow-lg;
+  }
+}
+
+/* Surcharge du thème par défaut pour le titre de slide */
+.title-slide h1 {
+  font-size: 2.5em;
+  color: $primary;
+}

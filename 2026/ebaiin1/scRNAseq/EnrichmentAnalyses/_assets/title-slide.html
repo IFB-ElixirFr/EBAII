@@ -1,0 +1,63 @@
+<section class="title-slide" data-state="title-slide">
+    <!-- 1. TITRE EN HAUT -->
+    <div class="title-header">
+        <!-- Utilisez $title$ pour le texte simple, ou {{{ title }}} pour conserver les balises HTML du titre -->
+        $title$
+    </div>
+
+    <!-- 2. AUTEURS (GAUCHE) ET DATE (DROITE) -->
+    <div class="meta-row">
+        
+        <!-- Colonne Auteurs (Gauche) -->
+        <div class="col-left">
+            <span class="label">Authors</span>
+            <div class="quarto-title-authors">
+                $for(by-author)$
+                <div class="quarto-title-author">
+                    <div class="quarto-title-author-name">
+                        <div class="reduced_text">
+                            $by-author.name.literal$
+                            $if(by-author.email)$
+                                <a href="mailto:$by-author.email$" style="text-decoration: none; margin-left: 5px; vertical-align: middle;">✉</a>
+                            $endif$
+                        </div>
+                    </div>
+                    $if(by-author.affiliations)$
+                        $for(by-author.affiliations)$
+                        <p class="quarto-title-affiliation">
+                          $if(it.url)$
+                          <a href="$it.url$">
+                          $endif$
+                          $it.name$
+                          $if(it.url)$
+                          </a>
+                          $endif$
+                        </p>
+                        $endfor$
+                    $endif$
+                </div>
+              $endfor$
+            </div>
+        </div>
+
+        <!-- Colonne Date (Droite) -->
+        <div class="col-right">
+            <span class="label">Published</span>
+            <br>
+            <div class="reduced_text">
+                <span class="date">$date$</span>
+            </div>
+        </div>
+        
+    </div>
+
+    <hr>
+    <hr>
+
+    <!-- 3. IMAGE EN BAS -->
+    <div class="image">
+        <img src="_imgs/eb3i_banner.png">
+    </div>
+    <hr>
+    <hr>
+</section>
