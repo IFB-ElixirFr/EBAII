@@ -182,7 +182,7 @@ First, **your** project name :
 #| label: setparam_projname
 #| filename: setparam_projname
 
-## Setting the project name. DO NOT COPY-PASTE ! USER YOURS !!
+## Setting the project name. DO NOT COPY-PASTE ! USE YOURS !!
 project_name <- "ebaii_sc_teachers"  # <1>
 ```
 
