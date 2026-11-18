@@ -17,7 +17,7 @@ format:
     number-sections: true  ## Adds number to headers (sections)
     embed-resources: true  ## Make a self-contained HTML
     anchor-sections: true  ## Create HTML anchors for all section titles
-    theme: flatly  ## CSS theme for the HTML page
+    theme: zephyr  ## CSS theme for the HTML page
     syntax-highlighting: tango  ## Theme for the code chunks
     toc: true  ## Add a table of content
     toc-location: left  ## Position of TOC on the left side
@@ -118,6 +118,25 @@ This file describes the different steps to perform **fifth** part of the data pr
 ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+
+# What to run ? {#what-to-run}
+
+You are **not intended** to run all of the chunks. We use a **color code**:
+
+| What you see | What it means |
+|:-----------------------------------|:-----------------------------------|
+| A regular code chunk | **Run it** |
+| A [**lightblue**]{style="color:lightblue"} "QUESTION" callout | Think about it before unfolding the answer |
+| A [**lightgreen**]{style="color:lightgreen"} "ANSWER" callout | Folded by default |
+| A [**yellow**]{style="color:yellow"} / [**orange**]{style="color:orange"} "OPTIONAL" callout | Extra content if you are ahead, not supported during the session |
+| A [**pink**]{style="color:pink"} "DEMO" callout | Shown by the teacher, **do not run** |
+
+<br>
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
 
 # Start Rstudio
 
@@ -704,7 +723,7 @@ We can generate a UMAP with 3 components, from the 20 PCs :
 ::::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
-```{r eval=FALSE}
+```{r}
 # umap3D20
 
 ## UMAP from 20 PCs, 3 components requested
@@ -721,7 +740,7 @@ sobj_U3D <- Seurat::RunUMAP(
 
 We can plot the two first UMAP components from this 3D space :
 
-```{r eval=FALSE}
+```{r}
 # plot_umap3D20
 
 ## DimPlot of the first 2 UMAP components
@@ -749,7 +768,7 @@ The plot is not the same as when using 25 PCs when requesting 3 UMAP components 
 The 2 components of a 2D UMAP are not the same as the two first components of a dim\>2 UMAP.
 :::
 
-```{r eval=FALSE}
+```{r }
 # umapXd
 
 patchwork::wrap_plots(
@@ -762,7 +781,7 @@ patchwork::wrap_plots(
 
 Let's perform a 3D representation of our UMAP (PRE-RENDERED)
 
-```{r eval=FALSE}
+```{r }
 # umap3D20rgl
 
 ## 3D plot (not run as failing in interactive mode)
@@ -953,7 +972,7 @@ Seurat::DimPlot(
     ::: {.callout-important icon="false" style="background: pink"}
     ## DEMO
 
-    ```{r eval=FALSE}
+    ```{r }
     # clustree_demo
 
     ## Full loading of clustree is needed here...
@@ -989,7 +1008,7 @@ Just for "fun" : what would have been seen on a PCA ? (DEMO)
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
-```{r eval=FALSE}
+```{r }
 # u_markers_pca
 
 ## Multiple FeaturePlots with markers
@@ -1083,7 +1102,7 @@ One can observe how many cells are in each cluster, and what proportion of all c
 ::: {.callout-important icon="false" style="background: pink"}
 ## DEMO
 
-```{r eval=FALSE}
+```{r}
 # clustpop
 
 ## Looping on resolutions
